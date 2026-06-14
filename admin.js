@@ -240,6 +240,8 @@
     status: $('f-status'), sort: $('f-sort'), published: $('f-published'), github: $('f-github')
   };
 
+  let isDirty = false;
+
   function openEditor(id) {
     const p = id ? cache.find(x => String(x.id) === String(id)) : null;
     $('modal-title').textContent = p ? `Edit ${p.code}` : 'New Project';
@@ -280,9 +282,16 @@
     msg($('form-msg'), '');
     $('modal-bg').classList.remove('hidden');
     F.code.focus();
+    isDirty = false;
   }
 
-  function closeEditor() { $('modal-bg').classList.add('hidden'); }
+  function closeEditor() {
+    if (isDirty) {
+      if (!confirm("You have unsaved changes. Are you sure you want to discard them?")) return;
+    }
+    $('modal-bg').classList.add('hidden');
+    isDirty = false;
+  }
 
   $('new-btn').addEventListener('click', () => openEditor(null));
   $('cancel-btn').addEventListener('click', closeEditor);
@@ -318,6 +327,7 @@
     }
     btn.disabled = false;
     if (error) { msg($('form-msg'), error.message, 'err'); return; }
+    isDirty = false;
     closeEditor();
     loadProjects();
   });
@@ -360,8 +370,8 @@
   // Live Previews
   Object.values(F).forEach(el => {
     if (el && el.tagName !== 'BUTTON' && el.tagName !== 'INPUT' || el.type !== 'hidden') {
-      el.addEventListener('input', updatePreviews);
-      el.addEventListener('change', updatePreviews);
+      el.addEventListener('input', () => { updatePreviews(); isDirty = true; });
+      el.addEventListener('change', () => { updatePreviews(); isDirty = true; });
     }
   });
 
@@ -441,6 +451,7 @@
     if (!confirm('Delete ' + (F.code.value || 'this project') + '? This cannot be undone.')) return;
     const { error } = await db.from('projects').delete().eq('id', F.id.value);
     if (error) { msg($('form-msg'), error.message, 'err'); return; }
+    isDirty = false;
     closeEditor();
     loadProjects();
   });
