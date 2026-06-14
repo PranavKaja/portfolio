@@ -318,6 +318,7 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
   padding: 14px 18px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.03);
   transition: transform 0.2s, box-shadow .2s, border-color .2s, opacity .2s;
+  cursor: pointer;
 }
 .proj-card:hover {
   transform: translateY(-2px);
@@ -334,7 +335,6 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
 .pc-code { font-family: 'Share Tech Mono', monospace; color: var(--accent); font-size: 0.78rem; min-width: 64px; }
 .pc-title { font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pc-tech { color: var(--text-muted); font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; white-space: nowrap; }
-.pc-edit { padding: 5px 12px; font-size: 0.72rem; flex: none; }
 .pc-hidden { color: var(--text-muted); font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 1px; text-transform: uppercase; }
 .proj-card .badge { flex: none; }
 .view-hint { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px; }

@@ -168,10 +168,14 @@
         <span class="pc-tech">${esc(p.tech || '')}</span>
         ${p.published ? '' : '<span class="pc-hidden">hidden</span>'}
         <span class="badge badge--${esc(p.status)}">${esc(STATUS_LABEL[p.status] || p.status)}</span>
-        <button class="pc-edit" data-edit="${esc(p.id)}">Edit</button>
       </div>`).join('');
-    el.querySelectorAll('[data-edit]').forEach(b =>
-      b.addEventListener('click', e => { e.stopPropagation(); openEditor(b.getAttribute('data-edit')); }));
+    el.querySelectorAll('.proj-card').forEach(card => {
+      card.addEventListener('click', e => { 
+        if (!e.target.classList.contains('pc-handle')) {
+          openEditor(card.getAttribute('data-id')); 
+        }
+      });
+    });
     wireDnd(el);
   }
 
