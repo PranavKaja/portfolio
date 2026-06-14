@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Ops Console</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="wrap">
+
+        <!-- shown when config.js has no Supabase credentials -->
+        <div id="unconfigured" class="banner hidden">
+            ⚠ Supabase isn't configured yet. Add your <code>SUPABASE_URL</code> and
+            <code>SUPABASE_ANON_KEY</code> in <code>config.js</code>, then reload. See <code>SETUP.md</code>.
+        </div>
+
+        <!-- LOGIN VIEW -->
+        <section id="login-view" class="hidden">
+            <div class="login-box">
+                <div class="console-label">// RESTRICTED</div>
+                <h1>OPS CONSOLE</h1>
+                <p class="sub">Authenticate to manage mission records.</p>
+                <form id="login-form">
+                    <label class="field">
+                        <span>Operator Email</span>
+                        <input type="email" id="login-email" autocomplete="username" required>
+                    </label>
+                    <label class="field">
+                        <span>Passphrase</span>
+                        <input type="password" id="login-password" autocomplete="current-password" required>
+                    </label>
+                    <button type="submit" class="primary" id="login-btn" style="width:100%">Authenticate</button>
+                    <div class="msg" id="login-msg"></div>
+                </form>
+            </div>
+        </section>
+
+        <!-- CONSOLE VIEW -->
+        <section id="console-view" class="hidden">
+            <div class="console-head">
+                <div class="console-label">// OPS CONSOLE</div>
+                <h1>Mission Control</h1>
+                <div class="spacer"></div>
+                <span class="console-label" id="who"></span>
+                <button class="ghost" id="signout-btn">Sign out</button>
+            </div>
+
+            <div class="tabbar">
+                <button class="tab active" data-tab="projects">Projects</button>
+                <button class="tab" data-tab="transmissions">Transmissions<span id="tx-unread" class="tab-badge hidden"></span></button>
+            </div>
+
+            <!-- PROJECTS PANEL -->
+            <div id="panel-projects">
+                <div class="row" style="margin-bottom:18px">
+                    <button class="primary" id="new-btn">+ New Project</button>
+                    <button class="ghost" id="refresh-btn">Refresh</button>
+                    <div class="spacer"></div>
+                    <span class="console-label" id="count"></span>
+                </div>
+
+                <div class="msg" id="console-msg"></div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:84px">Code</th>
+                            <th>Title</th>
+                            <th style="width:120px">Status</th>
+                            <th style="width:70px">Order</th>
+                            <th style="width:80px">Public</th>
+                            <th style="width:150px">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rows"></tbody>
+                </table>
+                <div class="empty hidden" id="empty">// NO MISSION RECORDS</div>
+            </div>
+
+            <!-- TRANSMISSIONS PANEL -->
+            <div id="panel-transmissions" class="hidden">
+                <div class="row" style="margin-bottom:18px">
+                    <button class="ghost" id="tx-refresh-btn">Refresh</button>
+                    <button class="ghost" id="tx-unread-btn">Unread only</button>
+                    <div class="spacer"></div>
+                    <span class="console-label" id="tx-count"></span>
+                </div>
+                <div class="msg" id="tx-console-msg"></div>
+                <div id="tx-list"></div>
+                <div class="empty hidden" id="tx-empty">// NO TRANSMISSIONS</div>
+            </div>
+        </section>
+    </div>
+
+    <!-- EDITOR MODAL -->
+    <div id="modal-bg" class="modal-bg hidden">
+        <div class="modal">
+            <h2 id="modal-title">New Project</h2>
+            <form id="project-form">
+                <input type="hidden" id="f-id">
+                <div class="grid2">
+                    <label class="field"><span>Code (e.g. MSN-10)</span><input type="text" id="f-code" required></label>
+                    <label class="field"><span>Title</span><input type="text" id="f-title" required></label>
+                    <label class="field"><span>Card stack (tech)</span><input type="text" id="f-tech"></label>
+                    <label class="field"><span>Full stack (overlay)</span><input type="text" id="f-stack"></label>
+                </div>
+                <label class="field"><span>Card one-liner (summary)</span><input type="text" id="f-summary"></label>
+                <label class="field"><span>Hook</span><input type="text" id="f-hook"></label>
+                <label class="field"><span>Brief</span><textarea id="f-brief"></textarea></label>
+                <div class="grid2">
+                    <label class="field"><span>Role</span><input type="text" id="f-role"></label>
+                    <label class="field"><span>Method</span><input type="text" id="f-method"></label>
+                </div>
+                <label class="field"><span>Outcome</span><input type="text" id="f-outcome"></label>
+                <label class="field"><span>Chips (one per line)</span><textarea id="f-chips" placeholder="0.978 AUC&#10;84% Recall"></textarea></label>
+                <div class="grid2">
+                    <label class="field"><span>Status</span>
+                        <select id="f-status">
+                            <option value="deployed">Deployed</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="archived">Archived</option>
+                            <option value="classified">Classified</option>
+                        </select>
+                    </label>
+                    <label class="field"><span>Sort order</span><input type="number" id="f-sort" value="100"></label>
+                </div>
+                <label class="field row" style="gap:8px;align-items:center">
+                    <input type="checkbox" id="f-published" checked style="width:auto">
+                    <span style="margin:0">Published (visible on the live site)</span>
+                </label>
+                <div class="msg" id="form-msg"></div>
+                <div class="modal-actions">
+                    <button type="submit" class="primary" id="save-btn">Save</button>
+                    <button type="button" class="ghost" id="cancel-btn">Cancel</button>
+                    <div class="spacer"></div>
+                    <button type="button" class="danger hidden" id="delete-btn">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
+</body>
+
+</html>

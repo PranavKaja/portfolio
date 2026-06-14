@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interests // PRANAV KAJA</title>
+    <meta name="description" content="A glimpse into what drives Pranav Kaja beyond the screen.">
+    <meta property="og:title" content="Interests | Pranav Kaja">
+    <meta property="og:description" content="A glimpse into what drives Pranav Kaja beyond the screen.">
+    <meta property="og:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Interests | Pranav Kaja">
+    <meta name="twitter:description" content="A glimpse into what drives Pranav Kaja beyond the screen.">
+    <meta name="twitter:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+</head>
+<body class="bg-main flex-col min-h-screen">
+    <!-- Custom Cursor -->
+    <div class="custom-cursor" id="custom-cursor">
+        <div class="cursor-center"></div>
+    </div>
+    <div class="crosshair-h"></div>
+    <div class="crosshair-v"></div>
+    
+    <nav class="header fixed-header">
+        <a href="/" class="logo interactive-element glitch-btn no-underline flex-center">
+            <span class="logo-text relative inline-block text-lg">&lt; RETURN TO MAIN_DB</span>
+        </a>
+    </nav>
+
+    <main class="content">
+        <section class="interests-section" id="interests">
+            <div class="interests-intro">
+                <div class="section-header hero-nav-line">
+                    <h2 class="hover-swap interactive-element"><span class="default-text">INTEREST_LOGS</span><span class="hover-text">INTERESTS</span></h2>
+                    <div class="line w-200"></div>
+                </div>
+            </div>
+            
+            <div class="interests-sticky-container" id="interests-sticky">
+                <div class="interests-bg" id="interests-bg">
+                    <img src="images/car.webp" class="interest-base-img" id="interest-base-img" alt="">
+                    <div class="interest-xray-mask" id="interest-xray-mask">
+                        <img src="images/car.webp" class="interest-xray-img" id="interest-xray-img" alt="">
+                    </div>
+                </div>
+                <div class="vignette-overlay"></div>
+
+                <div class="interests-joystick-container" id="interests-joystick-container">
+                    <div class="joystick-base" id="joystick-base">
+                        <div class="joystick-puck" id="joystick-puck"></div>
+                    </div>
+                </div>
+
+                <div class="interests-details" id="interests-details">
+                    <h3 class="detail-title" id="detail-title">INTEREST</h3>
+                    <div class="detail-desc-box">
+                        <p class="detail-desc" id="detail-desc">Details coming soon.</p>
+                    </div>
+                </div>
+                
+                <div class="wheel-container">
+                    <div class="wheel-track" id="wheel-track">
+                        <div class="wheel-node interactive-element" data-text="Automotive" data-icon1="car" data-icon2="wheel">Automotive</div>
+                        <div class="wheel-node interactive-element" data-text="Cooking" data-icon1="plate" data-icon2="cutlery">Cooking</div>
+                        <div class="wheel-node interactive-element" data-text="Adventure" data-icon1="mountain" data-icon2="compass">Adventure</div>
+                        <div class="wheel-node interactive-element" data-text="Photography" data-icon1="camera" data-icon2="image">Photography</div>
+                        <div class="wheel-node interactive-element" data-text="Gaming" data-icon1="gamepad" data-icon2="swords">Gaming</div>
+                        <div class="wheel-node interactive-element" data-text="Music" data-icon1="music" data-icon2="headphones">Music</div>
+                        <div class="wheel-node interactive-element" data-text="Technology" data-icon1="tech" data-icon2="code">Technology</div>
+                        <div class="wheel-node interactive-element" data-text="Plants" data-icon1="plant" data-icon2="flower">Plants</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="interests.js" defer></script>
+</body>
+</html>

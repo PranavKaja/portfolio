@@ -1,0 +1,323 @@
+/* --- CAR GAME ELEMENTS --- */
+
+#game-ui.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Player Car */
+#player-car {
+    position: fixed;
+    width: 30px;
+    height: 50px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 999;
+    transition: opacity 0.3s ease;
+}
+
+#player-car.hidden {
+    opacity: 0;
+}
+
+.car-body {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #ff4d4d, #b30000);
+    border-radius: 6px;
+    box-shadow: 0 10px 20px rgba(255, 0, 0, 0.4);
+    position: relative;
+}
+
+.car-body::after { /* Windshield */
+    content: '';
+    position: absolute;
+    top: 15%;
+    left: 10%;
+    width: 80%;
+    height: 25%;
+    background: #111;
+    border-radius: 4px;
+}
+
+.car-body::before { /* Rear window */
+    content: '';
+    position: absolute;
+    bottom: 10%;
+    left: 15%;
+    width: 70%;
+    height: 15%;
+    background: #111;
+    border-radius: 3px;
+}
+
+.headlights {
+    position: absolute;
+    top: -5px;
+    left: 0;
+    width: 100%;
+    height: 10px;
+}
+
+.headlights::before, .headlights::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 8px;
+    height: 150px;
+    background: linear-gradient(to bottom, rgba(255,255,200,0.6), transparent);
+    filter: blur(4px);
+    pointer-events: none;
+    transform-origin: top center;
+}
+
+.headlights::before {
+    left: 2px;
+}
+
+.headlights::after {
+    right: 2px;
+}
+
+@keyframes breathe {
+    0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.85; }
+    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.85; }
+}
+
+/* Checkpoint */
+#checkpoint {
+    position: fixed;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 998;
+    animation: breathe 2s ease-in-out infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(10, 10, 10, 0.8);
+    backdrop-filter: blur(8px);
+}
+
+#checkpoint.type-time {
+    border: 2px solid #5eff78;
+    color: #5eff78;
+    box-shadow: 0 0 15px rgba(94, 255, 120, 0.4), inset 0 0 10px rgba(94, 255, 120, 0.3);
+}
+
+#checkpoint.type-repair {
+    border: 2px solid #82c8ff;
+    color: #82c8ff;
+    box-shadow: 0 0 15px rgba(130, 200, 255, 0.4), inset 0 0 10px rgba(130, 200, 255, 0.3);
+}
+
+#checkpoint.type-overdrive {
+    border: 2px solid #d4b3ff;
+    color: #d4b3ff;
+    box-shadow: 0 0 15px rgba(212, 179, 255, 0.4), inset 0 0 10px rgba(212, 179, 255, 0.3);
+}
+
+#checkpoint.hidden {
+    display: none;
+}
+
+/* Text Splitting Utility */
+.word-wrap {
+    display: inline-block;
+    white-space: pre;
+}
+
+.char-wrap {
+    display: inline-block;
+    transition: transform 0.8s ease-out;
+    transform: translate3d(0px, 0px, 0px) rotate(0deg);
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+.char-wrap.scattered {
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* --- CANVAS --- */
+#game-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 990;
+    transition: opacity 0.3s;
+}
+#game-canvas.hidden { opacity: 0; }
+
+/* MATRIX THEME */
+body.matrix-mode {
+    --bg: #050505;
+    --text-main: #00ea3d;
+    --text-muted: #008f11;
+    --accent: #00ff41;
+    --border: #003b00;
+    --panel-bg: rgba(0, 20, 0, 0.8);
+    background-image: none !important;
+}
+body.matrix-mode * {
+    color: var(--text-main) !important;
+    border-color: var(--border) !important;
+}
+body.matrix-mode .top-nav {
+    background: rgba(5, 5, 5, 0.9) !important;
+    border-bottom: 2px solid var(--accent) !important;
+    z-index: 1000 !important;
+}
+body.matrix-mode .keycap {
+    background: rgba(0, 20, 0, 0.8) !important;
+    border-color: var(--text-main) !important;
+}
+
+body.matrix-mode #checkpoint {
+    background-color: var(--text-main) !important;
+    color: var(--bg) !important;
+    box-shadow: 0 0 20px var(--text-main) !important;
+    border-color: var(--text-main) !important;
+    font-weight: bold !important;
+}
+
+body.matrix-mode #checkpoint * {
+    color: var(--bg) !important;
+}
+
+body.game-active .top-nav > * {
+    filter: blur(4px) !important;
+    opacity: 0.6 !important;
+    transition: filter 0.3s ease, opacity 0.3s ease !important;
+}
+
+/* while driving, the page is the playfield: content hovers and
+   clicks are off (wheel scrolling still works), the game owns
+   input. Overlays stay clickable so an open popup can be closed */
+body.game-active .top-nav,
+body.game-active main,
+body.game-active .main-footer {
+    pointer-events: none;
+}
+
+.game-closing {
+    opacity: 0 !important;
+    filter: blur(8px) grayscale(50%) !important;
+    transform: scale(0.6) !important;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    pointer-events: none !important;
+}
+
+/* Game HUD Overlay */
+.game-hud-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 9000;
+    font-family: 'Share Tech Mono', monospace;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+.game-hud-overlay.hidden {
+    opacity: 0;
+}
+.hud-top-center {
+    position: absolute;
+    top: 25px; /* Aligned with nav */
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1rem;
+    color: var(--text-main);
+    display: flex; align-items: center; gap: 6px;
+}
+.hud-top-center #time-left {
+    color: var(--accent);
+}
+.hud-top-right {
+    position: absolute;
+    top: 100px; /* Under the header */
+    right: 40px;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.score-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 90px;
+    gap: 10px;
+}
+.score-box.best {
+    opacity: 1;
+}
+.hud-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+}
+.hud-value {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--text-main);
+}
+.hud-bottom-left {
+    position: absolute;
+    bottom: 30px;
+    left: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.status-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.label-col {
+    display: flex;
+    align-items: center;
+    width: 55px;
+}
+.boost-container {
+    position: relative;
+    margin-bottom: 5px; /* Give space for the absolute shift text */
+}
+.shift-text {
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    font-size: 0.5rem;
+}
+.hud-bar-container {
+    width: 60px;
+    height: 5px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.1);
+    position: relative;
+    border-radius: 1px;
+    overflow: hidden;
+}
+.hp-flex {
+    display: flex;
+    gap: 2px;
+    background: transparent;
+    border: none;
+}
+.hp-flex .hp-box {
+    flex: 1;
+    background: #00ea3d;
+    border-radius: 1px;
+}
+.boost-container #boost-bar {
+    height: 100%;
+    width: 100%;
+    background: var(--accent);
+    transition: width 0.1s linear;
+}
