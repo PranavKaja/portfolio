@@ -170,7 +170,8 @@
         <span class="pc-tech">${esc(p.tech || '')}</span>
         ${p.published ? '' : '<span class="pc-hidden">hidden</span>'}
         <span class="badge badge--${esc(p.status)}">${esc(STATUS_LABEL[p.status] || p.status)}</span>
-      </div>`).join('');
+      </div>`;
+    }).join('');
     el.querySelectorAll('.proj-card').forEach(card => {
       card.addEventListener('click', e => { 
         if (!e.target.classList.contains('pc-handle')) {
