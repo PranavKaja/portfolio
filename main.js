@@ -365,8 +365,8 @@ document.addEventListener('DOMContentLoaded', () => {
             || window.innerWidth <= 768;
         document.getElementById('sys-alert-title').textContent = 'GAME BRIEFING';
         document.getElementById('sys-alert-msg').textContent = touch
-            ? 'Close this file, scroll to the very bottom of the page, then pull up past the end one more time. The hidden game boots from there.'
-            : 'Close this file and press W, A, S or D. A car spawns: steer with WASD, hold SHIFT to boost, hold SPACE to drift. Hit checkpoints to stay on the clock. ESC ends the run.';
+            ? 'Close this file, scroll to the very bottom of the page, then pull up past the end one more time to launch the Tactical Grid (Tic Tac Toe).'
+            : 'Close this file and press W, A, S or D. A car spawns: steer with WASD, hold SHIFT to boost, hold SPACE to drift. Alternatively, click the W, A, S, D letters to launch the Tactical Grid (Tic Tac Toe).';
         alertOverlay.classList.add('active');
         document.getElementById('sys-alert-btn').onclick = () => alertOverlay.classList.remove('active');
     }
