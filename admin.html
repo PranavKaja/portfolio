@@ -180,10 +180,16 @@
                     <label class="field"><span>Method</span><input type="text" id="f-method"></label>
                 </div>
                 <label class="field"><span>Outcome</span><input type="text" id="f-outcome"></label>
-                <label class="field" id="github-container">
-                    <span style="display:flex; justify-content:space-between">GitHub URL <a href="#" id="toggle-github" style="color:var(--accent);font-size:0.7rem;">+ Add Link</a></span>
+                <div class="field" id="github-container">
+                    <span style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase;">
+                        GitHub URL 
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-github">
+                            <span class="slider"></span>
+                        </label>
+                    </span>
                     <input type="url" id="f-github" class="hidden" placeholder="https://github.com/username/repo">
-                </label>
+                </div>
                 <label class="field"><span>Chips (one per line)</span><textarea id="f-chips" placeholder="0.978 AUC&#10;84% Recall"></textarea></label>
                 <div class="grid2">
                     <label class="field"><span>Status</span>

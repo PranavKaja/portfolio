@@ -262,10 +262,10 @@
     const ghToggle = $('toggle-github');
     if (F.github.value) {
         F.github.classList.remove('hidden');
-        ghToggle.textContent = 'Hide';
+        ghToggle.checked = true;
     } else {
         F.github.classList.add('hidden');
-        ghToggle.textContent = '+ Add Link';
+        ghToggle.checked = false;
     }
 
     F.chips.value = p && p.chips ? p.chips.join('\n') : '';
@@ -333,15 +333,12 @@
   });
 
   // GitHub Link Toggle
-  $('toggle-github').addEventListener('click', (e) => {
-    e.preventDefault();
-    if (F.github.classList.contains('hidden')) {
+  $('toggle-github').addEventListener('change', (e) => {
+    if (e.target.checked) {
       F.github.classList.remove('hidden');
-      e.target.textContent = 'Hide';
     } else {
       F.github.classList.add('hidden');
       F.github.value = ''; // clear on hide
-      e.target.textContent = '+ Add Link';
       updatePreviews();
     }
   });
@@ -425,7 +422,10 @@
     const githubBtn = p.github_url ? `<a href="${esc(p.github_url)}" target="_blank" rel="noopener noreferrer" class="github-btn">
           <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-          </svg> View Source</a>` : '';
+          </svg>
+          <span class="gh-text-default">Case file</span>
+          <span class="gh-text-hover">GitHub</span>
+          </a>` : '';
 
     $('prev-popup-card').innerHTML = `
       <div class="msn-sheet-wrap" style="opacity: 1; transform: none;">

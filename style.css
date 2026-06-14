@@ -2340,3 +2340,11 @@ body.msn-open {
         animation: none;
     }
 }
+
+ . g i t h u b - b t n   {   c u r s o r :   p o i n t e r ;   t e x t - d e c o r a t i o n :   n o n e ;   } 
+ . g i t h u b - b t n : h o v e r   {   b a c k g r o u n d :   v a r ( - - t e x t - m a i n )   ! i m p o r t a n t ;   c o l o r :   v a r ( - - b g )   ! i m p o r t a n t ;   } 
+ . g i t h u b - b t n   . g h - t e x t - h o v e r   {   d i s p l a y :   n o n e ;   } 
+ . g i t h u b - b t n : h o v e r   . g h - t e x t - d e f a u l t   {   d i s p l a y :   n o n e ;   } 
+ . g i t h u b - b t n : h o v e r   . g h - t e x t - h o v e r   {   d i s p l a y :   i n l i n e ;   } 
+  
+ 
