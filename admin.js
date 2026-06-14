@@ -493,19 +493,23 @@
     const byDay = {};
     rows.forEach(r => { byDay[r.day] = r.n; });
     const days = [];
-    for (let i = 0; i <= 29; i++) {
+    for (let i = 6; i >= 0; i--) {
       const dt = new Date(); dt.setDate(dt.getDate() - i);
       const key = dt.toISOString().slice(0, 10);
       days.push([key, byDay[key] || 0]);
     }
     const total = days.reduce((s, d) => s + d[1], 0);
-    if (!total) { el.innerHTML = '<div class="bl-empty">// no views in the last 30 days</div>'; return; }
+    if (!total) { el.innerHTML = '<div class="bl-empty">// no views in the last 7 days</div>'; return; }
     const max = Math.max.apply(null, days.map(d => d[1])) || 1;
     const W = 720, H = 120, pad = 4, bw = (W - pad * 2) / days.length;
     const bars = days.map((d, i) => {
-      const h = d[1] === 0 ? 0 : Math.max(2, Math.round(d[1] / max * (H - 24)));
       const x = pad + i * bw;
-      return `<rect x="${x.toFixed(1)}" y="${(H - 16 - h).toFixed(1)}" width="${Math.max(1, bw - 2).toFixed(1)}" height="${h}"><title>${d[0]}: ${d[1]}</title></rect>`;
+      const w = Math.max(1, bw - 2).toFixed(1);
+      if (d[1] === 0) {
+        return `<rect x="${x.toFixed(1)}" y="${(H - 18).toFixed(1)}" width="${w}" height="2" style="fill: var(--text-muted); opacity: 0.3"><title>${d[0]}: 0 views</title></rect>`;
+      }
+      const h = Math.max(2, Math.round(d[1] / max * (H - 24)));
+      return `<rect x="${x.toFixed(1)}" y="${(H - 16 - h).toFixed(1)}" width="${w}" height="${h}"><title>${d[0]}: ${d[1]} views</title></rect>`;
     }).join('');
     const first = days[0][0].slice(5), last = days[days.length - 1][0].slice(5);
     el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="spark" preserveAspectRatio="none">${bars}` +
@@ -541,19 +545,48 @@
       title = 'Game Leaderboard — all players';
       body = (d.leaderboard || []).length ? leaderboardTable(d.leaderboard) : '';
     } else if (kind === 'daily') {
-      title = 'Page Views — last 30 days';
-      const byDay = {};
-      (d.daily || []).forEach(r => { byDay[r.day] = r.n; });
-      const rows = [];
-      for (let i = 0; i <= 29; i++) {            // newest day first
-        const dt = new Date(); dt.setDate(dt.getDate() - i);
-        const key = dt.toISOString().slice(0, 10);
-        rows.push([key, byDay[key] || 0]);
-      }
-      body = detailTable(['Day', 'Views'], rows);
+      title = 'Page Views — Analytics';
+      window._renderDailyTable = (daysCount) => {
+        const byDay = {};
+        (d.daily || []).forEach(r => { byDay[r.day] = r.n; });
+        const rows = [];
+        for (let i = 0; i < daysCount; i++) {            // newest day first
+          const dt = new Date(); dt.setDate(dt.getDate() - i);
+          const key = dt.toISOString().slice(0, 10);
+          rows.push([key, byDay[key] || 0]);
+        }
+        return detailTable(['Day', 'Views'], rows);
+      };
+      body = `
+        <div class="row" style="margin-bottom: 16px;" id="daily-filters">
+          <button class="ghost filter-btn" data-days="7">7 Days</button>
+          <button class="primary filter-btn" data-days="30">30 Days</button>
+          <button class="ghost filter-btn" data-days="90">90 Days</button>
+          <button class="ghost filter-btn" data-days="365">1 Year</button>
+        </div>
+        <div id="daily-table-container">
+          ${window._renderDailyTable(30)}
+        </div>
+      `;
     }
     $('intel-modal-title').textContent = title || 'Detail';
     $('intel-modal-body').innerHTML = body || '<div class="bl-empty">// no data yet</div>';
+    
+    if (kind === 'daily') {
+      const filters = $('daily-filters');
+      if (filters) {
+        filters.addEventListener('click', e => {
+          if (e.target.classList.contains('filter-btn')) {
+            const days = parseInt(e.target.dataset.days);
+            $('daily-table-container').innerHTML = window._renderDailyTable(days);
+            filters.querySelectorAll('.filter-btn').forEach(b => {
+              b.classList.toggle('primary', parseInt(b.dataset.days) === days);
+              b.classList.toggle('ghost', parseInt(b.dataset.days) !== days);
+            });
+          }
+        });
+      }
+    }
     $('intel-modal-bg').classList.remove('hidden');
   }
 
