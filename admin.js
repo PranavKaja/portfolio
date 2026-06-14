@@ -48,8 +48,15 @@
       console.warn('[auth] fast read failed:', e);
     }
 
+    window.onerror = function(msg, url, line) {
+      document.body.innerHTML += '<div style="position:fixed;top:0;left:0;background:red;color:white;z-index:9999;padding:10px;">ERROR: ' + msg + ' at line ' + line + '</div>';
+    };
+    window.onunhandledrejection = function(e) {
+      document.body.innerHTML += '<div style="position:fixed;top:40px;left:0;background:red;color:white;z-index:9999;padding:10px;">REJECTION: ' + (e.reason && e.reason.message || e.reason) + '</div>';
+    };
+
     if (session && session.user) {
-      operator = session.user.email;
+      const operator = session.user.email || 'operator';
       $('who').textContent = '// ' + operator;
       show('console');
       loadProjects();
