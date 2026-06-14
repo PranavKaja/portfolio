@@ -122,7 +122,7 @@
   $('refresh-btn').addEventListener('click', loadProjects);
 
   // ---- card view + drag-to-reorder ----
-  let projView = 'rows';
+  let projView = 'cards';
 
   function renderProjects() {
     renderRows();
@@ -135,7 +135,9 @@
     $('projects-table').classList.toggle('hidden', cards);
     $('projects-cards').classList.toggle('hidden', !cards);
     $('view-hint').classList.toggle('hidden', !cards);
-    $('view-toggle-btn').textContent = cards ? '▤ Row view' : '▦ Card view';
+    if ($('view-toggle-btn')) {
+      $('view-toggle-btn').textContent = cards ? '☰' : '▦';
+    }
     $('empty').classList.toggle('hidden', cache.length > 0 || cards);
   }
 
