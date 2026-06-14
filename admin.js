@@ -37,27 +37,32 @@
   // ============================================================
   async function refreshAuth() {
     let session = null;
+    
+    // Fast path: synchronous localStorage read to prevent UI hanging
     try {
-      const res = await db.auth.getSession();
-      session = res && res.data ? res.data.session : null;
+      const key = Object.keys(localStorage).find(k => /^sb-.*-auth-token$/.test(k));
+      if (key) {
+        session = JSON.parse(localStorage.getItem(key));
+      }
     } catch (e) {
-      // A corrupt/expired token in localStorage can throw here. Left unhandled
-      // it blanks the page (no view is ever shown) and a hard refresh won't fix
-      // it because localStorage survives. Clear the stored session and fall back
-      // to login so the console always self-heals.
-      console.warn('[auth] session read failed; clearing stored session:', e);
-      try {
-        Object.keys(localStorage).forEach(k => { if (/^sb-.*-auth-token$/.test(k)) localStorage.removeItem(k); });
-      } catch (e2) { /* ignore */ }
-      try { await db.auth.signOut(); } catch (e3) { /* ignore */ }
-      session = null;
+      console.warn('[auth] fast read failed:', e);
     }
-    if (session) {
-      $('who').textContent = '// ' + (session.user.email || 'OPERATOR');
+
+    if (session && session.user) {
+      operator = session.user.email;
+      $('who').textContent = '// ' + operator;
       show('console');
       loadProjects();
       loadTransmissions();
+      
+      // Fire-and-forget background token refresh (doesn't block UI)
+      db.auth.getSession().catch(() => {});
     } else {
+      // Clear anything corrupt
+      try {
+        Object.keys(localStorage).forEach(k => { if (/^sb-.*-auth-token$/.test(k)) localStorage.removeItem(k); });
+        await db.auth.signOut();
+      } catch (e) { /* ignore */ }
       show('login');
     }
   }
