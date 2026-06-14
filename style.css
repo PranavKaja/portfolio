@@ -2348,3 +2348,6 @@ body.msn-open {
  . g i t h u b - b t n : h o v e r   . g h - t e x t - h o v e r   {   d i s p l a y :   i n l i n e ;   } 
   
  
+ . p r o j e c t - p a n e l . l a s t - a c t i v e   {   b o r d e r - c o l o r :   v a r ( - - t e x t - m a i n ) ;   b o x - s h a d o w :   0   0   1 0 p x   r g b a ( 0 ,   0 ,   0 ,   0 . 2 ) ;   } 
+  
+ 

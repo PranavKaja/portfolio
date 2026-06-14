@@ -124,7 +124,9 @@
     function close() {
       overlay.classList.remove('active');
       document.body.classList.remove('msn-open');
+      document.querySelectorAll('.project-panel.last-active').forEach(c => c.classList.remove('last-active'));
       if (lastFocus) {
+        lastFocus.classList.add('last-active');
         lastFocus.focus({ preventScroll: true });
         if (!openedViaKeyboard) lastFocus.blur();
       }
@@ -147,6 +149,11 @@
     overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && overlay.classList.contains('active')) close();
+    });
+    document.addEventListener('click', e => {
+      if (!overlay.classList.contains('active') && !e.target.closest('.project-panel')) {
+        document.querySelectorAll('.project-panel.last-active').forEach(c => c.classList.remove('last-active'));
+      }
     });
   }
 
