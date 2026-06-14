@@ -119,7 +119,7 @@
     border: 1px solid var(--text-main);
     padding: 30px;
     position: relative;
-    width: 500px;
+    width: min(620px, 92vw);
     flex-shrink: 0;
 }
 .pp-expand::after {
@@ -176,13 +176,16 @@
 }
 
 /* 2. Popup Card (.msn-sheet) */
+.msn-sheet-wrap {
+    width: min(1000px, 94vw);
+    zoom: 0.75;
+}
 .msn-sheet {
     position: relative;
     background: var(--bg);
     border: 1px solid var(--text-main);
     padding: 30px 22px 34px;
     width: 100%;
-    max-width: 800px;
 }
 .msn-back {
     display: block;

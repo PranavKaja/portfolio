@@ -384,7 +384,7 @@
     
     // Default Card
     $('prev-default-card').innerHTML = `
-      <div class="project-panel" style="width: 100%;">
+      <div class="project-panel">
         ${statusHtml}
         <div class="proj-id">${esc(p.code)}</div>
         <h3>${esc(p.title)}</h3>
@@ -395,7 +395,7 @@
 
     // Hover Card
     $('prev-hover-card').innerHTML = `
-        <div class="pp-expand" style="display:block; width:100%; margin:0; opacity:1; visibility:visible;">
+        <div class="pp-expand" style="display:block; margin:0; opacity:1; visibility:visible;">
             <div class="pp-head"><span class="proj-id">${esc(p.code)}</span><span class="pp-stack">${esc(p.stack)}</span></div>
             <h3>${esc(p.title)}</h3>
             <p class="pp-hook">${esc(p.hook)}</p>
