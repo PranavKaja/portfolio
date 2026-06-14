@@ -611,5 +611,13 @@
   });
 
   // boot
-  refreshAuth();
+  const loader = document.createElement('div');
+  loader.id = 'boot-loader';
+  loader.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:"Share Tech Mono",monospace;color:var(--text-muted);font-size:0.8rem;letter-spacing:1px;';
+  loader.textContent = '// AUTHENTICATING...';
+  document.body.appendChild(loader);
+  
+  refreshAuth().finally(() => {
+    if (loader.parentNode) loader.remove();
+  });
 })();
