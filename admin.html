@@ -159,7 +159,10 @@
                 <input type="hidden" id="f-id">
                 <div class="grid2">
                     <label class="field"><span>Code (e.g. MSN-10)</span><input type="text" id="f-code" required></label>
-                    <label class="field"><span>Title</span><input type="text" id="f-title" required></label>
+                    <label class="field">
+                        <span style="display:flex; justify-content:space-between">Title <a href="#" id="toggle-github" style="color:var(--accent);font-size:0.7rem;">+ Add GitHub Link</a></span>
+                        <input type="text" id="f-title" required>
+                    </label>
                     <label class="field"><span>Card stack (tech)</span><input type="text" id="f-tech"></label>
                     <label class="field">
                         <span style="display:flex; justify-content:space-between">Full stack (overlay) <a href="#" id="sync-stack" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Tech</a></span>
@@ -180,7 +183,7 @@
                     <label class="field"><span>Method</span><input type="text" id="f-method"></label>
                 </div>
                 <label class="field"><span>Outcome</span><input type="text" id="f-outcome"></label>
-                <label class="field"><span>GitHub URL</span><input type="url" id="f-github" placeholder="https://github.com/username/repo"></label>
+                <label class="field hidden" id="github-container"><span>GitHub URL</span><input type="url" id="f-github" placeholder="https://github.com/username/repo"></label>
                 <label class="field"><span>Chips (one per line)</span><textarea id="f-chips" placeholder="0.978 AUC&#10;84% Recall"></textarea></label>
                 <div class="grid2">
                     <label class="field"><span>Status</span>

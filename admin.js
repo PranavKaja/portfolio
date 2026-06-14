@@ -255,6 +255,18 @@
     F.method.value = p ? (p.method || '') : '';
     F.outcome.value = p ? (p.outcome || '') : '';
     F.github.value = p ? (p.github_url || '') : '';
+    
+    // Setup Github Link toggle
+    const ghContainer = $('github-container');
+    const ghToggle = $('toggle-github');
+    if (F.github.value) {
+        ghContainer.classList.remove('hidden');
+        ghToggle.textContent = 'Hide GitHub Link';
+    } else {
+        ghContainer.classList.add('hidden');
+        ghToggle.textContent = '+ Add GitHub Link';
+    }
+
     F.chips.value = p && p.chips ? p.chips.join('\n') : '';
     F.status.value = p ? p.status : 'deployed';
     F.sort.value = p ? p.sort_order : (cache.length ? Math.max(...cache.map(x => x.sort_order || 0)) + 10 : 10);
@@ -309,6 +321,21 @@
     if (error) { msg($('form-msg'), error.message, 'err'); return; }
     closeEditor();
     loadProjects();
+  });
+
+  // GitHub Link Toggle
+  $('toggle-github').addEventListener('click', (e) => {
+    e.preventDefault();
+    const c = $('github-container');
+    if (c.classList.contains('hidden')) {
+      c.classList.remove('hidden');
+      e.target.textContent = 'Hide GitHub Link';
+    } else {
+      c.classList.add('hidden');
+      F.github.value = ''; // clear on hide
+      e.target.textContent = '+ Add GitHub Link';
+      updatePreviews();
+    }
   });
 
   // Sync Buttons
@@ -368,20 +395,13 @@
 
     // Hover Card
     $('prev-hover-card').innerHTML = `
-      <div class="project-panel project-panel-hovered" style="width: 100%;">
-        ${statusHtml}
-        <div class="proj-id">${esc(p.code)}</div>
-        <h3>${esc(p.title)}</h3>
-        <p class="tech">${esc(p.tech)}</p>
-        <p class="desc">${esc(p.summary)}</p>
-        <div class="pp-expand">
+        <div class="pp-expand" style="display:block; width:100%; margin:0; opacity:1; visibility:visible;">
             <div class="pp-head"><span class="proj-id">${esc(p.code)}</span><span class="pp-stack">${esc(p.stack)}</span></div>
             <h3>${esc(p.title)}</h3>
             <p class="pp-hook">${esc(p.hook)}</p>
             <p class="pp-brief">${esc(p.brief)}</p>
             <div class="pp-chips">${chipsHtml}</div>
         </div>
-      </div>
     `;
 
     // Popup Overlay Card
