@@ -366,10 +366,4 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
 .toggle-switch input:checked + .slider::before { transform: translateX(28px); }
 .toggle-switch input:checked + .slider::after { opacity: 1; }
 
-/* Distinct marker for the last opened card (avoids conflicting with the status border) */
-.proj-card.last-active { 
-    background-color: var(--panel-bg) !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
-    transform: translateY(-1px);
-    border-right: 4px solid var(--text-main);
-}
+.toggle-switch input:checked + .slider::after { opacity: 1; }
