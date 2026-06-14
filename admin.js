@@ -472,7 +472,7 @@
   });
 
   document.addEventListener('click', e => {
-    if (e.target.closest('.proj-card') || e.target.closest('.modal')) return;
+    if (e.target.closest('.proj-card') || e.target.closest('.modal') || e.target.classList.contains('modal-bg')) return;
     document.querySelectorAll('.proj-card.last-active').forEach(c => c.classList.remove('last-active'));
     lastActiveCardId = null;
   });
