@@ -367,3 +367,11 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
 .toggle-switch input:checked + .slider::after { opacity: 1; }
 
 .toggle-switch input:checked + .slider::after { opacity: 1; }
+
+/* Distinct marker for the last opened card */
+.proj-card.last-active { 
+    background-color: #fafaf9 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+    transform: translateY(-1px);
+    border-right: 4px solid var(--text-main);
+}

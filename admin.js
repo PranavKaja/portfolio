@@ -160,8 +160,10 @@
   function renderCards() {
     const el = $('projects-cards');
     if (!cache.length) { el.innerHTML = '<div class="empty">// NO MISSION RECORDS</div>'; return; }
-    el.innerHTML = cache.map(p => `
-      <div class="proj-card" draggable="true" data-id="${esc(p.id)}" data-status="${esc(p.status)}">
+    el.innerHTML = cache.map(p => {
+      const activeCls = (String(p.id) === String(lastActiveCardId)) ? ' last-active' : '';
+      return `
+      <div class="proj-card${activeCls}" draggable="true" data-id="${esc(p.id)}" data-status="${esc(p.status)}">
         <span class="pc-handle" aria-hidden="true" title="Drag to reorder">⠿</span>
         <span class="pc-code">${esc(p.code)}</span>
         <span class="pc-title">${esc(p.title)}</span>
@@ -241,8 +243,10 @@
   };
 
   let isDirty = false;
+  let lastActiveCardId = null;
 
   function openEditor(id) {
+    lastActiveCardId = id;
     const p = id ? cache.find(x => String(x.id) === String(id)) : null;
     $('modal-title').textContent = p ? `Edit ${p.code}` : 'New Project';
     F.id.value = p ? p.id : '';
@@ -291,6 +295,12 @@
     }
     $('modal-bg').classList.add('hidden');
     isDirty = false;
+
+    document.querySelectorAll('.proj-card.last-active').forEach(c => c.classList.remove('last-active'));
+    if (lastActiveCardId) {
+      const card = document.querySelector(`.proj-card[data-id="${lastActiveCardId}"]`);
+      if (card) card.classList.add('last-active');
+    }
   }
 
   $('new-btn').addEventListener('click', () => openEditor(null));
@@ -462,6 +472,8 @@
 
   document.addEventListener('click', e => {
     if (e.target.closest('.proj-card') || e.target.closest('.modal')) return;
+    document.querySelectorAll('.proj-card.last-active').forEach(c => c.classList.remove('last-active'));
+    lastActiveCardId = null;
   });
 
   // ============================================================
