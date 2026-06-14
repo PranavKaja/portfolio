@@ -9,7 +9,8 @@
     deployed: 'DEPLOYED',
     in_progress: 'IN PROGRESS',
     archived: 'ARCHIVED',
-    classified: 'CLASSIFIED'
+    classified: 'CLASSIFIED',
+    none: 'NONE'
   };
 
   function esc(s) {
@@ -50,10 +51,11 @@
     const num = codeNum(p.code);
     const status = p.status || 'deployed';
     const chips = (p.chips || []).map(c => `<span>${esc(c)}</span>`).join('');
+    const statusHtml = status === 'none' ? '' : `<span class="proj-status proj-status--${esc(status)}">${esc(STATUS_LABELS[status] || status)}</span>`;
     return `
     <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="${esc(num)}"
         aria-label="Open mission ${esc(p.code)}: ${esc(p.title)}">
-        <span class="proj-status proj-status--${esc(status)}">${esc(STATUS_LABELS[status] || status)}</span>
+        ${statusHtml}
         <div class="proj-id">${esc(p.code)}</div>
         <h3>${esc(p.title)}</h3>
         <p class="tech">${esc(p.tech)}</p>

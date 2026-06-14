@@ -10,8 +10,8 @@
     login: $('login-view'),
     console: $('console-view')
   };
-  const STATUS = ['deployed', 'in_progress', 'archived', 'classified'];
-  const STATUS_LABEL = { deployed: 'DEPLOYED', in_progress: 'IN PROGRESS', archived: 'ARCHIVED', classified: 'CLASSIFIED' };
+  const STATUS = ['deployed', 'in_progress', 'archived', 'classified', 'none'];
+  const STATUS_LABEL = { deployed: 'DEPLOYED', in_progress: 'IN PROGRESS', archived: 'ARCHIVED', classified: 'CLASSIFIED', none: 'NONE' };
 
   function show(view) {
     views.unconfigured.classList.toggle('hidden', view !== 'unconfigured');
