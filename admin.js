@@ -257,14 +257,13 @@
     F.github.value = p ? (p.github_url || '') : '';
     
     // Setup Github Link toggle
-    const ghContainer = $('github-container');
     const ghToggle = $('toggle-github');
     if (F.github.value) {
-        ghContainer.classList.remove('hidden');
-        ghToggle.textContent = 'Hide GitHub Link';
+        F.github.classList.remove('hidden');
+        ghToggle.textContent = 'Hide';
     } else {
-        ghContainer.classList.add('hidden');
-        ghToggle.textContent = '+ Add GitHub Link';
+        F.github.classList.add('hidden');
+        ghToggle.textContent = '+ Add Link';
     }
 
     F.chips.value = p && p.chips ? p.chips.join('\n') : '';
@@ -326,14 +325,13 @@
   // GitHub Link Toggle
   $('toggle-github').addEventListener('click', (e) => {
     e.preventDefault();
-    const c = $('github-container');
-    if (c.classList.contains('hidden')) {
-      c.classList.remove('hidden');
-      e.target.textContent = 'Hide GitHub Link';
+    if (F.github.classList.contains('hidden')) {
+      F.github.classList.remove('hidden');
+      e.target.textContent = 'Hide';
     } else {
-      c.classList.add('hidden');
+      F.github.classList.add('hidden');
       F.github.value = ''; // clear on hide
-      e.target.textContent = '+ Add GitHub Link';
+      e.target.textContent = '+ Add Link';
       updatePreviews();
     }
   });
