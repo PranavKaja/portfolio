@@ -61,5 +61,6 @@
     form.reset();
     form.classList.add('sent');
     setMsg('// Transmission received. I’ll be in touch.', 'ok');
+    if (window.intel) window.intel.track('contact_submit');
   });
 })();

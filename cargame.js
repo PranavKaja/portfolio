@@ -505,7 +505,10 @@ function gameLoop(now) {
 
 function endGame() {
     gameActive = false;
-    
+
+    // Visitor Intel: log the finished run's score (anonymous)
+    if (window.intel) window.intel.track('game_score', { score: score });
+
     // Add closing animation class
     const carBody = car.element.querySelector('.car-body');
     if (carBody) carBody.classList.add('game-closing');

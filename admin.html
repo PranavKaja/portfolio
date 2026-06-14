@@ -57,6 +57,7 @@
             <div class="tabbar">
                 <button class="tab active" data-tab="projects">Projects</button>
                 <button class="tab" data-tab="transmissions">Transmissions<span id="tx-unread" class="tab-badge hidden"></span></button>
+                <button class="tab" data-tab="intel">Intel</button>
             </div>
 
             <!-- PROJECTS PANEL -->
@@ -97,6 +98,42 @@
                 <div class="msg" id="tx-console-msg"></div>
                 <div id="tx-list"></div>
                 <div class="empty hidden" id="tx-empty">// NO TRANSMISSIONS</div>
+            </div>
+
+            <!-- INTEL PANEL -->
+            <div id="panel-intel" class="hidden">
+                <div class="row" style="margin-bottom:18px">
+                    <button class="ghost" id="intel-refresh-btn">Refresh</button>
+                    <div class="spacer"></div>
+                    <span class="console-label" id="intel-updated"></span>
+                </div>
+                <div class="msg" id="intel-msg"></div>
+
+                <div class="kpi-grid" id="intel-kpis"></div>
+
+                <div class="intel-cols">
+                    <div class="intel-card">
+                        <h3>Traffic Sources</h3>
+                        <div id="intel-traffic" class="barlist"></div>
+                    </div>
+                    <div class="intel-card">
+                        <h3>Top Projects</h3>
+                        <div id="intel-projects" class="barlist"></div>
+                    </div>
+                    <div class="intel-card">
+                        <h3>Top Pages</h3>
+                        <div id="intel-pages" class="barlist"></div>
+                    </div>
+                    <div class="intel-card">
+                        <h3>Tactical Grid — WASD game</h3>
+                        <div id="intel-game" class="gamestats"></div>
+                    </div>
+                </div>
+
+                <div class="intel-card intel-wide">
+                    <h3>Page Views — last 30 days</h3>
+                    <div id="intel-daily"></div>
+                </div>
             </div>
         </section>
     </div>

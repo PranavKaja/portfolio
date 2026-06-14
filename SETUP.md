@@ -22,9 +22,13 @@ to `data/projects.json`), so nothing breaks before setup.
 | **Transmission Log** — public contact form | `contact.html`, `contact.js` |
 | Inbound messages table + security | `supabase/transmissions.sql` |
 | Ops Console **Transmissions** inbox tab | `admin.html`, `admin.js` |
+| **Visitor Intel** — anonymous analytics tracker | `analytics.js` |
+| Events table + admin-only dashboard function | `supabase/analytics.sql` |
+| Ops Console **Intel** dashboard tab | `admin.html`, `admin.js`, `admin.css` |
 
 Status badges supported: **deployed**, **in_progress**, **archived**, **classified**.
 Message statuses: **received**, **decoded**, **replied** (+ a priority **flag**).
+Tracked events: **pageview**, **project_click**, **resume_download**, **contact_submit**, **game_score**.
 
 ---
 
@@ -39,6 +43,9 @@ Message statuses: **received**, **decoded**, **replied** (+ a priority **flag**)
 2. Paste the contents of [`supabase/schema.sql`](supabase/schema.sql) → **Run**.
 3. New query → paste [`supabase/seed.sql`](supabase/seed.sql) → **Run**. (Loads your 9 projects.)
 4. New query → paste [`supabase/transmissions.sql`](supabase/transmissions.sql) → **Run**. (Contact inbox.)
+5. New query → paste [`supabase/analytics.sql`](supabase/analytics.sql) → **Run**. (Visitor Intel.)
+
+> Or skip the four files and run [`supabase/setup_all.sql`](supabase/setup_all.sql) once — it bundles all of them.
 
 ### 3. Connect the front-end
 1. **Project Settings → API**.
@@ -105,6 +112,19 @@ card badge / visibility updates live. Set **published = off** to hide a project 
   never a dead end. A hidden honeypot field drops naive spam bots; for heavier spam
   protection add a Vercel function with rate limiting later.
 
+### Visitor Intel (analytics)
+- `analytics.js` loads on every public page and logs anonymous events to the `events` table:
+  page views (+ traffic source from the referrer), project opens, resume downloads, contact
+  submits, and WASD-game scores.
+- Open the **Intel** tab in the Ops Console for the dashboard: KPI cards, traffic sources,
+  top projects, top pages, game stats, and a 30-day page-view chart.
+- **Privacy:** no cookies, no IP, no names — just a random `localStorage` session id and a
+  normalized referrer. It **honors Do Not Track** (tracking is skipped entirely if the
+  browser sends DNT).
+- **Security:** the public can *write* events (anon insert, size-limited) but the dashboard
+  function (`intel_dashboard()`) is `EXECUTE`-granted to **authenticated only** — visitors
+  can never read the analytics back.
+
 ---
 
 ## How the data flows
@@ -142,5 +162,5 @@ re-running the wrap after render if you want it back.
 
 ## Next systems (not built yet)
 
-- **Visitor Intel** — analytics events + dashboard (your SQL views shine here)
-- Server-only bits (email-on-new-message, contact-form rate limiting) → small Vercel functions
+- Server-only bits (email-on-new-message, contact-form & event-tracking rate limiting) → small Vercel functions
+- Optional: per-project deep-dive pages, richer charts, date-range filters on the Intel dashboard

@@ -195,14 +195,15 @@
   // ============================================================
   // Tabs
   // ============================================================
+  const PANELS = { projects: 'panel-projects', transmissions: 'panel-transmissions', intel: 'panel-intel' };
   document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       const which = tab.getAttribute('data-tab');
-      $('panel-projects').classList.toggle('hidden', which !== 'projects');
-      $('panel-transmissions').classList.toggle('hidden', which !== 'transmissions');
+      Object.keys(PANELS).forEach(k => $(PANELS[k]).classList.toggle('hidden', k !== which));
       if (which === 'transmissions') renderTx();
+      if (which === 'intel') loadIntel(false);
     });
   });
 
@@ -300,6 +301,82 @@
     renderTx();
   }
 
+  // ============================================================
+  // Visitor Intel dashboard
+  // ============================================================
+  let intelLoaded = false;
+
+  async function loadIntel(force) {
+    if (intelLoaded && !force) return;
+    msg($('intel-msg'), '', '');
+    const { data, error } = await db.rpc('intel_dashboard');
+    if (error) { msg($('intel-msg'), error.message, 'err'); return; }
+    intelLoaded = true;
+    renderIntel(data || {});
+    $('intel-updated').textContent = '// updated ' + new Date().toLocaleString();
+  }
+
+  function renderIntel(d) {
+    const k = d.kpis || {};
+    const kpis = [
+      ['Total Views', k.total_views], ['Unique Visitors', k.unique_visitors],
+      ['Project Opens', k.project_clicks], ['Resume Downloads', k.resume_downloads],
+      ['Contact Submits', k.contact_submits], ['Game Plays', k.game_plays]
+    ];
+    $('intel-kpis').innerHTML = kpis.map(([label, val]) =>
+      `<div class="kpi"><div class="kpi-num">${val || 0}</div><div class="kpi-label">${label}</div></div>`).join('');
+
+    barlist('intel-traffic', (d.traffic || []).map(t => [t.source, t.n]));
+    barlist('intel-projects', (d.top_projects || []).map(p => [p.title || p.code, p.n]));
+    barlist('intel-pages', (d.top_pages || []).map(p => [p.path === '/' ? '/ (home)' : p.path, p.n]));
+
+    const g = d.game || {};
+    $('intel-game').innerHTML =
+      `<div class="gs"><span class="gs-num">${g.plays || 0}</span><span class="gs-label">plays</span></div>` +
+      `<div class="gs"><span class="gs-num">${g.high || 0}</span><span class="gs-label">high score</span></div>` +
+      `<div class="gs"><span class="gs-num">${g.avg || 0}</span><span class="gs-label">avg score</span></div>`;
+
+    renderDaily('intel-daily', d.daily || []);
+  }
+
+  function barlist(id, rows) {
+    const el = $(id);
+    if (!rows.length) { el.innerHTML = '<div class="bl-empty">// no data yet</div>'; return; }
+    const max = Math.max.apply(null, rows.map(r => r[1])) || 1;
+    el.innerHTML = rows.map(([label, n]) => `
+      <div class="bl-row">
+        <span class="bl-label" title="${esc(String(label))}">${esc(String(label))}</span>
+        <span class="bl-bar"><span class="bl-fill" style="width:${Math.max(4, Math.round(n / max * 100))}%"></span></span>
+        <span class="bl-n">${n}</span>
+      </div>`).join('');
+  }
+
+  function renderDaily(id, rows) {
+    const el = $(id);
+    const byDay = {};
+    rows.forEach(r => { byDay[r.day] = r.n; });
+    const days = [];
+    for (let i = 29; i >= 0; i--) {
+      const dt = new Date(); dt.setDate(dt.getDate() - i);
+      const key = dt.toISOString().slice(0, 10);
+      days.push([key, byDay[key] || 0]);
+    }
+    const total = days.reduce((s, d) => s + d[1], 0);
+    if (!total) { el.innerHTML = '<div class="bl-empty">// no views in the last 30 days</div>'; return; }
+    const max = Math.max.apply(null, days.map(d => d[1])) || 1;
+    const W = 720, H = 120, pad = 4, bw = (W - pad * 2) / days.length;
+    const bars = days.map((d, i) => {
+      const h = d[1] === 0 ? 0 : Math.max(2, Math.round(d[1] / max * (H - 24)));
+      const x = pad + i * bw;
+      return `<rect x="${x.toFixed(1)}" y="${(H - 16 - h).toFixed(1)}" width="${Math.max(1, bw - 2).toFixed(1)}" height="${h}"><title>${d[0]}: ${d[1]}</title></rect>`;
+    }).join('');
+    const first = days[0][0].slice(5), last = days[days.length - 1][0].slice(5);
+    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="spark" preserveAspectRatio="none">${bars}` +
+      `<text x="${pad}" y="${H - 2}" class="spark-ax">${first}</text>` +
+      `<text x="${W - pad}" y="${H - 2}" text-anchor="end" class="spark-ax">${last}</text></svg>`;
+  }
+
+  $('intel-refresh-btn').addEventListener('click', () => loadIntel(true));
   $('tx-refresh-btn').addEventListener('click', loadTransmissions);
   $('tx-unread-btn').addEventListener('click', () => {
     txUnreadOnly = !txUnreadOnly;

@@ -186,3 +186,37 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
 .star { border: none; background: none; color: var(--text-muted); font-size: 1.15rem; padding: 0 4px; cursor: pointer; line-height: 1; }
 .star:hover { background: none; color: var(--accent); }
 .star.on { color: var(--accent); }
+
+/* ---- Intel dashboard ---- */
+.kpi-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 20px; }
+.kpi { border: 1px solid var(--border); background: #fff; padding: 16px 14px; }
+.kpi-num { font: 700 1.9rem/1 'Space Mono', monospace; color: var(--text-main); }
+.kpi-label { font-family: 'Share Tech Mono', monospace; font-size: 0.66rem; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-top: 8px; }
+
+.intel-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.intel-card { border: 1px solid var(--border); background: #fff; padding: 18px; }
+.intel-card h3 { font: 700 0.8rem/1 'Share Tech Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin: 0 0 14px; }
+.intel-wide { margin-bottom: 16px; }
+
+.barlist { display: flex; flex-direction: column; gap: 9px; }
+.bl-row { display: grid; grid-template-columns: 140px 1fr 42px; align-items: center; gap: 10px; }
+.bl-label { font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bl-bar { height: 12px; background: var(--panel-bg); border: 1px solid var(--border); position: relative; }
+.bl-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); }
+.bl-n { font-family: 'Space Mono', monospace; font-size: 0.8rem; text-align: right; color: var(--text-main); }
+.bl-empty { font-family: 'Share Tech Mono', monospace; color: var(--text-muted); font-size: 0.8rem; padding: 8px 0; }
+
+.gamestats { display: flex; gap: 26px; flex-wrap: wrap; }
+.gs { display: flex; flex-direction: column; }
+.gs-num { font: 700 1.7rem/1 'Space Mono', monospace; color: var(--accent); }
+.gs-label { font-family: 'Share Tech Mono', monospace; font-size: 0.66rem; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-top: 6px; }
+
+.spark { width: 100%; height: 120px; display: block; }
+.spark rect { fill: var(--accent); }
+.spark-ax { fill: var(--text-muted); font-family: 'Share Tech Mono', monospace; font-size: 11px; }
+
+@media (max-width: 760px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .intel-cols { grid-template-columns: 1fr; }
+  .bl-row { grid-template-columns: 110px 1fr 36px; }
+}
