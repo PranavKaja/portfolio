@@ -54,9 +54,6 @@
       show('console');
       loadProjects();
       loadTransmissions();
-      
-      // Fire-and-forget background token refresh (doesn't block UI)
-      db.auth.getSession().catch(() => {});
     } else {
       // Clear anything corrupt
       try {
@@ -67,7 +64,11 @@
     }
   }
 
-  db.auth.onAuthStateChange(() => refreshAuth());
+  db.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+      refreshAuth();
+    }
+  });
 
   $('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
