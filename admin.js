@@ -58,7 +58,6 @@
       // Clear anything corrupt
       try {
         Object.keys(localStorage).forEach(k => { if (/^sb-.*-auth-token$/.test(k)) localStorage.removeItem(k); });
-        await db.auth.signOut();
       } catch (e) { /* ignore */ }
       show('login');
     }
