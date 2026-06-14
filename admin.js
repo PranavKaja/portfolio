@@ -491,7 +491,7 @@
     const byDay = {};
     rows.forEach(r => { byDay[r.day] = r.n; });
     const days = [];
-    for (let i = 29; i >= 0; i--) {
+    for (let i = 0; i <= 29; i++) {
       const dt = new Date(); dt.setDate(dt.getDate() - i);
       const key = dt.toISOString().slice(0, 10);
       days.push([key, byDay[key] || 0]);
@@ -543,7 +543,7 @@
       const byDay = {};
       (d.daily || []).forEach(r => { byDay[r.day] = r.n; });
       const rows = [];
-      for (let i = 29; i >= 0; i--) {
+      for (let i = 0; i <= 29; i++) {            // newest day first
         const dt = new Date(); dt.setDate(dt.getDate() - i);
         const key = dt.toISOString().slice(0, 10);
         rows.push([key, byDay[key] || 0]);
