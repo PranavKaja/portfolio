@@ -58,8 +58,23 @@ Message statuses: **received**, **decoded**, **replied** (+ a priority **flag**)
    (Or **Add user** → "Auto Confirm" so you can log in immediately.)
 2. That email/password is what you'll use at `/admin.html`.
 
-> Optional hardening: **Authentication → Providers → Email** → turn **off** "Allow new users to sign up"
-> so only the user you created can exist.
+### 5. ⚠️ REQUIRED — disable public signups
+The admin policies grant access to **any authenticated user**, and the publishable key is
+public (it's in the browser). If self-signup is left on, **anyone can register and gain admin
+access** — reading your contact inbox and editing your projects. Close it:
+
+- **Authentication → Sign In / Up** → turn **off** "Allow new users to sign up" → **Save changes**.
+- Confirm "Allow anonymous sign-ins" is also off.
+
+You create your admin manually (step 4), so you never need self-signup.
+
+> Optional extra hardening:
+> - **Authentication → Settings** → enable **leaked-password protection** (HaveIBeenPwned check).
+> - On an existing database, pin the trigger's search_path (already baked into `schema.sql` for
+>   fresh installs):
+>   ```sql
+>   alter function public.set_updated_at() set search_path = pg_catalog;
+>   ```
 
 ---
 

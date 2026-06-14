@@ -34,8 +34,12 @@ create table if not exists public.projects (
 create index if not exists projects_sort_idx on public.projects (sort_order);
 
 -- keep updated_at fresh on every edit
+-- search_path is pinned (not role-mutable) to satisfy the Supabase security linter
 create or replace function public.set_updated_at()
-returns trigger language plpgsql as $$
+returns trigger
+language plpgsql
+set search_path = pg_catalog
+as $$
 begin
   new.updated_at = now();
   return new;
