@@ -21,7 +21,12 @@ window.getSupabase = function () {
   if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY) return null;      // offline mode
   if (!window.supabase || !window.supabase.createClient) return null; // CDN didn't load
   if (!window.__sb) {
-    window.__sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+    try {
+      window.__sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+    } catch (e) {
+      console.warn('Supabase createClient failed (e.g. localStorage blocked in Incognito):', e);
+      return null;
+    }
   }
   return window.__sb;
 };
