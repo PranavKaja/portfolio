@@ -201,6 +201,9 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('ttt_system_score', systemScore);
         }
         
+        // Visitor Intel: log the finished match result (anonymous)
+        if (window.intel) window.intel.track('ttt_match', { result: winner });
+        
         updateScoreboard();
         
         rebootTimeout = setTimeout(() => {

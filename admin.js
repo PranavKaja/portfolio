@@ -599,6 +599,8 @@
     return m + ':' + String(ss).padStart(2, '0');
   }
 
+  let currentGameTab = 'wasd';
+
   async function loadIntel(force) {
     if (intelLoaded && !force) return;
     msg($('intel-msg'), '', '');
@@ -625,16 +627,49 @@
     barlist('intel-projects', (d.top_projects || []).map(p => [p.title || p.code, p.n]));
     barlist('intel-pages', (d.top_pages || []).map(p => [p.path === '/' ? '/ (home)' : p.path, p.n]));
 
-    const g = d.game || {};
-    $('intel-game').innerHTML =
-      `<div class="gs"><span class="gs-num">${g.players || 0}</span><span class="gs-label">players</span></div>` +
-      `<div class="gs"><span class="gs-num">${g.plays || 0}</span><span class="gs-label">total plays</span></div>` +
-      `<div class="gs"><span class="gs-num">${g.high || 0}</span><span class="gs-label">high score</span></div>` +
-      `<div class="gs"><span class="gs-num">${g.avg || 0}</span><span class="gs-label">avg score</span></div>`;
+    renderGameStats();
 
     renderLeaderboard('intel-leaderboard', d.leaderboard || []);
     renderDaily('intel-daily', d.daily || []);
   }
+
+  function renderGameStats() {
+    const isWASD = (currentGameTab === 'wasd');
+    const g = isWASD ? (intelData.game || {}) : (intelData.tictactoe || {});
+    
+    if (isWASD) {
+      $('intel-game').innerHTML =
+        `<div class="gs"><span class="gs-num">${g.players || 0}</span><span class="gs-label">players</span></div>` +
+        `<div class="gs"><span class="gs-num">${g.plays || 0}</span><span class="gs-label">total plays</span></div>` +
+        `<div class="gs"><span class="gs-num">${g.high || 0}</span><span class="gs-label">high score</span></div>` +
+        `<div class="gs"><span class="gs-num">${g.avg || 0}</span><span class="gs-label">avg score</span></div>`;
+    } else {
+      $('intel-game').innerHTML =
+        `<div class="gs"><span class="gs-num">${g.players || 0}</span><span class="gs-label">players</span></div>` +
+        `<div class="gs"><span class="gs-num">${g.plays || 0}</span><span class="gs-label">total plays</span></div>` +
+        `<div class="gs"><span class="gs-num">${g.user_wins || 0}</span><span class="gs-label">user wins</span></div>` +
+        `<div class="gs"><span class="gs-num">${g.system_wins || 0}</span><span class="gs-label">pranav wins</span></div>` +
+        `<div class="gs"><span class="gs-num">${g.draws || 0}</span><span class="gs-label">draws</span></div>`;
+    }
+  }
+
+  // Hook up game toggles
+  if ($('tg-wasd') && $('tg-ttt')) {
+    $('tg-wasd').addEventListener('click', (e) => {
+      $('tg-wasd').classList.add('active');
+      $('tg-ttt').classList.remove('active');
+      currentGameTab = 'wasd';
+      renderGameStats();
+    });
+    $('tg-ttt').addEventListener('click', (e) => {
+      $('tg-ttt').classList.add('active');
+      $('tg-wasd').classList.remove('active');
+      currentGameTab = 'ttt';
+      renderGameStats();
+    });
+  }
+
+
 
   // best score per distinct (anonymous) player — repeat plays collapse to one row
   function leaderboardTable(rows) {

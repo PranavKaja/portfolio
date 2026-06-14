@@ -118,6 +118,15 @@ as $$
         'avg',     coalesce(round(avg((meta->>'score')::numeric), 1), 0)
       ) from public.events where type = 'game_score'
     ),
+    'tictactoe', (
+      select json_build_object(
+        'plays', count(*),
+        'players', count(distinct session_id) filter (where session_id <> ''),
+        'user_wins', count(*) filter (where meta->>'result' = 'U'),
+        'system_wins', count(*) filter (where meta->>'result' = 'P'),
+        'draws', count(*) filter (where meta->>'result' = 'D')
+      ) from public.events where type = 'ttt_match'
+    ),
     -- one row per distinct anonymous player, their best score + how many times they played
     'leaderboard', (
       select coalesce(json_agg(l), '[]'::json) from (
