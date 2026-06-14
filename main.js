@@ -56,16 +56,19 @@ document.addEventListener('DOMContentLoaded', () => {
             cursorVisible = true;
         });
 
-        // Hover states
-        const interactiveElements = document.querySelectorAll('a, button, .panel:not(.scope-host), .project-panel, .skill-panel, .timeline-item, .interactive-element');
+        // Hover states using event delegation to support dynamically added elements
+        const hoverSelector = 'a, button, .panel:not(.scope-host), .project-panel, .skill-panel, .timeline-item, .interactive-element, .intel-clickable, .clickable';
         
-        interactiveElements.forEach(el => {
-            el.addEventListener('mouseenter', () => {
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.closest(hoverSelector)) {
                 if (cursor) cursor.classList.add('hover');
-            });
-            el.addEventListener('mouseleave', () => {
+            }
+        });
+        
+        document.addEventListener('mouseout', (e) => {
+            if (e.target.closest(hoverSelector)) {
                 if (cursor) cursor.classList.remove('hover');
-            });
+            }
         });
     }
 

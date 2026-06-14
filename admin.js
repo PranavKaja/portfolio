@@ -450,8 +450,10 @@
               <div class="msn-d-hook">${esc(p.hook)}</div>
               <div class="msn-d-brief">${esc(p.brief)}</div>
               ${rmoHtml}
-              <div class="pp-chips" style="display:inline-flex;">${chipsHtml}</div>
-              ${githubBtn}
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top: 15px;">
+                  <div class="pp-chips" style="display:inline-flex;">${chipsHtml}</div>
+                  <div>${githubBtn}</div>
+              </div>
           </div>
       </div>
     `;
