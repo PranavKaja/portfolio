@@ -124,7 +124,11 @@
       b.addEventListener('click', () => openEditor(b.getAttribute('data-edit'))));
   }
 
-  $('refresh-btn').addEventListener('click', loadProjects);
+  $('universal-refresh-btn')?.addEventListener('click', () => {
+    loadProjects();
+    loadTransmissions();
+    loadIntel(true);
+  });
 
   // ---- card view + drag-to-reorder ----
   let projView = 'cards';
@@ -607,8 +611,6 @@
     if (e.key === 'Escape' && !$('intel-modal-bg').classList.contains('hidden')) closeIntelModal();
   });
 
-  $('intel-refresh-btn')?.addEventListener('click', () => loadIntel(true));
-  $('tx-refresh-btn')?.addEventListener('click', loadTransmissions);
   $('tx-unread-btn')?.addEventListener('click', () => {
     txUnreadOnly = !txUnreadOnly;
     $('tx-unread-btn').textContent = txUnreadOnly ? 'Show all' : 'Unread only';
