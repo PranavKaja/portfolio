@@ -332,11 +332,29 @@
 
     const g = d.game || {};
     $('intel-game').innerHTML =
-      `<div class="gs"><span class="gs-num">${g.plays || 0}</span><span class="gs-label">plays</span></div>` +
+      `<div class="gs"><span class="gs-num">${g.players || 0}</span><span class="gs-label">players</span></div>` +
+      `<div class="gs"><span class="gs-num">${g.plays || 0}</span><span class="gs-label">total plays</span></div>` +
       `<div class="gs"><span class="gs-num">${g.high || 0}</span><span class="gs-label">high score</span></div>` +
       `<div class="gs"><span class="gs-num">${g.avg || 0}</span><span class="gs-label">avg score</span></div>`;
 
+    renderLeaderboard('intel-leaderboard', d.leaderboard || []);
     renderDaily('intel-daily', d.daily || []);
+  }
+
+  // best score per distinct (anonymous) player — repeat plays collapse to one row
+  function renderLeaderboard(id, rows) {
+    const el = $(id);
+    if (!el) return;
+    if (!rows.length) { el.innerHTML = '<div class="bl-empty">// no games played yet</div>'; return; }
+    el.innerHTML =
+      '<table class="lb"><thead><tr><th>#</th><th>Player</th><th>Best</th><th>Plays</th></tr></thead><tbody>' +
+      rows.map((r, i) => `<tr>
+        <td class="lb-rank">${i + 1}</td>
+        <td class="lb-player">#${esc(String(r.player || '').toUpperCase())}</td>
+        <td class="lb-best">${r.best}</td>
+        <td class="lb-plays">${r.plays}</td>
+      </tr>`).join('') +
+      '</tbody></table>';
   }
 
   function barlist(id, rows) {
@@ -376,9 +394,9 @@
       `<text x="${W - pad}" y="${H - 2}" text-anchor="end" class="spark-ax">${last}</text></svg>`;
   }
 
-  $('intel-refresh-btn').addEventListener('click', () => loadIntel(true));
-  $('tx-refresh-btn').addEventListener('click', loadTransmissions);
-  $('tx-unread-btn').addEventListener('click', () => {
+  $('intel-refresh-btn')?.addEventListener('click', () => loadIntel(true));
+  $('tx-refresh-btn')?.addEventListener('click', loadTransmissions);
+  $('tx-unread-btn')?.addEventListener('click', () => {
     txUnreadOnly = !txUnreadOnly;
     $('tx-unread-btn').textContent = txUnreadOnly ? 'Show all' : 'Unread only';
     renderTx();

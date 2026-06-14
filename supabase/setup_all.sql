@@ -372,10 +372,24 @@ as $$
     ),
     'game', (
       select json_build_object(
-        'plays', count(*),
-        'high',  coalesce(max((meta->>'score')::int), 0),
-        'avg',   coalesce(round(avg((meta->>'score')::numeric), 1), 0)
+        'plays',   count(*),
+        'players', count(distinct session_id) filter (where session_id <> ''),
+        'high',    coalesce(max((meta->>'score')::int), 0),
+        'avg',     coalesce(round(avg((meta->>'score')::numeric), 1), 0)
       ) from public.events where type = 'game_score'
+    ),
+    -- one row per distinct anonymous player, their best score + how many times they played
+    'leaderboard', (
+      select coalesce(json_agg(l), '[]'::json) from (
+        select left(session_id, 6) as player,
+               max((meta->>'score')::int) as best,
+               count(*) as plays
+        from public.events
+        where type = 'game_score' and session_id <> ''
+        group by session_id
+        order by best desc
+        limit 10
+      ) l
     )
   );
 $$;

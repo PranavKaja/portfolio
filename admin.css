@@ -215,6 +215,17 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
 .spark rect { fill: var(--accent); }
 .spark-ax { fill: var(--text-muted); font-family: 'Share Tech Mono', monospace; font-size: 11px; }
 
+/* leaderboard */
+.lb { width: 100%; border-collapse: collapse; }
+.lb th { text-align: left; font: 700 0.66rem/1 'Share Tech Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); padding: 0 0 8px; border-bottom: 1px solid var(--border); }
+.lb td { padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 0.86rem; }
+.lb tr:last-child td { border-bottom: none; }
+.lb-rank { width: 36px; color: var(--text-muted); font-family: 'Space Mono', monospace; }
+.lb-player { font-family: 'Share Tech Mono', monospace; letter-spacing: 1px; }
+.lb-best { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--accent); }
+.lb-plays { color: var(--text-muted); font-family: 'Space Mono', monospace; }
+.lb th:nth-child(3), .lb td:nth-child(3), .lb th:nth-child(4), .lb td:nth-child(4) { text-align: right; width: 80px; }
+
 @media (max-width: 760px) {
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
   .intel-cols { grid-template-columns: 1fr; }
