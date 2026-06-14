@@ -1,6 +1,10 @@
 # Pranav Kaja — Portfolio
 
-Live at **[pranavkaja.vercel.app](https://pranavkaja.vercel.app)**
+Live at **[pranavkajatest.vercel.app](https://pranavkajatest.vercel.app)**
+
+The full-stack version: projects, status badges, and the contact inbox are backed by
+Supabase (Postgres + Auth), managed through a built-in Ops Console at `/admin`.
+See [`SETUP.md`](SETUP.md) for the backend setup.
 
 Personal portfolio with a clinical/dossier visual language: grid-paper background,
 crosshair cursor, declassified personnel files, and a mission-log project grid.
