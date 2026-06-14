@@ -36,7 +36,22 @@
   // Auth
   // ============================================================
   async function refreshAuth() {
-    const { data: { session } } = await db.auth.getSession();
+    let session = null;
+    try {
+      const res = await db.auth.getSession();
+      session = res && res.data ? res.data.session : null;
+    } catch (e) {
+      // A corrupt/expired token in localStorage can throw here. Left unhandled
+      // it blanks the page (no view is ever shown) and a hard refresh won't fix
+      // it because localStorage survives. Clear the stored session and fall back
+      // to login so the console always self-heals.
+      console.warn('[auth] session read failed; clearing stored session:', e);
+      try {
+        Object.keys(localStorage).forEach(k => { if (/^sb-.*-auth-token$/.test(k)) localStorage.removeItem(k); });
+      } catch (e2) { /* ignore */ }
+      try { await db.auth.signOut(); } catch (e3) { /* ignore */ }
+      session = null;
+    }
     if (session) {
       $('who').textContent = '// ' + (session.user.email || 'OPERATOR');
       show('console');
@@ -188,7 +203,7 @@
     else msg($('console-msg'), updates.length + ' position' + (updates.length === 1 ? '' : 's') + ' saved.', 'ok');
   }
 
-  $('view-toggle-btn').addEventListener('click', () => {
+  $('view-toggle-btn')?.addEventListener('click', () => {
     projView = projView === 'cards' ? 'rows' : 'cards';
     applyView();
   });
@@ -542,12 +557,12 @@
 
   function closeIntelModal() { $('intel-modal-bg').classList.add('hidden'); }
 
-  $('panel-intel').addEventListener('click', e => {
+  $('panel-intel')?.addEventListener('click', e => {
     const card = e.target.closest('[data-detail]');
     if (card) openIntelDetail(card.getAttribute('data-detail'));
   });
-  $('intel-modal-close').addEventListener('click', closeIntelModal);
-  $('intel-modal-bg').addEventListener('click', e => { if (e.target === $('intel-modal-bg')) closeIntelModal(); });
+  $('intel-modal-close')?.addEventListener('click', closeIntelModal);
+  $('intel-modal-bg')?.addEventListener('click', e => { if (e.target === $('intel-modal-bg')) closeIntelModal(); });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && !$('intel-modal-bg').classList.contains('hidden')) closeIntelModal();
   });
