@@ -8,6 +8,7 @@
     <title>Ops Console</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="admin-preview.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Share+Tech+Mono&display=swap"
@@ -147,24 +148,39 @@
 
     <!-- EDITOR MODAL -->
     <div id="modal-bg" class="modal-bg hidden">
-        <div class="modal">
-            <h2 id="modal-title">New Project</h2>
-            <form id="project-form">
+        <div class="modal" style="max-width: 1200px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px;">
+                <h2 id="modal-title" style="margin-bottom:0;">New Project</h2>
+                <button type="button" id="toggle-preview-btn" class="ghost" style="padding: 5px 10px; font-size: 0.8rem;">Show Card Previews</button>
+            </div>
+            
+            <div style="display: flex; gap: 40px; width: 100%;">
+                <form id="project-form" style="flex: 1;">
                 <input type="hidden" id="f-id">
                 <div class="grid2">
                     <label class="field"><span>Code (e.g. MSN-10)</span><input type="text" id="f-code" required></label>
                     <label class="field"><span>Title</span><input type="text" id="f-title" required></label>
                     <label class="field"><span>Card stack (tech)</span><input type="text" id="f-tech"></label>
-                    <label class="field"><span>Full stack (overlay)</span><input type="text" id="f-stack"></label>
+                    <label class="field">
+                        <span style="display:flex; justify-content:space-between">Full stack (overlay) <a href="#" id="sync-stack" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Tech</a></span>
+                        <input type="text" id="f-stack">
+                    </label>
                 </div>
                 <label class="field"><span>Card one-liner (summary)</span><input type="text" id="f-summary"></label>
-                <label class="field"><span>Hook</span><input type="text" id="f-hook"></label>
-                <label class="field"><span>Brief</span><textarea id="f-brief"></textarea></label>
+                <label class="field">
+                    <span style="display:flex; justify-content:space-between">Hook <a href="#" id="sync-hook" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Summary</a></span>
+                    <input type="text" id="f-hook">
+                </label>
+                <label class="field">
+                    <span style="display:flex; justify-content:space-between">Brief <a href="#" id="sync-brief" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Summary</a></span>
+                    <textarea id="f-brief"></textarea>
+                </label>
                 <div class="grid2">
                     <label class="field"><span>Role</span><input type="text" id="f-role"></label>
                     <label class="field"><span>Method</span><input type="text" id="f-method"></label>
                 </div>
                 <label class="field"><span>Outcome</span><input type="text" id="f-outcome"></label>
+                <label class="field"><span>GitHub URL</span><input type="url" id="f-github" placeholder="https://github.com/username/repo"></label>
                 <label class="field"><span>Chips (one per line)</span><textarea id="f-chips" placeholder="0.978 AUC&#10;84% Recall"></textarea></label>
                 <div class="grid2">
                     <label class="field"><span>Status</span>
@@ -190,6 +206,21 @@
                     <button type="submit" class="primary" id="save-btn">Save</button>
                 </div>
             </form>
+            
+            <div id="project-preview" class="hidden" style="flex: 1;">
+                <div class="preview-section">
+                    <div class="preview-label">Live Preview</div>
+                    <div class="preview-row">
+                        <div id="prev-default-card"></div>
+                        <div id="prev-hover-card"></div>
+                    </div>
+                </div>
+                <div class="preview-section" style="margin-top: 40px;">
+                    <div class="preview-label">Popup Overlay (msn-sheet)</div>
+                    <div id="prev-popup-card"></div>
+                </div>
+            </div>
+            </div>
         </div>
     </div>
 

@@ -233,7 +233,7 @@
     id: $('f-id'), code: $('f-code'), title: $('f-title'), tech: $('f-tech'),
     stack: $('f-stack'), summary: $('f-summary'), hook: $('f-hook'), brief: $('f-brief'),
     role: $('f-role'), method: $('f-method'), outcome: $('f-outcome'), chips: $('f-chips'),
-    status: $('f-status'), sort: $('f-sort'), published: $('f-published')
+    status: $('f-status'), sort: $('f-sort'), published: $('f-published'), github: $('f-github')
   };
 
   function openEditor(id) {
@@ -250,10 +250,17 @@
     F.role.value = p ? (p.role || '') : '';
     F.method.value = p ? (p.method || '') : '';
     F.outcome.value = p ? (p.outcome || '') : '';
+    F.github.value = p ? (p.github_url || '') : '';
     F.chips.value = p && p.chips ? p.chips.join('\n') : '';
     F.status.value = p ? p.status : 'deployed';
     F.sort.value = p ? p.sort_order : (cache.length ? Math.max(...cache.map(x => x.sort_order || 0)) + 10 : 10);
     F.published.checked = p ? !!p.published : true;
+    
+    // Reset preview toggle if open
+    $('project-form').style.display = 'block';
+    $('project-preview').classList.add('hidden');
+    $('toggle-preview-btn').textContent = 'Show Card Previews';
+    updatePreviews();
     $('delete-btn').classList.toggle('hidden', !p);
     msg($('form-msg'), '');
     $('modal-bg').classList.remove('hidden');
@@ -279,6 +286,7 @@
       role: F.role.value.trim(),
       method: F.method.value.trim(),
       outcome: F.outcome.value.trim(),
+      github_url: F.github.value.trim() || null,
       chips: F.chips.value.split('\n').map(s => s.trim()).filter(Boolean),
       status: STATUS.includes(F.status.value) ? F.status.value : 'deployed',
       sort_order: parseInt(F.sort.value, 10) || 0,
@@ -298,6 +306,113 @@
     closeEditor();
     loadProjects();
   });
+
+  // Sync Buttons
+  $('sync-stack').addEventListener('click', (e) => { e.preventDefault(); F.stack.value = F.tech.value; updatePreviews(); });
+  $('sync-hook').addEventListener('click', (e) => { e.preventDefault(); F.hook.value = F.summary.value; updatePreviews(); });
+  $('sync-brief').addEventListener('click', (e) => { e.preventDefault(); F.brief.value = F.summary.value; updatePreviews(); });
+
+  // Preview Toggle
+  $('toggle-preview-btn').addEventListener('click', () => {
+    const previewContainer = $('project-preview');
+    const form = $('project-form');
+    if (previewContainer.classList.contains('hidden')) {
+      previewContainer.classList.remove('hidden');
+      form.style.display = 'none'; // hide form to focus on previews
+      $('toggle-preview-btn').textContent = 'Show Form';
+      updatePreviews();
+    } else {
+      previewContainer.classList.add('hidden');
+      form.style.display = 'block';
+      $('toggle-preview-btn').textContent = 'Show Card Previews';
+    }
+  });
+
+  // Live Previews
+  Object.values(F).forEach(el => {
+    if (el && el.tagName !== 'BUTTON' && el.tagName !== 'INPUT' || el.type !== 'hidden') {
+      el.addEventListener('input', updatePreviews);
+      el.addEventListener('change', updatePreviews);
+    }
+  });
+
+  function updatePreviews() {
+    if ($('project-preview').classList.contains('hidden')) return; // Save cycles if not viewing previews
+    
+    const p = {
+      code: F.code.value, title: F.title.value, tech: F.tech.value, stack: F.stack.value,
+      summary: F.summary.value, hook: F.hook.value, brief: F.brief.value,
+      role: F.role.value, method: F.method.value, outcome: F.outcome.value,
+      chips: F.chips.value.split('\n').filter(Boolean),
+      status: F.status.value, github_url: F.github.value
+    };
+
+    const num = String(p.code || '').match(/(\d+)/)?.[1] || '';
+    const statusHtml = p.status === 'none' ? '' : `<span class="proj-status proj-status--${esc(p.status)}">${esc(STATUS_LABEL[p.status] || p.status)}</span>`;
+    const chipsHtml = (p.chips || []).map(c => `<span>${esc(c)}</span>`).join('');
+    
+    // Default Card
+    $('prev-default-card').innerHTML = `
+      <div class="project-panel" style="width: 100%;">
+        ${statusHtml}
+        <div class="proj-id">${esc(p.code)}</div>
+        <h3>${esc(p.title)}</h3>
+        <p class="tech">${esc(p.tech)}</p>
+        <p class="desc">${esc(p.summary)}</p>
+      </div>
+    `;
+
+    // Hover Card
+    $('prev-hover-card').innerHTML = `
+      <div class="project-panel project-panel-hovered" style="width: 100%;">
+        ${statusHtml}
+        <div class="proj-id">${esc(p.code)}</div>
+        <h3>${esc(p.title)}</h3>
+        <p class="tech">${esc(p.tech)}</p>
+        <p class="desc">${esc(p.summary)}</p>
+        <div class="pp-expand">
+            <div class="pp-head"><span class="proj-id">${esc(p.code)}</span><span class="pp-stack">${esc(p.stack)}</span></div>
+            <h3>${esc(p.title)}</h3>
+            <p class="pp-hook">${esc(p.hook)}</p>
+            <p class="pp-brief">${esc(p.brief)}</p>
+            <div class="pp-chips">${chipsHtml}</div>
+        </div>
+      </div>
+    `;
+
+    // Popup Overlay Card
+    let rmoHtml = '';
+    if (p.role || p.method || p.outcome) {
+      rmoHtml = `<div class="msn-rmo">
+        <div class="rmo-cell"><div class="k">Role</div><div class="v">${esc(p.role)}</div></div>
+        <div class="rmo-cell"><div class="k">Method</div><div class="v">${esc(p.method)}</div></div>
+        <div class="rmo-cell"><div class="k">Outcome</div><div class="v">${esc(p.outcome)}</div></div>
+      </div>`;
+    }
+    
+    const githubBtn = p.github_url ? `<a href="${esc(p.github_url)}" target="_blank" rel="noopener noreferrer" class="github-btn">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+          </svg> View Source</a>` : '';
+
+    $('prev-popup-card').innerHTML = `
+      <div class="msn-sheet-wrap" style="opacity: 1; transform: none;">
+          <div class="msn-sheet">
+              <button class="msn-back">BACK TO DOSSIER</button>
+              <div class="msn-d-head">
+                  <div class="proj-id">${esc(p.code)}</div>
+                  <div class="msn-d-stack">${esc(p.stack)}</div>
+              </div>
+              <h2 class="msn-d-title">${esc(p.title)}</h2>
+              <div class="msn-d-hook">${esc(p.hook)}</div>
+              <div class="msn-d-brief">${esc(p.brief)}</div>
+              ${rmoHtml}
+              <div class="pp-chips" style="display:inline-flex;">${chipsHtml}</div>
+              ${githubBtn}
+          </div>
+      </div>
+    `;
+  }
 
   $('delete-btn').addEventListener('click', async () => {
     if (!F.id.value) return;

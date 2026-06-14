@@ -1,0 +1,274 @@
+/* Card Preview Mode Styles for Admin Console */
+
+#project-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    padding: 20px 0;
+    overflow-y: auto;
+    max-height: 70vh;
+}
+
+.preview-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.preview-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 5px;
+}
+
+.preview-row {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+/* 1. Default Card & Hover Card */
+.project-panel {
+    background: var(--panel-bg);
+    padding: 30px;
+    border: 1px solid var(--border);
+    position: relative;
+    width: 320px;
+    flex-shrink: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.project-panel-hovered {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 8px 8px 0px var(--text-main);
+    border-color: var(--text-main);
+    z-index: 10;
+}
+
+.proj-status {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    line-height: 1;
+}
+.proj-status::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+.proj-status--deployed { color: #2b8a3e; }
+.proj-status--in_progress { color: var(--accent); }
+.proj-status--archived { color: var(--text-muted); }
+.proj-status--classified {
+    color: #ffffff;
+    background: var(--text-main);
+    border-color: var(--text-main);
+}
+.proj-status--none { display: none; }
+
+.proj-id {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin-bottom: 15px;
+}
+
+.project-panel h3 {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+}
+
+.project-panel .tech {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 15px;
+}
+
+.project-panel .desc {
+    color: var(--text-muted);
+    font-size: 14.5px;
+    line-height: 1.55;
+}
+
+/* Hover Expand (Hover Card Preview) */
+.pp-expand {
+    background: var(--bg);
+    border: 1px solid var(--text-main);
+    padding: 30px;
+    position: relative;
+    width: 500px;
+    flex-shrink: 0;
+}
+.pp-expand::after {
+    content: '';
+    position: absolute;
+    top: 12px; left: 12px; right: -12px; bottom: -12px;
+    border: 2px solid var(--accent);
+    z-index: -1;
+}
+.pp-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 15px;
+}
+.pp-head .proj-id {
+    margin-bottom: 0;
+}
+.pp-stack {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    text-align: right;
+}
+.pp-expand h3 {
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+}
+.pp-hook {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 10px;
+}
+.pp-brief {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+    white-space: pre-wrap;
+}
+.pp-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.pp-chips span {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    border: 1px solid var(--text-main);
+    padding: 5px 9px;
+    background: var(--bg);
+}
+
+/* 2. Popup Card (.msn-sheet) */
+.msn-sheet {
+    position: relative;
+    background: var(--bg);
+    border: 1px solid var(--text-main);
+    padding: 30px 22px 34px;
+    width: 100%;
+    max-width: 800px;
+}
+.msn-back {
+    display: block;
+    background: transparent;
+    border: none;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+}
+.msn-d-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+.msn-d-head .proj-id {
+    margin-bottom: 0;
+}
+.msn-d-stack {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    text-align: right;
+}
+.msn-d-title {
+    font-size: 2.6rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 14px;
+}
+.msn-d-hook {
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 14px;
+}
+.msn-d-brief {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    white-space: pre-wrap;
+}
+.msn-rmo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 2px solid var(--text-main);
+    margin-bottom: 28px;
+}
+.rmo-cell {
+    padding: 20px 22px;
+    border-right: 2px solid var(--text-main);
+}
+.rmo-cell:last-child {
+    border-right: none;
+}
+.rmo-cell .k {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 9px;
+}
+.rmo-cell .v {
+    font-weight: 600;
+    font-size: 0.93rem;
+    line-height: 1.5;
+}
+
+.github-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 2px solid var(--text-main);
+    padding: 10px 16px;
+    font-family: 'Share Tech Mono', monospace;
+    font-weight: bold;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    text-transform: uppercase;
+    transition: all 0.2s;
+    float: right;
+    cursor: pointer;
+}
+.github-btn:hover {
+    background: var(--text-main);
+    color: var(--bg);
+}
