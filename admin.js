@@ -77,7 +77,7 @@
     if (error) { msg($('console-msg'), error.message, 'err'); return; }
     cache = data || [];
     msg($('console-msg'), '');
-    renderRows();
+    renderProjects();
   }
 
   function esc(s) {
@@ -105,6 +105,93 @@
   }
 
   $('refresh-btn').addEventListener('click', loadProjects);
+
+  // ---- card view + drag-to-reorder ----
+  let projView = 'rows';
+
+  function renderProjects() {
+    renderRows();
+    renderCards();
+    applyView();
+  }
+
+  function applyView() {
+    const cards = projView === 'cards';
+    $('projects-table').classList.toggle('hidden', cards);
+    $('projects-cards').classList.toggle('hidden', !cards);
+    $('view-hint').classList.toggle('hidden', !cards);
+    $('view-toggle-btn').textContent = cards ? '▤ Row view' : '▦ Card view';
+    $('empty').classList.toggle('hidden', cache.length > 0 || cards);
+  }
+
+  function renderCards() {
+    const el = $('projects-cards');
+    if (!cache.length) { el.innerHTML = '<div class="empty">// NO MISSION RECORDS</div>'; return; }
+    el.innerHTML = cache.map(p => `
+      <div class="proj-card" draggable="true" data-id="${esc(p.id)}" data-status="${esc(p.status)}">
+        <span class="pc-handle" aria-hidden="true" title="Drag to reorder">⠿</span>
+        <span class="pc-code">${esc(p.code)}</span>
+        <span class="pc-title">${esc(p.title)}</span>
+        <span class="pc-tech">${esc(p.tech || '')}</span>
+        ${p.published ? '' : '<span class="pc-hidden">hidden</span>'}
+        <span class="badge badge--${esc(p.status)}">${esc(STATUS_LABEL[p.status] || p.status)}</span>
+        <button class="pc-edit" data-edit="${esc(p.id)}">Edit</button>
+      </div>`).join('');
+    el.querySelectorAll('[data-edit]').forEach(b =>
+      b.addEventListener('click', e => { e.stopPropagation(); openEditor(b.getAttribute('data-edit')); }));
+    wireDnd(el);
+  }
+
+  function getDragAfterElement(container, y) {
+    const els = Array.prototype.slice.call(container.querySelectorAll('.proj-card:not(.dragging)'));
+    let best = { offset: -Infinity, el: null };
+    els.forEach(child => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > best.offset) best = { offset: offset, el: child };
+    });
+    return best.el;
+  }
+
+  function wireDnd(container) {
+    container.querySelectorAll('.proj-card').forEach(card => {
+      card.addEventListener('dragstart', () => setTimeout(() => card.classList.add('dragging'), 0));
+      card.addEventListener('dragend', () => { card.classList.remove('dragging'); persistOrder(container); });
+    });
+    container.addEventListener('dragover', e => {
+      e.preventDefault();
+      const dragged = container.querySelector('.dragging');
+      if (!dragged) return;
+      const after = getDragAfterElement(container, e.clientY);
+      if (after == null) container.appendChild(dragged);
+      else container.insertBefore(dragged, after);
+    });
+  }
+
+  async function persistOrder(container) {
+    const ids = Array.prototype.slice.call(container.querySelectorAll('.proj-card')).map(c => c.getAttribute('data-id'));
+    const reordered = ids.map(id => cache.find(p => String(p.id) === String(id))).filter(Boolean);
+    if (reordered.length !== cache.length) return;
+    const updates = [];
+    reordered.forEach((p, i) => {
+      const want = (i + 1) * 10;
+      if (p.sort_order !== want) { p.sort_order = want; updates.push({ id: p.id, sort_order: want }); }
+    });
+    cache = reordered;
+    renderRows(); // reflect new order in the row view immediately
+    if (!updates.length) return;
+    msg($('console-msg'), 'Saving order…');
+    const results = await Promise.all(updates.map(u =>
+      db.from('projects').update({ sort_order: u.sort_order }).eq('id', u.id)));
+    const failed = results.find(r => r.error);
+    if (failed) { msg($('console-msg'), 'Save failed: ' + failed.error.message, 'err'); loadProjects(); }
+    else msg($('console-msg'), updates.length + ' position' + (updates.length === 1 ? '' : 's') + ' saved.', 'ok');
+  }
+
+  $('view-toggle-btn').addEventListener('click', () => {
+    projView = projView === 'cards' ? 'rows' : 'cards';
+    applyView();
+  });
 
   // ============================================================
   // Editor modal
@@ -305,6 +392,14 @@
   // Visitor Intel dashboard
   // ============================================================
   let intelLoaded = false;
+  let intelData = {};
+
+  function fmtTime(s) {
+    s = Math.round(s || 0);
+    if (s < 60) return s + 's';
+    const m = Math.floor(s / 60), ss = s % 60;
+    return m + ':' + String(ss).padStart(2, '0');
+  }
 
   async function loadIntel(force) {
     if (intelLoaded && !force) return;
@@ -317,14 +412,16 @@
   }
 
   function renderIntel(d) {
+    intelData = d || {};
     const k = d.kpis || {};
     const kpis = [
       ['Total Views', k.total_views], ['Unique Visitors', k.unique_visitors],
+      ['Avg Time on Site', fmtTime(k.avg_time)],
       ['Project Opens', k.project_clicks], ['Resume Downloads', k.resume_downloads],
       ['Contact Submits', k.contact_submits], ['Game Plays', k.game_plays]
     ];
     $('intel-kpis').innerHTML = kpis.map(([label, val]) =>
-      `<div class="kpi"><div class="kpi-num">${val || 0}</div><div class="kpi-label">${label}</div></div>`).join('');
+      `<div class="kpi"><div class="kpi-num">${val == null ? 0 : val}</div><div class="kpi-label">${label}</div></div>`).join('');
 
     barlist('intel-traffic', (d.traffic || []).map(t => [t.source, t.n]));
     barlist('intel-projects', (d.top_projects || []).map(p => [p.title || p.code, p.n]));
@@ -342,12 +439,8 @@
   }
 
   // best score per distinct (anonymous) player — repeat plays collapse to one row
-  function renderLeaderboard(id, rows) {
-    const el = $(id);
-    if (!el) return;
-    if (!rows.length) { el.innerHTML = '<div class="bl-empty">// no games played yet</div>'; return; }
-    el.innerHTML =
-      '<table class="lb"><thead><tr><th>#</th><th>Player</th><th>Best</th><th>Plays</th></tr></thead><tbody>' +
+  function leaderboardTable(rows) {
+    return '<table class="lb"><thead><tr><th>#</th><th>Player</th><th>Best</th><th>Plays</th></tr></thead><tbody>' +
       rows.map((r, i) => `<tr>
         <td class="lb-rank">${i + 1}</td>
         <td class="lb-player">#${esc(String(r.player || '').toUpperCase())}</td>
@@ -357,16 +450,25 @@
       '</tbody></table>';
   }
 
+  function renderLeaderboard(id, rows) {
+    const el = $(id);
+    if (!el) return;
+    if (!rows.length) { el.innerHTML = '<div class="bl-empty">// no games played yet</div>'; return; }
+    el.innerHTML = leaderboardTable(rows.slice(0, 3)) +
+      (rows.length > 3 ? `<div class="bl-more">+ ${rows.length - 3} more player${rows.length - 3 === 1 ? '' : 's'}</div>` : '');
+  }
+
   function barlist(id, rows) {
     const el = $(id);
     if (!rows.length) { el.innerHTML = '<div class="bl-empty">// no data yet</div>'; return; }
     const max = Math.max.apply(null, rows.map(r => r[1])) || 1;
-    el.innerHTML = rows.map(([label, n]) => `
+    el.innerHTML = rows.slice(0, 3).map(([label, n]) => `
       <div class="bl-row">
         <span class="bl-label" title="${esc(String(label))}">${esc(String(label))}</span>
         <span class="bl-bar"><span class="bl-fill" style="width:${Math.max(4, Math.round(n / max * 100))}%"></span></span>
         <span class="bl-n">${n}</span>
-      </div>`).join('');
+      </div>`).join('') +
+      (rows.length > 3 ? `<div class="bl-more">+ ${rows.length - 3} more</div>` : '');
   }
 
   function renderDaily(id, rows) {
@@ -393,6 +495,62 @@
       `<text x="${pad}" y="${H - 2}" class="spark-ax">${first}</text>` +
       `<text x="${W - pad}" y="${H - 2}" text-anchor="end" class="spark-ax">${last}</text></svg>`;
   }
+
+  // ---- drill-down: click any Intel card → full breakdown ----
+  function detailTable(headers, rows) {
+    return '<table class="detail-table"><thead><tr>' +
+      headers.map((h, i) => `<th class="${i > 0 ? 'num' : ''}">${esc(h)}</th>`).join('') +
+      '</tr></thead><tbody>' +
+      rows.map(r => '<tr>' + r.map((c, i) => `<td class="${i > 0 ? 'num' : ''}">${esc(String(c))}</td>`).join('') + '</tr>').join('') +
+      '</tbody></table>';
+  }
+
+  function openIntelDetail(kind) {
+    const d = intelData || {};
+    let title = '', body = '';
+    if (kind === 'traffic') {
+      title = 'Traffic Sources';
+      const rows = (d.traffic || []).map(t => [t.source, t.n]);
+      body = rows.length ? detailTable(['Source', 'Views'], rows) : '';
+    } else if (kind === 'projects') {
+      title = 'Top Projects';
+      const rows = (d.top_projects || []).map(p => [p.title || p.code, p.n]);
+      body = rows.length ? detailTable(['Project', 'Opens'], rows) : '';
+    } else if (kind === 'pages') {
+      title = 'Pages — views & avg time';
+      const rows = (d.top_pages || []).map(p => [p.path === '/' ? '/ (home)' : p.path, p.n, fmtTime(p.avg_sec)]);
+      body = rows.length ? detailTable(['Page', 'Views', 'Avg time'], rows) : '';
+    } else if (kind === 'leaderboard') {
+      title = 'Game Leaderboard — all players';
+      body = (d.leaderboard || []).length ? leaderboardTable(d.leaderboard) : '';
+    } else if (kind === 'daily') {
+      title = 'Page Views — last 30 days';
+      const byDay = {};
+      (d.daily || []).forEach(r => { byDay[r.day] = r.n; });
+      const rows = [];
+      for (let i = 29; i >= 0; i--) {
+        const dt = new Date(); dt.setDate(dt.getDate() - i);
+        const key = dt.toISOString().slice(0, 10);
+        rows.push([key, byDay[key] || 0]);
+      }
+      body = detailTable(['Day', 'Views'], rows);
+    }
+    $('intel-modal-title').textContent = title || 'Detail';
+    $('intel-modal-body').innerHTML = body || '<div class="bl-empty">// no data yet</div>';
+    $('intel-modal-bg').classList.remove('hidden');
+  }
+
+  function closeIntelModal() { $('intel-modal-bg').classList.add('hidden'); }
+
+  $('panel-intel').addEventListener('click', e => {
+    const card = e.target.closest('[data-detail]');
+    if (card) openIntelDetail(card.getAttribute('data-detail'));
+  });
+  $('intel-modal-close').addEventListener('click', closeIntelModal);
+  $('intel-modal-bg').addEventListener('click', e => { if (e.target === $('intel-modal-bg')) closeIntelModal(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !$('intel-modal-bg').classList.contains('hidden')) closeIntelModal();
+  });
 
   $('intel-refresh-btn')?.addEventListener('click', () => loadIntel(true));
   $('tx-refresh-btn')?.addEventListener('click', loadTransmissions);

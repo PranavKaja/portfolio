@@ -205,7 +205,7 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
 .star.on { color: var(--accent); }
 
 /* ---- Intel dashboard ---- */
-.kpi-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 20px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
 .kpi { border: 1px solid var(--border); background: #fff; padding: 16px 14px; }
 .kpi-num { font: 700 1.9rem/1 'Space Mono', monospace; color: var(--text-main); }
 .kpi-label { font-family: 'Share Tech Mono', monospace; font-size: 0.66rem; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-top: 8px; }
@@ -248,3 +248,41 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
   .intel-cols { grid-template-columns: 1fr; }
   .bl-row { grid-template-columns: 110px 1fr 36px; }
 }
+
+/* ---- Projects: card view + drag-to-reorder ---- */
+.proj-cards { display: flex; flex-direction: column; gap: 10px; }
+.proj-card {
+  display: flex; align-items: center; gap: 14px;
+  background: #fff; border: 1px solid var(--border);
+  border-left: 3px solid var(--text-muted);
+  padding: 13px 16px;
+  transition: box-shadow .12s, border-color .12s, opacity .12s;
+}
+.proj-card[data-status="deployed"]    { border-left-color: #2b8a3e; }
+.proj-card[data-status="in_progress"] { border-left-color: var(--accent); }
+.proj-card[data-status="archived"]    { border-left-color: var(--text-muted); }
+.proj-card[data-status="classified"]  { border-left-color: var(--text-main); }
+.proj-card.dragging { opacity: .35; }
+.proj-card.drop-target { box-shadow: 0 -2px 0 var(--accent); }
+.pc-handle { cursor: grab; color: var(--text-muted); font-size: 1.05rem; line-height: 1; user-select: none; letter-spacing: -2px; }
+.pc-handle:active { cursor: grabbing; }
+.pc-code { font-family: 'Share Tech Mono', monospace; color: var(--accent); font-size: 0.78rem; min-width: 64px; }
+.pc-title { font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pc-tech { color: var(--text-muted); font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; white-space: nowrap; }
+.pc-edit { padding: 5px 12px; font-size: 0.72rem; flex: none; }
+.pc-hidden { color: var(--text-muted); font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 1px; text-transform: uppercase; }
+.proj-card .badge { flex: none; }
+.view-hint { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px; }
+@media (max-width: 640px) { .pc-tech { display: none; } }
+
+/* ---- Intel: clickable cards + drill-down ---- */
+.intel-clickable { cursor: pointer; transition: border-color .12s, box-shadow .12s; }
+.intel-clickable:hover { border-color: var(--text-main); box-shadow: 0 2px 0 var(--accent); }
+.intel-clickable h3 { display: flex; align-items: center; justify-content: space-between; }
+.intel-clickable h3::after { content: 'view all ↗'; font-size: 0.6rem; color: var(--accent); letter-spacing: 1px; }
+.bl-more { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; letter-spacing: 1px; color: var(--text-muted); padding-top: 4px; }
+.detail-table { width: 100%; border-collapse: collapse; }
+.detail-table th { text-align: left; font: 700 0.66rem/1 'Share Tech Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); padding: 0 10px 8px 0; border-bottom: 1px solid var(--border); }
+.detail-table td { padding: 9px 10px 9px 0; border-bottom: 1px solid var(--border); font-size: 0.86rem; }
+.detail-table td.num, .detail-table th.num { text-align: right; font-family: 'Space Mono', monospace; }
+.detail-table tr:last-child td { border-bottom: none; }

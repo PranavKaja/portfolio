@@ -77,4 +77,39 @@
       });
     }
   });
+
+  // ---- time on site ----
+  // Accumulate only *visible* time (paused when the tab is hidden), and flush
+  // the delta on every hide / unload. Uses a keepalive fetch because sendBeacon
+  // can't set the apikey header Supabase requires. Summed per session in SQL.
+  var cfg = window.PORTFOLIO_CONFIG || {};
+  var segStart = (document.visibilityState === 'visible') ? Date.now() : null;
+  var visibleMs = 0;
+
+  function flushTime() {
+    if (segStart) { visibleMs += Date.now() - segStart; segStart = (document.visibilityState === 'visible') ? Date.now() : null; }
+    var seconds = Math.round(visibleMs / 1000);
+    visibleMs = 0;
+    if (seconds < 2 || seconds > 7200) return;                 // ignore instant bounces / absurd values
+    if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY) return;
+    try {
+      fetch(cfg.SUPABASE_URL + '/rest/v1/events', {
+        method: 'POST',
+        keepalive: true,
+        headers: {
+          'apikey': cfg.SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + cfg.SUPABASE_ANON_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ type: 'page_time', path: location.pathname, source: SOURCE, session_id: SESSION, meta: { seconds: seconds } })
+      }).catch(function () {});
+    } catch (e) { /* no-op */ }
+  }
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') flushTime();
+    else segStart = Date.now();
+  });
+  window.addEventListener('pagehide', flushTime);
 })();

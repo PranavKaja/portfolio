@@ -7,7 +7,7 @@
 
 create table if not exists public.events (
   id          bigint generated always as identity primary key,
-  type        text not null,                  -- pageview | project_click | resume_download | contact_submit | game_score
+  type        text not null,                  -- pageview | project_click | resume_download | contact_submit | game_score | page_time
   path        text not null default '',
   source      text not null default 'Direct', -- normalized traffic source (Google, LinkedIn, Direct, ...)
   session_id  text not null default '',       -- anonymous, generated in the browser
@@ -60,7 +60,15 @@ as $$
         'project_clicks',   count(*) filter (where type = 'project_click'),
         'resume_downloads', count(*) filter (where type = 'resume_download'),
         'contact_submits',  count(*) filter (where type = 'contact_submit'),
-        'game_plays',       count(*) filter (where type = 'game_score')
+        'game_plays',       count(*) filter (where type = 'game_score'),
+        'avg_time',         (
+          select coalesce(round(avg(s.t)), 0) from (
+            select session_id, sum((meta->>'seconds')::numeric) as t
+            from public.events
+            where type = 'page_time' and session_id <> '' and (meta->>'seconds') is not null
+            group by session_id
+          ) s
+        )
       ) from public.events
     ),
     'traffic', (
@@ -80,9 +88,18 @@ as $$
     ),
     'top_pages', (
       select coalesce(json_agg(pg), '[]'::json) from (
-        select path, count(*) as n
-        from public.events where type = 'pageview'
-        group by path order by n desc limit 8
+        select v.path, v.n, coalesce(round(t.avg_sec), 0) as avg_sec
+        from (
+          select path, count(*) as n
+          from public.events where type = 'pageview'
+          group by path order by n desc limit 12
+        ) v
+        left join (
+          select path, avg((meta->>'seconds')::numeric) as avg_sec
+          from public.events where type = 'page_time' and (meta->>'seconds') is not null
+          group by path
+        ) t on t.path = v.path
+        order by v.n desc
       ) pg
     ),
     'daily', (

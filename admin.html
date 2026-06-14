@@ -65,13 +65,15 @@
                 <div class="row" style="margin-bottom:18px">
                     <button class="primary" id="new-btn">+ New Project</button>
                     <button class="ghost" id="refresh-btn">Refresh</button>
+                    <button class="ghost" id="view-toggle-btn">▦ Card view</button>
+                    <span class="view-hint hidden" id="view-hint">drag cards to reorder</span>
                     <div class="spacer"></div>
                     <span class="console-label" id="count"></span>
                 </div>
 
                 <div class="msg" id="console-msg"></div>
 
-                <table>
+                <table id="projects-table">
                     <thead>
                         <tr>
                             <th style="width:84px">Code</th>
@@ -85,6 +87,7 @@
                     <tbody id="rows"></tbody>
                 </table>
                 <div class="empty hidden" id="empty">// NO MISSION RECORDS</div>
+                <div id="projects-cards" class="proj-cards hidden"></div>
             </div>
 
             <!-- TRANSMISSIONS PANEL -->
@@ -112,15 +115,15 @@
                 <div class="kpi-grid" id="intel-kpis"></div>
 
                 <div class="intel-cols">
-                    <div class="intel-card">
+                    <div class="intel-card intel-clickable" data-detail="traffic">
                         <h3>Traffic Sources</h3>
                         <div id="intel-traffic" class="barlist"></div>
                     </div>
-                    <div class="intel-card">
+                    <div class="intel-card intel-clickable" data-detail="projects">
                         <h3>Top Projects</h3>
                         <div id="intel-projects" class="barlist"></div>
                     </div>
-                    <div class="intel-card">
+                    <div class="intel-card intel-clickable" data-detail="pages">
                         <h3>Top Pages</h3>
                         <div id="intel-pages" class="barlist"></div>
                     </div>
@@ -130,12 +133,12 @@
                     </div>
                 </div>
 
-                <div class="intel-card intel-wide">
+                <div class="intel-card intel-wide intel-clickable" data-detail="leaderboard">
                     <h3>Game Leaderboard — best score per player</h3>
                     <div id="intel-leaderboard"></div>
                 </div>
 
-                <div class="intel-card intel-wide">
+                <div class="intel-card intel-wide intel-clickable" data-detail="daily">
                     <h3>Page Views — last 30 days</h3>
                     <div id="intel-daily"></div>
                 </div>
@@ -187,6 +190,18 @@
                     <button type="button" class="danger hidden" id="delete-btn">Delete</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- INTEL DETAIL MODAL -->
+    <div id="intel-modal-bg" class="modal-bg hidden">
+        <div class="modal">
+            <h2 id="intel-modal-title">Detail</h2>
+            <div id="intel-modal-body"></div>
+            <div class="modal-actions">
+                <div class="spacer"></div>
+                <button type="button" class="ghost" id="intel-modal-close">Close</button>
+            </div>
         </div>
     </div>
 

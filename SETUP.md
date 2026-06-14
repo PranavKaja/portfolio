@@ -28,7 +28,10 @@ to `data/projects.json`), so nothing breaks before setup.
 
 Status badges supported: **deployed**, **in_progress**, **archived**, **classified**.
 Message statuses: **received**, **decoded**, **replied** (+ a priority **flag**).
-Tracked events: **pageview**, **project_click**, **resume_download**, **contact_submit**, **game_score**.
+Tracked events: **pageview**, **project_click**, **resume_download**, **contact_submit**, **game_score**, **page_time** (time-on-site).
+
+> Already set up? Re-run [`supabase/analytics.sql`](supabase/analytics.sql) once to enable the new
+> **Avg Time on Site** metric and per-page time (adds `page_time` aggregation to the dashboard function).
 
 ---
 
