@@ -354,9 +354,16 @@
   });
 
   // Sync Buttons
-  $('sync-stack').addEventListener('click', (e) => { e.preventDefault(); F.stack.value = F.tech.value; updatePreviews(); });
-  $('sync-hook').addEventListener('click', (e) => { e.preventDefault(); F.hook.value = F.summary.value; updatePreviews(); });
-  $('sync-brief').addEventListener('click', (e) => { e.preventDefault(); F.brief.value = F.summary.value; updatePreviews(); });
+  const syncBaseBtn = $('sync-base');
+  if (syncBaseBtn) {
+      syncBaseBtn.addEventListener('click', (e) => { 
+          e.preventDefault(); 
+          F.stack.value = F.tech.value; 
+          F.hook.value = F.summary.value; 
+          updatePreviews(); 
+          isDirty = true;
+      });
+  }
 
   // Preview Toggle
   $('toggle-preview-btn').addEventListener('click', () => {

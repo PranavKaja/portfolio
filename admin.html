@@ -196,11 +196,11 @@
                 <div class="grid2">
                     <label class="field">
                         <span>Code (e.g. MSN-10)</span>
-                        <input type="text" id="f-code" class="hl hl-all" required>
+                        <input type="text" id="f-code" required>
                     </label>
                     <label class="field">
                         <span>Title</span>
-                        <input type="text" id="f-title" class="hl hl-all" required>
+                        <input type="text" id="f-title" required>
                     </label>
                 </div>
                 <label class="field">
@@ -219,25 +219,19 @@
                 <!-- TIER 2: HOVER CARD -->
                 <button type="button" class="advanced-toggle-btn" id="hover-toggle-btn">[+] HOVER CARD</button>
                 <div id="hover-fields" class="advanced-section">
+                    <div style="text-align: right; margin-bottom: 12px;">
+                        <a href="#" id="sync-base" style="color:var(--accent); font-size:0.7rem; font-family:'Share Tech Mono', monospace; text-transform: uppercase; text-decoration: underline;">⟳ Sync from Base</a>
+                    </div>
                     <label class="field">
-                        <span style="display:flex; justify-content:space-between">
-                            <div>Full stack (overlay)</div>
-                            <a href="#" id="sync-stack" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Tech</a>
-                        </span>
+                        <span>Stack</span>
                         <input type="text" id="f-stack" class="hl hl-hover-pop">
                     </label>
                     <label class="field">
-                        <span style="display:flex; justify-content:space-between">
-                            <div>Hook</div>
-                            <a href="#" id="sync-hook" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Summary</a>
-                        </span>
+                        <span>Hook</span>
                         <input type="text" id="f-hook" class="hl hl-hover-pop">
                     </label>
                     <label class="field">
-                        <span style="display:flex; justify-content:space-between">
-                            <div>Brief</div>
-                            <a href="#" id="sync-brief" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Summary</a>
-                        </span>
+                        <span>Brief</span>
                         <textarea id="f-brief" class="hl hl-hover-pop"></textarea>
                     </label>
                     <label class="field">
