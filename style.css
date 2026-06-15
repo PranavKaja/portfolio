@@ -2461,6 +2461,7 @@ body.msn-open {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 40px;
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(8px);
     transition: opacity 0.3s ease;
@@ -2477,7 +2478,9 @@ body.msn-open {
     font-weight: bold;
     color: var(--accent);
     text-shadow: 0 0 20px rgba(255, 69, 0, 0.5);
-    margin-bottom: 40px;
+    line-height: 1;
+    margin: 0;
+    flex-shrink: 0;
     animation: countdown-pulse 1s infinite;
 }
 #game-countdown-overlay .countdown-box {
@@ -2490,6 +2493,7 @@ body.msn-open {
     padding: 24px 36px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     border-radius: 4px;
+    flex-shrink: 0;
 }
 #game-countdown-overlay .instruction-row {
     display: flex;
