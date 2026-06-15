@@ -2461,8 +2461,8 @@ body.msn-open {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: rgba(24, 24, 27, 0.85); /* semi-transparent dark */
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
     transition: opacity 0.3s ease;
 }
 #game-countdown-overlay.hidden {
@@ -2477,21 +2477,31 @@ body.msn-open {
     font-weight: bold;
     color: var(--accent);
     text-shadow: 0 0 20px rgba(255, 69, 0, 0.5);
-    margin-bottom: 30px;
+    margin-bottom: 40px;
     animation: countdown-pulse 1s infinite;
 }
-#game-countdown-overlay .countdown-instructions {
+#game-countdown-overlay .countdown-box {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 30px;
+    background: var(--bg);
+    border: 1px solid var(--text-main);
+    padding: 24px 36px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+#game-countdown-overlay .instruction-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+#game-countdown-overlay .inst-label {
     font-family: 'Share Tech Mono', monospace;
     color: var(--text-main);
     font-size: 1.1rem;
     font-weight: bold;
-}
-#game-countdown-overlay .countdown-instructions div {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    letter-spacing: 2px;
 }
 @keyframes countdown-pulse {
     0% { transform: scale(1); opacity: 1; }
@@ -2499,5 +2509,5 @@ body.msn-open {
     100% { transform: scale(1); opacity: 1; }
 }
 @media (max-width: 768px) {
-    #game-countdown-overlay .countdown-instructions { flex-direction: column; gap: 15px; }
+    #game-countdown-overlay .countdown-box { flex-direction: column; gap: 20px; }
 }
