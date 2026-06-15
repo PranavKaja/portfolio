@@ -320,21 +320,27 @@
     <!-- Game Countdown Overlay -->
     <div id="game-countdown-overlay" class="hidden">
         <div class="countdown-text" id="countdown-text">3</div>
-        <div class="countdown-box">
-            <div class="instruction-row">
-                <span class="keycap" data-text="W">W</span>
-                <span class="keycap" data-text="A">A</span>
-                <span class="keycap" data-text="S">S</span>
-                <span class="keycap" data-text="D">D</span> 
-                <span class="inst-label">DRIVE</span>
+        <div class="countdown-box" style="flex-direction: column; gap: 20px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 30px;">
+                <div class="instruction-row">
+                    <span class="keycap" data-text="W">W</span>
+                    <span class="keycap" data-text="A">A</span>
+                    <span class="keycap" data-text="S">S</span>
+                    <span class="keycap" data-text="D">D</span> 
+                    <span class="inst-label">DRIVE</span>
+                </div>
+                <div class="instruction-row">
+                    <span class="keycap" data-text="SHIFT">SHIFT</span> 
+                    <span class="inst-label">BOOST</span>
+                </div>
+                <div class="instruction-row">
+                    <span class="keycap" data-text="SPACE">SPACE</span> 
+                    <span class="inst-label">DRIFT</span>
+                </div>
             </div>
-            <div class="instruction-row">
-                <span class="keycap" data-text="SHIFT">SHIFT</span> 
-                <span class="inst-label">BOOST</span>
-            </div>
-            <div class="instruction-row">
-                <span class="keycap" data-text="SPACE">SPACE</span> 
-                <span class="inst-label">DRIFT</span>
+            <div style="border-top: 1px dashed var(--border); padding-top: 15px; text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 0.95rem; color: var(--text-muted); line-height: 1.6;">
+                <span class="text-accent" style="font-weight: bold;">NODES:</span> CLOCKS (+TIME), WRENCHES (+REPAIR), BOLTS (+SPEED) <br>
+                <span class="text-accent" style="font-weight: bold;">CRASHES:</span> DAMAGE REDUCES SPEED. 5 HITS = GAME OVER
             </div>
         </div>
     </div>
