@@ -51,8 +51,9 @@ body::before {
 }
 
 label.field { display: block; margin-bottom: 14px; }
-label.field span {
-    display: block;
+label.field > span:first-child, .field > span:first-child {
+    display: flex;
+    align-items: center;
     font-size: 0.75rem;
     font-family: 'Share Tech Mono', monospace;
     letter-spacing: 1px;
@@ -62,7 +63,7 @@ label.field span {
     font-weight: bold;
 }
 input[type=text], input[type=email], input[type=password],
-input[type=number], textarea, select {
+input[type=number], input[type=url], textarea, select {
   width: 100%;
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.95rem;
