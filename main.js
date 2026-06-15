@@ -20,10 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const heroBox = document.querySelector('.hero');
         if (heroBox) {
             const rect = heroBox.getBoundingClientRect();
-            // Optional: adjusting for border width or exact corner, 
-            // rect.left and rect.bottom give the outer edge.
-            mouseX = rect.left;
-            mouseY = rect.bottom;
+            // The hero box has a 4px border.
+            // rect.left is the outer edge, so center of left border is rect.left + 2
+            // rect.bottom is the outer edge, so center of bottom border is rect.bottom - 2
+            mouseX = rect.left + 2;
+            mouseY = rect.bottom - 2;
 
             if (cursor) {
                 cursor.style.transform = `translate3d(calc(${mouseX}px - 50%), calc(${mouseY}px - 50%), 0)`;
