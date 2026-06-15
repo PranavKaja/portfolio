@@ -168,7 +168,7 @@ const car = {
 const checkpoint = { x: 0, y: 0, element: document.getElementById('checkpoint'), type: 'time' };
 let score = 0;
 let timeLeft = 10;
-let bestScore = localStorage.getItem('cargame_best') || 1012;
+let bestScore = localStorage.getItem('cargame_best') || 0;
 document.getElementById('best-score').innerText = bestScore;
 
 let lastFrameTime = performance.now();
@@ -547,7 +547,7 @@ function endGame() {
                 const sysAlertOverlay = document.getElementById('sys-alert-overlay');
                 // the game briefing reuses this overlay and changes the title
                 document.getElementById('sys-alert-title').innerText = 'SYSTEM ALERT';
-                document.getElementById('sys-alert-msg').innerText = "Nice driving! For the record, Pranav's highest score is 1012.";
+                document.getElementById('sys-alert-msg').innerText = `Nice driving! You scored ${score} points!`;
                 sysAlertOverlay.classList.add('active');
                 
                 document.getElementById('sys-alert-btn').onclick = () => {
