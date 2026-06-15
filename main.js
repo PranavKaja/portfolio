@@ -599,6 +599,8 @@ window.addEventListener('load', () => {
     function checkTrophy() {
         const startTime = parseInt(localStorage.getItem('site_visit_start'), 10);
         if (Date.now() - startTime >= TROPHY_INTERVAL && !trophyInjected) {
+            // Don't interrupt gameplay
+            if (document.body.classList.contains('game-active')) return;
             injectTrophy();
         }
     }
@@ -631,6 +633,10 @@ window.addEventListener('load', () => {
 
         wrapper.appendChild(trophyContainer);
 
+        // Spawn subtle confetti
+        const rect = trophyContainer.getBoundingClientRect();
+        spawnConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
         const closeBtn = trophyContainer.querySelector('.trophy-close');
         closeBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -640,6 +646,62 @@ window.addEventListener('load', () => {
             // Reset timer for another 2 minutes
             localStorage.setItem('site_visit_start', Date.now());
         });
+    }
+
+    function spawnConfetti(startX, startY) {
+        const colors = ['#ffaa00', '#00ea3d', '#e3b341', '#ff4500', '#00ffff'];
+        const particles = [];
+        for(let i=0; i<25; i++) {
+            const p = document.createElement('div');
+            p.style.position = 'fixed';
+            p.style.left = startX + 'px';
+            p.style.top = startY + 'px';
+            p.style.width = (3 + Math.random()*4) + 'px';
+            p.style.height = (4 + Math.random()*6) + 'px';
+            p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            p.style.zIndex = '9999';
+            p.style.pointerEvents = 'none';
+            p.style.borderRadius = '1px';
+            document.body.appendChild(p);
+
+            particles.push({
+                el: p,
+                x: startX,
+                y: startY,
+                vx: (Math.random() - 0.5) * 8,
+                vy: (Math.random() - 1) * 8 - 2,
+                rot: Math.random() * 360,
+                rotSpeed: (Math.random() - 0.5) * 10,
+                settled: false
+            });
+        }
+
+        function animate() {
+            let allSettled = true;
+            particles.forEach(p => {
+                if (p.settled) return;
+                allSettled = false;
+                p.vy += 0.25; // gravity
+                p.vx *= 0.98; // friction
+                p.x += p.vx;
+                p.y += p.vy;
+                p.rot += p.rotSpeed;
+                
+                if (p.y >= window.innerHeight - 10) {
+                    p.y = window.innerHeight - 10;
+                    p.vy = 0;
+                    p.vx = 0;
+                    p.settled = true;
+                }
+                
+                p.el.style.transform = `translate3d(${p.x - startX}px, ${p.y - startY}px, 0) rotate(${p.rot}deg)`;
+            });
+            
+            if (!allSettled) {
+                requestAnimationFrame(animate);
+            }
+        }
+        requestAnimationFrame(animate);
     }
 
     // Check immediately, then every 5 seconds
