@@ -252,23 +252,21 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
 .star:hover { background: none; color: var(--accent); }
 .star.on { color: var(--accent); }
 
-/* Field Location Indicators */
-.ind-box {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    margin-left: 4px;
-    border: 1px solid #000;
-    vertical-align: middle;
+/* Section Highlights */
+.section-base {
+    border-left: 4px solid #3b82f6;
+    padding-left: 15px;
+    margin-bottom: 20px;
 }
-.ind-base { background: #3b82f6; }
-.ind-hover { background: #f97316; }
-.ind-pop { background: #22c55e; }
-.ind-group {
-    display: inline-flex;
-    gap: 2px;
-    vertical-align: middle;
-    margin-left: 8px;
+.section-hover {
+    border-left: 4px solid #f97316;
+    padding-left: 15px;
+    margin-bottom: 20px;
+}
+.section-pop {
+    border-left: 4px solid #22c55e;
+    padding-left: 15px;
+    margin-bottom: 20px;
 }
 
 /* Rich Chip Editor */
