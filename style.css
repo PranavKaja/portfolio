@@ -170,6 +170,24 @@ body.custom-cursor-active button {
     z-index: -1;
 }
 
+.hero::before {
+    content: '';
+    position: absolute;
+    left: -2px;
+    bottom: -2px;
+    width: 34px; 
+    height: 34px;
+    transform: translate(-50%, 50%);
+    pointer-events: none;
+    z-index: 10;
+    background:
+        radial-gradient(circle, var(--accent) 3px, transparent 3.5px) center no-repeat,
+        linear-gradient(var(--text-main), var(--text-main)) center top / 4px 10px no-repeat,
+        linear-gradient(var(--text-main), var(--text-main)) center bottom / 4px 10px no-repeat,
+        linear-gradient(var(--text-main), var(--text-main)) left center / 10px 4px no-repeat,
+        linear-gradient(var(--text-main), var(--text-main)) right center / 10px 4px no-repeat;
+}
+
 .hero-label {
     font-family: 'Share Tech Mono', monospace;
     background: var(--text-main);
