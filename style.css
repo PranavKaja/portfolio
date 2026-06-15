@@ -173,19 +173,19 @@ body.custom-cursor-active button {
 .hero::before {
     content: '';
     position: absolute;
-    left: -19px;
-    bottom: -19px;
-    width: 19px; 
-    height: 19px;
+    left: -20px;
+    bottom: -20px;
+    width: 21px; 
+    height: 21px;
     pointer-events: none;
     z-index: 10;
     background:
-        /* Orange square exactly covering the 4x4 border intersection */
-        linear-gradient(var(--accent), var(--accent)) top right / 4px 4px no-repeat,
+        /* Orange square exactly covering the 4x4 border intersection + 1px overhang */
+        linear-gradient(var(--accent), var(--accent)) top 0 right 0 / 6px 6px no-repeat,
         /* Left line (extending left from the corner) */
-        linear-gradient(var(--text-main), var(--text-main)) top left / 10px 4px no-repeat,
+        linear-gradient(var(--text-main), var(--text-main)) top 1px left 0 / 10px 4px no-repeat,
         /* Bottom line (extending down from the corner) */
-        linear-gradient(var(--text-main), var(--text-main)) bottom right / 4px 10px no-repeat;
+        linear-gradient(var(--text-main), var(--text-main)) bottom 0 right 1px / 4px 10px no-repeat;
 }
 
 .hero-label {
