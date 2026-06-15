@@ -61,7 +61,7 @@ body.custom-cursor-active button {
     border: 2px solid transparent; /* Kept transparent so hover can fade in */
     border-radius: 50%;
     pointer-events: none;
-    z-index: 10000;
+    z-index: 99999;
     transform: translate(-50%, -50%);
     opacity: 0;
     transition: opacity 0.3s, width 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
