@@ -1,0 +1,34 @@
+# Pranav Kaja
+
+> Pranav Kaja is a Data & Analytics Engineer translating complex data into clear
+> action since 2020. He holds an MS in Business Analytics from the University of
+> Massachusetts Amherst (GPA 4.00) and a BTech in Computer Science, is based in
+> Boston, MA, and is open to full-time roles.
+
+## About
+Pranav builds for the whole data lifecycle — clean inputs, edge cases, monitoring,
+and an audit trail — favoring models that ship and get monitored over ones that
+only look good on a slide.
+
+## Pages
+- [Home](https://pranavkaja.vercel.app/): Overview, experience, projects, and skills
+- [Why Pranav](https://pranavkaja.vercel.app/why-pranav): The short case for working with Pranav
+- [Contact](https://pranavkaja.vercel.app/contact): Email, LinkedIn, and a contact form
+- [Interests](https://pranavkaja.vercel.app/interests): Interests beyond work
+
+## Experience
+- Student Supervisor, UMass Amherst Dining (Sep 2024 - May 2026): automated a
+  37-location ETL pipeline, cutting manual reporting from 2 hrs/day to 12 min/day;
+  led 15+ student employees; built data-driven inventory forecasting.
+- Data Science Intern, Acmegrade (May 2022 - Jul 2022): built a Random Forest
+  churn predictor on 100K records, improving accuracy 15% over baseline.
+
+## Skills
+- Data Engineering: SQL, ETL/ELT, Python, Spark & Hadoop, Data Warehousing
+- Analytics & BI: Power BI, Tableau, Power Query, KPI Design, Financial Modeling
+- Machine Learning: XGBoost, Random Forest, Logistic Regression, SHAP, SMOTE
+- Programming: Python, SQL, R, VBA, REST APIs, LLM Integration
+
+## Links
+- LinkedIn: https://www.linkedin.com/in/balajipranav
+- GitHub: https://github.com/PranavKaja
