@@ -281,6 +281,12 @@ window.addEventListener('keyup', (e) => {
     if (e.code === 'ShiftLeft' || e.code === 'ShiftRight' || e.key === 'Shift') keys.shift = false;
 });
 
+window.addEventListener('blur', () => {
+    Object.keys(keys).forEach(k => keys[k] = false);
+    document.querySelectorAll('.keycap.pressed').forEach(el => el.classList.remove('pressed'));
+    startInactivityTimer();
+});
+
 function startInactivityTimer() {
     if (resetTimeout) clearTimeout(resetTimeout);
     if (!keys.w && !keys.a && !keys.s && !keys.d && !joystickActive) {
