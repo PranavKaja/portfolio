@@ -233,8 +233,17 @@
     id: $('f-id'), code: $('f-code'), title: $('f-title'), tech: $('f-tech'),
     stack: $('f-stack'), summary: $('f-summary'), hook: $('f-hook'), brief: $('f-brief'),
     role: $('f-role'), method: $('f-method'), outcome: $('f-outcome'), chips: $('f-chips'),
-    status: $('f-status'), show_status: $('f-show-status'), sort: $('f-sort'), published: $('f-published'), github: $('f-github')
+    show_status: $('f-show-status'), sort: $('f-sort'), published: $('f-published'), github: $('f-github')
   };
+
+  function getStatus() {
+    const checked = document.querySelector('input[name="f-status"]:checked');
+    return checked ? checked.value : 'deployed';
+  }
+  function setStatus(val) {
+    const radio = document.querySelector(`input[name="f-status"][value="${val}"]`);
+    if (radio) radio.checked = true;
+  }
 
   let isDirty = false;
   let lastActiveCardId = null;
@@ -267,11 +276,19 @@
     }
 
     F.chips.value = p && p.chips ? p.chips.join('\n') : '';
-    F.status.value = p ? p.status : 'deployed';
+    setStatus(p ? p.status : 'deployed');
     F.show_status.checked = p ? (p.show_status !== false) : true;
     F.sort.value = p ? p.sort_order : (cache.length ? Math.max(...cache.map(x => x.sort_order || 0)) + 10 : 10);
     F.published.checked = p ? !!p.published : true;
     
+    // Reset advanced section
+    $('advanced-fields').classList.remove('visible');
+    const advBtn = $('advanced-toggle-btn');
+    if (advBtn) {
+        advBtn.textContent = '[+] EXPAND DOSSIER DATA';
+        advBtn.classList.remove('active');
+    }
+
     // Reset preview toggle if open
     $('project-form').style.display = 'block';
     $('project-preview').classList.add('hidden');
@@ -317,7 +334,7 @@
       outcome: F.outcome.value.trim(),
       github_url: F.github.value.trim() || null,
       chips: F.chips.value.split('\n').map(s => s.trim()).filter(Boolean),
-      status: STATUS.includes(F.status.value) ? F.status.value : 'deployed',
+      status: STATUS.includes(getStatus()) ? getStatus() : 'deployed',
       show_status: F.show_status.checked,
       sort_order: parseInt(F.sort.value, 10) || 0,
       published: F.published.checked
@@ -370,12 +387,34 @@
     }
   });
 
+  // Expand button logic
+  const advToggleBtn = $('advanced-toggle-btn');
+  if (advToggleBtn) {
+    advToggleBtn.addEventListener('click', () => {
+      const advFields = $('advanced-fields');
+      const isHidden = !advFields.classList.contains('visible');
+      if (isHidden) {
+        advFields.classList.add('visible');
+        advToggleBtn.textContent = '[-] COLLAPSE DOSSIER DATA';
+        advToggleBtn.classList.add('active');
+      } else {
+        advFields.classList.remove('visible');
+        advToggleBtn.textContent = '[+] EXPAND DOSSIER DATA';
+        advToggleBtn.classList.remove('active');
+      }
+    });
+  }
+
   // Live Previews
   Object.values(F).forEach(el => {
     if (el && el.type !== 'hidden' && el.tagName !== 'BUTTON') {
       el.addEventListener('input', () => { updatePreviews(); isDirty = true; });
       el.addEventListener('change', () => { updatePreviews(); isDirty = true; });
     }
+  });
+
+  document.querySelectorAll('input[name="f-status"]').forEach(r => {
+    r.addEventListener('change', () => { updatePreviews(); isDirty = true; });
   });
 
   function updatePreviews() {
@@ -386,7 +425,7 @@
       summary: F.summary.value, hook: F.hook.value, brief: F.brief.value,
       role: F.role.value, method: F.method.value, outcome: F.outcome.value,
       chips: F.chips.value.split('\n').filter(Boolean),
-      status: F.status.value, show_status: F.show_status.checked, github_url: F.github.value
+      status: getStatus(), show_status: F.show_status.checked, github_url: F.github.value
     };
 
     const num = String(p.code || '').match(/(\d+)/)?.[1] || '';

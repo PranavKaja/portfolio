@@ -163,29 +163,44 @@
             <div style="display: flex; gap: 40px; width: 100%;">
                 <form id="project-form" style="flex: 1;">
                 <input type="hidden" id="f-id">
+                
+                <!-- TOP LEVEL: STATE & VISIBILITY -->
+                <div style="display: flex; gap: 20px; align-items: flex-end; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap;">
+                    <div class="field" style="margin-bottom:0;">
+                        <span>Status</span>
+                        <div class="status-group" id="f-status-group">
+                            <label><input type="radio" name="f-status" value="deployed" checked><span class="status-btn">Deployed</span></label>
+                            <label><input type="radio" name="f-status" value="in_progress"><span class="status-btn">In Progress</span></label>
+                            <label><input type="radio" name="f-status" value="archived"><span class="status-btn">Archived</span></label>
+                            <label><input type="radio" name="f-status" value="classified"><span class="status-btn">Classified</span></label>
+                            <label><input type="radio" name="f-status" value="none"><span class="status-btn">None</span></label>
+                        </div>
+                    </div>
+                    <div class="spacer"></div>
+                    <div class="field" style="margin-bottom:0;">
+                        <span>Public Badge</span>
+                        <label class="toggle-switch" title="Show status badge on live site">
+                            <input type="checkbox" id="f-show-status" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="field" style="margin-bottom:0;">
+                        <span>Live Site</span>
+                        <label class="toggle-switch" title="Published">
+                            <input type="checkbox" id="f-published" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- TIER 1: CORE IDENTITY -->
                 <div class="grid2">
                     <label class="field"><span>Code (e.g. MSN-10)</span><input type="text" id="f-code" required></label>
                     <label class="field"><span>Title</span><input type="text" id="f-title" required></label>
-                    <label class="field"><span>Card stack (tech)</span><input type="text" id="f-tech"></label>
-                    <label class="field">
-                        <span style="display:flex; justify-content:space-between">Full stack (overlay) <a href="#" id="sync-stack" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Tech</a></span>
-                        <input type="text" id="f-stack">
-                    </label>
                 </div>
+                <label class="field"><span>Card stack (tech)</span><input type="text" id="f-tech"></label>
                 <label class="field"><span>Card one-liner (summary)</span><input type="text" id="f-summary"></label>
-                <label class="field">
-                    <span style="display:flex; justify-content:space-between">Hook <a href="#" id="sync-hook" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Summary</a></span>
-                    <input type="text" id="f-hook">
-                </label>
-                <label class="field">
-                    <span style="display:flex; justify-content:space-between">Brief <a href="#" id="sync-brief" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Summary</a></span>
-                    <textarea id="f-brief"></textarea>
-                </label>
-                <div class="grid2">
-                    <label class="field"><span>Role</span><input type="text" id="f-role"></label>
-                    <label class="field"><span>Method</span><input type="text" id="f-method"></label>
-                </div>
-                <label class="field"><span>Outcome</span><input type="text" id="f-outcome"></label>
+                
                 <div class="field" id="github-container">
                     <span style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase;">
                         GitHub URL 
@@ -196,31 +211,33 @@
                     </span>
                     <input type="url" id="f-github" class="hidden" placeholder="https://github.com/username/repo">
                 </div>
-                <label class="field"><span>Chips (one per line)</span><textarea id="f-chips" placeholder="0.978 AUC&#10;84% Recall"></textarea></label>
-                <div class="grid2">
-                    <div class="field">
-                        <span>Status</span>
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <select id="f-status" style="flex: 1;">
-                                <option value="deployed">Deployed</option>
-                                <option value="in_progress">In Progress</option>
-                                <option value="archived">Archived</option>
-                                <option value="classified">Classified</option>
-                                <option value="none">None</option>
-                            </select>
-                            <label class="toggle-switch" title="Show status badge on live site">
-                                <input type="checkbox" id="f-show-status" checked>
-                                <span class="slider"></span>
-                            </label>
-                            <span style="font-size: 0.75rem; color: var(--text-muted);">Visible</span>
-                        </div>
+
+                <!-- EXPAND BUTTON -->
+                <button type="button" class="advanced-toggle-btn" id="advanced-toggle-btn">[+] EXPAND DOSSIER DATA</button>
+
+                <!-- TIER 2: ADVANCED FIELDS -->
+                <div id="advanced-fields" class="advanced-section">
+                    <label class="field">
+                        <span style="display:flex; justify-content:space-between">Full stack (overlay) <a href="#" id="sync-stack" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Tech</a></span>
+                        <input type="text" id="f-stack">
+                    </label>
+                    <label class="field">
+                        <span style="display:flex; justify-content:space-between">Hook <a href="#" id="sync-hook" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Summary</a></span>
+                        <input type="text" id="f-hook">
+                    </label>
+                    <label class="field">
+                        <span style="display:flex; justify-content:space-between">Brief <a href="#" id="sync-brief" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Summary</a></span>
+                        <textarea id="f-brief"></textarea>
+                    </label>
+                    <div class="grid2">
+                        <label class="field"><span>Role</span><input type="text" id="f-role"></label>
+                        <label class="field"><span>Method</span><input type="text" id="f-method"></label>
                     </div>
-                    <label class="field"><span>Sort order</span><input type="number" id="f-sort" value="100"></label>
+                    <label class="field"><span>Outcome</span><input type="text" id="f-outcome"></label>
+                    <label class="field"><span>Chips (one per line)</span><textarea id="f-chips" placeholder="0.978 AUC&#10;84% Recall"></textarea></label>
+                    <label class="field" style="max-width: 150px;"><span>Sort order</span><input type="number" id="f-sort" value="100"></label>
                 </div>
-                <label class="field row" style="gap:8px;align-items:center">
-                    <input type="checkbox" id="f-published" checked style="width:auto">
-                    <span style="margin:0">Published (visible on the live site)</span>
-                </label>
+
                 <div class="msg" id="form-msg"></div>
                 <div class="modal-actions">
                     <button type="button" class="danger hidden" id="delete-btn">Delete</button>
