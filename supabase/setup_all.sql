@@ -32,6 +32,8 @@ create table if not exists public.projects (
   chips       text[] not null default '{}',         -- metric chips
   status      project_status not null default 'deployed',
   show_status boolean not null default true,        -- false = hidden status badge
+  github_url  text,                                 -- optional github repository url
+  show_github boolean not null default true,        -- false = hide github link on live site
   sort_order  int not null default 0,               -- grid order (low first)
   published   boolean not null default true,        -- false = hidden from the public site
   created_at  timestamptz not null default now(),
@@ -208,7 +210,8 @@ on conflict (code) do update set
   title = excluded.title, tech = excluded.tech, summary = excluded.summary,
   stack = excluded.stack, hook = excluded.hook, brief = excluded.brief,
   role = excluded.role, method = excluded.method, outcome = excluded.outcome,
-  chips = excluded.chips, status = excluded.status,
+  chips = excluded.chips, status = excluded.status, show_status = excluded.show_status,
+  github_url = excluded.github_url, show_github = excluded.show_github,
   sort_order = excluded.sort_order, published = excluded.published;
 
 

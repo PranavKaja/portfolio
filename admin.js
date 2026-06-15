@@ -233,7 +233,8 @@
     id: $('f-id'), code: $('f-code'), title: $('f-title'), tech: $('f-tech'),
     stack: $('f-stack'), summary: $('f-summary'), hook: $('f-hook'), brief: $('f-brief'),
     role: $('f-role'), method: $('f-method'), outcome: $('f-outcome'), chips: $('f-chips'),
-    show_status: $('f-show-status'), sort: $('f-sort'), published: $('f-published'), github: $('f-github')
+    show_status: $('f-show-status'), sort: $('f-sort'), published: $('f-published'), 
+    github: $('f-github'), show_github: $('f-show-github')
   };
 
   function getStatus() {
@@ -264,16 +265,7 @@
     F.method.value = p ? (p.method || '') : '';
     F.outcome.value = p ? (p.outcome || '') : '';
     F.github.value = p ? (p.github_url || '') : '';
-    
-    // Setup Github Link toggle
-    const ghToggle = $('toggle-github');
-    if (F.github.value) {
-        F.github.classList.remove('hidden');
-        ghToggle.checked = true;
-    } else {
-        F.github.classList.add('hidden');
-        ghToggle.checked = false;
-    }
+    F.show_github.checked = p ? (p.show_github !== false) : true;
 
     F.chips.value = p && p.chips ? p.chips.join('\n') : '';
     setStatus(p ? p.status : 'deployed');
@@ -333,6 +325,7 @@
       method: F.method.value.trim(),
       outcome: F.outcome.value.trim(),
       github_url: F.github.value.trim() || null,
+      show_github: F.show_github.checked,
       chips: F.chips.value.split('\n').map(s => s.trim()).filter(Boolean),
       status: STATUS.includes(getStatus()) ? getStatus() : 'deployed',
       show_status: F.show_status.checked,
@@ -353,17 +346,6 @@
     isDirty = false;
     closeEditor();
     loadProjects();
-  });
-
-  // GitHub Link Toggle
-  $('toggle-github').addEventListener('change', (e) => {
-    if (e.target.checked) {
-      F.github.classList.remove('hidden');
-    } else {
-      F.github.classList.add('hidden');
-      F.github.value = ''; // clear on hide
-      updatePreviews();
-    }
   });
 
   // Sync Buttons
@@ -423,9 +405,10 @@
     const p = {
       code: F.code.value, title: F.title.value, tech: F.tech.value, stack: F.stack.value,
       summary: F.summary.value, hook: F.hook.value, brief: F.brief.value,
-      role: F.role.value, method: F.method.value, outcome: F.outcome.value,
+      role: F.role.value.trim(), method: F.method.value.trim(), outcome: F.outcome.value.trim(),
       chips: F.chips.value.split('\n').filter(Boolean),
-      status: getStatus(), show_status: F.show_status.checked, github_url: F.github.value
+      status: getStatus(), show_status: F.show_status.checked, 
+      github_url: F.github.value, show_github: F.show_github.checked
     };
 
     const num = String(p.code || '').match(/(\d+)/)?.[1] || '';
@@ -464,7 +447,7 @@
       </div>`;
     }
     
-    const githubBtn = p.github_url ? `<a href="${esc(p.github_url)}" target="_blank" rel="noopener noreferrer" class="github-btn">
+    const githubBtn = (p.github_url && p.show_github) ? `<a href="${esc(p.github_url)}" target="_blank" rel="noopener noreferrer" class="github-btn">
           <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
           </svg>

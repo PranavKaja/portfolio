@@ -204,12 +204,15 @@
                 <div class="field" id="github-container">
                     <span style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase;">
                         GitHub URL 
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggle-github">
-                            <span class="slider"></span>
-                        </label>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-size: 0.65rem; color: var(--text-muted);">Visible</span>
+                            <label class="toggle-switch" title="Show GitHub link on live site">
+                                <input type="checkbox" id="f-show-github" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
                     </span>
-                    <input type="url" id="f-github" class="hidden" placeholder="https://github.com/username/repo">
+                    <input type="url" id="f-github" placeholder="https://github.com/username/repo">
                 </div>
 
                 <!-- EXPAND BUTTON -->
