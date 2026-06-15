@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Readmission Risk — 73% Critical-Case Detection | Pranav Kaja</title>
+    <meta name="description"
+        content="Hospital readmission risk scoring by Pranav Kaja: logistic regression with tuned probability thresholds lifts critical-case detection to 73% on 25,000 records; SHAP surfaces the drivers.">
+    <meta name="author" content="Pranav Kaja">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta property="og:title" content="Hospital Readmission Risk — 73% Critical-Case Detection | Pranav Kaja">
+    <meta property="og:description" content="Threshold-tuned logistic regression catches 73% of critical readmission cases before discharge.">
+    <meta property="og:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://pranavkaja.vercel.app/projects/hospital-readmission">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Hospital Readmission Risk — 73% Critical-Case Detection | Pranav Kaja">
+    <meta name="twitter:description" content="Threshold-tuned logistic regression catches 73% of critical readmission cases before discharge.">
+    <meta name="twitter:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+    <link rel="canonical" href="https://pranavkaja.vercel.app/projects/hospital-readmission">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        { "@type": "TechArticle", "headline": "Hospital Readmission Risk — 73% Critical-Case Detection",
+          "description": "Logistic regression with tuned probability thresholds lifts critical-case detection to 73% on 25,000 anonymized records; SHAP surfaces inpatient-visit count and age as dominant predictors.",
+          "author": { "@type": "Person", "name": "Pranav Kaja", "url": "https://pranavkaja.vercel.app/" },
+          "url": "https://pranavkaja.vercel.app/projects/hospital-readmission",
+          "image": "https://pranavkaja.vercel.app/images/og-card.png",
+          "keywords": "hospital readmission, logistic regression, threshold tuning, SHAP, healthcare analytics, Pranav Kaja",
+          "about": ["Healthcare Analytics", "Machine Learning", "Explainable AI"], "inLanguage": "en" },
+        { "@type": "BreadcrumbList", "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://pranavkaja.vercel.app/" },
+          { "@type": "ListItem", "position": 2, "name": "Projects", "item": "https://pranavkaja.vercel.app/projects" },
+          { "@type": "ListItem", "position": 3, "name": "Hospital Readmission", "item": "https://pranavkaja.vercel.app/projects/hospital-readmission" } ] }
+      ]
+    }
+    </script>
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <nav class="top-nav">
+        <a href="/" class="nav-logo interactive-element no-underline text-inherit">SUBJECT // PRANAV KAJA</a>
+        <div class="nav-links"><a href="/projects"><span class="nav-num">&larr; </span>ALL MISSIONS</a></div>
+    </nav>
+
+    <main class="container" id="main">
+        <header class="hero">
+            <div class="hero-label mb-20"><span class="status-dot"></span>MSN-04 // DEPLOYED</div>
+            <h1 class="hero-title" style="font-size: 3rem; line-height: 1.05;">HOSPITAL READMISSION</h1>
+            <p class="hero-subtitle">73% critical-case detection through deliberate threshold tuning.</p>
+            <div class="pp-chips" style="margin-top: 8px;">
+                <span>25K Records</span><span>73% Detection</span><span>SHAP Drivers</span><span>Threshold Tuning</span>
+            </div>
+        </header>
+
+        <section class="section">
+            <div class="section-header"><h2>BRIEFING</h2><div class="line"></div></div>
+            <p style="font-size: 1.05rem; line-height: 1.7; max-width: 760px;">
+                Readmission risk scoring on 25,000 anonymized records. Rather than accept the default 0.5 cutoff,
+                probability thresholds were tuned to lift critical-case detection to <strong>73%</strong> while
+                consciously balancing the precision&ndash;recall trade-off — in a clinical setting, a missed high-risk
+                patient costs far more than a false alarm. SHAP surfaced inpatient-visit count and age as the dominant
+                predictors, pointing discharge planning at the right patients.
+            </p>
+        </section>
+
+        <section class="section">
+            <div class="section-header"><h2>ROLE / METHOD / OUTCOME</h2><div class="line"></div></div>
+            <div class="msn-rmo">
+                <div class="rmo-cell"><div class="k">Role</div><div class="v">Solo analysis.</div></div>
+                <div class="rmo-cell"><div class="k">Method</div><div class="v">Logistic regression with tuned probability thresholds.</div></div>
+                <div class="rmo-cell"><div class="k">Outcome</div><div class="v">73% of critical cases caught before discharge.</div></div>
+            </div>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 20px; font-family: 'Share Tech Mono', monospace;">
+                STACK: Python &middot; Logistic Regression &middot; SHAP
+            </p>
+        </section>
+
+        <section class="section">
+            <div class="interests-simple-box">
+                <h3 class="beyond-title">MORE MISSIONS</h3>
+                <p class="beyond-subtitle">Eight more case files — ML, BI, and supply-chain strategy.</p>
+                <a href="/projects" class="btn btn-secondary interactive-element no-underline">VIEW ALL MISSIONS</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">&copy; <span id="year"></span> Pranav Kaja. All rights reserved.</footer>
+    <div class="custom-cursor" id="custom-cursor"></div>
+    <div class="crosshair-h"></div>
+    <div class="crosshair-v"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="/config.js" defer></script>
+    <script src="/analytics.js" defer></script>
+    <script src="/main.js" defer></script>
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+
+</html>

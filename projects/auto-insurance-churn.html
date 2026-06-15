@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Insurance Churn — 350K Records, SMOTE Pipeline | Pranav Kaja</title>
+    <meta name="description"
+        content="Auto-insurance churn modeling by Pranav Kaja: Random Forest + Gradient Boosting on 350,000 policyholder records with a SMOTE pipeline for class imbalance — projected churn cut from 18% to 11%.">
+    <meta name="author" content="Pranav Kaja">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta property="og:title" content="Auto Insurance Churn — 350K Records, SMOTE Pipeline | Pranav Kaja">
+    <meta property="og:description" content="Random Forest + Gradient Boosting on 350K records; SMOTE handles imbalance; churn projected 18%→11%.">
+    <meta property="og:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://pranavkaja.vercel.app/projects/auto-insurance-churn">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Auto Insurance Churn — 350K Records, SMOTE Pipeline | Pranav Kaja">
+    <meta name="twitter:description" content="Random Forest + Gradient Boosting on 350K records; SMOTE handles imbalance; churn projected 18%→11%.">
+    <meta name="twitter:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+    <link rel="canonical" href="https://pranavkaja.vercel.app/projects/auto-insurance-churn">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        { "@type": "TechArticle", "headline": "Auto Insurance Churn — 350K Records with a SMOTE Pipeline",
+          "description": "Random Forest and Gradient Boosting on 350,000 policyholder records with a SMOTE resampling pipeline for severe class imbalance; projected churn cut from 18% to 11%.",
+          "author": { "@type": "Person", "name": "Pranav Kaja", "url": "https://pranavkaja.vercel.app/" },
+          "url": "https://pranavkaja.vercel.app/projects/auto-insurance-churn",
+          "image": "https://pranavkaja.vercel.app/images/og-card.png",
+          "keywords": "churn prediction, Random Forest, Gradient Boosting, SMOTE, class imbalance, insurance analytics, Pranav Kaja",
+          "about": ["Churn Prediction", "Machine Learning", "Imbalanced Data"], "inLanguage": "en" },
+        { "@type": "BreadcrumbList", "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://pranavkaja.vercel.app/" },
+          { "@type": "ListItem", "position": 2, "name": "Projects", "item": "https://pranavkaja.vercel.app/projects" },
+          { "@type": "ListItem", "position": 3, "name": "Auto Insurance Churn", "item": "https://pranavkaja.vercel.app/projects/auto-insurance-churn" } ] }
+      ]
+    }
+    </script>
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <nav class="top-nav">
+        <a href="/" class="nav-logo interactive-element no-underline text-inherit">SUBJECT // PRANAV KAJA</a>
+        <div class="nav-links"><a href="/projects"><span class="nav-num">&larr; </span>ALL MISSIONS</a></div>
+    </nav>
+
+    <main class="container" id="main">
+        <header class="hero">
+            <div class="hero-label mb-20"><span class="status-dot"></span>MSN-05 // DEPLOYED</div>
+            <h1 class="hero-title" style="font-size: 3rem; line-height: 1.05;">AUTO INSURANCE CHURN</h1>
+            <p class="hero-subtitle">18% &rarr; 11% projected churn across 350K policyholders.</p>
+            <div class="pp-chips" style="margin-top: 8px;">
+                <span>350K Records</span><span>18% &rarr; 11% Churn</span><span>SMOTE Pipeline</span><span>Class Imbalance</span>
+            </div>
+        </header>
+
+        <section class="section">
+            <div class="section-header"><h2>BRIEFING</h2><div class="line"></div></div>
+            <p style="font-size: 1.05rem; line-height: 1.7; max-width: 760px;">
+                Random Forest and Gradient Boosting classifiers on 350,000 policyholder records to flag retention risk
+                early. The hard part wasn't the model — it was the <strong>severe class imbalance</strong> (churners are
+                rare). A <strong>SMOTE resampling pipeline</strong> rebalanced the training data so precision and recall
+                held steady across high-risk segments instead of collapsing onto the majority class. The model points
+                retention spend at the policyholders most likely to leave, projecting churn down from 18% to 11%.
+            </p>
+        </section>
+
+        <section class="section">
+            <div class="section-header"><h2>ROLE / METHOD / OUTCOME</h2><div class="line"></div></div>
+            <div class="msn-rmo">
+                <div class="rmo-cell"><div class="k">Role</div><div class="v">Solo build.</div></div>
+                <div class="rmo-cell"><div class="k">Method</div><div class="v">Random Forest + Gradient Boosting with a SMOTE resampling pipeline.</div></div>
+                <div class="rmo-cell"><div class="k">Outcome</div><div class="v">Projected churn cut from 18% to 11%.</div></div>
+            </div>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 20px; font-family: 'Share Tech Mono', monospace;">
+                STACK: Python &middot; scikit-learn &middot; Gradient Boosting &middot; SMOTE
+            </p>
+        </section>
+
+        <section class="section">
+            <div class="interests-simple-box">
+                <h3 class="beyond-title">MORE MISSIONS</h3>
+                <p class="beyond-subtitle">Eight more case files — ML, BI, and supply-chain strategy.</p>
+                <a href="/projects" class="btn btn-secondary interactive-element no-underline">VIEW ALL MISSIONS</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">&copy; <span id="year"></span> Pranav Kaja. All rights reserved.</footer>
+    <div class="custom-cursor" id="custom-cursor"></div>
+    <div class="crosshair-h"></div>
+    <div class="crosshair-v"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="/config.js" defer></script>
+    <script src="/analytics.js" defer></script>
+    <script src="/main.js" defer></script>
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+
+</html>

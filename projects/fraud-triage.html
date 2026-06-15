@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraud Triage — LLM-Augmented Fraud Detection (XGBoost + Gemini) | Pranav Kaja</title>
+    <meta name="description"
+        content="A two-stage fraud pipeline by Pranav Kaja: XGBoost scores 284,807 card transactions at 0.978 AUC, then Google Gemini writes analyst-ready verdicts for the high-risk flags.">
+    <meta name="author" content="Pranav Kaja">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta property="og:title" content="Fraud Triage — LLM-Augmented Fraud Detection | Pranav Kaja">
+    <meta property="og:description" content="XGBoost scores 284K transactions at 0.978 AUC; Google Gemini triages the high-risk flags into structured, analyst-ready verdicts.">
+    <meta property="og:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://pranavkaja.vercel.app/projects/fraud-triage">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Fraud Triage — LLM-Augmented Fraud Detection | Pranav Kaja">
+    <meta name="twitter:description" content="XGBoost + Google Gemini: speed of classical ML, explainability of generative AI.">
+    <meta name="twitter:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+    <link rel="canonical" href="https://pranavkaja.vercel.app/projects/fraud-triage">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "TechArticle",
+          "headline": "Fraud Triage — LLM-Augmented Transaction Fraud Detection",
+          "description": "A two-stage fraud pipeline: XGBoost scores 284,807 card transactions at 0.978 AUC, then Google Gemini writes structured, analyst-ready verdicts for the high-risk flags.",
+          "author": { "@type": "Person", "name": "Pranav Kaja", "url": "https://pranavkaja.vercel.app/" },
+          "url": "https://pranavkaja.vercel.app/projects/fraud-triage",
+          "image": "https://pranavkaja.vercel.app/images/og-card.png",
+          "keywords": "fraud detection, XGBoost, LLM, Google Gemini, imbalanced data, machine learning, anomaly detection, Pranav Kaja",
+          "about": ["Fraud Detection", "Machine Learning", "Large Language Models"],
+          "inLanguage": "en"
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://pranavkaja.vercel.app/" },
+            { "@type": "ListItem", "position": 2, "name": "Projects", "item": "https://pranavkaja.vercel.app/projects" },
+            { "@type": "ListItem", "position": 3, "name": "Fraud Triage", "item": "https://pranavkaja.vercel.app/projects/fraud-triage" }
+          ]
+        }
+      ]
+    }
+    </script>
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <nav class="top-nav">
+        <a href="/" class="nav-logo interactive-element no-underline text-inherit">SUBJECT // PRANAV KAJA</a>
+        <div class="nav-links">
+            <a href="/projects"><span class="nav-num">&larr; </span>ALL MISSIONS</a>
+        </div>
+    </nav>
+
+    <main class="container" id="main">
+        <header class="hero">
+            <div class="hero-label mb-20"><span class="status-dot"></span>MSN-01 // DEPLOYED</div>
+            <h1 class="hero-title" style="font-size: 3.2rem; line-height: 1.05;">FRAUD TRIAGE</h1>
+            <p class="hero-subtitle">A two-stage pipeline that catches what the model misses — XGBoost for speed,
+                Google Gemini for the reasoning.</p>
+            <div class="pp-chips" style="margin-top: 8px;">
+                <span>0.978 AUC</span>
+                <span>84% Recall</span>
+                <span>84% Precision</span>
+                <span>284K Records</span>
+                <span>~2s Latency</span>
+                <span>$0 on Free Tier</span>
+            </div>
+        </header>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>BRIEFING</h2>
+                <div class="line"></div>
+            </div>
+            <p style="font-size: 1.05rem; line-height: 1.7; max-width: 760px;">
+                Card networks process millions of transactions a day. Under 1% are fraudulent, but each one is real
+                money lost. The job is two-sided: catch fraud without drowning analysts in false flags, and give them
+                enough context to make a fast, defensible call on the ones that do get flagged. Most systems stop at a
+                score — a 0.87 doesn't tell an analyst <em>why</em> a transaction looks wrong or what to do about it.
+            </p>
+            <p style="font-size: 1.05rem; line-height: 1.7; max-width: 760px; margin-top: 14px;">
+                This project pairs two complementary AI systems so each does what it's best at: <strong>XGBoost</strong>
+                rapidly scores every transaction, then <strong>Google Gemini</strong> takes the small fraction flagged
+                as suspicious and produces a structured, analyst-actionable verdict with reasoning — the speed of
+                classical ML with the explainability of generative AI.
+            </p>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>ROLE / METHOD / OUTCOME</h2>
+                <div class="line"></div>
+            </div>
+            <div class="msn-rmo">
+                <div class="rmo-cell">
+                    <div class="k">Role</div>
+                    <div class="v">Solo build, end to end — modeling, LLM layer, and batch pipeline.</div>
+                </div>
+                <div class="rmo-cell">
+                    <div class="k">Method</div>
+                    <div class="v">Weighted-loss XGBoost plus a Gemini triage layer with strict JSON output.</div>
+                </div>
+                <div class="rmo-cell">
+                    <div class="k">Outcome</div>
+                    <div class="v">Industry-grade AUC with a reasoning trail analysts can audit.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>HOW IT WORKS</h2>
+                <div class="line"></div>
+            </div>
+            <div class="grid-2">
+                <div class="panel">
+                    <h3>STAGE 1 — XGBOOST</h3>
+                    <p>Trained on 284,807 historical card transactions, it scores every transaction with a fraud
+                        probability. Fast and cheap, it scales to millions of transactions a day and flags only the
+                        highest-risk ones for review.</p>
+                </div>
+                <div class="panel">
+                    <h3>STAGE 2 — GOOGLE GEMINI</h3>
+                    <p>A reasoning layer that examines each flagged transaction's raw features and writes a structured
+                        verdict — what's suspicious, why, and the recommended action — only paying the LLM cost on the
+                        few cases that need deep analysis.</p>
+                </div>
+            </div>
+            <p style="font-size: 1rem; line-height: 1.7; max-width: 760px; margin-top: 22px;">
+                In practice: overnight the model scores a million transactions and flags the top 100. Each flag is sent
+                through the Gemini triage agent, which returns a standardized JSON case file — verdict, confidence,
+                primary signals, reasoning, and a recommended action. The analyst reviews a decision instead of a bare
+                number. What used to take ~5 minutes of investigation per case becomes ~30 seconds of verification.
+            </p>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>THE FINDING WORTH TELLING</h2>
+                <div class="line"></div>
+            </div>
+            <div class="panel" style="border-left: 4px solid var(--accent);">
+                <p style="font-size: 1.02rem; line-height: 1.7;">
+                    During testing, a transaction scored <strong>0.000000</strong> — the ML model was certain it was
+                    legitimate. It was actually fraud. The model would have let it through. Reading the <em>raw feature
+                    values</em> rather than the model's confidence, the LLM noticed multiple anomalous signals and
+                    flagged it anyway. That's the whole case for two layers: the model is excellent on the bulk of
+                    cases but has occasional blind spots, and a second opinion reasoning differently sometimes catches
+                    what it missed.
+                </p>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>THE ENGINEERING ARC</h2>
+                <div class="line"></div>
+            </div>
+            <ul class="ops-points" style="max-width: 780px;">
+                <li><strong>Started with vanilla Gradient Boosting</strong> — the textbook baseline. It hit a wall at
+                    0.60 AUC, barely better than random.</li>
+                <li><strong>Diagnosed the failure:</strong> a 577:1 class imbalance was overwhelming the loss function,
+                    and 1,081 duplicate rows produced bimodal predictions that broke the metric.</li>
+                <li><strong>Switched to XGBoost with weighted loss</strong> — <code>scale_pos_weight=577</code> weights
+                    fraud examples 577&times; during training; L2 regularization smoothed the duplicate-row impact.
+                    AUC jumped from 0.60 to <strong>0.978</strong>, at 84% recall and 84% precision on the rare class.</li>
+                <li><strong>Added the Gemini triage layer</strong> — a function that formats the XGBoost score plus the
+                    top features into a structured prompt and returns a strict-JSON verdict.</li>
+                <li><strong>Scaled to batch</strong> — a rate-limited processor that runs 100 transactions through the
+                    LLM in ~10 minutes with timing, token tracking, error handling, and caching.</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>PRODUCTION THINKING</h2>
+                <div class="line"></div>
+            </div>
+            <ul class="ops-points" style="max-width: 780px;">
+                <li><strong>Structured output enforcement</strong> — Gemini set to <code>response_mime_type="application/json"</code>,
+                    guaranteeing valid JSON: no regex parsing, no markdown fences, no malformed responses.</li>
+                <li><strong>Signal compression</strong> — only the top 5 most anomalous features (not all 30) go to the
+                    LLM, keeping prompts focused and token cost low.</li>
+                <li><strong>Rate limiting &amp; caching</strong> — 5s between calls to stay under the free-tier limit, with
+                    results saved to disk after every batch so a dropped session loses no work.</li>
+                <li><strong>Cost projections</strong> — tokens-per-call tracked and projected across 1K&ndash;1M daily
+                    volumes (~$30/month at 100K/day): the analysis that actually decides whether to deploy.</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>RESULTS</h2>
+                <div class="line"></div>
+            </div>
+            <div class="vitals">
+                <div class="vital"><div class="k">Records processed</div><div class="v">284,807</div></div>
+                <div class="vital"><div class="k">Held-out AUC</div><div class="v live">0.978</div></div>
+                <div class="vital"><div class="k">Recall / Precision</div><div class="v">84% / 84%</div></div>
+                <div class="vital"><div class="k">LLM latency</div><div class="v">~2s / verdict</div></div>
+                <div class="vital"><div class="k">Run cost</div><div class="v">$0 (free tier)</div></div>
+            </div>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 16px; font-family: 'Share Tech Mono', monospace;">
+                STACK: XGBoost &middot; Google Gemini &middot; Python &middot; scikit-learn &middot; pandas
+            </p>
+        </section>
+
+        <section class="section">
+            <div class="interests-simple-box">
+                <h3 class="beyond-title">MORE MISSIONS</h3>
+                <p class="beyond-subtitle">Eight more case files — ML, BI, and supply-chain strategy.</p>
+                <a href="/projects" class="btn btn-secondary interactive-element no-underline">VIEW ALL MISSIONS</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        &copy; <span id="year"></span> Pranav Kaja. All rights reserved.
+    </footer>
+
+    <div class="custom-cursor" id="custom-cursor"></div>
+    <div class="crosshair-h"></div>
+    <div class="crosshair-v"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="/config.js" defer></script>
+    <script src="/analytics.js" defer></script>
+    <script src="/main.js" defer></script>
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>
