@@ -578,3 +578,71 @@ window.addEventListener('load', () => {
     // Wait 2.5 seconds after main page load before starting
     setTimeout(loadNext, 2500);
 });
+
+// ============================================================
+// 2-MINUTE TROPHY ACHIEVEMENT
+// Tracks visit time across pages and awards a recurring trophy
+// ============================================================
+window.addEventListener('load', () => {
+    const navLogo = document.querySelector('.nav-logo');
+    if (!navLogo) return;
+
+    const TROPHY_INTERVAL = 120000; // 2 minutes
+    
+    // Initialize or get start time
+    if (!localStorage.getItem('site_visit_start')) {
+        localStorage.setItem('site_visit_start', Date.now());
+    }
+
+    let trophyInjected = false;
+
+    function checkTrophy() {
+        const startTime = parseInt(localStorage.getItem('site_visit_start'), 10);
+        if (Date.now() - startTime >= TROPHY_INTERVAL && !trophyInjected) {
+            injectTrophy();
+        }
+    }
+
+    function injectTrophy() {
+        trophyInjected = true;
+        
+        // Ensure navLogo is wrapped so flex space-between doesn't break
+        let wrapper = navLogo.parentNode;
+        if (!wrapper.classList.contains('nav-logo-wrapper')) {
+            wrapper = document.createElement('div');
+            wrapper.className = 'nav-logo-wrapper';
+            wrapper.style.display = 'flex';
+            wrapper.style.alignItems = 'center';
+            navLogo.parentNode.insertBefore(wrapper, navLogo);
+            wrapper.appendChild(navLogo);
+        }
+
+        const trophyContainer = document.createElement('div');
+        trophyContainer.className = 'trophy-container';
+        
+        trophyContainer.innerHTML = `
+            <span class="trophy-icon">🏆</span>
+            <div class="trophy-popup">
+                <button class="trophy-close" aria-label="Close Trophy">&times;</button>
+                <p>Thanks for spending time on this site for so long, please drop me a message / connect with me!</p>
+                <a href="contact.html" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.9rem; margin-top: 10px;">Contact</a>
+            </div>
+        `;
+
+        wrapper.appendChild(trophyContainer);
+
+        const closeBtn = trophyContainer.querySelector('.trophy-close');
+        closeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            trophyContainer.remove();
+            trophyInjected = false;
+            // Reset timer for another 2 minutes
+            localStorage.setItem('site_visit_start', Date.now());
+        });
+    }
+
+    // Check immediately, then every 5 seconds
+    checkTrophy();
+    setInterval(checkTrophy, 5000);
+});
