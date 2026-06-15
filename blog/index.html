@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog — Notes on Data, ML & Engineering | Pranav Kaja</title>
+    <meta name="description"
+        content="Field notes from Pranav Kaja, Data & Analytics Engineer — how things were actually built: fraud detection with LLMs, automating ETL pipelines, and lessons from real data work.">
+    <meta name="author" content="Pranav Kaja">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta property="og:title" content="Blog — Notes on Data, ML & Engineering | Pranav Kaja">
+    <meta property="og:description" content="How things were actually built — fraud detection with LLMs, ETL automation, and real data lessons.">
+    <meta property="og:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pranavkaja.vercel.app/blog">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Blog — Notes on Data, ML & Engineering | Pranav Kaja">
+    <meta name="twitter:description" content="How things were actually built — fraud detection with LLMs, ETL automation, and real data lessons.">
+    <meta name="twitter:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+    <link rel="canonical" href="https://pranavkaja.vercel.app/blog">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Blog",
+      "url": "https://pranavkaja.vercel.app/blog",
+      "name": "Pranav Kaja — Blog",
+      "description": "Field notes on data, machine learning, and engineering by Pranav Kaja.",
+      "author": { "@type": "Person", "name": "Pranav Kaja", "jobTitle": "Data & Analytics Engineer", "url": "https://pranavkaja.vercel.app/" },
+      "blogPost": [
+        { "@type": "BlogPosting", "headline": "Two-Stage Fraud Detection: XGBoost for Speed, an LLM for Reasoning", "url": "https://pranavkaja.vercel.app/blog/two-stage-fraud-detection", "datePublished": "2026-06-15", "author": { "@type": "Person", "name": "Pranav Kaja" } },
+        { "@type": "BlogPosting", "headline": "Automating a 37-Location ETL Pipeline (2 Hours to 12 Minutes a Day)", "url": "https://pranavkaja.vercel.app/blog/automating-etl-pipeline", "datePublished": "2026-06-15", "author": { "@type": "Person", "name": "Pranav Kaja" } }
+      ]
+    }
+    </script>
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <nav class="top-nav">
+        <a href="/" class="nav-logo interactive-element no-underline text-inherit">SUBJECT // PRANAV KAJA</a>
+        <div class="nav-links"><a href="/"><span class="nav-num">&larr; </span>MAIN_DB</a></div>
+    </nav>
+
+    <main class="container" id="main">
+        <header class="hero">
+            <div class="hero-label mb-20"><span class="status-dot"></span>[ FIELD NOTES ]</div>
+            <h1 class="hero-title" style="font-size: 3.4rem;">BLOG</h1>
+            <p class="hero-subtitle">How things actually got built — the decisions, the dead ends, and what
+                survived contact with real data.</p>
+        </header>
+
+        <section class="section">
+            <div class="post-list">
+                <a href="/blog/two-stage-fraud-detection" class="post-card no-underline text-inherit interactive-element">
+                    <div class="post-meta">Jun 2026 &middot; Machine Learning &middot; LLMs</div>
+                    <h3>Two-Stage Fraud Detection: XGBoost for Speed, an LLM for Reasoning</h3>
+                    <p>Why I put a reasoning layer on top of a classical model — and the case where the LLM caught a
+                        fraud the model scored a perfect 0.000000.</p>
+                </a>
+                <a href="/blog/automating-etl-pipeline" class="post-card no-underline text-inherit interactive-element">
+                    <div class="post-meta">Jun 2026 &middot; Data Engineering</div>
+                    <h3>Automating a 37-Location ETL Pipeline (2 Hours to 12 Minutes a Day)</h3>
+                    <p>The win wasn't a clever model — it was deleting two hours of manual reporting a day and making the
+                        numbers trustworthy enough to forecast on.</p>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">&copy; <span id="year"></span> Pranav Kaja. All rights reserved.</footer>
+    <div class="custom-cursor" id="custom-cursor"></div>
+    <div class="crosshair-h"></div>
+    <div class="crosshair-v"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="/config.js" defer></script>
+    <script src="/analytics.js" defer></script>
+    <script src="/main.js" defer></script>
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+
+</html>

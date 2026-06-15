@@ -39,4 +39,12 @@
   <url><loc>https://pranavkaja.vercel.app/projects/bullwhip-mitigation</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://pranavkaja.vercel.app/projects/prime-air-drone-logistics</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://pranavkaja.vercel.app/projects/strategy-summit</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url>
+    <loc>https://pranavkaja.vercel.app/blog</loc>
+    <lastmod>2026-06-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url><loc>https://pranavkaja.vercel.app/blog/two-stage-fraud-detection</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pranavkaja.vercel.app/blog/automating-etl-pipeline</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>
