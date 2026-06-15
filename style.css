@@ -2451,3 +2451,53 @@ body.msn-open {
     outline: 2px solid var(--accent);
     outline-offset: 3px;
 }
+
+/* Countdown Overlay */
+#game-countdown-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10001; /* Above game HUD */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(24, 24, 27, 0.85); /* semi-transparent dark */
+    backdrop-filter: blur(4px);
+    transition: opacity 0.3s ease;
+}
+#game-countdown-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+#game-countdown-overlay .countdown-text {
+    font-size: 8rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-weight: bold;
+    color: var(--accent);
+    text-shadow: 0 0 20px rgba(255, 69, 0, 0.5);
+    margin-bottom: 30px;
+    animation: countdown-pulse 1s infinite;
+}
+#game-countdown-overlay .countdown-instructions {
+    display: flex;
+    gap: 30px;
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--text-main);
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+#game-countdown-overlay .countdown-instructions div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+@keyframes countdown-pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+@media (max-width: 768px) {
+    #game-countdown-overlay .countdown-instructions { flex-direction: column; gap: 15px; }
+}

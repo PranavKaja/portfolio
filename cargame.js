@@ -241,13 +241,13 @@ window.addEventListener('keydown', (e) => {
                 hintEl.classList.add('first-trigger');
                 hintEl.classList.remove('triggered');
                 setTimeout(() => {
-                    if (gameActive && hintEl.classList.contains('first-trigger')) {
+                    if ((gameActive || gameStarting) && hintEl.classList.contains('first-trigger')) {
                         hintEl.classList.remove('first-trigger');
                         hintEl.classList.add('triggered');
                     }
                 }, 800);
             }
-            startGame();
+            if (!gameStarting) startGame();
         } else {
             if (hintEl && !hintEl.classList.contains('first-trigger')) {
                 hintEl.classList.add('triggered');
@@ -299,9 +299,14 @@ function startInactivityTimer() {
 
 
 // --- 6. GAME LOGIC ---
+let gameStarting = false;
+
 function startGame() {
     if (window.innerWidth <= 768) return;
-    gameActive = true; score = 0; timeLeft = 12;
+    if (gameStarting) return;
+    
+    gameStarting = true;
+    score = 0; timeLeft = 12;
     car.x = window.innerWidth / 2; car.y = window.innerHeight / 2;
     car.velocity = 0; car.angle = 0; car.visualAngle = 0; car.hp = 5;
     car.brokenDown = false; car.maxSpeed = car.baseMaxSpeed; car.boost = 100;
@@ -330,7 +335,44 @@ function startGame() {
 
     // Toggle game-active class for cursor
     document.body.classList.add('game-active');
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     skidmarks = [];
+
+    // Trigger game-active to hide cursor
+    document.body.classList.add('game-active');
+
+    // Show countdown
+    const countdownOverlay = document.getElementById('game-countdown-overlay');
+    const countdownText = document.getElementById('countdown-text');
+    countdownOverlay.classList.remove('hidden');
+    
+    let count = 3;
+    countdownText.innerText = count;
+    playTone(400, 'sine', 0.2, 0.3);
+    
+    const countInterval = setInterval(() => {
+        count--;
+        if (count > 0) {
+            countdownText.innerText = count;
+            playTone(400, 'sine', 0.2, 0.3);
+        } else if (count === 0) {
+            countdownText.innerText = "GO!";
+            playTone(800, 'square', 0.4, 0.4);
+        } else {
+            clearInterval(countInterval);
+            countdownOverlay.classList.add('hidden');
+            finishStartGame();
+        }
+    }, 1000);
+}
+
+function finishStartGame() {
+    gameStarting = false;
+    gameActive = true; 
+    
+    // Resume audio context if needed
+    if(audioCtx.state === 'suspended') audioCtx.resume();
 
     updateHealthUI();
     updateScore(); spawnCheckpoint(); updateCharRects();
