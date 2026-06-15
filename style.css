@@ -116,7 +116,8 @@ body.custom-cursor-active button {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 40px;
+    height: 58px;
+    padding: 0 40px;
     border-bottom: 2px solid var(--text-main);
     z-index: 100;
     font-family: 'Share Tech Mono', monospace;
@@ -1107,6 +1108,7 @@ body.ttt-active .container, body.ttt-active .top-nav {
         padding: 110px 15px 30px;
     }
     .top-nav {
+        height: auto;
         padding: 15px 0 10px 0;
         flex-direction: column;
         align-items: center;
