@@ -60,7 +60,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const cursor = document.getElementById('custom-cursor');
     const chH = document.querySelector('.crosshair-h');
     const chV = document.querySelector('.crosshair-v');
-    
+    // Hide the OS pointer only now that JS is running and the custom crosshair
+    // exists; on touch the media query restores the system cursor regardless.
+    if (cursor) document.body.classList.add('custom-cursor-active');
+
     let cursorVisible = false;
 
     let isCursorUpdating = false;

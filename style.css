@@ -22,7 +22,6 @@ body {
     background-color: var(--bg);
     color: var(--text-main);
     line-height: 1.6;
-    cursor: none; /* Custom clinical cursor */
     overflow-x: clip;
 }
 
@@ -40,9 +39,18 @@ body::before {
 }
 
 a, button {
-    cursor: none;
     text-decoration: none;
     color: inherit;
+}
+
+/* The custom crosshair replaces the OS pointer — but only once JS has
+   confirmed it is live (main.js / interests.js add .custom-cursor-active).
+   If the script ever fails to load, the system cursor stays visible instead
+   of leaving the user with no pointer at all. */
+body.custom-cursor-active,
+body.custom-cursor-active a,
+body.custom-cursor-active button {
+    cursor: none;
 }
 
 /* Clinical Aim Crosshair */

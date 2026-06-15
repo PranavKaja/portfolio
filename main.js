@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const isTouchDevice = window.matchMedia("(any-hover: none)").matches;
     
     if (!isTouchDevice) {
+        // Hide the OS pointer only now that JS is running and the custom
+        // crosshair exists — if this script never runs, the system cursor stays.
+        if (cursor) document.body.classList.add('custom-cursor-active');
         let mouseX = 0;
         let mouseY = 0;
         let isCursorUpdating = false;
