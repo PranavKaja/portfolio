@@ -16,6 +16,30 @@ document.addEventListener('DOMContentLoaded', () => {
         let mouseY = 0;
         let isCursorUpdating = false;
 
+        // Set default position to bottom-left of hero box
+        const heroBox = document.querySelector('.hero');
+        if (heroBox) {
+            const rect = heroBox.getBoundingClientRect();
+            // Optional: adjusting for border width or exact corner, 
+            // rect.left and rect.bottom give the outer edge.
+            mouseX = rect.left;
+            mouseY = rect.bottom;
+
+            if (cursor) {
+                cursor.style.transform = `translate3d(calc(${mouseX}px - 50%), calc(${mouseY}px - 50%), 0)`;
+                cursor.classList.add('active');
+            }
+            if (chH) {
+                chH.style.transform = `translate3d(0, ${mouseY}px, 0)`;
+                chH.classList.add('active');
+            }
+            if (chV) {
+                chV.style.transform = `translate3d(${mouseX}px, 0, 0)`;
+                chV.classList.add('active');
+            }
+            cursorVisible = true;
+        }
+
         // Crosshair logic
         document.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
