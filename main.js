@@ -624,8 +624,8 @@ window.addEventListener('load', () => {
             <span class="trophy-icon">🏆</span>
             <div class="trophy-popup">
                 <button class="trophy-close" aria-label="Close Trophy">&times;</button>
-                <p>Thanks for spending time on this site for so long, please drop me a message / connect with me!</p>
-                <a href="contact.html" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.9rem; margin-top: 10px;">Contact</a>
+                <p>You've been exploring for a while! Thank you for taking the time to dive into my work. I'd love to hear from you—let's connect!</p>
+                <a href="contact.html" class="trophy-btn">CONNECT WITH ME</a>
             </div>
         `;
 
