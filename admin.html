@@ -165,10 +165,9 @@
                 <input type="hidden" id="f-id">
                 
                 <!-- TIER 1: BASE CARD -->
-                <div class="section-base">
-                    <div style="display: flex; gap: 20px; align-items: flex-end; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap;">
-                        <div class="field" style="margin-bottom:0;">
-                            <span>Status</span>
+                <div style="display: flex; gap: 20px; align-items: flex-end; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap;">
+                    <div class="field hl hl-base" style="margin-bottom:0;">
+                        <span>Status</span>
                             <div class="status-group" id="f-status-group">
                                 <label><input type="radio" name="f-status" value="classified"><span class="status-btn">Classified</span></label>
                                 <label><input type="radio" name="f-status" value="in_progress"><span class="status-btn">In Progress</span></label>
@@ -177,16 +176,16 @@
                                 <label><input type="radio" name="f-status" value="none"><span class="status-btn">None</span></label>
                             </div>
                         </div>
-                        <div class="spacer"></div>
-                        <div class="field" style="margin-bottom:0;">
-                            <span>Public Badge</span>
-                            <label class="toggle-switch" title="Show status badge on live site">
-                                <input type="checkbox" id="f-show-status" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="field" style="margin-bottom:0;">
-                            <span>Live Site</span>
+                    <div class="spacer"></div>
+                    <div class="field hl hl-base" style="margin-bottom:0;">
+                        <span>Public Badge</span>
+                        <label class="toggle-switch" title="Show status badge on live site">
+                            <input type="checkbox" id="f-show-status" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="field hl hl-base" style="margin-bottom:0;">
+                        <span>Live Site</span>
                             <label class="toggle-switch" title="Published">
                                 <input type="checkbox" id="f-published" checked>
                                 <span class="slider"></span>
@@ -194,55 +193,54 @@
                         </div>
                     </div>
 
-                    <div class="grid2">
-                        <label class="field">
-                            <span>Code (e.g. MSN-10)</span>
-                            <input type="text" id="f-code" required>
-                        </label>
-                        <label class="field">
-                            <span>Title</span>
-                            <input type="text" id="f-title" required>
-                        </label>
-                    </div>
-                    <label class="field">
-                        <span>Card stack (tech)</span>
-                        <input type="text" id="f-tech">
+                <div class="grid2">
+                    <label class="field hl hl-all">
+                        <span>Code (e.g. MSN-10)</span>
+                        <input type="text" id="f-code" required>
                     </label>
-                    <label class="field">
-                        <span>Card one-liner (summary)</span>
-                        <input type="text" id="f-summary">
-                    </label>
-                    <label class="field" style="max-width: 150px;">
-                        <span>Sort order</span>
-                        <input type="number" id="f-sort" value="100">
+                    <label class="field hl hl-all">
+                        <span>Title</span>
+                        <input type="text" id="f-title" required>
                     </label>
                 </div>
+                <label class="field hl hl-base">
+                    <span>Tech</span>
+                    <input type="text" id="f-tech">
+                </label>
+                <label class="field hl hl-base">
+                    <span>Summary</span>
+                    <input type="text" id="f-summary">
+                </label>
+                <label class="field hl hl-base" style="max-width: 150px;">
+                    <span>Sort order</span>
+                    <input type="number" id="f-sort" value="100">
+                </label>
 
                 <!-- TIER 2: HOVER CARD -->
                 <button type="button" class="advanced-toggle-btn" id="hover-toggle-btn">[+] HOVER CARD</button>
-                <div id="hover-fields" class="advanced-section section-hover">
-                    <label class="field">
+                <div id="hover-fields" class="advanced-section">
+                    <label class="field hl hl-hover-pop">
                         <span style="display:flex; justify-content:space-between">
                             <div>Full stack (overlay)</div>
                             <a href="#" id="sync-stack" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Tech</a>
                         </span>
                         <input type="text" id="f-stack">
                     </label>
-                    <label class="field">
+                    <label class="field hl hl-hover-pop">
                         <span style="display:flex; justify-content:space-between">
                             <div>Hook</div>
                             <a href="#" id="sync-hook" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Summary</a>
                         </span>
                         <input type="text" id="f-hook">
                     </label>
-                    <label class="field">
+                    <label class="field hl hl-hover-pop">
                         <span style="display:flex; justify-content:space-between">
                             <div>Brief</div>
                             <a href="#" id="sync-brief" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Summary</a>
                         </span>
                         <textarea id="f-brief"></textarea>
                     </label>
-                    <label class="field">
+                    <label class="field hl hl-hover-pop">
                         <span>Chips (hit Enter)</span>
                         <div class="chip-editor" id="chip-editor-ui">
                             <input type="text" class="chip-input-field" id="chip-input" placeholder="Type and hit enter...">
@@ -253,22 +251,22 @@
 
                 <!-- TIER 3: POPUP DOSSIER -->
                 <button type="button" class="advanced-toggle-btn" id="pop-toggle-btn">[+] POPUP DOSSIER</button>
-                <div id="pop-fields" class="advanced-section section-pop">
+                <div id="pop-fields" class="advanced-section">
                     <div class="grid2">
-                        <label class="field">
+                        <label class="field hl hl-pop">
                             <span>Role</span>
                             <input type="text" id="f-role">
                         </label>
-                        <label class="field">
+                        <label class="field hl hl-pop">
                             <span>Method</span>
                             <input type="text" id="f-method">
                         </label>
                     </div>
-                    <label class="field">
+                    <label class="field hl hl-pop">
                         <span>Outcome</span>
                         <input type="text" id="f-outcome">
                     </label>
-                    <label class="field">
+                    <label class="field hl hl-pop">
                         <span style="display:flex; align-items:center; gap: 15px;">
                             <div>GitHub URL</div>
                             <div style="display:flex; align-items:center; gap:6px;">

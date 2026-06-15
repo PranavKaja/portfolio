@@ -253,22 +253,23 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
 .star:hover { background: none; color: var(--accent); }
 .star.on { color: var(--accent); }
 
-/* Section Highlights */
-.section-base {
-    border-left: 4px solid #3b82f6;
-    padding-left: 15px;
-    margin-bottom: 20px;
+/* Field Location Highlights */
+.hl {
+    position: relative;
+    padding-left: 12px;
 }
-.section-hover {
-    border-left: 4px solid #f97316;
-    padding-left: 15px;
-    margin-bottom: 20px;
+.hl::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
 }
-.section-pop {
-    border-left: 4px solid #22c55e;
-    padding-left: 15px;
-    margin-bottom: 20px;
-}
+.hl-base::before { background: #3b82f6; }
+.hl-pop::before { background: #22c55e; }
+.hl-hover-pop::before { background: linear-gradient(to bottom, #f97316 50%, #22c55e 50%); }
+.hl-all::before { background: linear-gradient(to bottom, #3b82f6 33.3%, #f97316 33.3% 66.6%, #22c55e 66.6%); }
 
 /* Rich Chip Editor */
 .chip-editor {
