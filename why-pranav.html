@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why Pranav | Pranav Kaja</title>
+    <meta name="description"
+        content="Why work with Pranav Kaja — a data & analytics engineer who ships models that survive contact with real data.">
+    <meta property="og:title" content="Why Pranav | Pranav Kaja">
+    <meta property="og:description" content="The short case for working with Pranav Kaja.">
+    <meta property="og:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://pranavkaja.vercel.app/why-pranav">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Why Pranav | Pranav Kaja">
+    <meta name="twitter:description" content="The short case for working with Pranav Kaja.">
+    <meta name="twitter:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+    <link rel="canonical" href="https://pranavkaja.vercel.app/why-pranav">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <nav class="top-nav">
+        <a href="/" class="nav-logo interactive-element no-underline text-inherit">SUBJECT // PRANAV KAJA</a>
+        <div class="nav-links">
+            <a href="/"><span class="nav-num">&larr; </span>MAIN_DB</a>
+        </div>
+    </nav>
+
+    <main class="container" id="main">
+        <header class="hero">
+            <div class="hero-label mb-20"><span class="status-dot"></span>[ CASE FILE ]</div>
+            <h1 class="hero-title">WHY<br>PRANAV</h1>
+            <p class="hero-subtitle">The short version. The rest of this site is the long one.</p>
+        </header>
+
+        <!-- ============================================================
+             PLACEHOLDER CONTENT — Pranav to rewrite tomorrow.
+             Reuses the homepage panel/grid styling so it's on-brand.
+             ============================================================ -->
+        <section class="section">
+            <div class="section-header">
+                <h2>THE CASE</h2>
+                <div class="line"></div>
+            </div>
+            <div class="grid-3">
+                <div class="panel">
+                    <h3>OUTCOME OVER OPTICS</h3>
+                    <p>Placeholder — a reason about shipping work that drives real decisions, not slideware.
+                        Rewrite this with your own words.</p>
+                </div>
+                <div class="panel">
+                    <h3>FULL LIFECYCLE</h3>
+                    <p>Placeholder — a reason about owning the whole pipeline: clean inputs, edge cases, monitoring,
+                        and an audit trail. Rewrite this.</p>
+                </div>
+                <div class="panel">
+                    <h3>CLEAR COMMUNICATOR</h3>
+                    <p>Placeholder — a reason about translating complex data into action people can use.
+                        Rewrite this.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="interests-simple-box">
+                <h3 class="beyond-title">LET'S TALK</h3>
+                <p class="beyond-subtitle">If this resonates, the channel is open.</p>
+                <a href="/contact"
+                    class="btn btn-secondary interactive-element hover-swap clickable no-underline"
+                    onclick="if(window.intel) window.intel.track('contact_click');">
+                    <span class="default-text flex-center">INITIATE CONTACT <span class="blink-dot ml-10"></span></span>
+                    <span class="hover-text flex-center-all">CONTACT PRANAV</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        &copy; <span id="year"></span> Pranav Kaja. All rights reserved.
+    </footer>
+
+    <!-- Global Custom Cursor nodes placed at end of DOM to guarantee top stacking context -->
+    <div class="custom-cursor" id="custom-cursor"></div>
+    <div class="crosshair-h"></div>
+    <div class="crosshair-v"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="config.js" defer></script>
+    <script src="analytics.js" defer></script>
+    <script src="main.js" defer></script>
+    <script>
+        // Self-updating copyright year
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>

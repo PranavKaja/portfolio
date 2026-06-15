@@ -575,8 +575,8 @@
       tab.classList.add('active');
       const which = tab.getAttribute('data-tab');
       Object.keys(PANELS).forEach(k => $(PANELS[k]).classList.toggle('hidden', k !== which));
-      if (which === 'transmissions') renderTx();
-      if (which === 'intel') loadIntel(false);
+      if (which === 'transmissions') loadTransmissions();
+      if (which === 'intel') loadIntel(true);
     });
   });
 

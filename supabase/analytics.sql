@@ -30,6 +30,10 @@ create policy "anyone logs events"
     and char_length(source) <= 80
     and char_length(session_id) <= 64
     and pg_column_size(meta) <= 2000
+    -- numeric fields the dashboard casts must actually be numeric (or absent),
+    -- else a crafted event would break intel_dashboard()'s ::int/::numeric casts
+    and (meta->'score'   is null or (meta->>'score')   ~ '^[0-9]+$')
+    and (meta->'seconds' is null or (meta->>'seconds') ~ '^[0-9]+([.][0-9]+)?$')
   );
 
 drop policy if exists "admin reads events" on public.events;
@@ -66,7 +70,7 @@ as $$
           select coalesce(round(avg(s.t)), 0) from (
             select session_id, sum((meta->>'seconds')::numeric) as t
             from public.events
-            where type = 'page_time' and session_id <> '' and (meta->>'seconds') is not null
+            where type = 'page_time' and session_id <> '' and (meta->>'seconds') ~ '^[0-9]+([.][0-9]+)?$'
             group by session_id
           ) s
         )
@@ -97,7 +101,7 @@ as $$
         ) v
         left join (
           select path, avg((meta->>'seconds')::numeric) as avg_sec
-          from public.events where type = 'page_time' and (meta->>'seconds') is not null
+          from public.events where type = 'page_time' and (meta->>'seconds') ~ '^[0-9]+([.][0-9]+)?$'
           group by path
         ) t on t.path = v.path
         order by v.n desc
@@ -110,7 +114,7 @@ as $$
                count(*) filter (where type = 'game_score' or type = 'ttt_match') as game_plays,
                count(*) filter (where type = 'resume_download') as downloads,
                count(*) filter (where type = 'contact_click') as contact_clicks,
-               coalesce(sum((meta->>'seconds')::numeric) filter (where type = 'page_time'), 0) as time_sec
+               coalesce(sum((meta->>'seconds')::numeric) filter (where type = 'page_time' and (meta->>'seconds') ~ '^[0-9]+([.][0-9]+)?$'), 0) as time_sec
         from public.events
         where created_at > now() - interval '365 days'
         group by 1
@@ -120,8 +124,8 @@ as $$
       select json_build_object(
         'plays',   count(*),
         'players', count(distinct session_id) filter (where session_id <> ''),
-        'high',    coalesce(max((meta->>'score')::int), 0),
-        'avg',     coalesce(round(avg((meta->>'score')::numeric), 1), 0)
+        'high',    coalesce(max((meta->>'score')::int) filter (where (meta->>'score') ~ '^[0-9]+$'), 0),
+        'avg',     coalesce(round(avg((meta->>'score')::numeric) filter (where (meta->>'score') ~ '^[0-9]+$'), 1), 0)
       ) from public.events where type = 'game_score'
     ),
     'tictactoe', (
@@ -140,7 +144,7 @@ as $$
                max((meta->>'score')::int) as best,
                count(*) as plays
         from public.events
-        where type = 'game_score' and session_id <> ''
+        where type = 'game_score' and session_id <> '' and (meta->>'score') ~ '^[0-9]+$'
         group by session_id
         order by best desc
         limit 10

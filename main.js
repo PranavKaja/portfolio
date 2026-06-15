@@ -623,7 +623,7 @@ window.addEventListener('load', () => {
         trophyContainer.className = 'trophy-container';
         
         trophyContainer.innerHTML = `
-            <span class="trophy-icon">🏆</span>
+            <span class="trophy-icon" role="button" tabindex="0" aria-expanded="false" aria-label="Trophy unlocked — open message">🏆</span>
             <div class="trophy-popup">
                 <button class="trophy-close" aria-label="Close Trophy">&times;</button>
                 <p>You've been exploring for a while!<br>Thank you for taking the<br>time to dive into my work.<br>I'd love to hear from you.<br>let's connect!</p>
@@ -645,6 +645,20 @@ window.addEventListener('load', () => {
             trophyInjected = false;
             // Reset timer for another 2 minutes
             localStorage.setItem('site_visit_start', Date.now());
+        });
+
+        // Hover shows the popup on a mouse; tap/click/keyboard toggles it so
+        // touch and keyboard users can open it too (was hover-only).
+        const icon = trophyContainer.querySelector('.trophy-icon');
+        const togglePopup = (force) => {
+            const open = typeof force === 'boolean' ? force : !trophyContainer.classList.contains('open');
+            trophyContainer.classList.toggle('open', open);
+            icon.setAttribute('aria-expanded', open ? 'true' : 'false');
+        };
+        icon.addEventListener('click', () => togglePopup());
+        icon.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePopup(); }
+            else if (e.key === 'Escape') { togglePopup(false); }
         });
     }
 
@@ -712,4 +726,105 @@ window.addEventListener('load', () => {
     // Check immediately, then every 5 seconds
     checkTrophy();
     setInterval(checkTrophy, 5000);
+});
+
+// ============================================================
+// OPS LOG — experience timeline items open a detail overlay,
+// mirroring the mission cards. Content lives in a small data map
+// (easy to expand later); for now it echoes the card copy.
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('ops-overlay');
+    const timeline = document.querySelector('#experience .timeline');
+    if (!overlay || !timeline) return;
+
+    const OPS = {
+        '0': {
+            dates: 'SEP 2024 - MAY 2026',
+            role: 'Student Supervisor',
+            company: 'UMASS AMHERST DINING',
+            brief: 'Automated a 37-location ETL pipeline, cutting manual reporting from 2 hrs/day to 12 min/day. Led a team of 15+ student employees and implemented data-driven inventory forecasting.',
+            points: [
+                'Automated a 37-location ETL pipeline',
+                'Cut manual reporting from 2 hrs/day to 12 min/day',
+                'Led a team of 15+ student employees',
+                'Implemented data-driven inventory forecasting'
+            ]
+        },
+        '1': {
+            dates: 'MAY 2022 - JUL 2022',
+            role: 'Data Science Intern',
+            company: 'ACMEGRADE',
+            brief: 'Built a Random Forest churn predictor on 100K records, improving model accuracy 15% over baseline.',
+            points: [
+                'Built a Random Forest churn predictor on 100K records',
+                'Improved model accuracy 15% over baseline'
+            ]
+        }
+    };
+
+    const el = id => document.getElementById(id);
+    const sheet = overlay.querySelector('.msn-sheet');
+    const backBtn = el('ops-back');
+    let lastFocus = null;
+    let openedViaKeyboard = false;
+
+    function open(key, isKeyboard) {
+        const o = OPS[key];
+        if (!o) return;
+        lastFocus = document.activeElement;
+        openedViaKeyboard = !!isKeyboard;
+        el('ops-d-dates').textContent = o.dates;
+        el('ops-d-role').textContent = o.role;
+        el('ops-d-title').textContent = o.company;
+        el('ops-d-brief').textContent = o.brief;
+        const ul = el('ops-d-points');
+        ul.innerHTML = '';
+        (o.points || []).forEach(p => {
+            const li = document.createElement('li');
+            li.textContent = p;
+            ul.appendChild(li);
+        });
+        overlay.classList.add('active');
+        document.body.classList.add('msn-open');
+        sheet.scrollTop = 0;
+        backBtn.focus();
+    }
+
+    function close() {
+        overlay.classList.remove('active');
+        document.body.classList.remove('msn-open');
+        if (lastFocus) {
+            lastFocus.focus({ preventScroll: true });
+            if (!openedViaKeyboard) lastFocus.blur();
+        }
+    }
+
+    timeline.addEventListener('click', e => {
+        const item = e.target.closest('.timeline-item[data-ops]');
+        if (item) open(item.dataset.ops, false);
+    });
+    timeline.addEventListener('keydown', e => {
+        const item = e.target.closest('.timeline-item[data-ops]');
+        if (item && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            open(item.dataset.ops, true);
+        }
+    });
+    backBtn.addEventListener('click', close);
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', e => {
+        // focus trap while the sheet is open
+        if (e.key === 'Tab' && overlay.classList.contains('active')) {
+            const items = Array.from(sheet.querySelectorAll('a[href], button:not([disabled]), [tabindex="0"]'))
+                .filter(x => x.offsetParent !== null);
+            if (items.length) {
+                const first = items[0], last = items[items.length - 1];
+                if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+            }
+            return;
+        }
+        if (e.key === 'Escape' && overlay.classList.contains('active')) close();
+    });
 });

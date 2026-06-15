@@ -33,11 +33,11 @@
                 <form id="login-form">
                     <label class="field">
                         <span>Operator Email</span>
-                        <input type="email" id="login-email" autocomplete="username" required>
+                        <input type="email" id="login-email" autocomplete="username" maxlength="320" required>
                     </label>
                     <label class="field">
                         <span>Passphrase</span>
-                        <input type="password" id="login-password" autocomplete="current-password" required>
+                        <input type="password" id="login-password" autocomplete="current-password" maxlength="128" required>
                     </label>
                     <button type="submit" class="primary" id="login-btn" style="width:100%">Authenticate</button>
                     <div class="msg" id="login-msg"></div>

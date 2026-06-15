@@ -118,7 +118,8 @@
                 <div class="line"></div>
             </div>
             <div class="timeline">
-                <div class="timeline-item">
+                <div class="timeline-item interactive-element" data-ops="0" tabindex="0" role="button"
+                    aria-label="Student Supervisor at UMass Amherst Dining — open details">
                     <div class="tl-date">SEP 2024 - MAY 2026</div>
                     <div class="tl-content">
                         <h3>UMASS AMHERST DINING</h3>
@@ -126,8 +127,11 @@
                         <p>Automated 37-location ETL pipeline, cutting manual reporting from 2 hrs/day to 12 min/day.
                             Led a team of 15+ student employees and implemented data-driven inventory forecasting.</p>
                     </div>
+                    <span class="tl-arrow" aria-hidden="true">&nearr;</span>
+                    <div class="tl-cue">[ <span class="verb-touch">TAP</span><span class="verb-click">CLICK</span> TO EXPAND ]</div>
                 </div>
-                <div class="timeline-item">
+                <div class="timeline-item interactive-element" data-ops="1" tabindex="0" role="button"
+                    aria-label="Data Science Intern at Acmegrade — open details">
                     <div class="tl-date">MAY 2022 - JUL 2022</div>
                     <div class="tl-content">
                         <h3>ACMEGRADE</h3>
@@ -135,6 +139,8 @@
                         <p>Built Random Forest churn predictor on 100K records; improved model accuracy 15% over
                             baseline.</p>
                     </div>
+                    <span class="tl-arrow" aria-hidden="true">&nearr;</span>
+                    <div class="tl-cue">[ <span class="verb-touch">TAP</span><span class="verb-click">CLICK</span> TO EXPAND ]</div>
                 </div>
             </div>
         </section>
@@ -166,11 +172,11 @@
             <div id="core-skills-grid" class="grid-3 loadout-collapsed mb-50">
                 <div class="skill-panel">
                     <h3>DATA ENGINEERING</h3>
-                    <p>SQL, ETL/ELT, Python, Power Query, Data Warehousing</p>
+                    <p>SQL, ETL/ELT, Python, Spark &amp; Hadoop, Data Warehousing</p>
                 </div>
                 <div class="skill-panel">
                     <h3>ANALYTICS & BI</h3>
-                    <p>Power BI, Tableau, KPI Design, Financial Modeling</p>
+                    <p>Power BI, Tableau, Power Query, KPI Design, Financial Modeling</p>
                 </div>
                 <div class="skill-panel">
                     <h3>MACHINE LEARNING</h3>
@@ -450,6 +456,23 @@
                     <span class="dsr-eof" aria-hidden="true">// END OF FILE</span>
                     <button class="dsr-next interactive-element" id="dsr-next">NEXT FILE &rarr;</button>
                 </footer>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ops Log Detail Overlay -->
+    <div id="ops-overlay" class="msn-overlay">
+        <div class="msn-sheet-wrap">
+            <div class="msn-frame" aria-hidden="true"></div>
+            <div class="msn-sheet" role="dialog" aria-modal="true" aria-labelledby="ops-d-title">
+                <button class="msn-back interactive-element" id="ops-back">&larr; ALL OPS</button>
+                <div class="msn-d-head">
+                    <span class="proj-id" id="ops-d-dates"></span>
+                    <span class="msn-d-stack" id="ops-d-role"></span>
+                </div>
+                <h3 class="msn-d-title" id="ops-d-title"></h3>
+                <p class="msn-d-brief" id="ops-d-brief"></p>
+                <ul class="ops-points" id="ops-d-points"></ul>
             </div>
         </div>
     </div>
