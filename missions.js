@@ -146,6 +146,17 @@
     backBtn.addEventListener('click', close);
     overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
     document.addEventListener('keydown', e => {
+      // keep Tab focus inside the open mission sheet (modal focus trap)
+      if (e.key === 'Tab' && overlay.classList.contains('active')) {
+        const items = Array.from(sheet.querySelectorAll('a[href], button:not([disabled]), [tabindex="0"]'))
+          .filter(el => el.offsetParent !== null);
+        if (items.length) {
+          const first = items[0], last = items[items.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+        return;
+      }
       if (e.key === 'Escape' && overlay.classList.contains('active')) close();
     });
   }
@@ -160,6 +171,7 @@
     } catch (e) {
       console.error('[projects] failed to load', e);
       grid.innerHTML = '<p class="proj-load-error">// PROJECT FEED UNAVAILABLE</p>';
+      grid.setAttribute('aria-busy', 'false');
       return;
     }
 
@@ -167,6 +179,7 @@
     projects.forEach(p => { byCode[codeNum(p.code)] = p; });
 
     grid.innerHTML = projects.map(cardHTML).join('');
+    grid.setAttribute('aria-busy', 'false');
     wireOverlay(byCode, grid);
 
     // the carousel scrollbar (main.js) measured an empty grid at load;

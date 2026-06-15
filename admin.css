@@ -1,5 +1,5 @@
 /* ============================================================
- * Ops Console â€” admin panel styling (tactical theme, standalone)
+ * Ops Console - admin panel styling (tactical theme, standalone)
  * ============================================================ */
 :root {
   --bg: #ffffff;
@@ -21,7 +21,7 @@ body {
 }
 /* Subtle, screen-size-independent backdrop: a soft proportional glow for
    depth + a whisper-faint grid for tactical texture. Fixed + composited so
-   it never repaints on scroll and reads identically at any screen size â€”
+   it never repaints on scroll and reads identically at any screen size -
    replaces the hard 50px grid that competed with the data on big screens. */
 body::before {
   content: '';
@@ -355,7 +355,7 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
   box-shadow: 0 6px 16px rgba(0,0,0,0.08); 
 }
 .intel-clickable h3 { display: flex; align-items: center; justify-content: space-between; }
-.intel-clickable h3::after { content: 'view all â†—'; font-size: 0.6rem; color: var(--accent); letter-spacing: 1px; }
+.intel-clickable h3::after { content: 'view all \2197'; font-size: 0.6rem; color: var(--accent); letter-spacing: 1px; }
 .bl-more { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; letter-spacing: 1px; color: var(--text-muted); padding-top: 4px; }
 .detail-table { width: 100%; border-collapse: collapse; }
 .detail-table th { text-align: left; font: 700 0.66rem/1 'Share Tech Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); padding: 0 10px 8px 0; border-bottom: 1px solid var(--border); }

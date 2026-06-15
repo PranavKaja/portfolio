@@ -1,6 +1,6 @@
 # Pranav Kaja — Portfolio
 
-Live at **[pranavkajatest.vercel.app](https://pranavkajatest.vercel.app)**
+Live at **[pranavkaja.vercel.app](https://pranavkaja.vercel.app)**
 
 The full-stack version: projects, status badges, and the contact inbox are backed by
 Supabase (Postgres + Auth), managed through a built-in Ops Console at `/admin`.

@@ -1,11 +1,19 @@
 // --- 1. TEXT WRAPPING SETUP ---
 function wrapText() {
+    // The per-character scatter is a desktop-pointer-only easter egg. On touch
+    // devices the car game can't run at all, so exploding every heading and
+    // paragraph into single-character spans would only bloat the DOM and break
+    // screen-reader reading order for zero benefit — skip wrapping entirely.
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
     // skip text inside the hover popovers: they're invisible while the
     // game runs, so wrapping them only bloats the DOM (it roughly
     // doubles the span count) and creates unhittable collision targets
     const textElements = document.querySelectorAll('h1, h2, p');
     textElements.forEach(el => {
         if (el.closest('.pp-expand')) return;
+        // capture the readable text before it's shredded into per-char spans
+        const accessibleText = el.innerText;
         const processNode = (node) => {
             if (node.nodeType === 3) {
                 const text = node.nodeValue;
@@ -43,6 +51,13 @@ function wrapText() {
             const newChild = processNode(child);
             if (newChild !== child && newChild.nodeType) el.replaceChild(newChild, child);
         });
+        // Hide the decorative char spans from assistive tech and expose the real
+        // text once, so screen readers announce words — not "P R A G M A T I C".
+        Array.from(el.children).forEach(c => c.setAttribute('aria-hidden', 'true'));
+        const srText = document.createElement('span');
+        srText.className = 'sr-only';
+        srText.textContent = accessibleText;
+        el.appendChild(srText);
     });
 }
 wrapText();

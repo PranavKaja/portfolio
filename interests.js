@@ -131,10 +131,30 @@ document.addEventListener('DOMContentLoaded', () => {
             const angle = (index / totalNodes) * Math.PI * 2;
             node.dataset.baseAngle = angle;
             node.dataset.hovered = "false";
-            
+
+            // Keyboard + screen-reader access: each interest is a focusable
+            // button whose label carries the full description, so assistive-tech
+            // users get the same content the hover/scroll reveal gives mouse users.
+            const interestName = node.dataset.text;
+            node.setAttribute('tabindex', '0');
+            node.setAttribute('role', 'button');
+            node.setAttribute('aria-label', interestName + '. ' + (descriptions[interestName] || ''));
+            node.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    node.click();
+                } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    (node.nextElementSibling || wheelTrack.firstElementChild).focus();
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    (node.previousElementSibling || wheelTrack.lastElementChild).focus();
+                }
+            });
+
             node.addEventListener('mouseenter', () => node.dataset.hovered = "true");
             node.addEventListener('mouseleave', () => node.dataset.hovered = "false");
-            
+
             // Allow clicking nodes to rotate them to center
             node.addEventListener('click', () => {
                 const nodeAngleDeg = angle * (180 / Math.PI);

@@ -2332,190 +2332,6 @@ body.msn-open {
        reads as one unit, not two separate lines */
 }
 
-@media (hover: hover) and (pointer: fine) {
-    .project-panel:hover .project-arrow,
-    .project-panel:focus-visible .project-arrow {
-        opacity: 1;
-        transform: translate(0, 0);
-    }
-}
-
-
-/* ============================================================
-   DOSSIER SHEET FINISH - structured chrome for the Origin File
-   popup: header rail, stamp row with file counter, bordered
-   spec table, EOF footer, staggered content rise.
-   ============================================================ */
-.msn-sheet {
-    scrollbar-width: thin;
-    scrollbar-color: var(--text-main) transparent;
-}
-
-.msn-sheet::-webkit-scrollbar {
-    width: 4px;
-}
-
-.msn-sheet::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.msn-sheet::-webkit-scrollbar-thumb {
-    background: var(--text-main);
-}
-
-.dsr-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 14px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: clamp(8px, 2vh, 14px);
-    margin-bottom: clamp(10px, 2.6vh, 24px);
-}
-
-.dsr-top .msn-back {
-    margin-bottom: 0;
-}
-
-.dsr-stamp-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 8px 14px;
-    margin-bottom: clamp(10px, 2.4vh, 22px);
-}
-
-.dsr-stamp-row .dossier-head {
-    margin-bottom: 0;
-    font-size: 11px;
-    letter-spacing: 0.16em;
-    padding: 5px 10px;
-}
-
-.dsr-file-no {
-    font-family: 'Space Mono', 'Share Tech Mono', monospace;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    color: var(--text-muted);
-    white-space: nowrap;
-}
-
-/* stats as a bordered spec table, in the vitals strip language */
-.dsr-list {
-    gap: 0;
-    border: 1px solid var(--text-main);
-}
-
-.dsr-list li {
-    justify-content: space-between;
-    gap: 18px;
-    padding: clamp(6px, 1.6vh, 11px) 16px;
-    border-bottom: 1px solid var(--border);
-}
-
-.dsr-list li:last-child {
-    border-bottom: none;
-}
-
-.dsr-list .d-dots {
-    display: none;
-}
-
-.dsr-list .d-key {
-    font-size: 11px;
-    letter-spacing: 1.5px;
-}
-
-/* the easter-egg row is clickable: arrow cue always on for touch,
-   hover-revealed on desktop along with a faint accent wash */
-.dsr-game-row {
-    cursor: pointer;
-}
-
-.dsr-game-row .d-val::after {
-    content: ' \2197';
-    color: var(--accent);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .dsr-game-row:hover,
-    .dsr-game-row:focus-visible {
-        background: rgba(255, 69, 0, 0.06);
-    }
-    .dsr-game-row:hover .d-val,
-    .dsr-game-row:focus-visible .d-val {
-        text-decoration: underline;
-    }
-    .dsr-game-row:hover .d-val::after,
-    .dsr-game-row:focus-visible .d-val::after {
-        opacity: 1;
-    }
-}
-
-@media (hover: none), (pointer: coarse) {
-    .dsr-game-row .d-val::after {
-        opacity: 1;
-    }
-}
-
-.dsr-foot {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 14px;
-    margin-top: clamp(12px, 2.6vh, 28px);
-}
-
-.dsr-eof {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--text-muted);
-}
-
-.dsr-next {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
-    font-weight: bold;
-    letter-spacing: 1.5px;
-    background: transparent;
-    border: 1px solid var(--text-main);
-    color: var(--text-main);
-    padding: 9px 14px;
-    transition: background 0.2s, color 0.2s;
-}
-
-.dsr-next:hover {
-    background: var(--text-main);
-    color: var(--bg);
-}
-
-/* staggered content rise, restarted from main.js on each open */
-.dsr-sheet.dsr-animate > * {
-    animation: dsrRise 0.45s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-}
-
-.dsr-sheet.dsr-animate > *:nth-child(2) { animation-delay: 0.05s; }
-.dsr-sheet.dsr-animate > *:nth-child(3) { animation-delay: 0.1s; }
-.dsr-sheet.dsr-animate > *:nth-child(4) { animation-delay: 0.15s; }
-.dsr-sheet.dsr-animate > *:nth-child(5) { animation-delay: 0.2s; }
-.dsr-sheet.dsr-animate > *:nth-child(6) { animation-delay: 0.25s; }
-
-@keyframes dsrRise {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: none;
-    }
-}
-
 
 @media (max-width: 768px) {
     .dsr-list li {
@@ -2558,3 +2374,72 @@ body.msn-open {
 .github-btn .gh-text-hover { display: none; }
 .github-btn:hover .gh-text-default { display: none; }
 .github-btn:hover .gh-text-hover { display: inline; }
+
+
+/* ============================================================
+   ACCESSIBILITY POLISH
+   - sr-only: visually hidden, still read by screen readers
+   - skip-link: keyboard bypass to main content
+   - accent-text: a darker orange used ONLY for small text, so it
+     clears WCAG AA 4.5:1 on white and the #f4f4f5 panels (the bright
+     --accent stays for fills, borders, large button text and dots)
+   - visible focus rings on overlay controls + interest wheel nodes
+   ============================================================ */
+:root { --accent-text: #c43c00; }
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.skip-link {
+    position: fixed;
+    top: -120px;
+    left: 12px;
+    z-index: 10001;
+    background: var(--text-main);
+    color: var(--bg);
+    padding: 10px 16px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    transition: top 0.2s ease;
+}
+.skip-link:focus {
+    top: 12px;
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* small accent-orange text → darker token for AA contrast */
+.tl-date,
+.proj-id,
+.vital .v.live,
+.nav-links a.active,
+.pp-stack,
+.msn-d-stack,
+.proj-status--in_progress {
+    color: var(--accent-text);
+}
+
+/* visible keyboard focus on overlay controls (was outline:none) */
+.msn-back:focus-visible,
+.dsr-next:focus-visible,
+.dsr-game-row:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.wheel-node:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}

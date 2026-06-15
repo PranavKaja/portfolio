@@ -404,6 +404,17 @@ document.addEventListener('DOMContentLoaded', () => {
     backBtn.addEventListener('click', closeDossier);
     overlay.addEventListener('click', (e) => { if (e.target === overlay) closeDossier(); });
     document.addEventListener('keydown', (e) => {
+        // keep Tab focus inside the open file (focus trap for the modal dialog)
+        if (e.key === 'Tab' && overlay.classList.contains('active')) {
+            const items = Array.from(sheet.querySelectorAll('a[href], button:not([disabled]), [tabindex="0"]'))
+                .filter(el => el.offsetParent !== null);
+            if (items.length) {
+                const first = items[0], last = items[items.length - 1];
+                if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+            }
+            return;
+        }
         if (e.key !== 'Escape') return;
         // the briefing sits on top of the file: close it first
         if (alertOverlay && alertOverlay.classList.contains('active')) {
