@@ -213,6 +213,10 @@ window.addEventListener('resize', updateCharRects);
 window.addEventListener('scroll', updateCharRects);
 
 // --- 5. INPUT HANDLING ---
+window.addEventListener('contextmenu', (e) => {
+    if (gameActive) e.preventDefault();
+});
+
 window.addEventListener('keydown', (e) => {
     const key = e.key.toLowerCase();
     if (e.key === 'Escape' && gameActive) {
