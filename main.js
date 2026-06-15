@@ -648,14 +648,17 @@ window.addEventListener('load', () => {
         });
     }
 
-    function spawnConfetti(startX, startY) {
+    function spawnConfetti(viewportX, viewportY) {
+        const absoluteX = viewportX + window.scrollX;
+        const absoluteY = viewportY + window.scrollY;
+        
         const colors = ['#ffaa00', '#00ea3d', '#e3b341', '#ff4500', '#00ffff'];
         const particles = [];
         for(let i=0; i<25; i++) {
             const p = document.createElement('div');
-            p.style.position = 'fixed';
-            p.style.left = startX + 'px';
-            p.style.top = startY + 'px';
+            p.style.position = 'absolute';
+            p.style.left = absoluteX + 'px';
+            p.style.top = absoluteY + 'px';
             p.style.width = (3 + Math.random()*4) + 'px';
             p.style.height = (4 + Math.random()*6) + 'px';
             p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
@@ -666,8 +669,8 @@ window.addEventListener('load', () => {
 
             particles.push({
                 el: p,
-                x: startX,
-                y: startY,
+                x: absoluteX,
+                y: absoluteY,
                 vx: (Math.random() - 0.5) * 8,
                 vy: (Math.random() - 1) * 8 - 2,
                 rot: Math.random() * 360,
@@ -678,23 +681,25 @@ window.addEventListener('load', () => {
 
         function animate() {
             let allSettled = true;
+            const floorY = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) - 10;
+            
             particles.forEach(p => {
                 if (p.settled) return;
                 allSettled = false;
-                p.vy += 0.25; // gravity
+                p.vy += 0.35; // slightly higher gravity for a longer drop
                 p.vx *= 0.98; // friction
                 p.x += p.vx;
                 p.y += p.vy;
                 p.rot += p.rotSpeed;
                 
-                if (p.y >= window.innerHeight - 10) {
-                    p.y = window.innerHeight - 10;
+                if (p.y >= floorY) {
+                    p.y = floorY;
                     p.vy = 0;
                     p.vx = 0;
                     p.settled = true;
                 }
                 
-                p.el.style.transform = `translate3d(${p.x - startX}px, ${p.y - startY}px, 0) rotate(${p.rot}deg)`;
+                p.el.style.transform = `translate3d(${p.x - absoluteX}px, ${p.y - absoluteY}px, 0) rotate(${p.rot}deg)`;
             });
             
             if (!allSettled) {
