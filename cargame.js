@@ -345,26 +345,52 @@ function startGame() {
     // Show countdown
     const countdownOverlay = document.getElementById('game-countdown-overlay');
     const countdownText = document.getElementById('countdown-text');
+    const pauseBtn = document.getElementById('countdown-pause-btn');
     countdownOverlay.classList.remove('hidden');
     
     let count = 3;
+    let countInterval;
+    let isPaused = false;
+    
     countdownText.innerText = count;
     playTone(400, 'sine', 0.2, 0.3);
     
-    const countInterval = setInterval(() => {
-        count--;
-        if (count > 0) {
-            countdownText.innerText = count;
-            playTone(400, 'sine', 0.2, 0.3);
-        } else if (count === 0) {
-            countdownText.innerText = "GO!";
-            playTone(800, 'square', 0.4, 0.4);
-        } else {
-            clearInterval(countInterval);
-            countdownOverlay.classList.add('hidden');
-            finishStartGame();
-        }
-    }, 1000);
+    if (pauseBtn) {
+        pauseBtn.innerText = 'PAUSE TIMER';
+        pauseBtn.onclick = () => {
+            isPaused = !isPaused;
+            if (isPaused) {
+                clearInterval(countInterval);
+                pauseBtn.innerText = 'RESUME TIMER';
+                countdownText.innerText = 'PAUSED';
+            } else {
+                pauseBtn.innerText = 'PAUSE TIMER';
+                countdownText.innerText = count;
+                startCountdown();
+            }
+        };
+    }
+    
+    function startCountdown() {
+        countInterval = setInterval(() => {
+            count--;
+            if (count > 0) {
+                countdownText.innerText = count;
+                playTone(400, 'sine', 0.2, 0.3);
+            } else if (count === 0) {
+                countdownText.innerText = "GO!";
+                if (pauseBtn) pauseBtn.style.display = 'none';
+                playTone(800, 'square', 0.4, 0.4);
+            } else {
+                clearInterval(countInterval);
+                countdownOverlay.classList.add('hidden');
+                if (pauseBtn) pauseBtn.style.display = 'inline-block';
+                finishStartGame();
+            }
+        }, 1000);
+    }
+    
+    startCountdown();
 }
 
 function finishStartGame() {
