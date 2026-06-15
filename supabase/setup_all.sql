@@ -31,6 +31,7 @@ create table if not exists public.projects (
   outcome     text not null default '',
   chips       text[] not null default '{}',         -- metric chips
   status      project_status not null default 'deployed',
+  show_status boolean not null default true,        -- false = hidden status badge
   sort_order  int not null default 0,               -- grid order (low first)
   published   boolean not null default true,        -- false = hidden from the public site
   created_at  timestamptz not null default now(),

@@ -198,15 +198,23 @@
                 </div>
                 <label class="field"><span>Chips (one per line)</span><textarea id="f-chips" placeholder="0.978 AUC&#10;84% Recall"></textarea></label>
                 <div class="grid2">
-                    <label class="field"><span>Status</span>
-                        <select id="f-status">
-                            <option value="deployed">Deployed</option>
-                            <option value="in_progress">In Progress</option>
-                            <option value="archived">Archived</option>
-                            <option value="classified">Classified</option>
-                            <option value="none">None</option>
-                        </select>
-                    </label>
+                    <div class="field">
+                        <span>Status</span>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <select id="f-status" style="flex: 1;">
+                                <option value="deployed">Deployed</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="archived">Archived</option>
+                                <option value="classified">Classified</option>
+                                <option value="none">None</option>
+                            </select>
+                            <label class="toggle-switch" title="Show status badge on live site">
+                                <input type="checkbox" id="f-show-status" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Visible</span>
+                        </div>
+                    </div>
                     <label class="field"><span>Sort order</span><input type="number" id="f-sort" value="100"></label>
                 </div>
                 <label class="field row" style="gap:8px;align-items:center">

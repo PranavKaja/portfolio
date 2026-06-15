@@ -233,7 +233,7 @@
     id: $('f-id'), code: $('f-code'), title: $('f-title'), tech: $('f-tech'),
     stack: $('f-stack'), summary: $('f-summary'), hook: $('f-hook'), brief: $('f-brief'),
     role: $('f-role'), method: $('f-method'), outcome: $('f-outcome'), chips: $('f-chips'),
-    status: $('f-status'), sort: $('f-sort'), published: $('f-published'), github: $('f-github')
+    status: $('f-status'), show_status: $('f-show-status'), sort: $('f-sort'), published: $('f-published'), github: $('f-github')
   };
 
   let isDirty = false;
@@ -268,6 +268,7 @@
 
     F.chips.value = p && p.chips ? p.chips.join('\n') : '';
     F.status.value = p ? p.status : 'deployed';
+    F.show_status.checked = p ? (p.show_status !== false) : true;
     F.sort.value = p ? p.sort_order : (cache.length ? Math.max(...cache.map(x => x.sort_order || 0)) + 10 : 10);
     F.published.checked = p ? !!p.published : true;
     
@@ -317,6 +318,7 @@
       github_url: F.github.value.trim() || null,
       chips: F.chips.value.split('\n').map(s => s.trim()).filter(Boolean),
       status: STATUS.includes(F.status.value) ? F.status.value : 'deployed',
+      show_status: F.show_status.checked,
       sort_order: parseInt(F.sort.value, 10) || 0,
       published: F.published.checked
     };
@@ -384,11 +386,11 @@
       summary: F.summary.value, hook: F.hook.value, brief: F.brief.value,
       role: F.role.value, method: F.method.value, outcome: F.outcome.value,
       chips: F.chips.value.split('\n').filter(Boolean),
-      status: F.status.value, github_url: F.github.value
+      status: F.status.value, show_status: F.show_status.checked, github_url: F.github.value
     };
 
     const num = String(p.code || '').match(/(\d+)/)?.[1] || '';
-    const statusHtml = p.status === 'none' ? '' : `<span class="proj-status proj-status--${esc(p.status)}">${esc(STATUS_LABEL[p.status] || p.status)}</span>`;
+    const statusHtml = (p.status === 'none' || !p.show_status) ? '' : `<span class="proj-status proj-status--${esc(p.status)}">${esc(STATUS_LABEL[p.status] || p.status)}</span>`;
     const chipsHtml = (p.chips || []).map(c => `<span>${esc(c)}</span>`).join('');
     
     // Default Card

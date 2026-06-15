@@ -50,8 +50,9 @@
   function cardHTML(p) {
     const num = codeNum(p.code);
     const status = p.status || 'deployed';
+    const showStatus = p.show_status !== false;
     const chips = (p.chips || []).map(c => `<span>${esc(c)}</span>`).join('');
-    const statusHtml = status === 'none' ? '' : `<span class="proj-status proj-status--${esc(status)}">${esc(STATUS_LABELS[status] || status)}</span>`;
+    const statusHtml = (status === 'none' || !showStatus) ? '' : `<span class="proj-status proj-status--${esc(status)}">${esc(STATUS_LABELS[status] || status)}</span>`;
     return `
     <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="${esc(num)}"
         aria-label="Open mission ${esc(p.code)}: ${esc(p.title)}">
