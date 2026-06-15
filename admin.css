@@ -51,14 +51,15 @@ body::before {
 }
 
 label.field { display: block; margin-bottom: 14px; }
-label.field > span {
-  display: block;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.7rem;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 5px;
+label.field span {
+    display: block;
+    font-size: 0.75rem;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 1px;
+    color: #000;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: bold;
 }
 input[type=text], input[type=email], input[type=password],
 input[type=number], textarea, select {
@@ -250,6 +251,85 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
 .star { border: none; background: none; color: var(--text-muted); font-size: 1.15rem; padding: 0 4px; cursor: pointer; line-height: 1; }
 .star:hover { background: none; color: var(--accent); }
 .star.on { color: var(--accent); }
+
+/* Field Location Indicators */
+.ind-box {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-left: 4px;
+    border: 1px solid #000;
+    vertical-align: middle;
+}
+.ind-base { background: #3b82f6; }
+.ind-hover { background: #f97316; }
+.ind-pop { background: #22c55e; }
+.ind-group {
+    display: inline-flex;
+    gap: 2px;
+    vertical-align: middle;
+    margin-left: 8px;
+}
+
+/* Rich Chip Editor */
+.chip-editor {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    background: #f4f4f4;
+    border: 1px solid var(--border);
+    padding: 8px;
+    min-height: 40px;
+    align-items: center;
+    cursor: text;
+}
+.chip-editor.focus {
+    border-color: #000;
+    background: #fff;
+}
+.chip-tag {
+    display: inline-flex;
+    align-items: center;
+    background: #e5e5e5;
+    color: #000;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    padding: 4px 8px;
+    border-radius: 2px;
+    gap: 6px;
+}
+.chip-tag span {
+    display: inline !important;
+    font-size: 0.85rem !important;
+    margin: 0 !important;
+    color: #000 !important;
+    text-transform: none !important;
+    font-weight: normal !important;
+    letter-spacing: normal !important;
+}
+.chip-tag button {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 2px;
+}
+.chip-tag button:hover {
+    color: var(--accent);
+}
+.chip-input-field {
+    border: none !important;
+    background: transparent !important;
+    outline: none !important;
+    padding: 0 !important;
+    font-family: 'Share Tech Mono', monospace;
+    flex-grow: 1;
+    min-width: 120px;
+    height: 24px;
+}
+
 
 /* ---- Intel dashboard ---- */
 .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }

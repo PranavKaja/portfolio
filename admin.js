@@ -268,17 +268,22 @@
     F.show_github.checked = p ? (p.show_github !== false) : true;
 
     F.chips.value = p && p.chips ? p.chips.join('\n') : '';
+    renderChipsEditor();
     setStatus(p ? p.status : 'deployed');
     F.show_status.checked = p ? (p.show_status !== false) : true;
     F.sort.value = p ? p.sort_order : (cache.length ? Math.max(...cache.map(x => x.sort_order || 0)) + 10 : 10);
     F.published.checked = p ? !!p.published : true;
     
     // Reset advanced section
-    $('advanced-fields').classList.remove('visible');
-    const advBtn = $('advanced-toggle-btn');
-    if (advBtn) {
-        advBtn.textContent = '[+] EXPAND DOSSIER DATA';
-        advBtn.classList.remove('active');
+    $('hover-fields').classList.remove('visible');
+    if ($('hover-toggle-btn')) {
+        $('hover-toggle-btn').textContent = '[+] HOVER CARD';
+        $('hover-toggle-btn').classList.remove('active');
+    }
+    $('pop-fields').classList.remove('visible');
+    if ($('pop-toggle-btn')) {
+        $('pop-toggle-btn').textContent = '[+] POPUP DOSSIER';
+        $('pop-toggle-btn').classList.remove('active');
     }
 
     // Reset preview toggle if open
@@ -370,21 +375,78 @@
   });
 
   // Expand button logic
-  const advToggleBtn = $('advanced-toggle-btn');
-  if (advToggleBtn) {
-    advToggleBtn.addEventListener('click', () => {
-      const advFields = $('advanced-fields');
-      const isHidden = !advFields.classList.contains('visible');
+  function setupToggle(btnId, sectionId, label) {
+    const btn = $(btnId);
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const section = $(sectionId);
+      const isHidden = !section.classList.contains('visible');
       if (isHidden) {
-        advFields.classList.add('visible');
-        advToggleBtn.textContent = '[-] COLLAPSE DOSSIER DATA';
-        advToggleBtn.classList.add('active');
+        section.classList.add('visible');
+        btn.textContent = '[-] ' + label;
+        btn.classList.add('active');
       } else {
-        advFields.classList.remove('visible');
-        advToggleBtn.textContent = '[+] EXPAND DOSSIER DATA';
-        advToggleBtn.classList.remove('active');
+        section.classList.remove('visible');
+        btn.textContent = '[+] ' + label;
+        btn.classList.remove('active');
       }
     });
+  }
+  setupToggle('hover-toggle-btn', 'hover-fields', 'HOVER CARD');
+  setupToggle('pop-toggle-btn', 'pop-fields', 'POPUP DOSSIER');
+
+  // Chip Editor Logic
+  const chipInput = $('chip-input');
+  const chipContainer = $('chip-editor-ui');
+  
+  function renderChipsEditor() {
+    if (!chipContainer || !chipInput) return;
+    // Remove existing chip-tags
+    chipContainer.querySelectorAll('.chip-tag').forEach(el => el.remove());
+    
+    const val = F.chips.value.trim();
+    const chips = val ? val.split('\n') : [];
+    
+    chips.forEach((c, i) => {
+      const tag = document.createElement('div');
+      tag.className = 'chip-tag';
+      tag.innerHTML = `<span>${esc(c)}</span><button type="button" data-idx="${i}">×</button>`;
+      chipContainer.insertBefore(tag, chipInput);
+    });
+    
+    chipContainer.querySelectorAll('.chip-tag button').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const idx = parseInt(btn.getAttribute('data-idx'));
+        chips.splice(idx, 1);
+        F.chips.value = chips.join('\n');
+        renderChipsEditor();
+        updatePreviews();
+        isDirty = true;
+      });
+    });
+  }
+
+  if (chipInput) {
+    chipInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const text = chipInput.value.trim();
+        if (text) {
+          const chips = F.chips.value ? F.chips.value.split('\n') : [];
+          chips.push(text);
+          F.chips.value = chips.join('\n');
+          chipInput.value = '';
+          renderChipsEditor();
+          updatePreviews();
+          isDirty = true;
+        }
+      }
+    });
+    
+    chipContainer.addEventListener('click', () => chipInput.focus());
+    chipInput.addEventListener('focus', () => chipContainer.classList.add('focus'));
+    chipInput.addEventListener('blur', () => chipContainer.classList.remove('focus'));
   }
 
   // Live Previews

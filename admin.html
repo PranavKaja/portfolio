@@ -164,7 +164,8 @@
                 <form id="project-form" style="flex: 1;">
                 <input type="hidden" id="f-id">
                 
-                <!-- TOP LEVEL: STATE & VISIBILITY -->
+                <!-- TIER 1: BASE CARD -->
+                <div class="section-header" style="margin-top:0; font-size: 0.9rem; margin-bottom: 15px;">BASE CARD</div>
                 <div style="display: flex; gap: 20px; align-items: flex-end; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap;">
                     <div class="field" style="margin-bottom:0;">
                         <span>Status</span>
@@ -193,52 +194,92 @@
                     </div>
                 </div>
 
-                <!-- TIER 1: CORE IDENTITY -->
                 <div class="grid2">
-                    <label class="field"><span>Code (e.g. MSN-10)</span><input type="text" id="f-code" required></label>
-                    <label class="field"><span>Title</span><input type="text" id="f-title" required></label>
-                </div>
-                <label class="field"><span>Card stack (tech)</span><input type="text" id="f-tech"></label>
-                <label class="field"><span>Card one-liner (summary)</span><input type="text" id="f-summary"></label>
-                
-                <div class="field" id="github-container">
-                    <span style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase;">
-                        GitHub URL 
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <span style="font-size: 0.65rem; color: var(--text-muted);">Visible</span>
-                            <label class="toggle-switch" title="Show GitHub link on live site">
-                                <input type="checkbox" id="f-show-github" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </span>
-                    <input type="url" id="f-github" placeholder="https://github.com/username/repo">
-                </div>
-
-                <!-- EXPAND BUTTON -->
-                <button type="button" class="advanced-toggle-btn" id="advanced-toggle-btn">[+] EXPAND DOSSIER DATA</button>
-
-                <!-- TIER 2: ADVANCED FIELDS -->
-                <div id="advanced-fields" class="advanced-section">
                     <label class="field">
-                        <span style="display:flex; justify-content:space-between">Full stack (overlay) <a href="#" id="sync-stack" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Tech</a></span>
+                        <span>Code (e.g. MSN-10) <div class="ind-group"><div class="ind-box ind-base" title="Base Card"></div><div class="ind-box ind-hover" title="Hover Card"></div><div class="ind-box ind-pop" title="Popup Dossier"></div></div></span>
+                        <input type="text" id="f-code" required>
+                    </label>
+                    <label class="field">
+                        <span>Title <div class="ind-group"><div class="ind-box ind-base" title="Base Card"></div><div class="ind-box ind-hover" title="Hover Card"></div><div class="ind-box ind-pop" title="Popup Dossier"></div></div></span>
+                        <input type="text" id="f-title" required>
+                    </label>
+                </div>
+                <label class="field">
+                    <span>Card stack (tech) <div class="ind-group"><div class="ind-box ind-base" title="Base Card"></div></div></span>
+                    <input type="text" id="f-tech">
+                </label>
+                <label class="field">
+                    <span>Card one-liner (summary) <div class="ind-group"><div class="ind-box ind-base" title="Base Card"></div></div></span>
+                    <input type="text" id="f-summary">
+                </label>
+                <label class="field" style="max-width: 150px;">
+                    <span>Sort order</span>
+                    <input type="number" id="f-sort" value="100">
+                </label>
+
+                <!-- TIER 2: HOVER CARD -->
+                <button type="button" class="advanced-toggle-btn" id="hover-toggle-btn">[+] HOVER CARD</button>
+                <div id="hover-fields" class="advanced-section">
+                    <label class="field">
+                        <span style="display:flex; justify-content:space-between">
+                            <div>Full stack (overlay) <div class="ind-group"><div class="ind-box ind-hover" title="Hover Card"></div><div class="ind-box ind-pop" title="Popup Dossier"></div></div></div>
+                            <a href="#" id="sync-stack" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Tech</a>
+                        </span>
                         <input type="text" id="f-stack">
                     </label>
                     <label class="field">
-                        <span style="display:flex; justify-content:space-between">Hook <a href="#" id="sync-hook" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Summary</a></span>
+                        <span style="display:flex; justify-content:space-between">
+                            <div>Hook <div class="ind-group"><div class="ind-box ind-hover" title="Hover Card"></div><div class="ind-box ind-pop" title="Popup Dossier"></div></div></div>
+                            <a href="#" id="sync-hook" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Summary</a>
+                        </span>
                         <input type="text" id="f-hook">
                     </label>
                     <label class="field">
-                        <span style="display:flex; justify-content:space-between">Brief <a href="#" id="sync-brief" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Summary</a></span>
+                        <span style="display:flex; justify-content:space-between">
+                            <div>Brief <div class="ind-group"><div class="ind-box ind-hover" title="Hover Card"></div><div class="ind-box ind-pop" title="Popup Dossier"></div></div></div>
+                            <a href="#" id="sync-brief" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Summary</a>
+                        </span>
                         <textarea id="f-brief"></textarea>
                     </label>
+                    <label class="field">
+                        <span>Chips (hit Enter) <div class="ind-group"><div class="ind-box ind-hover" title="Hover Card"></div><div class="ind-box ind-pop" title="Popup Dossier"></div></div></span>
+                        <div class="chip-editor" id="chip-editor-ui">
+                            <input type="text" class="chip-input-field" id="chip-input" placeholder="Type and hit enter...">
+                        </div>
+                        <input type="hidden" id="f-chips">
+                    </label>
+                </div>
+
+                <!-- TIER 3: POPUP DOSSIER -->
+                <button type="button" class="advanced-toggle-btn" id="pop-toggle-btn">[+] POPUP DOSSIER</button>
+                <div id="pop-fields" class="advanced-section">
                     <div class="grid2">
-                        <label class="field"><span>Role</span><input type="text" id="f-role"></label>
-                        <label class="field"><span>Method</span><input type="text" id="f-method"></label>
+                        <label class="field">
+                            <span>Role <div class="ind-group"><div class="ind-box ind-pop" title="Popup Dossier"></div></div></span>
+                            <input type="text" id="f-role">
+                        </label>
+                        <label class="field">
+                            <span>Method <div class="ind-group"><div class="ind-box ind-pop" title="Popup Dossier"></div></div></span>
+                            <input type="text" id="f-method">
+                        </label>
                     </div>
-                    <label class="field"><span>Outcome</span><input type="text" id="f-outcome"></label>
-                    <label class="field"><span>Chips (one per line)</span><textarea id="f-chips" placeholder="0.978 AUC&#10;84% Recall"></textarea></label>
-                    <label class="field" style="max-width: 150px;"><span>Sort order</span><input type="number" id="f-sort" value="100"></label>
+                    <label class="field">
+                        <span>Outcome <div class="ind-group"><div class="ind-box ind-pop" title="Popup Dossier"></div></div></span>
+                        <input type="text" id="f-outcome">
+                    </label>
+                    <label class="field">
+                        <span style="display:flex; align-items:center; gap: 15px;">
+                            <div>GitHub URL <div class="ind-group"><div class="ind-box ind-pop" title="Popup Dossier"></div></div></div>
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <span style="font-size: 0.65rem; color: var(--text-muted); margin-bottom:0;">Visible</span>
+                                <label class="toggle-switch" title="Show GitHub link on live site">
+                                    <input type="checkbox" id="f-show-github" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </span>
+                        <input type="url" id="f-github" placeholder="https://github.com/username/repo">
+                    </label>
                 </div>
 
                 <div class="msg" id="form-msg"></div>
