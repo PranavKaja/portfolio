@@ -307,6 +307,12 @@ function startGame() {
     
     gameStarting = true;
     score = 0; timeLeft = 12;
+    
+    const baseScale = window.innerWidth / 1920;
+    car.scaleFactor = Math.max(0.5, Math.min(baseScale, 1.5));
+    car.baseMaxSpeed = 8 * car.scaleFactor;
+    car.acceleration = 0.3 * car.scaleFactor;
+
     car.x = window.innerWidth / 2; car.y = window.innerHeight / 2;
     car.velocity = 0; car.angle = 0; car.visualAngle = 0; car.hp = 5;
     car.brokenDown = false; car.maxSpeed = car.baseMaxSpeed; car.boost = 100;
@@ -442,12 +448,15 @@ function gameLoop(now) {
     if (!gameActive) return;
     const dt = (now - lastFrameTime) / 1000;
     lastFrameTime = now;
+    const safeDt = Math.min(dt, 0.1);
+    const timeScale = safeDt * 60; // 1.0 at 60fps
+
     renderCanvas();
 
     if (!car.brokenDown) {
         // Give slightly more acceleration when drifting so you can power through corners
-        if (keys.w) car.velocity += keys.space ? car.acceleration * 1.5 : car.acceleration;
-        if (keys.s) car.velocity -= car.acceleration;
+        if (keys.w) car.velocity += (keys.space ? car.acceleration * 1.5 : car.acceleration) * timeScale;
+        if (keys.s) car.velocity -= car.acceleration * timeScale;
     }
 
     let currentFriction = keys.space ? 0.91 : 0.95;
@@ -457,43 +466,43 @@ function gameLoop(now) {
     let currentMaxSpeed = car.maxSpeed;
     if (keys.shift && car.boost > 0 && !car.brokenDown) {
         car.boost -= dt * 33; // Depletes in ~3 seconds
-        currentMaxSpeed = 14;
-        car.velocity += car.acceleration * 1.5;
-        if (Math.random() < 0.3) spawnSparks(car.x, car.y); // visual effect
+        currentMaxSpeed = 14 * (car.scaleFactor || 1);
+        car.velocity += car.acceleration * 1.5 * timeScale;
+        if (Math.random() < 0.3 * timeScale) spawnSparks(car.x, car.y); // visual effect
     } else {
         car.boost += dt * 10; // Refills in 10 seconds
     }
     car.boost = Math.max(0, Math.min(100, car.boost));
     updateBoostUI();
 
-    car.velocity *= currentFriction;
+    car.velocity *= Math.pow(currentFriction, timeScale);
 
-    if (car.velocity > currentMaxSpeed) car.velocity -= car.acceleration;
-    if (car.velocity < -currentMaxSpeed/2) car.velocity += car.acceleration;
+    if (car.velocity > currentMaxSpeed) car.velocity -= car.acceleration * timeScale;
+    if (car.velocity < -currentMaxSpeed/2) car.velocity += car.acceleration * timeScale;
 
     if (Math.abs(car.velocity) > 0.1) {
         const dir = car.velocity > 0 ? 1 : -1;
         if (keys.space) {
             // Drift mode: visual angle changes much faster, real angle changes slightly
-            if (keys.a) { car.visualAngle -= 0.1 * dir; car.angle -= 0.02 * dir; }
-            if (keys.d) { car.visualAngle += 0.1 * dir; car.angle += 0.02 * dir; }
+            if (keys.a) { car.visualAngle -= 0.1 * dir * timeScale; car.angle -= 0.02 * dir * timeScale; }
+            if (keys.d) { car.visualAngle += 0.1 * dir * timeScale; car.angle += 0.02 * dir * timeScale; }
         } else {
             // Normal mode
-            if (keys.a) car.angle -= baseTurnSpeed * dir;
-            if (keys.d) car.angle += baseTurnSpeed * dir;
+            if (keys.a) car.angle -= baseTurnSpeed * dir * timeScale;
+            if (keys.d) car.angle += baseTurnSpeed * dir * timeScale;
             
             // Snap visual angle back towards movement angle
             let diff = car.angle - car.visualAngle;
             while(diff > Math.PI) diff -= Math.PI*2;
             while(diff < -Math.PI) diff += Math.PI*2;
-            car.visualAngle += diff * 0.15; 
+            car.visualAngle += diff * 0.15 * timeScale; 
         }
     } else {
         car.visualAngle = car.angle;
     }
 
-    car.x += Math.sin(car.angle) * car.velocity;
-    car.y -= Math.cos(car.angle) * car.velocity;
+    car.x += Math.sin(car.angle) * car.velocity * timeScale;
+    car.y -= Math.cos(car.angle) * car.velocity * timeScale;
 
     // Skid marks
     if (keys.space && Math.abs(car.velocity) > 3) {
