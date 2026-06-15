@@ -340,6 +340,7 @@ as $$
         'unique_visitors',  count(distinct session_id) filter (where type = 'pageview' and session_id <> ''),
         'project_clicks',   count(*) filter (where type = 'project_click'),
         'resume_downloads', count(*) filter (where type = 'resume_download'),
+        'contact_clicks',   count(*) filter (where type = 'contact_click'),
         'contact_submits',  count(*) filter (where type = 'contact_submit'),
         'game_plays',       count(*) filter (where type = 'game_score'),
         'avg_time',         (
@@ -385,9 +386,14 @@ as $$
     ),
     'daily', (
       select coalesce(json_agg(d order by d.day), '[]'::json) from (
-        select to_char(created_at, 'YYYY-MM-DD') as day, count(*) as n
+        select to_char(created_at, 'YYYY-MM-DD') as day,
+               count(*) filter (where type = 'pageview') as views,
+               count(*) filter (where type = 'game_score' or type = 'ttt_match') as game_plays,
+               count(*) filter (where type = 'resume_download') as downloads,
+               count(*) filter (where type = 'contact_click') as contact_clicks,
+               coalesce(sum((meta->>'seconds')::numeric) filter (where type = 'page_time'), 0) as time_sec
         from public.events
-        where type = 'pageview' and created_at > now() - interval '30 days'
+        where created_at > now() - interval '365 days'
         group by 1
       ) d
     ),

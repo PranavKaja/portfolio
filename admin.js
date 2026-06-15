@@ -706,7 +706,7 @@
       ['Total Views', k.total_views], ['Unique Visitors', k.unique_visitors],
       ['Avg Time on Site', fmtTime(k.avg_time)],
       ['Project Opens', k.project_clicks], ['Resume Downloads', k.resume_downloads],
-      ['Contact Submits', k.contact_submits], ['Game Plays', k.game_plays]
+      ['Contact Clicks', k.contact_clicks], ['Messages', k.contact_submits], ['Game Plays', k.game_plays]
     ];
     $('intel-kpis').innerHTML = kpis.map(([label, val]) =>
       `<div class="kpi"><div class="kpi-num">${val == null ? 0 : val}</div><div class="kpi-label">${label}</div></div>`).join('');
@@ -795,7 +795,7 @@
   function renderDaily(id, rows) {
     const el = $(id);
     const byDay = {};
-    rows.forEach(r => { byDay[r.day] = r.n; });
+    rows.forEach(r => { byDay[r.day] = r.views; });
     const days = [];
     for (let i = 6; i >= 0; i--) {
       const dt = new Date(); dt.setDate(dt.getDate() - i);
@@ -852,14 +852,28 @@
       title = 'Page Views — Analytics';
       window._renderDailyTable = (daysCount) => {
         const byDay = {};
-        (d.daily || []).forEach(r => { byDay[r.day] = r.n; });
+        (d.daily || []).forEach(r => { byDay[r.day] = r; });
         const rows = [];
         for (let i = 0; i < daysCount; i++) {            // newest day first
           const dt = new Date(); dt.setDate(dt.getDate() - i);
           const key = dt.toISOString().slice(0, 10);
-          rows.push([key, byDay[key] || 0]);
+          
+          const mm = String(dt.getMonth() + 1).padStart(2, '0');
+          const dd = String(dt.getDate()).padStart(2, '0');
+          const yy = String(dt.getFullYear()).slice(-2);
+          const formattedDate = `${mm}/${dd}/${yy}`;
+
+          const data = byDay[key] || { views: 0, time_sec: 0, game_plays: 0, downloads: 0, contact_clicks: 0 };
+          rows.push([
+              formattedDate, 
+              data.views || 0,
+              fmtTime(data.time_sec || 0),
+              data.game_plays || 0,
+              data.downloads || 0,
+              data.contact_clicks || 0
+          ]);
         }
-        return detailTable(['Day', 'Views'], rows);
+        return detailTable(['Day', 'Views', 'Time', 'Game Plays', 'Downloads', 'Contact Clicks'], rows);
       };
       body = `
         <div class="row" style="margin-bottom: 16px;" id="daily-filters">
