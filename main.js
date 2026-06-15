@@ -16,31 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let mouseY = 0;
         let isCursorUpdating = false;
 
-        // Set default position to bottom-left of hero box
-        const heroBox = document.querySelector('.hero');
-        if (heroBox) {
-            const rect = heroBox.getBoundingClientRect();
-            // The hero box has a 4px border.
-            // rect.left is the outer edge, so center of left border is rect.left + 2
-            // rect.bottom is the outer edge, so center of bottom border is rect.bottom - 2
-            mouseX = rect.left + 2;
-            mouseY = rect.bottom - 2;
-
-            if (cursor) {
-                cursor.style.transform = `translate3d(calc(${mouseX}px - 50%), calc(${mouseY}px - 50%), 0)`;
-                cursor.classList.add('active');
-            }
-            if (chH) {
-                chH.style.transform = `translate3d(0, ${mouseY}px, 0)`;
-                chH.classList.add('active');
-            }
-            if (chV) {
-                chV.style.transform = `translate3d(${mouseX}px, 0, 0)`;
-                chV.classList.add('active');
-            }
-            cursorVisible = true;
-        }
-
         // Crosshair logic
         document.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
