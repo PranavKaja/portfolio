@@ -194,22 +194,22 @@
                     </div>
 
                 <div class="grid2">
-                    <label class="field hl hl-all">
+                    <label class="field">
                         <span>Code (e.g. MSN-10)</span>
-                        <input type="text" id="f-code" required>
+                        <input type="text" id="f-code" class="hl hl-all" required>
                     </label>
-                    <label class="field hl hl-all">
+                    <label class="field">
                         <span>Title</span>
-                        <input type="text" id="f-title" required>
+                        <input type="text" id="f-title" class="hl hl-all" required>
                     </label>
                 </div>
-                <label class="field hl hl-base">
+                <label class="field">
                     <span>Tech</span>
-                    <input type="text" id="f-tech">
+                    <input type="text" id="f-tech" class="hl hl-base">
                 </label>
-                <label class="field hl hl-base">
+                <label class="field">
                     <span>Summary</span>
-                    <input type="text" id="f-summary">
+                    <input type="text" id="f-summary" class="hl hl-base">
                 </label>
                 <label class="field" style="max-width: 150px;">
                     <span>Sort order</span>
@@ -219,30 +219,30 @@
                 <!-- TIER 2: HOVER CARD -->
                 <button type="button" class="advanced-toggle-btn" id="hover-toggle-btn">[+] HOVER CARD</button>
                 <div id="hover-fields" class="advanced-section">
-                    <label class="field hl hl-hover-pop">
+                    <label class="field">
                         <span style="display:flex; justify-content:space-between">
                             <div>Full stack (overlay)</div>
                             <a href="#" id="sync-stack" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Tech</a>
                         </span>
-                        <input type="text" id="f-stack">
+                        <input type="text" id="f-stack" class="hl hl-hover-pop">
                     </label>
-                    <label class="field hl hl-hover-pop">
+                    <label class="field">
                         <span style="display:flex; justify-content:space-between">
                             <div>Hook</div>
                             <a href="#" id="sync-hook" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Summary</a>
                         </span>
-                        <input type="text" id="f-hook">
+                        <input type="text" id="f-hook" class="hl hl-hover-pop">
                     </label>
-                    <label class="field hl hl-hover-pop">
+                    <label class="field">
                         <span style="display:flex; justify-content:space-between">
                             <div>Brief</div>
                             <a href="#" id="sync-brief" style="color:var(--accent);font-size:0.7rem;">⟳ Sync from Summary</a>
                         </span>
-                        <textarea id="f-brief"></textarea>
+                        <textarea id="f-brief" class="hl hl-hover-pop"></textarea>
                     </label>
-                    <label class="field hl hl-hover-pop">
+                    <label class="field">
                         <span>Chips (hit Enter)</span>
-                        <div class="chip-editor" id="chip-editor-ui">
+                        <div class="chip-editor hl hl-hover-pop" id="chip-editor-ui">
                             <input type="text" class="chip-input-field" id="chip-input" placeholder="Type and hit enter...">
                         </div>
                         <input type="hidden" id="f-chips">
@@ -253,20 +253,20 @@
                 <button type="button" class="advanced-toggle-btn" id="pop-toggle-btn">[+] POPUP DOSSIER</button>
                 <div id="pop-fields" class="advanced-section">
                     <div class="grid2">
-                        <label class="field hl hl-pop">
+                        <label class="field">
                             <span>Role</span>
-                            <input type="text" id="f-role">
+                            <input type="text" id="f-role" class="hl hl-pop">
                         </label>
-                        <label class="field hl hl-pop">
+                        <label class="field">
                             <span>Method</span>
-                            <input type="text" id="f-method">
+                            <input type="text" id="f-method" class="hl hl-pop">
                         </label>
                     </div>
-                    <label class="field hl hl-pop">
+                    <label class="field">
                         <span>Outcome</span>
-                        <input type="text" id="f-outcome">
+                        <input type="text" id="f-outcome" class="hl hl-pop">
                     </label>
-                    <label class="field hl hl-pop">
+                    <label class="field">
                         <span style="display:flex; align-items:center; gap: 15px;">
                             <div>GitHub URL</div>
                             <div style="display:flex; align-items:center; gap:6px;">
@@ -277,7 +277,7 @@
                                 </label>
                             </div>
                         </span>
-                        <input type="url" id="f-github" placeholder="https://github.com/username/repo">
+                        <input type="url" id="f-github" class="hl hl-pop" placeholder="https://github.com/username/repo">
                     </label>
                 </div>
 

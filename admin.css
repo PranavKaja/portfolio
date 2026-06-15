@@ -255,21 +255,15 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
 
 /* Field Location Highlights */
 .hl {
-    position: relative;
-    padding-left: 12px;
+    background-repeat: no-repeat !important;
+    background-position: left top !important;
+    background-size: 4px 100% !important;
+    padding-left: 16px !important;
 }
-.hl::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-}
-.hl-base::before { background: #3b82f6; }
-.hl-pop::before { background: #22c55e; }
-.hl-hover-pop::before { background: linear-gradient(to bottom, #f97316 50%, #22c55e 50%); }
-.hl-all::before { background: linear-gradient(to bottom, #3b82f6 33.3%, #f97316 33.3% 66.6%, #22c55e 66.6%); }
+.hl-base { background-image: linear-gradient(#3b82f6, #3b82f6) !important; }
+.hl-pop { background-image: linear-gradient(#22c55e, #22c55e) !important; }
+.hl-hover-pop { background-image: linear-gradient(to bottom, #f97316 50%, #22c55e 50%) !important; }
+.hl-all { background-image: linear-gradient(to bottom, #3b82f6 33.3%, #f97316 33.3% 66.6%, #22c55e 66.6%) !important; }
 
 /* Rich Chip Editor */
 .chip-editor {
