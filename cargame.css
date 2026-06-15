@@ -168,6 +168,12 @@ body.matrix-mode * {
     color: var(--text-main) !important;
     border-color: var(--border) !important;
 }
+body.matrix-mode .hero-label,
+body.matrix-mode .hero-label *,
+body.matrix-mode .btn-primary,
+body.matrix-mode .btn-primary * {
+    color: var(--bg) !important;
+}
 body.matrix-mode .top-nav {
     background: rgba(5, 5, 5, 0.9) !important;
     border-bottom: 2px solid var(--accent) !important;
