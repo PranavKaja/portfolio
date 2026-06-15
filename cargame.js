@@ -547,7 +547,7 @@ function endGame() {
                 const sysAlertOverlay = document.getElementById('sys-alert-overlay');
                 // the game briefing reuses this overlay and changes the title
                 document.getElementById('sys-alert-title').innerText = 'SYSTEM ALERT';
-                document.getElementById('sys-alert-msg').innerText = `Nice driving! You scored ${score} points!`;
+                document.getElementById('sys-alert-msg').innerText = "Nice driving! For the record, Pranav's highest score is 1012.";
                 sysAlertOverlay.classList.add('active');
                 
                 document.getElementById('sys-alert-btn').onclick = () => {
