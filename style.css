@@ -97,7 +97,7 @@ body.custom-cursor-active button {
     position: fixed;
     background: rgba(255, 69, 0, 0.15);
     pointer-events: none;
-    z-index: 9999;
+    z-index: 99999;
     opacity: 0;
     transition: opacity 0.3s;
 }
