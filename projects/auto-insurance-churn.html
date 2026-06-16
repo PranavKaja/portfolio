@@ -4,19 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Insurance Churn — 350K Records, SMOTE Pipeline | Pranav Kaja</title>
+    <title>Auto Insurance Churn — 92,849 Records, SMOTE + Gradient Boosting | Pranav Kaja</title>
     <meta name="description"
-        content="Auto-insurance churn modeling by Pranav Kaja: Random Forest + Gradient Boosting on 350,000 policyholder records with a SMOTE pipeline for class imbalance — projected churn cut from 18% to 11%.">
+        content="Auto-insurance churn modeling by Pranav Kaja: five classifiers on 92,849 policyholders with a SMOTE pipeline for class imbalance; Gradient Boosting reaches ROC-AUC 0.70, threshold-tuned for recall.">
     <meta name="author" content="Pranav Kaja">
     <meta name="robots" content="index, follow, max-image-preview:large">
-    <meta property="og:title" content="Auto Insurance Churn — 350K Records, SMOTE Pipeline | Pranav Kaja">
-    <meta property="og:description" content="Random Forest + Gradient Boosting on 350K records; SMOTE handles imbalance; churn projected 18%→11%.">
+    <meta property="og:title" content="Auto Insurance Churn — 92,849 Records, SMOTE + Gradient Boosting | Pranav Kaja">
+    <meta property="og:description" content="Five classifiers on 92,849 policyholders; SMOTE handles 11.5% imbalance; Gradient Boosting at ROC-AUC 0.70.">
     <meta property="og:image" content="https://pranavkaja.vercel.app/images/og-card.png">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://pranavkaja.vercel.app/projects/auto-insurance-churn">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Auto Insurance Churn — 350K Records, SMOTE Pipeline | Pranav Kaja">
-    <meta name="twitter:description" content="Random Forest + Gradient Boosting on 350K records; SMOTE handles imbalance; churn projected 18%→11%.">
+    <meta name="twitter:title" content="Auto Insurance Churn — 92,849 Records, SMOTE + Gradient Boosting | Pranav Kaja">
+    <meta name="twitter:description" content="Five classifiers on 92,849 policyholders; SMOTE handles 11.5% imbalance; Gradient Boosting at ROC-AUC 0.70.">
     <meta name="twitter:image" content="https://pranavkaja.vercel.app/images/og-card.png">
     <link rel="canonical" href="https://pranavkaja.vercel.app/projects/auto-insurance-churn">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -31,8 +31,8 @@
     {
       "@context": "https://schema.org",
       "@graph": [
-        { "@type": "TechArticle", "headline": "Auto Insurance Churn — 350K Records with a SMOTE Pipeline",
-          "description": "Random Forest and Gradient Boosting on 350,000 policyholder records with a SMOTE resampling pipeline for severe class imbalance; projected churn cut from 18% to 11%.",
+        { "@type": "TechArticle", "headline": "Auto Insurance Churn — 92,849 Records with a SMOTE Pipeline",
+          "description": "Five classifiers on 92,849 policyholder records with a SMOTE resampling pipeline for severe class imbalance (11.5% churn); Gradient Boosting reaches ROC-AUC 0.70, with a data-leakage fix in the pipeline.",
           "author": { "@type": "Person", "name": "Pranav Kaja", "url": "https://pranavkaja.vercel.app/" },
           "url": "https://pranavkaja.vercel.app/projects/auto-insurance-churn",
           "image": "https://pranavkaja.vercel.app/images/og-card.png",
@@ -58,20 +58,24 @@
         <header class="hero">
             <div class="hero-label mb-20"><span class="status-dot"></span>MSN-05 // DEPLOYED</div>
             <h1 class="hero-title" style="font-size: 3rem; line-height: 1.05;">AUTO INSURANCE CHURN</h1>
-            <p class="hero-subtitle">18% &rarr; 11% projected churn across 350K policyholders.</p>
+            <p class="hero-subtitle">Churn modeling on 92,849 policyholders — SMOTE + Gradient Boosting at ROC-AUC 0.70.</p>
             <div class="pp-chips" style="margin-top: 8px;">
-                <span>350K Records</span><span>18% &rarr; 11% Churn</span><span>SMOTE Pipeline</span><span>Class Imbalance</span>
+                <span>92,849 Records</span><span>ROC-AUC 0.70</span><span>SMOTE Pipeline</span><span>Leakage Catch</span>
+            </div>
+            <div class="hero-actions" style="margin-top: 18px;">
+                <a href="https://github.com/PranavKaja/insurance-churn" target="_blank" rel="noopener noreferrer" class="btn btn-secondary interactive-element no-underline">VIEW CODE &nearr;</a>
             </div>
         </header>
 
         <section class="section">
             <div class="section-header"><h2>BRIEFING</h2><div class="line"></div></div>
             <p style="font-size: 1.05rem; line-height: 1.7; max-width: 760px;">
-                Random Forest and Gradient Boosting classifiers on 350,000 policyholder records to flag retention risk
-                early. The hard part wasn't the model — it was the <strong>severe class imbalance</strong> (churners are
-                rare). A <strong>SMOTE resampling pipeline</strong> rebalanced the training data so precision and recall
-                held steady across high-risk segments instead of collapsing onto the majority class. The model points
-                retention spend at the policyholders most likely to leave, projecting churn down from 18% to 11%.
+                Five classifiers on <strong>92,849 policyholder records</strong> to flag retention risk early. The hard
+                part wasn't the model — it was the <strong>severe class imbalance</strong> (only 11.5% churn). A
+                <strong>SMOTE resampling pipeline</strong> rebalanced the training data so precision and recall held up
+                instead of collapsing onto the majority class, and a <strong>data-leakage catch</strong> — dropping a
+                column only populated after a customer churns — kept the score honest. Gradient Boosting came out on top
+                at <strong>ROC-AUC 0.70</strong>, threshold-tuned to favor recall so more at-risk policyholders get flagged.
             </p>
         </section>
 
@@ -79,8 +83,8 @@
             <div class="section-header"><h2>ROLE / METHOD / OUTCOME</h2><div class="line"></div></div>
             <div class="msn-rmo">
                 <div class="rmo-cell"><div class="k">Role</div><div class="v">Solo build.</div></div>
-                <div class="rmo-cell"><div class="k">Method</div><div class="v">Random Forest + Gradient Boosting with a SMOTE resampling pipeline.</div></div>
-                <div class="rmo-cell"><div class="k">Outcome</div><div class="v">Projected churn cut from 18% to 11%.</div></div>
+                <div class="rmo-cell"><div class="k">Method</div><div class="v">Five-model comparison on a SMOTE pipeline; champion chosen by ROC-AUC, tuned for recall.</div></div>
+                <div class="rmo-cell"><div class="k">Outcome</div><div class="v">Gradient Boosting at ROC-AUC 0.70, with a leakage fix an earlier run had missed.</div></div>
             </div>
             <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 20px; font-family: 'Share Tech Mono', monospace;">
                 STACK: Python &middot; scikit-learn &middot; Gradient Boosting &middot; SMOTE

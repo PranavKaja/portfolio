@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPK Production Planner — Order-to-Prep Tool | Pranav Kaja</title>
+    <meta name="description"
+        content="An interactive tool by Pranav Kaja: paste a commissary kitchen's daily order report and instantly get the make list and per-station pick sheets across 36 locations. Runs entirely in your browser.">
+    <meta name="author" content="Pranav Kaja">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta property="og:title" content="CPK Production Planner — Order-to-Prep Tool | Pranav Kaja">
+    <meta property="og:description" content="Paste the day's order report; get the make list + per-station pick sheets across 36 locations. Live, in-browser.">
+    <meta property="og:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pranavkaja.vercel.app/projects/cpk-production">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CPK Production Planner — Order-to-Prep Tool">
+    <meta name="twitter:description" content="Paste the day's order report; get the make list + per-station pick sheets. Live, in-browser.">
+    <meta name="twitter:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+    <link rel="canonical" href="https://pranavkaja.vercel.app/projects/cpk-production">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        { "@type": "WebApplication",
+          "name": "CPK Production Planner",
+          "description": "Paste a commissary kitchen's daily order report and get the make list and per-station pick sheets across 36 locations. Runs entirely in the browser.",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Any (web)",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "author": { "@type": "Person", "name": "Pranav Kaja", "url": "https://pranavkaja.vercel.app/" },
+          "url": "https://pranavkaja.vercel.app/projects/cpk-production", "inLanguage": "en" },
+        { "@type": "BreadcrumbList", "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://pranavkaja.vercel.app/" },
+          { "@type": "ListItem", "position": 2, "name": "Projects", "item": "https://pranavkaja.vercel.app/projects" },
+          { "@type": "ListItem", "position": 3, "name": "CPK Production Planner", "item": "https://pranavkaja.vercel.app/projects/cpk-production" } ] }
+      ]
+    }
+    </script>
+    <style>
+        .cpk-wrap { border: 2px solid var(--text-main); background: var(--bg); padding: 0; margin-top: 10px; }
+        .cpk-io { padding: 22px; }
+        .cpk-label { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; letter-spacing: 1.5px;
+            text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; display: block; }
+        #cpk-input { width: 100%; min-height: 180px; resize: vertical; font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem; line-height: 1.5; border: 1px solid var(--text-main); padding: 12px;
+            background: var(--panel-bg); color: var(--text-main); white-space: pre; overflow-x: auto; }
+        #cpk-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+        .cpk-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 14px; }
+        .cpk-meta { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: var(--text-muted); margin-left: auto; }
+        .cpk-tabs { display: flex; gap: 2px; border-top: 2px solid var(--text-main); border-bottom: 1px solid var(--border);
+            background: var(--panel-bg); flex-wrap: wrap; }
+        .cpk-tab { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase;
+            background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-muted);
+            padding: 12px 18px; cursor: pointer; }
+        .cpk-tab:hover { color: var(--text-main); }
+        .cpk-tab.active { color: var(--text-main); border-bottom-color: var(--accent); }
+        .cpk-tab.soon { opacity: 0.5; cursor: not-allowed; }
+        #cpk-output { padding: 22px; overflow-x: auto; }
+        .cpk-empty, .cpk-hint { font-family: 'Share Tech Mono', monospace; color: var(--text-muted); font-size: 0.85rem; }
+        .cpk-hint { margin-top: 12px; }
+        .cpk-scroll { overflow-x: auto; }
+        .cpk-table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+        .cpk-table th { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; letter-spacing: 1px;
+            text-transform: uppercase; color: var(--text-muted); text-align: left; padding: 8px 12px;
+            border-bottom: 2px solid var(--text-main); white-space: nowrap; }
+        .cpk-table td { padding: 7px 12px; border-bottom: 1px solid var(--border); }
+        .cpk-table td.num, .cpk-table th.num { text-align: right; font-family: 'Space Mono', monospace; }
+        .cpk-table td.mono { font-family: 'Share Tech Mono', monospace; color: var(--accent-text); }
+        .cpk-table td.strong, .cpk-table .strong { font-weight: 700; }
+        .cpk-table tfoot td, .cpk-table tr.totals td { border-top: 2px solid var(--text-main); border-bottom: none;
+            font-weight: 700; background: var(--panel-bg); }
+        .cpk-pivot td.loc { font-weight: 600; white-space: nowrap; }
+        .cpk-pivot td.zero { color: var(--border); }
+        .cpk-pivot th, .cpk-pivot td { border-right: 1px solid var(--border); }
+        .cpk-routing { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
+        .cpk-loccard { border: 1px solid var(--border); border-left: 3px solid var(--text-main); }
+        .cpk-lochead { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 12px;
+            background: var(--panel-bg); border-bottom: 1px solid var(--border); }
+        .cpk-locname { font-weight: 700; font-size: 0.92rem; }
+        .cpk-loctot { margin-left: auto; font-family: 'Space Mono', monospace; font-size: 0.76rem; color: var(--text-muted); }
+        .cpk-badge { font-family: 'Share Tech Mono', monospace; font-size: 0.56rem; letter-spacing: 0.5px;
+            text-transform: uppercase; padding: 2px 6px; border: 1px solid currentColor; border-radius: 2px; }
+        .cpk-badge.cpk-dc { color: var(--accent-text); }
+        .cpk-badge.cpk-retail { color: #2b8a3e; }
+        .cpk-loccard .cpk-table td { padding: 5px 12px; font-size: 0.85rem; }
+    </style>
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <nav class="top-nav">
+        <a href="/" class="nav-logo interactive-element no-underline text-inherit">SUBJECT // PRANAV KAJA</a>
+        <div class="nav-links"><a href="/projects"><span class="nav-num">&larr; </span>ALL MISSIONS</a></div>
+    </nav>
+
+    <main class="container" id="main">
+        <header class="hero">
+            <div class="hero-label mb-20"><span class="status-dot"></span>LIVE TOOL // TRY IT</div>
+            <h1 class="hero-title" style="font-size: 2.7rem; line-height: 1.05;">CPK PRODUCTION PLANNER</h1>
+            <p class="hero-subtitle">Paste a commissary kitchen's daily order report and get back the make list and
+                per-station pick sheets across 36 campus locations — what used to be manual counting across 100+ items.
+                Runs entirely in your browser; nothing is sent anywhere.</p>
+        </header>
+
+        <section class="section">
+            <div class="cpk-wrap">
+                <div class="cpk-io">
+                    <label class="cpk-label" for="cpk-input">// Paste the order report (sample is loaded — just hit Generate)</label>
+                    <textarea id="cpk-input" spellcheck="false" aria-label="Order report input"></textarea>
+                    <div class="cpk-controls">
+                        <button class="btn btn-primary" id="cpk-gen" style="padding:12px 26px;">GENERATE</button>
+                        <button class="btn btn-secondary" id="cpk-sample" style="padding:12px 20px;">LOAD SAMPLE</button>
+                        <button class="btn btn-secondary" id="cpk-clear" style="padding:12px 20px;">CLEAR</button>
+                        <span class="cpk-meta" id="cpk-meta"></span>
+                    </div>
+                </div>
+                <div class="cpk-tabs" role="tablist">
+                    <button class="cpk-tab active" data-tab="make">Make List</button>
+                    <button class="cpk-tab" data-tab="pivot">Station Grid</button>
+                    <button class="cpk-tab" data-tab="routing">Routing</button>
+                    <button class="cpk-tab soon" disabled title="Coming next">Bread</button>
+                    <button class="cpk-tab soon" disabled title="Coming next">Prep / Ingredients</button>
+                </div>
+                <div id="cpk-output"></div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header"><h2>HOW IT WORKS</h2><div class="line"></div></div>
+            <ul class="ops-points" style="max-width: 760px;">
+                <li><strong>Paste</strong> the day's raw order report — each line is one location ordering N of an item.</li>
+                <li><strong>Make list</strong> aggregates every order into the total to produce per item.</li>
+                <li><strong>Station grid</strong> pivots the orders into an item &times; location matrix with row/column
+                    totals, so each prep station knows exactly how many of each item goes to each caf&eacute;.</li>
+                <li><strong>Routing, bread &amp; ingredient prep</strong> (next) explode the counts into label/destination
+                    routing, bread to defrost, and raw ingredient quantities via a recipe BOM.</li>
+            </ul>
+            <p style="font-size: 0.92rem; color: var(--text-muted); margin-top: 12px;">
+                Replaces a manual spreadsheet workflow for the Worcester central production kitchen (UMass Dining).
+                Sample data shown is anonymized.</p>
+        </section>
+
+        <section class="section">
+            <div class="interests-simple-box">
+                <h3 class="beyond-title">MORE MISSIONS</h3>
+                <p class="beyond-subtitle">Other case files — ML, BI, and supply-chain strategy.</p>
+                <a href="/projects" class="btn btn-secondary interactive-element no-underline">VIEW ALL MISSIONS</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">&copy; <span id="year"></span> Pranav Kaja. All rights reserved.</footer>
+    <div class="custom-cursor" id="custom-cursor"></div>
+    <div class="crosshair-h"></div>
+    <div class="crosshair-v"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="/config.js" defer></script>
+    <script src="/analytics.js" defer></script>
+    <script src="/main.js" defer></script>
+    <script src="/projects/cpk.js" defer></script>
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+
+</html>
