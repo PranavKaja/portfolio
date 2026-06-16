@@ -55,6 +55,9 @@
             font-size: 0.85rem; line-height: 1.5; border: 1px solid var(--text-main); padding: 12px;
             background: var(--panel-bg); color: var(--text-main); white-space: pre; overflow-x: auto; }
         #cpk-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+        #cpk-input.cpk-drag { outline: 2px dashed var(--accent); outline-offset: 1px; background: var(--panel-bg); }
+        #cpk-file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+        .cpk-upload { padding: 12px 20px; cursor: pointer; }
         .cpk-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 14px; }
         .cpk-meta { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: var(--text-muted); margin-left: auto; }
         .cpk-tabs { display: flex; gap: 2px; border-top: 2px solid var(--text-main); border-bottom: 1px solid var(--border);
@@ -68,6 +71,9 @@
         #cpk-output { padding: 22px; overflow-x: auto; }
         .cpk-empty, .cpk-hint { font-family: 'Share Tech Mono', monospace; color: var(--text-muted); font-size: 0.85rem; }
         .cpk-hint { margin-top: 12px; }
+        .cpk-warn { font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; line-height: 1.5;
+            color: var(--accent-text, #c2410c); margin-top: 14px; }
+        .cpk-conv { color: var(--text-muted); font-size: 0.82em; }
         .cpk-scroll { overflow-x: auto; }
         .cpk-table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
         .cpk-table th { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; letter-spacing: 1px;
@@ -115,10 +121,12 @@
         <section class="section">
             <div class="cpk-wrap">
                 <div class="cpk-io">
-                    <label class="cpk-label" for="cpk-input">// Paste the order report (sample is loaded — just hit Generate)</label>
+                    <label class="cpk-label" for="cpk-input">// Paste the order report, or upload / drop a .txt file (sample is loaded — just hit Generate)</label>
                     <textarea id="cpk-input" spellcheck="false" aria-label="Order report input"></textarea>
                     <div class="cpk-controls">
                         <button class="btn btn-primary" id="cpk-gen" style="padding:12px 26px;">GENERATE</button>
+                        <label class="btn btn-secondary cpk-upload" for="cpk-file">UPLOAD FILE</label>
+                        <input type="file" id="cpk-file" accept=".txt,.csv,.tsv,text/plain" aria-label="Upload order report file">
                         <button class="btn btn-secondary" id="cpk-sample" style="padding:12px 20px;">LOAD SAMPLE</button>
                         <button class="btn btn-secondary" id="cpk-clear" style="padding:12px 20px;">CLEAR</button>
                         <span class="cpk-meta" id="cpk-meta"></span>
@@ -128,8 +136,8 @@
                     <button class="cpk-tab active" data-tab="make">Make List</button>
                     <button class="cpk-tab" data-tab="pivot">Station Grid</button>
                     <button class="cpk-tab" data-tab="routing">Routing</button>
-                    <button class="cpk-tab soon" disabled title="Coming next">Bread</button>
-                    <button class="cpk-tab soon" disabled title="Coming next">Prep / Ingredients</button>
+                    <button class="cpk-tab" data-tab="bread">Bread</button>
+                    <button class="cpk-tab" data-tab="prep">Prep / Ingredients</button>
                 </div>
                 <div id="cpk-output"></div>
             </div>
@@ -142,8 +150,10 @@
                 <li><strong>Make list</strong> aggregates every order into the total to produce per item.</li>
                 <li><strong>Station grid</strong> pivots the orders into an item &times; location matrix with row/column
                     totals, so each prep station knows exactly how many of each item goes to each caf&eacute;.</li>
-                <li><strong>Routing, bread &amp; ingredient prep</strong> (next) explode the counts into label/destination
-                    routing, bread to defrost, and raw ingredient quantities via a recipe BOM.</li>
+                <li><strong>Routing</strong> groups every location's items with its label channel &mdash; commissary DCs
+                    (FoodPro stickers) vs. retail caf&eacute;s (Harvest Fresh stickers).</li>
+                <li><strong>Bread</strong> totals every loaf, roll and wrap to defrost; <strong>Prep / Ingredients</strong>
+                    explodes the make list into raw ingredient quantities via a per-item recipe BOM.</li>
             </ul>
             <p style="font-size: 0.92rem; color: var(--text-muted); margin-top: 12px;">
                 Replaces a manual spreadsheet workflow for the Worcester central production kitchen (UMass Dining).
