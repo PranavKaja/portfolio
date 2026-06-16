@@ -40,6 +40,9 @@
   // raw Orders Recap ("23, Harvest   4   2 eac   <running total>"):
   // date  item#  name(multi-word)  loc#, loc name  DUE-AMOUNT  [pack] UNIT  [total]
   const LINE = /^\s*(\d{1,2}\/\d{1,2}\/\d{2,4})\s+(\d[\d.]*)\s+(.+?)\s+(\d{1,3})\s*,\s*(.+?)\s{2,}(\d+)\s+(?:(\d+)\s+)?([A-Za-z]+)/;
+  // Fallback for text pasted from editors that collapse the column gaps to a
+  // single space (losing the \s{2,} anchor between location and amount).
+  const LINE_LOOSE = /^\s*(\d{1,2}\/\d{1,2}\/\d{2,4})\s+(\d[\d.]*)\s+(.+?)\s+(\d{1,3})\s*,\s*(.+?)\s+(\d+)\s+(?:(\d+)\s+)?([A-Za-z]+)/;
   const DATE_LEAD = /^\s*\d{1,2}\/\d{1,2}\/\d{2,4}/;
 
   function parse(text) {
@@ -54,7 +57,7 @@
     }
     text.split(/\r?\n/).forEach(line => {
       if (!line.trim()) return;
-      const m = line.match(LINE);
+      const m = line.match(LINE) || line.match(LINE_LOOSE);
       // Only flag genuine data lines (they start with a date) that failed to
       // parse — page headers, separators and totals are silently ignored.
       if (!m) { if (DATE_LEAD.test(line)) skipped.push(line.trim()); return; }
