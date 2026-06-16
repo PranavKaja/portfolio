@@ -44,21 +44,30 @@
 
   function parse(text) {
     const rows = [], skipped = [];
+    // A pasted/uploaded file may stack a history of recaps top-to-bottom. Use
+    // only the FIRST (topmost) one — each recap ends with an "END OF LIST" line.
+    let multi = false;
+    const end = text.search(/^[ \t]*END OF LIST/im);
+    if (end !== -1) {
+      multi = /\d{1,2}\/\d{1,2}\/\d{2,4}/.test(text.slice(end + 11)); // another recap follows?
+      text = text.slice(0, end);
+    }
     text.split(/\r?\n/).forEach(line => {
       if (!line.trim()) return;
       const m = line.match(LINE);
       // Only flag genuine data lines (they start with a date) that failed to
       // parse — page headers, separators and totals are silently ignored.
       if (!m) { if (DATE_LEAD.test(line)) skipped.push(line.trim()); return; }
+      const due = parseInt(m[6], 10) || 0;
+      const pack = m[7] ? parseInt(m[7], 10) : 1; // "2 each" → pack of 2
       rows.push({
         item: m[2], name: m[3].trim(),
         locCode: m[4], loc: m[5].trim(),
-        qty: parseInt(m[6], 10) || 0,
-        pack: m[7] ? parseInt(m[7], 10) : 1,
+        due: due, pack: pack, qty: due * pack, // qty = production count (expanded by pack)
         unit: /^EA/i.test(m[8]) ? 'EACH' : m[8].toUpperCase()
       });
     });
-    return { rows, skipped };
+    return { rows, skipped, multi };
   }
 
   function esc(s) {
@@ -87,6 +96,9 @@
     });
     h += `</tbody><tfoot><tr><td></td><td>GRAND TOTAL</td><td class="num strong">${total}</td>` +
       '<td>UNITS</td><td></td></tr></tfoot></table>';
+    if (rows.some(r => r.pack > 1)) {
+      h += '<p class="cpk-hint">"2 each" pack lines are expanded to single-unit counts (× pack size).</p>';
+    }
     return h;
   }
 
@@ -288,7 +300,8 @@
   function generate() {
     data = parse($('cpk-input').value);
     const m = `${data.rows.length} order line${data.rows.length === 1 ? '' : 's'} parsed` +
-      (data.skipped.length ? ` · ${data.skipped.length} skipped` : '');
+      (data.skipped.length ? ` · ${data.skipped.length} skipped` : '') +
+      (data.multi ? ' · first order only' : '');
     $('cpk-meta').textContent = '// ' + m;
     render();
     if (window.intel) try { window.intel.track('cpk_generate', { lines: data.rows.length }); } catch (e) { }
