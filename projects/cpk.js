@@ -436,7 +436,8 @@
       let trayAcc = 0, any = false;
       let cells = '';
       PK_COLS.forEach(col => {
-        const q = qLoc(ctx.idx, col.item, loc);
+        let q = qLoc(ctx.idx, col.item, loc);
+        if (col.tri) q *= 2; // triple stacks ship as packages (ordered ×2)
         if (q) { any = true; colTot[col.item] = (colTot[col.item] || 0) + q; trayAcc += q / TRAY_DIV[col.g]; }
         cells += `<td class="num${q ? '' : ' zero'}">${q || ''}</td>`;
       });
@@ -448,7 +449,7 @@
     t += '<tr class="totals"><td>TOTAL</td>';
     PK_COLS.forEach(col => t += `<td class="num strong">${colTot[col.item] || ''}</td>`);
     t += `<td class="num strong">${grandTrays}</td></tr></tbody></table></div>`;
-    return h + t + '<p class="cpk-hint">Each cell = units ordered for that item at that café. Trays ≈ salads/16 + sandwiches/20 + wraps/24 + fruit/30 (rounded up). Triple-stack packaging is handled on the Retail sheet.</p>';
+    return h + t + '<p class="cpk-hint">Each cell = units to send that café (triple stacks shown as packages = ordered ×2). Trays ≈ salads/16 + sandwiches/20 + wraps/24 + fruit/30 (rounded up).</p>';
   }
 
   function renderStickers(ctx) {
