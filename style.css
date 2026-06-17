@@ -2592,9 +2592,12 @@ body.game-active .trophy-container {
 }
 
 .trophy-icon {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
+    line-height: 1;
     cursor: pointer;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     animation: trophy-bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     transition: transform 0.2s;
 }
