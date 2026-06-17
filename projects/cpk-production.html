@@ -99,6 +99,18 @@
         .cpk-badge.cpk-dc { color: var(--accent-text); }
         .cpk-badge.cpk-retail { color: #2b8a3e; }
         .cpk-loccard .cpk-table td { padding: 5px 12px; font-size: 0.85rem; }
+        .cpk-sheet-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+        .cpk-sheet-title { margin: 0; font-size: 1.15rem; letter-spacing: 0.5px; }
+        .cpk-date { font-family: 'Share Tech Mono', monospace; font-size: 0.74rem; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 1px; margin-left: auto; }
+        .cpk-grid2 { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+        @media (max-width: 720px) { .cpk-grid2 { grid-template-columns: 1fr; } }
+        .cpk-block-label { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 1.5px;
+            text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+        .cpk-secrow td { background: var(--panel-bg); font-family: 'Share Tech Mono', monospace; font-size: 0.68rem;
+            letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent-text); padding-top: 10px; }
+        .cpk-note { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; color: var(--text-muted); }
+        .cpk-bread td:first-child { white-space: nowrap; }
     </style>
 </head>
 
@@ -113,9 +125,9 @@
         <header class="hero">
             <div class="hero-label mb-20"><span class="status-dot"></span>LIVE TOOL // TRY IT</div>
             <h1 class="hero-title" style="font-size: 2.7rem; line-height: 1.05;">CPK PRODUCTION PLANNER</h1>
-            <p class="hero-subtitle">Paste a commissary kitchen's daily order report and get back the make list and
-                per-station pick sheets across 36 campus locations — what used to be manual counting across 100+ items.
-                Runs entirely in your browser; nothing is sent anywhere.</p>
+            <p class="hero-subtitle">Paste the central kitchen's daily Orders Recap and get back every production sheet —
+                DC &amp; Retail make lists, bread, prep, fruit, packout and stickers — across 36 campus locations. Replaces
+                a hand-built 39-tab spreadsheet. Runs entirely in your browser; nothing is sent anywhere.</p>
         </header>
 
         <section class="section">
@@ -133,11 +145,12 @@
                     </div>
                 </div>
                 <div class="cpk-tabs" role="tablist">
-                    <button class="cpk-tab active" data-tab="make">Make List</button>
-                    <button class="cpk-tab" data-tab="pivot">Station Grid</button>
-                    <button class="cpk-tab" data-tab="routing">Routing</button>
-                    <button class="cpk-tab" data-tab="bread">Bread</button>
-                    <button class="cpk-tab" data-tab="prep">Prep / Ingredients</button>
+                    <button class="cpk-tab active" data-tab="dc">DC G&amp;G</button>
+                    <button class="cpk-tab" data-tab="retail">Retail G&amp;G</button>
+                    <button class="cpk-tab" data-tab="fruit">Fruit</button>
+                    <button class="cpk-tab" data-tab="prep">Prep</button>
+                    <button class="cpk-tab" data-tab="packout">Packout</button>
+                    <button class="cpk-tab" data-tab="stickers">Stickers</button>
                 </div>
                 <div id="cpk-output"></div>
             </div>
@@ -146,14 +159,15 @@
         <section class="section">
             <div class="section-header"><h2>HOW IT WORKS</h2><div class="line"></div></div>
             <ul class="ops-points" style="max-width: 760px;">
-                <li><strong>Paste</strong> the day's raw order report — each line is one location ordering N of an item.</li>
-                <li><strong>Make list</strong> aggregates every order into the total to produce per item.</li>
-                <li><strong>Station grid</strong> pivots the orders into an item &times; location matrix with row/column
-                    totals, so each prep station knows exactly how many of each item goes to each caf&eacute;.</li>
-                <li><strong>Routing</strong> groups every location's items with its label channel &mdash; commissary DCs
-                    (FoodPro stickers) vs. retail caf&eacute;s (Harvest Fresh stickers).</li>
-                <li><strong>Bread</strong> totals every loaf, roll and wrap to defrost; <strong>Prep / Ingredients</strong>
-                    explodes the make list into raw ingredient quantities via a per-item recipe BOM.</li>
+                <li><strong>Paste or upload</strong> the day's Orders Recap — each line is one caf&eacute; ordering N of an
+                    item. A file holding several days is fine; it uses the first recap.</li>
+                <li><strong>DC G&amp;G</strong> &amp; <strong>Retail G&amp;G</strong> are the make sheets: how many of each
+                    sandwich, salad and wrap to build, split into the Worcester DC batch vs. the retail caf&eacute;s, each
+                    with its bread-to-defrost and chicken-to-cook totals.</li>
+                <li><strong>Fruit</strong> totals the fruit cups and the bulk fruit (lbs) to cut.</li>
+                <li><strong>Prep</strong> rolls every order up into sliced meats, cheeses, vegetables and dressings to prep.</li>
+                <li><strong>Packout</strong> is the per-caf&eacute; pick grid with tray counts; <strong>Stickers</strong> is
+                    the label run &mdash; DC (FoodPro) and retail (Harvest Fresh).</li>
             </ul>
             <p style="font-size: 0.92rem; color: var(--text-muted); margin-top: 12px;">
                 Replaces a manual spreadsheet workflow for the Worcester central production kitchen (UMass Dining).

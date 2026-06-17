@@ -7,3 +7,7 @@ apply_gamer_theme.ps1
 /og-*.png
 # local dev tooling (preview server, launch config)
 .claude/
+# local CPK source data — kept out of the repo (raw orders + manager workbook)
+projects/*.xlsx
+projects/*.xlsm
+projects/cpktest.txt
