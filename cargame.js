@@ -231,9 +231,9 @@ window.addEventListener('contextmenu', (e) => {
 
 window.addEventListener('keydown', (e) => {
     const key = e.key.toLowerCase();
-    if (e.key === 'Escape' && gameActive) {
-        endGame();
-        return;
+    if (e.key === 'Escape') {
+        if (gameActive) { endGame(); return; }
+        if (gameStarting) { cancelCountdown(); return; }   // bail out mid-countdown too
     }
     if (['w', 'a', 's', 'd'].includes(key)) {
         keys[key] = true;
@@ -316,6 +316,7 @@ function startInactivityTimer() {
 
 // --- 6. GAME LOGIC ---
 let gameStarting = false;
+let countdownInterval = null;
 
 function startGame() {
     if (window.innerWidth <= 768) return;
@@ -377,7 +378,6 @@ function startGame() {
     requestAnimationFrame(() => requestAnimationFrame(ensureWrapped));
     
     let count = 3;
-    let countInterval;
     let isPaused = false;
     
     countdownText.innerText = count;
@@ -388,7 +388,7 @@ function startGame() {
         pauseBtn.onclick = () => {
             isPaused = !isPaused;
             if (isPaused) {
-                clearInterval(countInterval);
+                clearInterval(countdownInterval);
                 pauseBtn.innerText = 'RESUME TIMER';
                 countdownText.innerText = 'PAUSED';
             } else {
@@ -400,7 +400,7 @@ function startGame() {
     }
     
     function startCountdown() {
-        countInterval = setInterval(() => {
+        countdownInterval = setInterval(() => {
             count--;
             if (count > 0) {
                 countdownText.innerText = count;
@@ -410,7 +410,8 @@ function startGame() {
                 if (pauseBtn) pauseBtn.style.display = 'none';
                 playTone(800, 'square', 0.4, 0.4);
             } else {
-                clearInterval(countInterval);
+                clearInterval(countdownInterval);
+                countdownInterval = null;
                 countdownOverlay.classList.add('hidden');
                 if (pauseBtn) pauseBtn.style.display = 'inline-block';
                 finishStartGame();
@@ -432,6 +433,25 @@ function finishStartGame() {
     updateScore(); spawnCheckpoint(); updateCharRects();
     lastFrameTime = performance.now();
     requestAnimationFrame(gameLoop);
+}
+
+// ESC during the 3-2-1 countdown bails out cleanly: the run never started, so
+// just tear the staged game down (no score logged, no closing animation).
+function cancelCountdown() {
+    if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+    gameStarting = false;
+    const overlay = document.getElementById('game-countdown-overlay');
+    if (overlay) overlay.classList.add('hidden');
+    const pauseBtn = document.getElementById('countdown-pause-btn');
+    if (pauseBtn) { pauseBtn.style.display = 'inline-block'; pauseBtn.innerText = 'PAUSE TIMER'; }
+    car.element.classList.add('hidden');
+    uiOverlay.classList.add('hidden');
+    checkpoint.element.classList.add('hidden');
+    canvas.classList.add('hidden');
+    document.body.classList.remove('game-active');
+    const hintEl = document.getElementById('wasd-hint');
+    if (hintEl) { hintEl.classList.remove('triggered'); hintEl.classList.remove('first-trigger'); }
+    startInactivityTimer();
 }
 
 function spawnCheckpoint() {
