@@ -60,7 +60,11 @@ function wrapText() {
         el.appendChild(srText);
     });
 }
-wrapText();
+// NOTE: wrapText() is intentionally NOT called at load. It shreds every heading
+// and paragraph into per-character spans that each carry will-change:transform —
+// thousands of layer-promoted nodes that drag the whole page even when nobody
+// plays the game. It's now deferred to ensureWrapped(), called the first time the
+// car actually spawns (see startGame). Everyday visitors pay nothing.
 
 // --- 2. AUDIO SYNTHESIS ---
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -203,14 +207,22 @@ function updateBoostUI() {
 }
 
 let charElements = [];
-window.addEventListener('load', () => {
-    charElements = Array.from(document.querySelectorAll('.char-wrap')).map(el => ({ element: el, rect: null, scattered: false, currX: 0, currY: 0, currRot: 0 }));
-});
+let textWrapped = false;
+// Build the char spans lazily — only when the game first runs — and capture
+// each char's starting position once at that point.
+function ensureWrapped() {
+    if (textWrapped) return;
+    textWrapped = true;
+    wrapText();
+    charElements = Array.from(document.querySelectorAll('.char-wrap'))
+        .map(el => ({ element: el, rect: el.getBoundingClientRect(), scattered: false, currX: 0, currY: 0, currRot: 0 }));
+}
 function updateCharRects() {
+    if (!gameActive) return;   // skip the per-scroll forced reflow unless a game is actually running
     charElements.forEach(char => { if (!char.scattered) char.rect = char.element.getBoundingClientRect(); });
 }
 window.addEventListener('resize', updateCharRects);
-window.addEventListener('scroll', updateCharRects);
+window.addEventListener('scroll', updateCharRects, { passive: true });
 
 // --- 5. INPUT HANDLING ---
 window.addEventListener('contextmenu', (e) => {
@@ -308,7 +320,8 @@ let gameStarting = false;
 function startGame() {
     if (window.innerWidth <= 768) return;
     if (gameStarting) return;
-    
+
+    ensureWrapped();   // first run: shred the page text into the char spans the scatter effect needs
     gameStarting = true;
     score = 0; timeLeft = 12;
     
