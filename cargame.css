@@ -134,13 +134,16 @@
 .char-wrap {
     display: inline-block;
     transition: transform 0.8s ease-out;
-    transform: translate3d(0px, 0px, 0px) rotate(0deg);
-    will-change: transform;
     backface-visibility: hidden;
 }
 
+/* Only chars the car has actually hit get promoted to their own GPU layer.
+   Keeping will-change + the 3D transform off the resting state means the
+   browser isn't juggling thousands of layers for static text during play. */
 .char-wrap.scattered {
     transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translate3d(0px, 0px, 0px) rotate(0deg);
+    will-change: transform;
 }
 
 /* --- CANVAS --- */

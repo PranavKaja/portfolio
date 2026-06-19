@@ -321,7 +321,6 @@ function startGame() {
     if (window.innerWidth <= 768) return;
     if (gameStarting) return;
 
-    ensureWrapped();   // first run: shred the page text into the char spans the scatter effect needs
     gameStarting = true;
     score = 0; timeLeft = 12;
     
@@ -370,6 +369,12 @@ function startGame() {
     const countdownText = document.getElementById('countdown-text');
     const pauseBtn = document.getElementById('countdown-pause-btn');
     countdownOverlay.classList.remove('hidden');
+
+    // Build the char spans the scatter effect needs WHILE the countdown is on
+    // screen — deferred two frames so the "3" paints first and the heavy wrap
+    // (thousands of spans + their layout reads) is hidden behind it instead of
+    // freezing the keypress. It finishes long before "GO!", so play starts smooth.
+    requestAnimationFrame(() => requestAnimationFrame(ensureWrapped));
     
     let count = 3;
     let countInterval;
