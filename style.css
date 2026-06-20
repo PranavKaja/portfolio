@@ -2719,16 +2719,17 @@ body.game-active .trophy-container {
     .trophy-popup {
         position: fixed;
         top: 50vh;
-        left: 50vw;
-        right: auto;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
         width: 90vw;
         max-width: 350px;
-        transform: translate(-50%, -50%);
+        transform: translateY(-50%);
         box-shadow: 0 10px 40px rgba(0,0,0,0.3);
     }
     .trophy-container:hover .trophy-popup,
     .trophy-container.open .trophy-popup {
-        transform: translate(-50%, -50%);
+        transform: translateY(-50%);
     }
     /* hide the tooltip arrow since it's a centered modal now */
     .trophy-popup::before {
