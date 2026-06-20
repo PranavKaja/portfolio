@@ -662,6 +662,30 @@ window.addEventListener('load', () => {
         });
     }
 
+    // Confetti that has come to rest. We keep a registry of settled particles
+    // so they can be re-pinned to the TRUE bottom of the page whenever the
+    // layout height changes — e.g. the mobile Loadout section expanding, fonts
+    // or images loading, or a window resize. Each particle settles at an
+    // absolute document Y; without re-pinning, growing the page (expanding
+    // Loadout) leaves them frozen at the old bottom, i.e. floating mid-page.
+    const settledConfetti = [];
+    let confettiRaf = null;
+    function repositionConfetti() {
+        if (!settledConfetti.length || confettiRaf) return;
+        confettiRaf = requestAnimationFrame(() => {
+            confettiRaf = null;
+            const floorY = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) - 10;
+            settledConfetti.forEach(p => {
+                p.el.style.transform =
+                    `translate3d(${p.x - p.baseX}px, ${floorY - p.baseY}px, 0) rotate(${p.rot}deg)`;
+            });
+        });
+    }
+    window.addEventListener('resize', repositionConfetti);
+    if ('ResizeObserver' in window) {
+        new ResizeObserver(repositionConfetti).observe(document.body);
+    }
+
     function spawnConfetti(viewportX, viewportY) {
         const absoluteX = viewportX + window.scrollX;
         const absoluteY = viewportY + window.scrollY;
@@ -711,6 +735,8 @@ window.addEventListener('load', () => {
                     p.vy = 0;
                     p.vx = 0;
                     p.settled = true;
+                    // Remember it so we can re-pin it to the bottom on layout changes.
+                    settledConfetti.push({ el: p.el, baseX: absoluteX, baseY: absoluteY, x: p.x, rot: p.rot });
                 }
                 
                 p.el.style.transform = `translate3d(${p.x - absoluteX}px, ${p.y - absoluteY}px, 0) rotate(${p.rot}deg)`;
