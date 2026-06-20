@@ -2713,34 +2713,7 @@ body.game-active .trophy-container {
     box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
 }
 
-/* Mobile: turn the trophy card into a centered modal popup instead of a hover card 
-   to prevent it from clipping or looking attached to the top navbar. */
-@media (max-width: 768px) {
-    .trophy-container {
-        animation: none !important;
-        transition: none !important;
-        transform: none !important;
-    }
-    .trophy-popup {
-        position: fixed;
-        top: 50vh;
-        left: 0;
-        right: 0;
-        margin: 0 auto;
-        width: 90vw;
-        max-width: 350px;
-        transform: translateY(-50%);
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    }
-    .trophy-container:hover .trophy-popup,
-    .trophy-container.open .trophy-popup {
-        transform: translateY(-50%);
-    }
-    /* hide the tooltip arrow since it's a centered modal now */
-    .trophy-popup::before {
-        display: none;
-    }
-}
+
 
 
 /* ============================================================
