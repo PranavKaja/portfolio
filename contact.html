@@ -277,14 +277,14 @@
                 <form id="transmit-form" class="transmit-form" novalidate>
                     <div class="tx-row">
                         <label class="tx-field"><span>Callsign / Name</span>
-                            <input type="text" id="tx-name" maxlength="200" autocomplete="name" required></label>
+                            <input type="text" id="tx-name" maxlength="200" autocomplete="name" placeholder="e.g. emelon musk" required></label>
                         <label class="tx-field"><span>Return Email</span>
-                            <input type="email" id="tx-email" maxlength="320" autocomplete="email" required></label>
+                            <input type="email" id="tx-email" maxlength="320" autocomplete="email" placeholder="emusk@spacey.com" required></label>
                     </div>
                     <label class="tx-field"><span>Phone (optional)</span>
-                        <input type="tel" id="tx-phone" maxlength="50" autocomplete="tel"></label>
+                        <input type="tel" id="tx-phone" maxlength="50" autocomplete="tel" placeholder="your phone number here"></label>
                     <label class="tx-field"><span>Transmission</span>
-                        <textarea id="tx-body" maxlength="5000" required></textarea></label>
+                        <textarea id="tx-body" maxlength="5000" placeholder="Your message here..." required></textarea></label>
                     <!-- honeypot: invisible to humans; bots fill it and get silently dropped -->
                     <input type="text" id="tx-website" class="tx-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
                     <div class="tx-actions">
