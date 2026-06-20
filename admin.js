@@ -891,15 +891,68 @@
         const tConts = rows.reduce((s, r) => s + r[5], 0);
         return detailTable(['Day', 'Views', 'Time', 'Game Plays', 'Downloads', 'Contact Clicks'], rows, ['Total', tViews, '', tGames, tDowns, tConts]);
       };
+
+      window._renderDetailedChart = (daysCount) => {
+        const byDay = {};
+        (d.daily || []).forEach(r => { byDay[r.day] = r; });
+        const days = [];
+        for (let i = daysCount - 1; i >= 0; i--) { // chronological
+          const dt = new Date(); dt.setDate(dt.getDate() - i);
+          const key = dt.toISOString().slice(0, 10);
+          days.push([key, byDay[key] ? byDay[key].views : 0]);
+        }
+        
+        if (!days.length) return '<div class="bl-empty">// no data</div>';
+        
+        const max = Math.max.apply(null, days.map(d => d[1])) || 1;
+        const W = 800, H = 250, pad = 20, bw = (W - pad * 2) / days.length;
+        
+        const bars = days.map((d, i) => {
+          const x = pad + i * bw;
+          const w = Math.max(1, bw - 2).toFixed(1);
+          if (d[1] === 0) {
+            return `<rect x="${x.toFixed(1)}" y="${(H - 20).toFixed(1)}" width="${w}" height="2" style="fill: var(--text-muted); opacity: 0.3"><title>${d[0]}: 0 views</title></rect>` +
+                   (daysCount <= 30 ? `<text x="${(x + w/2).toFixed(1)}" y="${(H - 24).toFixed(1)}" fill="currentColor" text-anchor="middle" font-size="10" font-family="'Share Tech Mono', monospace" opacity="0.6">0</text>` : '');
+          }
+          const h = Math.max(2, Math.round(d[1] / max * (H - 40)));
+          const barColor = 'var(--accent, #ff4500)';
+          
+          const textNode = h > 14 && daysCount <= 30
+              ? `<text x="${(x + w/2).toFixed(1)}" y="${(H - 20 - h + 11).toFixed(1)}" fill="#fff" text-anchor="middle" font-size="10" font-family="'Share Tech Mono', monospace" font-weight="bold">${d[1]}</text>`
+              : (daysCount <= 30 ? `<text x="${(x + w/2).toFixed(1)}" y="${(H - 20 - h - 4).toFixed(1)}" fill="currentColor" text-anchor="middle" font-size="10" font-family="'Share Tech Mono', monospace" font-weight="bold">${d[1]}</text>` : '');
+              
+          return `<rect x="${x.toFixed(1)}" y="${(H - 20 - h).toFixed(1)}" width="${w}" height="${h}" fill="${barColor}"><title>${d[0]}: ${d[1]} views</title></rect>${textNode}`;
+        }).join('');
+        
+        const first = days[0][0].slice(5), last = days[days.length - 1][0].slice(5);
+        
+        return `<svg viewBox="0 0 ${W} ${H}" class="spark" preserveAspectRatio="none" style="width: 100%; height: auto; max-height: 300px; overflow: visible; margin-top: 10px;">
+            ${bars}
+            <text x="${pad}" y="${H - 2}" font-size="12" fill="currentColor" font-family="'Share Tech Mono', monospace">${first}</text>
+            <text x="${W - pad}" y="${H - 2}" text-anchor="end" font-size="12" fill="currentColor" font-family="'Share Tech Mono', monospace">${last}</text>
+        </svg>`;
+      };
+
       body = `
-        <div class="row" style="margin-bottom: 16px;" id="daily-filters">
-          <button class="ghost filter-btn" data-days="7">7 Days</button>
-          <button class="primary filter-btn" data-days="30">30 Days</button>
-          <button class="ghost filter-btn" data-days="90">90 Days</button>
-          <button class="ghost filter-btn" data-days="365">1 Year</button>
+        <div class="row" style="margin-bottom: 16px; justify-content: space-between; align-items: center;" id="daily-controls">
+          <div id="daily-filters">
+            <button class="ghost filter-btn" data-days="7">7 Days</button>
+            <button class="primary filter-btn" data-days="30">30 Days</button>
+            <button class="ghost filter-btn" data-days="90">90 Days</button>
+            <button class="ghost filter-btn" data-days="365">1 Year</button>
+          </div>
+          <div id="daily-view-toggle">
+            <button class="primary view-btn" data-view="table">Table</button>
+            <button class="ghost view-btn" data-view="chart">Chart</button>
+          </div>
         </div>
-        <div id="daily-table-container">
-          ${window._renderDailyTable(30)}
+        <div id="daily-content-container">
+          <div id="daily-table-container">
+            ${window._renderDailyTable(30)}
+          </div>
+          <div id="daily-chart-container" style="display: none;">
+            ${window._renderDetailedChart(30)}
+          </div>
         </div>
       `;
     }
@@ -908,14 +961,32 @@
     
     if (kind === 'daily') {
       const filters = $('daily-filters');
+      const viewToggle = $('daily-view-toggle');
+      let currentDays = 30;
+      let currentView = 'table';
+      
       if (filters) {
         filters.addEventListener('click', e => {
           if (e.target.classList.contains('filter-btn')) {
-            const days = parseInt(e.target.dataset.days);
-            $('daily-table-container').innerHTML = window._renderDailyTable(days);
+            currentDays = parseInt(e.target.dataset.days);
+            $('daily-table-container').innerHTML = window._renderDailyTable(currentDays);
+            $('daily-chart-container').innerHTML = window._renderDetailedChart(currentDays);
             filters.querySelectorAll('.filter-btn').forEach(b => {
-              b.classList.toggle('primary', parseInt(b.dataset.days) === days);
-              b.classList.toggle('ghost', parseInt(b.dataset.days) !== days);
+              b.classList.toggle('primary', parseInt(b.dataset.days) === currentDays);
+              b.classList.toggle('ghost', parseInt(b.dataset.days) !== currentDays);
+            });
+          }
+        });
+      }
+      if (viewToggle) {
+        viewToggle.addEventListener('click', e => {
+          if (e.target.classList.contains('view-btn')) {
+            currentView = e.target.dataset.view;
+            $('daily-table-container').style.display = currentView === 'table' ? 'block' : 'none';
+            $('daily-chart-container').style.display = currentView === 'chart' ? 'block' : 'none';
+            viewToggle.querySelectorAll('.view-btn').forEach(b => {
+              b.classList.toggle('primary', b.dataset.view === currentView);
+              b.classList.toggle('ghost', b.dataset.view !== currentView);
             });
           }
         });
