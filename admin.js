@@ -810,24 +810,33 @@
       const x = pad + i * bw;
       const w = Math.max(1, bw - 2).toFixed(1);
       if (d[1] === 0) {
-        return `<rect x="${x.toFixed(1)}" y="${(H - 18).toFixed(1)}" width="${w}" height="2" style="fill: var(--text-muted); opacity: 0.3"><title>${d[0]}: 0 views</title></rect>`;
+        return `<rect x="${x.toFixed(1)}" y="${(H - 18).toFixed(1)}" width="${w}" height="2" style="fill: var(--text-muted); opacity: 0.3"><title>${d[0]}: 0 views</title></rect>` +
+               `<text x="${(x + w/2).toFixed(1)}" y="${(H - 22).toFixed(1)}" fill="currentColor" text-anchor="middle" font-size="10" font-family="'Share Tech Mono', monospace" opacity="0.6">0</text>`;
       }
       const h = Math.max(2, Math.round(d[1] / max * (H - 24)));
-      return `<rect x="${x.toFixed(1)}" y="${(H - 16 - h).toFixed(1)}" width="${w}" height="${h}"><title>${d[0]}: ${d[1]} views</title></rect>`;
+      const barColor = '#ff4500'; // Assuming var(--accent) is orangeish, using pure orange here or currentColor if needed.
+      const textNode = h > 14 
+          ? `<text x="${(x + w/2).toFixed(1)}" y="${(H - 16 - h + 11).toFixed(1)}" fill="#fff" text-anchor="middle" font-size="10" font-family="'Share Tech Mono', monospace" font-weight="bold">${d[1]}</text>`
+          : `<text x="${(x + w/2).toFixed(1)}" y="${(H - 16 - h - 4).toFixed(1)}" fill="currentColor" text-anchor="middle" font-size="10" font-family="'Share Tech Mono', monospace" font-weight="bold">${d[1]}</text>`;
+      return `<rect x="${x.toFixed(1)}" y="${(H - 16 - h).toFixed(1)}" width="${w}" height="${h}"><title>${d[0]}: ${d[1]} views</title></rect>${textNode}`;
     }).join('');
     const first = days[0][0].slice(5), last = days[days.length - 1][0].slice(5);
-    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="spark" preserveAspectRatio="none">${bars}` +
+    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="spark" preserveAspectRatio="none" style="overflow: visible;">${bars}` +
       `<text x="${pad}" y="${H - 2}" class="spark-ax">${first}</text>` +
       `<text x="${W - pad}" y="${H - 2}" text-anchor="end" class="spark-ax">${last}</text></svg>`;
   }
 
   // ---- drill-down: click any Intel card → full breakdown ----
-  function detailTable(headers, rows) {
+  function detailTable(headers, rows, totals) {
+    let tfoot = '';
+    if (totals) {
+      tfoot = '<tfoot><tr>' + totals.map((c, i) => `<td class="${i > 0 ? 'num' : ''}" style="font-weight: bold; border-top: 1px solid var(--border); padding-top: 8px;">${esc(String(c))}</td>`).join('') + '</tr></tfoot>';
+    }
     return '<table class="detail-table"><thead><tr>' +
       headers.map((h, i) => `<th class="${i > 0 ? 'num' : ''}">${esc(h)}</th>`).join('') +
       '</tr></thead><tbody>' +
       rows.map(r => '<tr>' + r.map((c, i) => `<td class="${i > 0 ? 'num' : ''}">${esc(String(c))}</td>`).join('') + '</tr>').join('') +
-      '</tbody></table>';
+      '</tbody>' + tfoot + '</table>';
   }
 
   function openIntelDetail(kind) {
@@ -836,15 +845,18 @@
     if (kind === 'traffic') {
       title = 'Traffic Sources';
       const rows = (d.traffic || []).map(t => [t.source, t.n]);
-      body = rows.length ? detailTable(['Source', 'Views'], rows) : '';
+      const total = rows.reduce((s, r) => s + r[1], 0);
+      body = rows.length ? detailTable(['Source', 'Views'], rows, ['Total', total]) : '';
     } else if (kind === 'projects') {
       title = 'Top Projects';
       const rows = (d.top_projects || []).map(p => [p.title || p.code, p.n]);
-      body = rows.length ? detailTable(['Project', 'Opens'], rows) : '';
+      const total = rows.reduce((s, r) => s + r[1], 0);
+      body = rows.length ? detailTable(['Project', 'Opens'], rows, ['Total', total]) : '';
     } else if (kind === 'pages') {
       title = 'Pages — views & avg time';
       const rows = (d.top_pages || []).map(p => [p.path === '/' ? '/ (home)' : p.path, p.n, fmtTime(p.avg_sec)]);
-      body = rows.length ? detailTable(['Page', 'Views', 'Avg time'], rows) : '';
+      const totalViews = rows.reduce((s, r) => s + r[1], 0);
+      body = rows.length ? detailTable(['Page', 'Views', 'Avg time'], rows, ['Total', totalViews, '']) : '';
     } else if (kind === 'leaderboard') {
       title = 'Game Leaderboard — all players';
       body = (d.leaderboard || []).length ? leaderboardTable(d.leaderboard) : '';
@@ -873,7 +885,11 @@
               data.contact_clicks || 0
           ]);
         }
-        return detailTable(['Day', 'Views', 'Time', 'Game Plays', 'Downloads', 'Contact Clicks'], rows);
+        const tViews = rows.reduce((s, r) => s + r[1], 0);
+        const tGames = rows.reduce((s, r) => s + r[3], 0);
+        const tDowns = rows.reduce((s, r) => s + r[4], 0);
+        const tConts = rows.reduce((s, r) => s + r[5], 0);
+        return detailTable(['Day', 'Views', 'Time', 'Game Plays', 'Downloads', 'Contact Clicks'], rows, ['Total', tViews, '', tGames, tDowns, tConts]);
       };
       body = `
         <div class="row" style="margin-bottom: 16px;" id="daily-filters">
