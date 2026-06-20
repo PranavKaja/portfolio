@@ -19,14 +19,14 @@ const svgs = {
 };
 
 const descriptions = {
-    Automotive: "Cars, and the engineering that makes them move. I dig into design, aerodynamics, and the mechanics under the hood.",
-    Cooking: "I cook to learn where a dish comes from. The cuisines, the flavors, and the chemistry that makes them work.",
+    Automotive: "I like vehicles of all kinds and how design, aerodynamics, and mechanics come together to move them.",
+    Cooking: "I cook to learn where a dish comes from. The cuisines, the flavors, and the science behind them.",
     Adventure: "New trails, harder routes, places I haven't been. Half the fun is the trip, half is the problem-solving.",
-    Photography: "Light and framing do most of the work. I shoot architecture, sharp lines, and moments that don't wait around.",
-    Gaming: "What keeps you playing? I look at the stories, the game loops, and the choices that pull you back in.",
-    Music: "I listen for how a track is built. Rhythm, texture, and the way sound sets a mood.",
-    Technology: "I keep up with what's new. How the hardware is built, and how the software on top of it actually works.",
-    Plants: "I grow plants indoors. It takes patience and a read on what each one needs to stay alive."
+    Photography: "Light and framing do most of the work. I shoot architecture, nature, and moments that don't wait around.",
+    Gaming: "For me, gaming is big open worlds, tight gunplay, and the kind of lobbies that keep you saying “one more.",
+    Music: "I listen for how a track is built. Rhythm, texture, Melody, and the way sound sets a mood.",
+    Technology: "I enjoy following new tech and digging into how it actually works under the hood.",
+    Plants: "I keep a small indoor jungle and enjoy learning how each plant reacts to light, water, and care."
 };
 
 const interestImages = {
@@ -79,12 +79,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (chV) chV.classList.add('active');
             cursorVisible = true;
         }
-        
+
         if (!isCursorUpdating) {
             requestAnimationFrame(() => {
-                if(cursor) cursor.style.transform = `translate3d(calc(${cursorX}px - 50%), calc(${cursorY}px - 50%), 0)`;
-                if(chH) chH.style.transform = `translate3d(0, ${cursorY}px, 0)`;
-                if(chV) chV.style.transform = `translate3d(${cursorX}px, 0, 0)`;
+                if (cursor) cursor.style.transform = `translate3d(calc(${cursorX}px - 50%), calc(${cursorY}px - 50%), 0)`;
+                if (chH) chH.style.transform = `translate3d(0, ${cursorY}px, 0)`;
+                if (chV) chV.style.transform = `translate3d(${cursorX}px, 0, 0)`;
                 isCursorUpdating = false;
             });
             isCursorUpdating = true;
@@ -108,10 +108,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const interactiveElements = document.querySelectorAll('.interactive-element, a, button');
     interactiveElements.forEach(el => {
         el.addEventListener('mouseenter', () => {
-            if(cursor) cursor.classList.add('hover');
+            if (cursor) cursor.classList.add('hover');
         });
         el.addEventListener('mouseleave', () => {
-            if(cursor) cursor.classList.remove('hover');
+            if (cursor) cursor.classList.remove('hover');
         });
     });
 
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const detailTitle = document.getElementById('detail-title');
     const detailDesc = document.getElementById('detail-desc');
     const detailPanel = document.getElementById('interests-details');
-    
+
     let targetXrayRadius = 0;
     let currentXrayRadius = 0;
 
@@ -161,13 +161,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Allow clicking nodes to rotate them to center
             node.addEventListener('click', () => {
                 const nodeAngleDeg = angle * (180 / Math.PI);
-                
+
                 // Calculate shortest path to the new angle
                 let diff = (nodeAngleDeg - targetTrackRotation) % 360;
-                
+
                 if (diff > 180) diff -= 360;
                 else if (diff <= -180) diff += 360;
-                
+
                 targetTrackRotation += diff;
             });
         });
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const sectionTop = section.offsetTop;
                 const currentScroll = window.scrollY - sectionTop;
                 const totalScrollDistance = section.offsetHeight - window.innerHeight;
-                
+
                 if (totalScrollDistance > 0) {
                     if (currentScroll >= 0 && currentScroll <= totalScrollDistance) {
                         targetOrbitProgress = currentScroll / totalScrollDistance;
@@ -197,14 +197,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         window.addEventListener('wheel', (e) => {
             const section = document.getElementById('interests');
-            if(section) {
+            if (section) {
                 const sectionTop = section.offsetTop;
                 const currentScroll = window.scrollY - sectionTop;
-                
+
                 if (currentScroll > -window.innerHeight && currentScroll < section.offsetHeight + window.innerHeight) {
                     if (typeof window.lastSnap === 'undefined') window.lastSnap = 0;
-                    targetTrackRotation += e.deltaY * 0.15; 
-                    
+                    targetTrackRotation += e.deltaY * 0.15;
+
                     clearTimeout(window.snapTimeout);
                     const snapAngle = 360 / totalNodes;
                     window.snapTimeout = setTimeout(() => {
@@ -224,10 +224,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
 
         function animateWheel() {
-            if(wheelTrack) {
+            if (wheelTrack) {
                 trackRotation += (targetTrackRotation - trackRotation) * 0.05;
                 orbitProgress += (targetOrbitProgress - orbitProgress) * 0.05;
-                
+
                 let maxZ = -Infinity;
                 let maxZNode = null;
                 const isMobile = window.innerWidth <= 768;
@@ -243,10 +243,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (maxZNode) {
                     interestsBg.style.opacity = '1';
-                    
+
                     // Restore Copy8 logic: Hovering the center node reveals the X-ray peek effect
                     targetXrayRadius = maxZNode.dataset.hovered === "true" ? (isMobile ? 250 : 400) : 0;
-                    
+
                     // compare textContent, not innerText: the title renders
                     // text-transform: uppercase, so innerText reads back
                     // "AUTOMOTIVE" vs dataset "Automotive" and the guard would
@@ -261,12 +261,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         detailTitle.textContent = newText;
                         detailDesc.textContent = descriptions[newText] || "";
-                        
-                        if(imgPath && interestBaseImg && interestXrayImg) {
+
+                        if (imgPath && interestBaseImg && interestXrayImg) {
                             interestBaseImg.src = imgPath;
                             interestXrayImg.src = imgPath;
-                            
-                            if(bgContainer) {
+
+                            if (bgContainer) {
                                 bgContainer.style.transition = 'none';
                                 bgContainer.style.filter = 'blur(15px)';
                                 void bgContainer.offsetWidth;
@@ -279,13 +279,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     interestsBg.style.opacity = '0';
                     targetXrayRadius = 0;
                 }
-                
+
                 // Details panel only shows if scrolled down (which is disabled on PC now via 100vh)
                 // or if forced on mobile via CSS
                 detailPanel.style.opacity = orbitProgress > 0.5 ? (orbitProgress - 0.5) * 2 : 0;
 
                 currentXrayRadius += (targetXrayRadius - currentXrayRadius) * 0.1;
-                if(interestXrayMask) {
+                if (interestXrayMask) {
                     const sectionRect = document.getElementById('interests-sticky').getBoundingClientRect();
                     const localX = isMobile ? window.innerWidth / 2 : cursorX - sectionRect.left;
                     const localY = isMobile ? window.innerHeight * 0.4 : cursorY - sectionRect.top;
@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 wheelNodes.forEach((node) => {
                     const baseAngle = parseFloat(node.dataset.baseAngle);
                     const globalAngle = baseAngle - trackRotation * (Math.PI / 180);
-                    
+
                     const radius = Math.min(350, window.innerWidth * 0.4);
                     const x0 = Math.sin(globalAngle) * radius;
                     const y0 = 0;
@@ -303,39 +303,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     const rZ0 = 120;
 
                     const isMobile = window.innerWidth <= 768;
-                    const x1 = isMobile ? 0 : -window.innerWidth * 0.25; 
-                    const y1 = isMobile ? Math.sin(globalAngle) * 350 - 150 : Math.sin(globalAngle) * 600; 
+                    const x1 = isMobile ? 0 : -window.innerWidth * 0.25;
+                    const y1 = isMobile ? Math.sin(globalAngle) * 350 - 150 : Math.sin(globalAngle) * 600;
                     const z1 = Math.cos(globalAngle) * 300;
                     const rZ1 = 300;
-                    
+
                     const x = x0 * (1 - orbitProgress) + x1 * orbitProgress;
                     const y = y0 * (1 - orbitProgress) + y1 * orbitProgress;
                     const z = z0 * (1 - orbitProgress) + z1 * orbitProgress;
                     const rZ = rZ0 * (1 - orbitProgress) + rZ1 * orbitProgress;
-                    
+
                     const scale0 = (z0 + rZ0) / (2 * rZ0) * 0.5 + 0.5;
                     const maxScale = isMobile ? 1.0 : 2.0;
-                    const scale1 = (z1 + rZ1) / (2 * rZ1) * maxScale + 0.5; 
+                    const scale1 = (z1 + rZ1) / (2 * rZ1) * maxScale + 0.5;
                     const scale = scale0 * (1 - orbitProgress) + scale1 * orbitProgress;
-                    
-                    let opacity = (z + rZ) / (2 * rZ) * 0.8 + 0.2; 
+
+                    let opacity = (z + rZ) / (2 * rZ) * 0.8 + 0.2;
                     let blurPx = 0;
-                    
+
                     if (isMobile) {
                         const depth = 1 - ((z + rZ) / (2 * rZ)); // 0 at front, 1 at back
                         opacity = (z + rZ) / (2 * rZ) * 0.95 + 0.05; // Fade darker in back
                         blurPx = depth * 5; // Up to 5px blur based on depth
                     }
-                    
+
                     node.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
                     node.style.zIndex = Math.round(z + rZ);
                     node.style.opacity = opacity;
                     node.style.filter = blurPx > 0.1 ? `blur(${blurPx}px)` : 'none';
 
-                    const desiredHTML = (node === maxZNode && z > rZ * 0.9) 
-                        ? (node.dataset.hovered === "true" ? svgs[node.dataset.icon2] : svgs[node.dataset.icon1]) 
+                    const desiredHTML = (node === maxZNode && z > rZ * 0.9)
+                        ? (node.dataset.hovered === "true" ? svgs[node.dataset.icon2] : svgs[node.dataset.icon1])
                         : node.dataset.text;
-                        
+
                     if (node.innerHTML !== desiredHTML) {
                         node.innerHTML = desiredHTML;
                     }
@@ -350,7 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const joystickBase = document.getElementById('joystick-base');
     const joystickPuck = document.getElementById('joystick-puck');
 
-    if(joystickBase && joystickPuck) {
+    if (joystickBase && joystickPuck) {
         let isDragging = false;
         let startY = 0;
         let puckY = 0;
@@ -367,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: false });
 
         joystickBase.addEventListener('touchmove', (e) => {
-            if(!isDragging) return;
+            if (!isDragging) return;
             const currentY = e.touches[0].clientY;
             let deltaY = currentY - startY;
 
@@ -384,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
             puckY = 0;
             joystickPuck.style.transition = 'transform 0.2s ease-out';
             joystickPuck.style.transform = `translateY(0px)`;
-            
+
             if (wasDragging) {
                 // Directional magnetic snap when released
                 const wheelNodes = document.querySelectorAll('.wheel-node');
@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const snapAngle = 360 / wheelNodes.length;
                     const deltaRot = targetTrackRotation - dragStartRotation;
                     const startSnap = Math.round(dragStartRotation / snapAngle) * snapAngle;
-                    
+
                     if (deltaRot > 0.5) {
                         // Guaranteed snap forward
                         const targetSnap = Math.ceil(targetTrackRotation / snapAngle) * snapAngle;
