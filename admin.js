@@ -830,7 +830,7 @@
   function detailTable(headers, rows, totals) {
     let tfoot = '';
     if (totals) {
-      tfoot = '<tfoot><tr>' + totals.map((c, i) => `<td class="${i > 0 ? 'num' : ''}" style="${i > 0 && c !== '' ? 'font-weight: bold;' : 'font-weight: normal;'} border-top: 2px solid var(--text-main); padding-top: 8px;">${esc(String(c))}</td>`).join('') + '</tr></tfoot>';
+      tfoot = '<tfoot><tr>' + totals.map((c, i) => `<td class="${i > 0 ? 'num' : ''}" style="${i > 0 && c !== '' ? 'font-weight: bold;' : 'font-weight: normal;'} border-top: 2px solid var(--text-main); border-bottom: none; padding-top: 8px;">${esc(String(c))}</td>`).join('') + '</tr></tfoot>';
     }
     return '<table class="detail-table"><thead><tr>' +
       headers.map((h, i) => `<th class="${i > 0 ? 'num' : ''}">${esc(h)}</th>`).join('') +
@@ -856,7 +856,8 @@
       title = 'Pages — views & avg time';
       const rows = (d.top_pages || []).map(p => [p.path === '/' ? '/ (home)' : p.path, p.n, fmtTime(p.avg_sec)]);
       const totalViews = rows.reduce((s, r) => s + r[1], 0);
-      body = rows.length ? detailTable(['Page', 'Views', 'Avg time'], rows, ['Total', totalViews, '']) : '';
+      const overallAvgTime = d.kpis ? fmtTime(d.kpis.avg_time) : '';
+      body = rows.length ? detailTable(['Page', 'Views', 'Avg time'], rows, ['Total', totalViews, overallAvgTime]) : '';
     } else if (kind === 'leaderboard') {
       title = 'Game Leaderboard — all players';
       body = (d.leaderboard || []).length ? leaderboardTable(d.leaderboard) : '';
@@ -866,6 +867,7 @@
         const byDay = {};
         (d.daily || []).forEach(r => { byDay[r.day] = r; });
         const rows = [];
+        let tTimeSec = 0;
         for (let i = 0; i < daysCount; i++) {            // newest day first
           const dt = new Date(); dt.setDate(dt.getDate() - i);
           const key = dt.toISOString().slice(0, 10);
@@ -876,6 +878,7 @@
           const formattedDate = `${mm}/${dd}/${yy}`;
 
           const data = byDay[key] || { views: 0, time_sec: 0, game_plays: 0, downloads: 0, contact_clicks: 0 };
+          tTimeSec += (data.time_sec || 0);
           rows.push([
               formattedDate, 
               data.views || 0,
@@ -889,7 +892,7 @@
         const tGames = rows.reduce((s, r) => s + r[3], 0);
         const tDowns = rows.reduce((s, r) => s + r[4], 0);
         const tConts = rows.reduce((s, r) => s + r[5], 0);
-        return detailTable(['Day', 'Views', 'Time', 'Game Plays', 'Downloads', 'Contact Clicks'], rows, ['Total', tViews, '', tGames, tDowns, tConts]);
+        return detailTable(['Day', 'Views', 'Time', 'Game Plays', 'Downloads', 'Contact Clicks'], rows, ['Total', tViews, fmtTime(tTimeSec), tGames, tDowns, tConts]);
       };
 
       window._renderDetailedChart = (daysCount) => {
