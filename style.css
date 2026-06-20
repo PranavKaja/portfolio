@@ -2716,6 +2716,11 @@ body.game-active .trophy-container {
 /* Mobile: turn the trophy card into a centered modal popup instead of a hover card 
    to prevent it from clipping or looking attached to the top navbar. */
 @media (max-width: 768px) {
+    .trophy-container {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+    }
     .trophy-popup {
         position: fixed;
         top: 50vh;
