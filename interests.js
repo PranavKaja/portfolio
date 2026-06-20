@@ -19,14 +19,14 @@ const svgs = {
 };
 
 const descriptions = {
-    Automotive: "Passionate about modern engineering and performance. Exploring design language, aerodynamics, and the raw mechanics of motion.",
-    Cooking: "Exploring cultural histories through culinary traditions, flavor profiles, and the science of gastronomy.",
-    Adventure: "Seeking unknown paths. From alpine trails to navigating entirely new environments and challenges.",
-    Photography: "Capturing fleeting moments and architectural symmetry. Focusing on lighting, exposure, and raw composition.",
-    Gaming: "Analyzing interactive narratives, game loops, and the psychology behind engaging user experiences.",
-    Music: "Deconstructing rhythm and soundscapes. How auditory experiences shape emotion and drive atmospheric focus.",
-    Technology: "Obsessed with the bleeding edge. From hardware architecture to the algorithms that dictate the future.",
-    Plants: "Cultivating indoor environments. Understanding the patience and precise variables required for growth."
+    Automotive: "Cars, and the engineering that makes them move. I dig into design, aerodynamics, and the mechanics under the hood.",
+    Cooking: "I cook to learn where a dish comes from. The cuisines, the flavors, and the chemistry that makes them work.",
+    Adventure: "New trails, harder routes, places I haven't been. Half the fun is the trip, half is the problem-solving.",
+    Photography: "Light and framing do most of the work. I shoot architecture, sharp lines, and moments that don't wait around.",
+    Gaming: "What keeps you playing? I look at the stories, the game loops, and the choices that pull you back in.",
+    Music: "I listen for how a track is built. Rhythm, texture, and the way sound sets a mood.",
+    Technology: "I keep up with what's new. How the hardware is built, and how the software on top of it actually works.",
+    Plants: "I grow plants indoors. It takes patience and a read on what each one needs to stay alive."
 };
 
 const interestImages = {

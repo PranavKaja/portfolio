@@ -6,17 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Automating a 37-Location ETL Pipeline (2 Hours to 12 Minutes a Day) | Pranav Kaja</title>
     <meta name="description"
-        content="How Pranav Kaja automated a 37-location ETL pipeline at UMass Amherst Dining — cutting manual reporting from 2 hours a day to 12 minutes and making the numbers trustworthy enough to forecast on.">
+        content="How Pranav Kaja automated a 37-location ETL pipeline at UMass Amherst Dining, cutting manual reporting from 2 hours a day to 12 minutes and making the numbers trustworthy enough to forecast on.">
     <meta name="author" content="Pranav Kaja">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <meta property="og:title" content="Automating a 37-Location ETL Pipeline (2 Hours to 12 Minutes a Day)">
-    <meta property="og:description" content="The win wasn't a clever model — it was deleting two hours of manual reporting a day and making the data trustworthy.">
+    <meta property="og:description" content="The win wasn't a clever model. It was deleting two hours of manual reporting a day and making the data trustworthy.">
     <meta property="og:image" content="https://pranavkaja.vercel.app/images/og-card.png">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://pranavkaja.vercel.app/blog/automating-etl-pipeline">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Automating a 37-Location ETL Pipeline">
-    <meta name="twitter:description" content="From 2 hours of manual reporting a day to 12 minutes — and data you can forecast on.">
+    <meta name="twitter:description" content="From 2 hours of manual reporting a day to 12 minutes, and data you can forecast on.">
     <meta name="twitter:image" content="https://pranavkaja.vercel.app/images/og-card.png">
     <link rel="canonical" href="https://pranavkaja.vercel.app/blog/automating-etl-pipeline">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -71,24 +71,24 @@
                 numbers from each location, pasted them into a master sheet, reconciled the inevitable mismatches, and
                 only then could anyone ask an actual question of the data. By the time the report was ready, it was
                 already stale.</p>
-            <p>None of that was a modeling problem. It was an <strong>ETL</strong> problem — extract, transform, load —
+            <p>None of that was a modeling problem. It was an <strong>ETL</strong> problem (extract, transform, load),
                 and it was being done by hand. So I automated it.</p>
 
             <h2>Extract: meet the data where it lives</h2>
-            <p>Thirty-seven locations means thirty-seven slightly different habits — different column orders, different
+            <p>Thirty-seven locations means thirty-seven slightly different habits. Different column orders, different
                 names for the same thing, the occasional missing day. The first job wasn't transformation, it was
                 building extraction that tolerates that mess instead of breaking on it. Standardize on ingest, log what
                 doesn't fit, and never silently drop a row.</p>
 
             <h2>Transform: make it boring and repeatable</h2>
             <p>The transform layer normalizes everything into one shape: consistent keys, consistent units, consistent
-                location IDs. The rule I held onto was <strong>idempotency</strong> — running the pipeline twice on the
+                location IDs. The rule I held onto was <strong>idempotency</strong>. Running the pipeline twice on the
                 same inputs produces exactly the same output. That's what lets you re-run it without fear when a
                 location submits a correction at 4pm.</p>
             <ul class="ops-points">
                 <li>Validate at the edges: row counts, value ranges, and "does every location actually show up today?"
                     checks that fail loudly instead of producing a quietly wrong number.</li>
-                <li>Keep an audit trail — what ran, when, and what it touched — so the next person (or future me) can
+                <li>Keep an audit trail of what ran, when, and what it touched, so the next person (or future me) can
                     actually read what happened.</li>
                 <li>Write the logic so a teammate can follow it. A pipeline only one person understands is a liability,
                     not an asset.</li>
@@ -96,19 +96,19 @@
 
             <h2>Load: one source of truth</h2>
             <p>Everything lands in a single reporting layer, so leadership stops reconciling spreadsheets and starts
-                asking questions. The two hours of manual reporting dropped to about <strong>12 minutes</strong> — and
+                asking questions. The two hours of manual reporting dropped to about <strong>12 minutes</strong>, and
                 most of that is now review, not assembly.</p>
 
             <h2>The real payoff: forecasting on data you trust</h2>
             <p>Once the numbers were consistent and current, they were good enough to <strong>forecast on</strong>. That
-                opened the door to data-driven inventory forecasting across locations — anticipating demand instead of
+                opened the door to data-driven inventory forecasting across locations, anticipating demand instead of
                 reacting to last week's stockout. You can't forecast on data you don't trust, and you can't trust data
                 that's reassembled by hand every morning.</p>
 
             <blockquote>The lesson I keep relearning: the highest-leverage data work is often the least glamorous.
                 Remove the toil, make the inputs trustworthy, and the interesting analysis becomes possible.</blockquote>
 
-            <p style="margin-top: 8px; font-size: 0.92rem; color: var(--text-muted);"><em>Working draft — I'll expand
+            <p style="margin-top: 8px; font-size: 0.92rem; color: var(--text-muted);"><em>Working draft. I'll expand
                 this with the specific tooling and a before/after diagram.</em></p>
         </article>
 

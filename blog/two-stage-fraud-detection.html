@@ -10,13 +10,13 @@
     <meta name="author" content="Pranav Kaja">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <meta property="og:title" content="Two-Stage Fraud Detection: XGBoost for Speed, an LLM for Reasoning">
-    <meta property="og:description" content="A reasoning layer on top of a classical model — and the case where the LLM caught a fraud the model scored 0.000000.">
+    <meta property="og:description" content="A reasoning layer on top of a classical model, and the case where the LLM caught a fraud the model scored 0.000000.">
     <meta property="og:image" content="https://pranavkaja.vercel.app/images/og-card.png">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://pranavkaja.vercel.app/blog/two-stage-fraud-detection">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Two-Stage Fraud Detection: XGBoost + an LLM">
-    <meta name="twitter:description" content="A reasoning layer on top of a classical model — and the case where the LLM caught a fraud the model scored 0.000000.">
+    <meta name="twitter:description" content="A reasoning layer on top of a classical model, and the case where the LLM caught a fraud the model scored 0.000000.">
     <meta name="twitter:image" content="https://pranavkaja.vercel.app/images/og-card.png">
     <link rel="canonical" href="https://pranavkaja.vercel.app/blog/two-stage-fraud-detection">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -63,26 +63,26 @@
             <h1 class="hero-title" style="font-size: 2.6rem; line-height: 1.1;">Two-Stage Fraud Detection: XGBoost for
                 Speed, an LLM for Reasoning</h1>
             <p class="hero-subtitle">A classical model is great at the bulk of cases. A reasoning layer on top catches
-                what it misses — and tells the analyst why.</p>
+                what it misses, and tells the analyst why.</p>
         </header>
 
         <article class="section post-body">
             <p>Most fraud systems hand the analyst a number. The model scores a transaction <code>0.87</code> and the
                 analyst has to figure out, from scratch, <em>why</em> it looks suspicious and what to do about it. That's
-                fine at low volume and brutal at scale — card networks see millions of transactions a day, under 1% of
+                fine at low volume and brutal at scale. Card networks see millions of transactions a day, under 1% of
                 them fraud, each one real money.</p>
             <p>So I built a two-stage pipeline that splits the job between two systems that are each good at different
                 things.</p>
 
-            <h2>Stage 1 — XGBoost scores everything</h2>
+            <h2>Stage 1: XGBoost scores everything</h2>
             <p>A gradient-boosted model trained on 284,807 historical card transactions scores every transaction with a
                 fraud probability. It's fast and cheap, so it scales to the full firehose and flags only the highest-risk
                 handful for review.</p>
 
-            <h2>Stage 2 — an LLM reasons about the few</h2>
+            <h2>Stage 2: an LLM reasons about the few</h2>
             <p>Each flagged transaction goes to a Google Gemini triage agent that reads the raw feature values and writes
-                a structured case file — verdict, confidence, the primary signals, the reasoning, and a recommended
-                action — in a fixed JSON shape:</p>
+                a structured case file in a fixed JSON shape. It gives the verdict, the confidence, the primary signals,
+                the reasoning, and a recommended action:</p>
             <blockquote><code>{ "verdict": "block", "confidence": 0.92, "primary_signals": ["V14","V10","V12"],
                 "reasoning": "Multiple anomalous patterns coincide with an elevated model score, consistent with
                 card-testing fraud.", "recommended_action": "Block and trigger SMS verification." }</code></blockquote>
@@ -91,31 +91,31 @@
                 the model already flagged, you only pay its cost where it earns its keep.</p>
 
             <h2>The case that justified the whole thing</h2>
-            <p>During testing, one transaction scored <code>0.000000</code> — the model was certain it was legitimate. It
+            <p>During testing, one transaction scored <code>0.000000</code>. The model was certain it was legitimate. It
                 was actually fraud. The model would have let it through. The LLM, reading the raw features rather than the
                 model's confidence, noticed several anomalous signals and flagged it anyway.</p>
             <p>That's the entire argument for two layers: the model is excellent on the bulk of cases but has occasional
                 blind spots, and a second opinion that reasons differently sometimes catches what it missed.</p>
 
             <h2>The engineering arc</h2>
-            <p>It didn't start clean. A vanilla gradient-boosting baseline stalled at 0.60 AUC — barely better than a coin
-                flip. The cause wasn't the algorithm; it was the data: a 577-to-1 class imbalance was drowning the loss
+            <p>It didn't start clean. A vanilla gradient-boosting baseline stalled at 0.60 AUC, barely better than a coin
+                flip. The cause wasn't the algorithm. It was the data: a 577-to-1 class imbalance was drowning the loss
                 function, and 1,081 duplicate rows pushed it toward bimodal predictions that broke the metric.</p>
             <ul class="ops-points">
                 <li>Switching to XGBoost with <code>scale_pos_weight=577</code> told the model to weight fraud examples
-                    577&times; during training; L2 regularization smoothed the duplicate-row impact. AUC jumped from 0.60
+                    577&times; during training. L2 regularization smoothed the duplicate-row impact. AUC jumped from 0.60
                     to <strong>0.978</strong>, at 84% recall and 84% precision on the rare class.</li>
-                <li>The LLM layer enforces JSON with <code>response_mime_type="application/json"</code> — no regex
+                <li>The LLM layer enforces JSON with <code>response_mime_type="application/json"</code>. No regex
                     parsing, no markdown fences to strip.</li>
-                <li>Only the top 5 most anomalous features go in the prompt, not all 30 — focused prompts, lower tokens.</li>
+                <li>Only the top 5 most anomalous features go in the prompt, not all 30. Focused prompts, lower tokens.</li>
                 <li>A rate-limited batch processor handles 100 transactions in ~10 minutes with caching, so a dropped
-                    session loses no work, and projects cost across 1K&ndash;1M daily volumes (~$30/month at 100K/day).</li>
+                    session loses no work, and projects cost across 1K to 1M daily volumes (~$30/month at 100K/day).</li>
             </ul>
 
             <h2>Why it matters</h2>
-            <p>The interesting part isn't the AUC — it's the shape. This is how major payments teams are starting to
+            <p>The interesting part isn't the AUC. It's the shape. This is how major payments teams are starting to
                 deploy LLMs internally: as a reasoning layer <em>on top of</em> traditional ML, not as a replacement.
-                The model gives you speed; the LLM gives you explainability and an audit trail. You don't have to pick.</p>
+                The model gives you speed. The LLM gives you explainability and an audit trail. You don't have to pick.</p>
             <p style="margin-top: 26px;"><a href="/projects/fraud-triage" style="color: var(--accent-text); font-weight: 600;">&rarr; See the full project case file</a></p>
         </article>
 
