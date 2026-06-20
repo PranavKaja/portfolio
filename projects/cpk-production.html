@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -10,13 +9,15 @@
     <meta name="author" content="Pranav Kaja">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <meta property="og:title" content="CPK Production Planner — Order-to-Prep Tool | Pranav Kaja">
-    <meta property="og:description" content="Paste the day's order report; get the make list + per-station pick sheets across 36 locations. Live, in-browser.">
+    <meta property="og:description"
+        content="Paste the day's order report; get the make list + per-station pick sheets across 36 locations. Live, in-browser.">
     <meta property="og:image" content="https://pranavkaja.vercel.app/images/og-card.png">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://pranavkaja.vercel.app/projects/cpk-production">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="CPK Production Planner — Order-to-Prep Tool">
-    <meta name="twitter:description" content="Paste the day's order report; get the make list + per-station pick sheets. Live, in-browser.">
+    <meta name="twitter:description"
+        content="Paste the day's order report; get the make list + per-station pick sheets. Live, in-browser.">
     <meta name="twitter:image" content="https://pranavkaja.vercel.app/images/og-card.png">
     <link rel="canonical" href="https://pranavkaja.vercel.app/projects/cpk-production">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -47,70 +48,331 @@
     }
     </script>
     <style>
-        .cpk-wrap { border: 2px solid var(--text-main); background: var(--bg); padding: 0; margin-top: 10px; }
-        .cpk-io { padding: 22px; }
-        .cpk-label { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; letter-spacing: 1.5px;
-            text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; display: block; }
-        #cpk-input { width: 100%; min-height: 180px; resize: vertical; font-family: 'Share Tech Mono', monospace;
-            font-size: 0.85rem; line-height: 1.5; border: 1px solid var(--text-main); padding: 12px;
-            background: var(--panel-bg); color: var(--text-main); white-space: pre; overflow-x: auto; }
-        #cpk-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-        #cpk-input.cpk-drag { outline: 2px dashed var(--accent); outline-offset: 1px; background: var(--panel-bg); }
-        #cpk-file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
-        .cpk-upload { padding: 12px 20px; cursor: pointer; }
-        .cpk-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 14px; }
-        .cpk-meta { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: var(--text-muted); margin-left: auto; }
-        .cpk-tabs { display: flex; gap: 2px; border-top: 2px solid var(--text-main); border-bottom: 1px solid var(--border);
-            background: var(--panel-bg); flex-wrap: wrap; }
-        .cpk-tab { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase;
-            background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-muted);
-            padding: 12px 18px; cursor: pointer; }
-        .cpk-tab:hover { color: var(--text-main); }
-        .cpk-tab.active { color: var(--text-main); border-bottom-color: var(--accent); }
-        .cpk-tab.soon { opacity: 0.5; cursor: not-allowed; }
-        #cpk-output { padding: 22px; overflow-x: auto; }
-        .cpk-empty, .cpk-hint { font-family: 'Share Tech Mono', monospace; color: var(--text-muted); font-size: 0.85rem; }
-        .cpk-hint { margin-top: 12px; }
-        .cpk-warn { font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; line-height: 1.5;
-            color: var(--accent-text, #c2410c); margin-top: 14px; }
-        .cpk-conv { color: var(--text-muted); font-size: 0.82em; }
-        .cpk-scroll { overflow-x: auto; }
-        .cpk-table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
-        .cpk-table th { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; letter-spacing: 1px;
-            text-transform: uppercase; color: var(--text-muted); text-align: left; padding: 8px 12px;
-            border-bottom: 2px solid var(--text-main); white-space: nowrap; }
-        .cpk-table td { padding: 7px 12px; border-bottom: 1px solid var(--border); }
-        .cpk-table td.num, .cpk-table th.num { text-align: right; font-family: 'Space Mono', monospace; }
-        .cpk-table td.mono { font-family: 'Share Tech Mono', monospace; color: var(--accent-text); }
-        .cpk-table td.strong, .cpk-table .strong { font-weight: 700; }
-        .cpk-table tfoot td, .cpk-table tr.totals td { border-top: 2px solid var(--text-main); border-bottom: none;
-            font-weight: 700; background: var(--panel-bg); }
-        .cpk-pivot td.loc { font-weight: 600; white-space: nowrap; }
-        .cpk-pivot td.zero { color: var(--border); }
-        .cpk-pivot th, .cpk-pivot td { border-right: 1px solid var(--border); }
-        .cpk-routing { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
-        .cpk-loccard { border: 1px solid var(--border); border-left: 3px solid var(--text-main); }
-        .cpk-lochead { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 12px;
-            background: var(--panel-bg); border-bottom: 1px solid var(--border); }
-        .cpk-locname { font-weight: 700; font-size: 0.92rem; }
-        .cpk-loctot { margin-left: auto; font-family: 'Space Mono', monospace; font-size: 0.76rem; color: var(--text-muted); }
-        .cpk-badge { font-family: 'Share Tech Mono', monospace; font-size: 0.56rem; letter-spacing: 0.5px;
-            text-transform: uppercase; padding: 2px 6px; border: 1px solid currentColor; border-radius: 2px; }
-        .cpk-badge.cpk-dc { color: var(--accent-text); }
-        .cpk-badge.cpk-retail { color: #2b8a3e; }
-        .cpk-loccard .cpk-table td { padding: 5px 12px; font-size: 0.85rem; }
-        .cpk-sheet-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-bottom: 14px; }
-        .cpk-sheet-title { margin: 0; font-size: 1.15rem; letter-spacing: 0.5px; }
-        .cpk-date { font-family: 'Share Tech Mono', monospace; font-size: 0.74rem; color: var(--text-muted);
-            text-transform: uppercase; letter-spacing: 1px; margin-left: auto; }
-        .cpk-grid2 { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 22px; align-items: start; }
-        @media (max-width: 720px) { .cpk-grid2 { grid-template-columns: 1fr; } }
-        .cpk-block-label { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 1.5px;
-            text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
-        .cpk-secrow td { background: var(--panel-bg); font-family: 'Share Tech Mono', monospace; font-size: 0.68rem;
-            letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent-text); padding-top: 10px; }
-        .cpk-note { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; color: var(--text-muted); }
-        .cpk-bread td:first-child { white-space: nowrap; }
+        .cpk-wrap {
+            border: 2px solid var(--text-main);
+            background: var(--bg);
+            padding: 0;
+            margin-top: 10px;
+        }
+
+        .cpk-io {
+            padding: 22px;
+        }
+
+        .cpk-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        #cpk-input {
+            width: 100%;
+            min-height: 180px;
+            resize: vertical;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            border: 1px solid var(--text-main);
+            padding: 12px;
+            background: var(--panel-bg);
+            color: var(--text-main);
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        #cpk-input:focus {
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+        }
+
+        #cpk-input.cpk-drag {
+            outline: 2px dashed var(--accent);
+            outline-offset: 1px;
+            background: var(--panel-bg);
+        }
+
+        #cpk-file {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .cpk-upload {
+            padding: 12px 20px;
+            cursor: pointer;
+        }
+
+        .cpk-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-top: 14px;
+        }
+
+        .cpk-meta {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        .cpk-tabs {
+            display: flex;
+            gap: 2px;
+            border-top: 2px solid var(--text-main);
+            border-bottom: 1px solid var(--border);
+            background: var(--panel-bg);
+            flex-wrap: wrap;
+        }
+
+        .cpk-tab {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-muted);
+            padding: 12px 18px;
+            cursor: pointer;
+        }
+
+        .cpk-tab:hover {
+            color: var(--text-main);
+        }
+
+        .cpk-tab.active {
+            color: var(--text-main);
+            border-bottom-color: var(--accent);
+        }
+
+        .cpk-tab.soon {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #cpk-output {
+            padding: 22px;
+            overflow-x: auto;
+        }
+
+        .cpk-empty,
+        .cpk-hint {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .cpk-hint {
+            margin-top: 12px;
+        }
+
+        .cpk-warn {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.78rem;
+            line-height: 1.5;
+            color: var(--accent-text, #c2410c);
+            margin-top: 14px;
+        }
+
+        .cpk-conv {
+            color: var(--text-muted);
+            font-size: 0.82em;
+        }
+
+        .cpk-scroll {
+            overflow-x: auto;
+        }
+
+        .cpk-table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+        .cpk-table th {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.68rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            text-align: left;
+            padding: 8px 12px;
+            border-bottom: 2px solid var(--text-main);
+            white-space: nowrap;
+        }
+
+        .cpk-table td {
+            padding: 7px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cpk-table td.num,
+        .cpk-table th.num {
+            text-align: right;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .cpk-table td.mono {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--accent-text);
+        }
+
+        .cpk-table td.strong,
+        .cpk-table .strong {
+            font-weight: 700;
+        }
+
+        .cpk-table tfoot td,
+        .cpk-table tr.totals td {
+            border-top: 2px solid var(--text-main);
+            border-bottom: none;
+            font-weight: 700;
+            background: var(--panel-bg);
+        }
+
+        .cpk-pivot td.loc {
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .cpk-pivot td.zero {
+            color: var(--border);
+        }
+
+        .cpk-pivot th,
+        .cpk-pivot td {
+            border-right: 1px solid var(--border);
+        }
+
+        .cpk-routing {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 16px;
+        }
+
+        .cpk-loccard {
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--text-main);
+        }
+
+        .cpk-lochead {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cpk-locname {
+            font-weight: 700;
+            font-size: 0.92rem;
+        }
+
+        .cpk-loctot {
+            margin-left: auto;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.76rem;
+            color: var(--text-muted);
+        }
+
+        .cpk-badge {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.56rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border: 1px solid currentColor;
+            border-radius: 2px;
+        }
+
+        .cpk-badge.cpk-dc {
+            color: var(--accent-text);
+        }
+
+        .cpk-badge.cpk-retail {
+            color: #2b8a3e;
+        }
+
+        .cpk-loccard .cpk-table td {
+            padding: 5px 12px;
+            font-size: 0.85rem;
+        }
+
+        .cpk-sheet-head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .cpk-sheet-title {
+            margin: 0;
+            font-size: 1.15rem;
+            letter-spacing: 0.5px;
+        }
+
+        .cpk-date {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-left: auto;
+        }
+
+        .cpk-grid2 {
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        @media (max-width: 720px) {
+            .cpk-grid2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .cpk-block-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .cpk-secrow td {
+            background: var(--panel-bg);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.68rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--accent-text);
+            padding-top: 10px;
+        }
+
+        .cpk-note {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .cpk-bread td:first-child {
+            white-space: nowrap;
+        }
     </style>
 </head>
 
@@ -125,21 +387,26 @@
         <header class="hero">
             <div class="hero-label mb-20"><span class="status-dot"></span>LIVE TOOL // TRY IT</div>
             <h1 class="hero-title" style="font-size: 2.7rem; line-height: 1.05;">CPK PRODUCTION PLANNER</h1>
-            <p class="hero-subtitle">Paste the central kitchen's daily Orders Recap and get back every production sheet —
-                DC &amp; Retail make lists, bread, prep, fruit, packout and stickers — across 36 campus locations. Replaces
+            <p class="hero-subtitle">Paste the central kitchen's daily Orders Recap and get back every production sheet
+                —
+                DC &amp; Retail make lists, bread, prep, fruit, packout and stickers — across 36 campus locations.
+                Replaces
                 a hand-built 39-tab spreadsheet. Runs entirely in your browser; nothing is sent anywhere.</p>
         </header>
 
         <section class="section">
             <div class="cpk-wrap">
                 <div class="cpk-io">
-                    <label class="cpk-label" for="cpk-input">// Paste the order report, or upload / drop a .txt file (sample is loaded — just hit Generate)</label>
+                    <label class="cpk-label" for="cpk-input">// Paste the order report, or upload / drop a .txt file
+                        (sample is loaded — just hit Generate)</label>
                     <textarea id="cpk-input" spellcheck="false" aria-label="Order report input"></textarea>
                     <div class="cpk-controls">
                         <button class="btn btn-primary" id="cpk-gen" style="padding:12px 26px;">GENERATE</button>
                         <label class="btn btn-secondary cpk-upload" for="cpk-file">UPLOAD FILE</label>
-                        <input type="file" id="cpk-file" accept=".txt,.csv,.tsv,text/plain" aria-label="Upload order report file">
-                        <button class="btn btn-secondary" id="cpk-sample" style="padding:12px 20px;">LOAD SAMPLE</button>
+                        <input type="file" id="cpk-file" accept=".txt,.csv,.tsv,text/plain"
+                            aria-label="Upload order report file">
+                        <button class="btn btn-secondary" id="cpk-sample" style="padding:12px 20px;">LOAD
+                            SAMPLE</button>
                         <button class="btn btn-secondary" id="cpk-clear" style="padding:12px 20px;">CLEAR</button>
                         <span class="cpk-meta" id="cpk-meta"></span>
                     </div>
@@ -157,16 +424,24 @@
         </section>
 
         <section class="section">
-            <div class="section-header"><h2>HOW IT WORKS</h2><div class="line"></div></div>
+            <div class="section-header">
+                <h2>HOW IT WORKS</h2>
+                <div class="line"></div>
+            </div>
             <ul class="ops-points" style="max-width: 760px;">
-                <li><strong>Paste or upload</strong> the day's Orders Recap — each line is one caf&eacute; ordering N of an
+                <li><strong>Paste or upload</strong> the day's Orders Recap — each line is one caf&eacute; ordering N of
+                    an
                     item. A file holding several days is fine; it uses the first recap.</li>
-                <li><strong>DC G&amp;G</strong> &amp; <strong>Retail G&amp;G</strong> are the make sheets: how many of each
-                    sandwich, salad and wrap to build, split into the Worcester DC batch vs. the retail caf&eacute;s, each
+                <li><strong>DC G&amp;G</strong> &amp; <strong>Retail G&amp;G</strong> are the make sheets: how many of
+                    each
+                    sandwich, salad and wrap to build, split into the Worcester DC batch vs. the retail caf&eacute;s,
+                    each
                     with its bread-to-defrost and chicken-to-cook totals.</li>
                 <li><strong>Fruit</strong> totals the fruit cups and the bulk fruit (lbs) to cut.</li>
-                <li><strong>Prep</strong> rolls every order up into sliced meats, cheeses, vegetables and dressings to prep.</li>
-                <li><strong>Packout</strong> is the per-caf&eacute; pick grid with tray counts; <strong>Stickers</strong> is
+                <li><strong>Prep</strong> rolls every order up into sliced meats, cheeses, vegetables and dressings to
+                    prep.</li>
+                <li><strong>Packout</strong> is the per-caf&eacute; pick grid with tray counts;
+                    <strong>Stickers</strong> is
                     the label run &mdash; DC (FoodPro) and retail (Harvest Fresh).</li>
             </ul>
             <p style="font-size: 0.92rem; color: var(--text-muted); margin-top: 12px;">

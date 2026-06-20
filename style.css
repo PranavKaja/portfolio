@@ -745,7 +745,11 @@ h2.hover-swap {
     transition: background 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
     font-family: 'Share Tech Mono', monospace;
     cursor: none;
-    will-change: transform, opacity, filter;
+    /* No will-change: transform here. It cached each node as a fixed-resolution
+       GPU texture, and the per-frame scale() (depth zoom) then upsampled that
+       small bitmap — making the text/icons blurry at rest and only snapping
+       sharp when :hover forced a repaint. Re-rasterizing per frame keeps the 8
+       nodes crisp; the intentional depth softness is the JS blur() filter. */
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
