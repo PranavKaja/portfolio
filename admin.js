@@ -830,7 +830,7 @@
   function detailTable(headers, rows, totals) {
     let tfoot = '';
     if (totals) {
-      tfoot = '<tfoot><tr>' + totals.map((c, i) => `<td class="${i > 0 ? 'num' : ''}" style="font-weight: bold; border-top: 1px solid var(--border); padding-top: 8px;">${esc(String(c))}</td>`).join('') + '</tr></tfoot>';
+      tfoot = '<tfoot><tr>' + totals.map((c, i) => `<td class="${i > 0 ? 'num' : ''}" style="${i > 0 && c !== '' ? 'font-weight: bold;' : 'font-weight: normal;'} border-top: 2px solid var(--text-main); padding-top: 8px;">${esc(String(c))}</td>`).join('') + '</tr></tfoot>';
     }
     return '<table class="detail-table"><thead><tr>' +
       headers.map((h, i) => `<th class="${i > 0 ? 'num' : ''}">${esc(h)}</th>`).join('') +
