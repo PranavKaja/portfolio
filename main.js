@@ -622,43 +622,65 @@ window.addEventListener('load', () => {
         const trophyContainer = document.createElement('div');
         trophyContainer.className = 'trophy-container';
         
+        const popupHTML = `
+            <button class="trophy-close" aria-label="Close Trophy">&times;</button>
+            <p>You've been exploring for a while!<br>Thank you for taking the<br>time to dive into my work.<br>I'd love to hear from you.<br>let's connect!</p>
+            <a href="contact.html" class="trophy-btn">CONNECT WITH ME</a>
+        `;
+
         trophyContainer.innerHTML = `
             <span class="trophy-icon" role="button" tabindex="0" aria-expanded="false" aria-label="Trophy unlocked — open message">🏆</span>
-            <div class="trophy-popup">
-                <button class="trophy-close" aria-label="Close Trophy">&times;</button>
-                <p>You've been exploring for a while!<br>Thank you for taking the<br>time to dive into my work.<br>I'd love to hear from you.<br>let's connect!</p>
-                <a href="contact.html" class="trophy-btn">CONNECT WITH ME</a>
-            </div>
+            <div class="trophy-popup desktop-popup">${popupHTML}</div>
         `;
 
         wrapper.appendChild(trophyContainer);
+
+        const mobileModal = document.createElement('div');
+        mobileModal.className = 'trophy-mobile-modal hidden';
+        mobileModal.innerHTML = `<div class="trophy-mobile-content">${popupHTML}</div>`;
+        document.body.appendChild(mobileModal);
 
         // Spawn subtle confetti
         const rect = trophyContainer.getBoundingClientRect();
         spawnConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
 
-        const closeBtn = trophyContainer.querySelector('.trophy-close');
-        closeBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
+        const closeTrophy = (e) => {
+            if (e) { e.preventDefault(); e.stopPropagation(); }
             trophyContainer.remove();
+            mobileModal.remove();
             trophyInjected = false;
-            // Reset timer for another 2 minutes
             localStorage.setItem('site_visit_start', Date.now());
-        });
+        };
+
+        const closeBtns = [
+            trophyContainer.querySelector('.trophy-close'),
+            mobileModal.querySelector('.trophy-close')
+        ];
+        closeBtns.forEach(btn => btn?.addEventListener('click', closeTrophy));
 
         // Hover shows the popup on a mouse; tap/click/keyboard toggles it so
         // touch and keyboard users can open it too (was hover-only).
         const icon = trophyContainer.querySelector('.trophy-icon');
         const togglePopup = (force) => {
-            const open = typeof force === 'boolean' ? force : !trophyContainer.classList.contains('open');
-            trophyContainer.classList.toggle('open', open);
-            icon.setAttribute('aria-expanded', open ? 'true' : 'false');
+            if (window.innerWidth <= 768) {
+                const open = typeof force === 'boolean' ? force : mobileModal.classList.contains('hidden');
+                mobileModal.classList.toggle('hidden', !open);
+                icon.setAttribute('aria-expanded', open ? 'true' : 'false');
+            } else {
+                const open = typeof force === 'boolean' ? force : !trophyContainer.classList.contains('open');
+                trophyContainer.classList.toggle('open', open);
+                icon.setAttribute('aria-expanded', open ? 'true' : 'false');
+            }
         };
         icon.addEventListener('click', () => togglePopup());
         icon.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePopup(); }
             else if (e.key === 'Escape') { togglePopup(false); }
+        });
+
+        // Close mobile modal on outside tap
+        mobileModal.addEventListener('click', (e) => {
+            if (e.target === mobileModal) togglePopup(false);
         });
     }
 

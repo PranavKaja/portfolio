@@ -2713,7 +2713,68 @@ body.game-active .trophy-container {
     box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
 }
 
+/* ---- Dedicated Mobile Modal (injected to body) ---- */
+.trophy-mobile-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.trophy-mobile-modal:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+.trophy-mobile-content {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 30px 20px;
+    width: 100%;
+    max-width: 350px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    position: relative;
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.trophy-mobile-modal:not(.hidden) .trophy-mobile-content {
+    transform: translateY(0) scale(1);
+}
+.trophy-mobile-content .trophy-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 5px;
+}
+.trophy-mobile-content p {
+    font-size: 0.95rem;
+    color: var(--text-main);
+    line-height: 1.5;
+    margin: 0 0 20px 0;
+}
 
+@media (min-width: 769px) {
+    .trophy-mobile-modal { display: none !important; }
+}
+@media (max-width: 768px) {
+    .desktop-popup { display: none !important; }
+}
 
 
 /* ============================================================
