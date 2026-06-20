@@ -827,10 +827,20 @@
   }
 
   // ---- drill-down: click any Intel card → full breakdown ----
+  function fmtTimeHM(s) {
+    s = Math.round(s || 0);
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const ss = s % 60;
+    if (h > 0) return `${h}h ${m}m`;
+    if (m > 0) return `${m}m ${ss}s`;
+    return `${ss}s`;
+  }
+
   function detailTable(headers, rows, totals) {
     let tfoot = '';
     if (totals) {
-      tfoot = '<tfoot><tr>' + totals.map((c, i) => `<td class="${i > 0 ? 'num' : ''}" style="${i > 0 && c !== '' ? 'font-weight: bold;' : 'font-weight: normal;'} border-top: 2px solid var(--text-main); border-bottom: none; padding-top: 8px;">${esc(String(c))}</td>`).join('') + '</tr></tfoot>';
+      tfoot = '<tfoot style="border-bottom: none !important;"><tr style="border-bottom: none !important;">' + totals.map((c, i) => `<td class="${i > 0 ? 'num' : ''}" style="${i > 0 && c !== '' ? 'font-weight: bold;' : 'font-weight: normal;'} border-top: 2px solid var(--text-main) !important; border-bottom: none !important; padding-top: 8px;">${esc(String(c))}</td>`).join('') + '</tr></tfoot>';
     }
     return '<table class="detail-table"><thead><tr>' +
       headers.map((h, i) => `<th class="${i > 0 ? 'num' : ''}">${esc(h)}</th>`).join('') +
@@ -856,7 +866,7 @@
       title = 'Pages — views & avg time';
       const rows = (d.top_pages || []).map(p => [p.path === '/' ? '/ (home)' : p.path, p.n, fmtTime(p.avg_sec)]);
       const totalViews = rows.reduce((s, r) => s + r[1], 0);
-      const overallAvgTime = d.kpis ? fmtTime(d.kpis.avg_time) : '';
+      const overallAvgTime = d.kpis ? fmtTimeHM(d.kpis.avg_time) : '';
       body = rows.length ? detailTable(['Page', 'Views', 'Avg time'], rows, ['Total', totalViews, overallAvgTime]) : '';
     } else if (kind === 'leaderboard') {
       title = 'Game Leaderboard — all players';
@@ -892,7 +902,7 @@
         const tGames = rows.reduce((s, r) => s + r[3], 0);
         const tDowns = rows.reduce((s, r) => s + r[4], 0);
         const tConts = rows.reduce((s, r) => s + r[5], 0);
-        return detailTable(['Day', 'Views', 'Time', 'Game Plays', 'Downloads', 'Contact Clicks'], rows, ['Total', tViews, fmtTime(tTimeSec), tGames, tDowns, tConts]);
+        return detailTable(['Day', 'Views', 'Time', 'Game Plays', 'Downloads', 'Contact Clicks'], rows, ['Total', tViews, fmtTimeHM(tTimeSec), tGames, tDowns, tConts]);
       };
 
       window._renderDetailedChart = (daysCount) => {
