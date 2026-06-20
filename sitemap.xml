@@ -45,6 +45,7 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url><loc>https://pranavkaja.vercel.app/blog/how-this-site-works</loc><lastmod>2026-06-20</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://pranavkaja.vercel.app/blog/two-stage-fraud-detection</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://pranavkaja.vercel.app/blog/automating-etl-pipeline</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>

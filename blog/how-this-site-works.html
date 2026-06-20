@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How This Site Works: A Tour Under the Hood | Pranav Kaja</title>
+    <meta name="description"
+        content="A guided, interactive tour of how pranavkaja.vercel.app is actually built — a static front end on Vercel talking straight to a Supabase Postgres database, the security model that makes that safe, the signature project reveal, and the admin console behind it.">
+    <meta name="author" content="Pranav Kaja">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta property="og:title" content="How This Site Works: A Tour Under the Hood">
+    <meta property="og:description" content="No backend server, yet a real database. How a static site talks straight to Postgres — safely — plus the admin console and the tricks worth knowing.">
+    <meta property="og:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://pranavkaja.vercel.app/blog/how-this-site-works">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="How This Site Works: A Tour Under the Hood">
+    <meta name="twitter:description" content="A static front end talking straight to Postgres — safely. The architecture, the database, the admin console, and the tricks.">
+    <meta name="twitter:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+    <link rel="canonical" href="https://pranavkaja.vercel.app/blog/how-this-site-works">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        { "@type": "BlogPosting",
+          "headline": "How This Site Works: A Tour Under the Hood",
+          "description": "An interactive walkthrough of how pranavkaja.vercel.app is built: a static front end on Vercel that talks straight to a Supabase Postgres database, the Row Level Security model that makes shipping the key safe, the three data flows, the signature 3-tier project reveal, and the admin console.",
+          "author": { "@type": "Person", "name": "Pranav Kaja", "url": "https://pranavkaja.vercel.app/" },
+          "publisher": { "@type": "Person", "name": "Pranav Kaja" },
+          "datePublished": "2026-06-20", "dateModified": "2026-06-20",
+          "url": "https://pranavkaja.vercel.app/blog/how-this-site-works",
+          "image": "https://pranavkaja.vercel.app/images/og-card.png",
+          "keywords": "web architecture, static site, Supabase, Postgres, Row Level Security, RLS, PostgREST, serverless, Vercel, portfolio engineering, Pranav Kaja",
+          "mainEntityOfPage": "https://pranavkaja.vercel.app/blog/how-this-site-works", "inLanguage": "en" },
+        { "@type": "BreadcrumbList", "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://pranavkaja.vercel.app/" },
+          { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://pranavkaja.vercel.app/blog" },
+          { "@type": "ListItem", "position": 3, "name": "How This Site Works", "item": "https://pranavkaja.vercel.app/blog/how-this-site-works" } ] }
+      ]
+    }
+    </script>
+
+    <style>
+    /* ============================================================
+       Scoped styles for this post only (prefix: ht-).
+       Deliberately light on orange — the interactive accent is a
+       calm teal, with the site's orange kept for tiny highlights.
+       ============================================================ */
+    #howto{
+      --ht-ink:#18181b; --ht-muted:#6d6d75; --ht-line:#e4e4e7;
+      --ht-panel:#f7f7f8; --ht-card:#ffffff;
+      --ht-accent:#0d9488;      /* teal — primary interactive colour */
+      --ht-accent-soft:#f0fdfa; /* teal tint */
+      --ht-browser:#2563eb;     /* blue  */
+      --ht-host:#7c3aed;        /* violet */
+      --ht-db:#0d9488;          /* teal  */
+      --ht-warn:#b45309;        /* muted amber */
+      --ht-ok:#059669; --ht-no:#dc2626;
+      --ht-orange:#c43c00;      /* the site accent — used sparingly */
+      max-width:840px;
+    }
+    #howto.post-body p{ font-size:1.05rem; line-height:1.75; }
+    #howto a{ color:var(--ht-accent); text-underline-offset:3px; }
+
+    /* thin reading-progress bar pinned to the very top */
+    .ht-progress{ position:fixed; top:0; left:0; height:3px; width:0;
+      background:var(--ht-accent); z-index:200; transition:width .08s linear; }
+
+    /* fixed dot rail (desktop only) — click a dot to jump, current section lights up */
+    .ht-rail{ position:fixed; right:18px; top:50%; transform:translateY(-50%);
+      z-index:90; display:flex; flex-direction:column; gap:13px; }
+    .ht-rail a{ position:relative; width:11px; height:11px; border-radius:50%;
+      border:1.6px solid var(--ht-muted); background:transparent; transition:.18s; }
+    .ht-rail a:hover, .ht-rail a.active{ background:var(--ht-accent);
+      border-color:var(--ht-accent); transform:scale(1.3); }
+    .ht-rail a span{ position:absolute; right:22px; top:50%; transform:translateY(-50%);
+      white-space:nowrap; background:var(--ht-ink); color:#fff;
+      font:600 11px/1 'Inter',sans-serif; padding:6px 9px; border-radius:6px;
+      opacity:0; pointer-events:none; transition:.18s; }
+    .ht-rail a:hover span{ opacity:1; }
+    @media(max-width:1180px){ .ht-rail{ display:none; } }
+
+    /* contents card */
+    .ht-toc{ border:1px solid var(--ht-line); background:var(--ht-panel);
+      border-radius:12px; padding:18px 20px 8px; margin:8px 0 30px; }
+    .ht-toc .ht-toc-h{ font-family:'Share Tech Mono',monospace; font-size:.78rem;
+      letter-spacing:.14em; text-transform:uppercase; color:var(--ht-muted); margin-bottom:6px; }
+    .ht-toc ol{ list-style:none; margin:0; padding:0;
+      display:grid; grid-template-columns:1fr 1fr; gap:2px 22px; }
+    @media(max-width:620px){ .ht-toc ol{ grid-template-columns:1fr; } }
+    .ht-toc li a{ display:flex; gap:10px; align-items:baseline; padding:8px 4px;
+      border-bottom:1px solid transparent; text-decoration:none; color:var(--ht-ink);
+      font-size:.95rem; transition:.15s; }
+    .ht-toc li a:hover{ color:var(--ht-accent); }
+    .ht-toc li a .num{ font-family:'Share Tech Mono',monospace; font-size:.8rem;
+      color:var(--ht-accent); min-width:22px; }
+
+    /* section anchors clear the fixed top-nav */
+    .ht-sec{ scroll-margin-top:84px; }
+    #howto h2 .num{ font-family:'Share Tech Mono',monospace; color:var(--ht-accent);
+      font-size:.85rem; margin-right:10px; vertical-align:1px; }
+
+    /* big-idea callout */
+    .ht-big{ border:1px solid var(--ht-line); border-left:4px solid var(--ht-accent);
+      background:linear-gradient(180deg,var(--ht-accent-soft),#fff);
+      border-radius:0 12px 12px 0; padding:20px 24px; margin:6px 0 4px; }
+    .ht-big .k{ font-family:'Share Tech Mono',monospace; font-size:.72rem;
+      letter-spacing:.16em; text-transform:uppercase; color:var(--ht-accent); }
+    .ht-big p{ margin:6px 0 0 !important; font-size:1.12rem !important; }
+
+    /* teal note */
+    .ht-note{ border-left:3px solid var(--ht-accent); background:var(--ht-accent-soft);
+      padding:13px 17px; border-radius:0 9px 9px 0; margin:18px 0; font-size:.96rem;
+      line-height:1.6; color:#1f3a37; }
+    .ht-note b{ color:var(--ht-accent); }
+
+    /* figure cards for the SVG diagrams */
+    .ht-fig{ border:1px solid var(--ht-line); background:var(--ht-card);
+      border-radius:12px; padding:12px; margin:20px 0; }
+    .ht-fig svg{ display:block; width:100%; height:auto; }
+    .ht-cap{ font-family:'Share Tech Mono',monospace; font-size:.74rem; line-height:1.5;
+      color:var(--ht-muted); text-align:center; padding:10px 12px 2px; }
+
+    /* tables */
+    .ht-table{ border-collapse:collapse; width:100%; font-size:.9rem; margin:16px 0;
+      border:1px solid var(--ht-line); border-radius:10px; overflow:hidden; }
+    .ht-table th, .ht-table td{ text-align:left; padding:10px 13px;
+      border-bottom:1px solid var(--ht-line); vertical-align:top; }
+    .ht-table th{ background:var(--ht-panel); font-family:'Share Tech Mono',monospace;
+      font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ht-muted); }
+    .ht-table tr:last-child td{ border-bottom:none; }
+    .ht-table code{ background:var(--ht-panel); border:1px solid var(--ht-line);
+      padding:1px 5px; border-radius:4px; font-family:'Share Tech Mono',monospace; font-size:.85em; }
+
+    /* tabs (data flows) */
+    .ht-tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:18px 0 0; }
+    .ht-tab{ font:600 .82rem/1 'Share Tech Mono',monospace; letter-spacing:.03em;
+      padding:10px 15px; border:1px solid var(--ht-line); background:var(--ht-card);
+      border-radius:9px; cursor:pointer; color:var(--ht-muted); transition:.15s; }
+    .ht-tab:hover{ border-color:var(--ht-accent); color:var(--ht-accent); }
+    .ht-tab.active{ border-color:var(--ht-accent); color:#fff; background:var(--ht-accent); }
+    .ht-panel{ display:none; border:1px solid var(--ht-line); border-radius:0 12px 12px 12px;
+      background:var(--ht-card); padding:20px 22px; margin-top:-1px; }
+    .ht-panel.active{ display:block; animation:htFade .25s ease; }
+    @keyframes htFade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+    .ht-panel h4{ font:700 1.02rem 'Inter',sans-serif; margin:0 0 4px; }
+    .ht-panel .who{ font-family:'Share Tech Mono',monospace; font-size:.74rem;
+      letter-spacing:.04em; text-transform:uppercase; color:var(--ht-muted); margin-bottom:12px; }
+    /* a little flow strip inside each panel */
+    .ht-flow{ display:flex; flex-wrap:wrap; align-items:stretch; gap:8px; margin:14px 0 4px; }
+    .ht-flow .box{ flex:1 1 0; min-width:120px; border:1px solid var(--ht-line);
+      border-radius:9px; padding:10px 12px; background:var(--ht-panel); }
+    .ht-flow .box .t{ font:600 .82rem 'Share Tech Mono',monospace; color:var(--ht-ink); }
+    .ht-flow .box .s{ font-size:.78rem; color:var(--ht-muted); margin-top:3px; line-height:1.4; }
+    .ht-flow .box.lock{ border-color:var(--ht-accent); background:var(--ht-accent-soft); }
+    .ht-flow .arr{ align-self:center; color:var(--ht-accent); font-weight:700;
+      font-family:'Share Tech Mono',monospace; }
+    @media(max-width:640px){ .ht-flow{ flex-direction:column; } .ht-flow .arr{ transform:rotate(90deg); } }
+
+    /* permission simulator */
+    .ht-sim{ border:1px solid var(--ht-line); border-radius:14px; overflow:hidden;
+      background:var(--ht-card); margin:20px 0; }
+    .ht-sim-head{ background:var(--ht-panel); border-bottom:1px solid var(--ht-line);
+      padding:14px 18px; }
+    .ht-sim-head .lab{ font-family:'Share Tech Mono',monospace; font-size:.72rem;
+      letter-spacing:.12em; text-transform:uppercase; color:var(--ht-muted); }
+    .ht-sim-body{ padding:18px; display:grid; gap:16px; }
+    .ht-row .lab{ font-family:'Share Tech Mono',monospace; font-size:.72rem;
+      letter-spacing:.08em; text-transform:uppercase; color:var(--ht-muted);
+      display:block; margin-bottom:8px; }
+    .ht-seg{ display:inline-flex; border:1px solid var(--ht-line); border-radius:9px; overflow:hidden; }
+    .ht-seg button{ font:600 .85rem 'Inter',sans-serif; padding:9px 16px; border:none;
+      background:var(--ht-card); color:var(--ht-muted); cursor:pointer; transition:.15s; }
+    .ht-seg button + button{ border-left:1px solid var(--ht-line); }
+    .ht-seg button.on{ background:var(--ht-ink); color:#fff; }
+    .ht-chip-group{ display:flex; flex-wrap:wrap; gap:8px; }
+    .ht-chip{ font:500 .85rem 'Inter',sans-serif; padding:8px 13px; border:1px solid var(--ht-line);
+      border-radius:20px; background:var(--ht-card); color:var(--ht-ink); cursor:pointer; transition:.15s; }
+    .ht-chip:hover{ border-color:var(--ht-accent); }
+    .ht-chip.on{ background:var(--ht-accent); border-color:var(--ht-accent); color:#fff; }
+    .ht-result{ border-radius:11px; padding:16px 18px; border:1px solid var(--ht-line);
+      background:var(--ht-panel); display:flex; gap:14px; align-items:flex-start; }
+    .ht-verdict{ font:800 .8rem 'Share Tech Mono',monospace; letter-spacing:.08em;
+      padding:6px 11px; border-radius:7px; white-space:nowrap; }
+    .ht-verdict.ok{ background:#dcfce7; color:#166534; border:1px solid #86efac; }
+    .ht-verdict.no{ background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
+    .ht-why{ font-size:.95rem; line-height:1.55; color:var(--ht-ink); }
+
+    /* collapsible deep dives */
+    .ht-more{ border:1px solid var(--ht-line); border-radius:11px; background:var(--ht-panel);
+      margin:18px 0; padding:0 18px; }
+    .ht-more summary{ cursor:pointer; list-style:none; padding:15px 0;
+      font:600 .92rem 'Inter',sans-serif; color:var(--ht-ink);
+      display:flex; align-items:center; gap:10px; }
+    .ht-more summary::-webkit-details-marker{ display:none; }
+    .ht-more summary::before{ content:'+'; font-family:'Share Tech Mono',monospace;
+      color:var(--ht-accent); font-size:1.1rem; line-height:1; }
+    .ht-more[open] summary::before{ content:'\2212'; }
+    .ht-more[open] summary{ border-bottom:1px solid var(--ht-line); }
+    .ht-more .ht-more-body{ padding:8px 0 18px; font-size:.95rem; line-height:1.65; color:var(--ht-ink); }
+    .ht-more pre{ background:#0e0e10; color:#e9e9ee; border-radius:9px; padding:14px 16px;
+      overflow:auto; font:0.82rem/1.55 'Share Tech Mono',monospace; margin:10px 0; }
+    .ht-more pre .c{ color:#7fb5a8; }
+
+    /* db cards */
+    .ht-db-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:18px 0; }
+    @media(max-width:720px){ .ht-db-grid{ grid-template-columns:1fr; } }
+    .ht-db-card{ border:1px solid var(--ht-line); border-top:3px solid var(--ht-db);
+      border-radius:11px; background:var(--ht-card); padding:14px 16px; }
+    .ht-db-card h4{ font:700 1.02rem 'Inter',sans-serif; margin:0; display:flex;
+      justify-content:space-between; align-items:baseline; }
+    .ht-db-card h4 .rows{ font-family:'Share Tech Mono',monospace; font-size:.7rem; color:var(--ht-muted); }
+    .ht-db-card .role{ font-size:.78rem; color:var(--ht-muted); margin:6px 0 10px; line-height:1.45; }
+    .ht-db-card ul{ list-style:none; margin:0; padding:0; }
+    .ht-db-card li{ font-family:'Share Tech Mono',monospace; font-size:.76rem; color:var(--ht-ink);
+      padding:3px 0; border-bottom:1px dashed var(--ht-line); }
+    .ht-db-card li:last-child{ border-bottom:none; }
+    .ht-db-card li span{ color:var(--ht-muted); }
+
+    /* stepper */
+    .ht-steps{ margin:18px 0; padding:0; list-style:none; counter-reset:s; }
+    .ht-steps li{ position:relative; padding:0 0 18px 46px; border-left:2px solid var(--ht-line);
+      margin-left:14px; }
+    .ht-steps li:last-child{ border-left-color:transparent; padding-bottom:0; }
+    .ht-steps li::before{ counter-increment:s; content:counter(s);
+      position:absolute; left:-15px; top:-2px; width:28px; height:28px; border-radius:50%;
+      background:var(--ht-accent); color:#fff; font:700 .82rem 'Share Tech Mono',monospace;
+      display:flex; align-items:center; justify-content:center; }
+    .ht-steps li b{ font:700 .98rem 'Inter',sans-serif; }
+    .ht-steps li p{ margin:3px 0 0 !important; font-size:.95rem !important; color:var(--ht-muted); line-height:1.55; }
+
+    .ht-pills{ display:flex; flex-wrap:wrap; gap:8px; margin:14px 0; }
+    .ht-pills span{ font:600 .76rem 'Share Tech Mono',monospace; letter-spacing:.03em;
+      padding:6px 11px; border:1px solid var(--ht-line); border-radius:20px;
+      color:var(--ht-ink); background:var(--ht-card); }
+    .ht-backtop{ display:inline-block; margin-top:6px; font-family:'Share Tech Mono',monospace;
+      font-size:.8rem; color:var(--ht-muted); }
+    </style>
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="ht-progress" id="ht-progress" aria-hidden="true"></div>
+
+    <nav class="top-nav">
+        <a href="/" class="nav-logo interactive-element no-underline text-inherit">SUBJECT // PRANAV KAJA</a>
+        <div class="nav-links"><a href="/blog"><span class="nav-num">&larr; </span>ALL POSTS</a></div>
+    </nav>
+
+    <!-- dot rail: jump between sections, current one lights up -->
+    <nav class="ht-rail" id="ht-rail" aria-label="Section navigation">
+        <a href="#idea"><span>The one idea</span></a>
+        <a href="#stack"><span>The stack</span></a>
+        <a href="#map"><span>Architecture map</span></a>
+        <a href="#load"><span>One page load</span></a>
+        <a href="#flows"><span>The three data flows</span></a>
+        <a href="#db"><span>The database</span></a>
+        <a href="#rls"><span>Who can do what</span></a>
+        <a href="#reveal"><span>The 3-tier reveal</span></a>
+        <a href="#admin"><span>The admin console</span></a>
+        <a href="#tricks"><span>Shipping &amp; tricks</span></a>
+    </nav>
+
+    <main class="container" id="main">
+        <header class="hero">
+            <div class="post-meta mb-20">Jun 2026 &middot; Engineering &middot; ~9 min read</div>
+            <h1 class="hero-title" style="font-size: 2.5rem; line-height: 1.12;">How This Site Works: A Tour
+                Under the Hood</h1>
+            <p class="hero-subtitle">You're reading a page that has no backend server — and yet it has a real
+                database, a login, and an analytics dashboard. Here's how that's possible, what you can do here,
+                and the tricks worth stealing.</p>
+        </header>
+
+        <article class="section post-body" id="howto">
+
+            <nav class="ht-toc" aria-label="Table of contents">
+                <div class="ht-toc-h">// Contents — jump anywhere</div>
+                <ol>
+                    <li><a href="#idea"><span class="num">01</span> The one idea that explains everything</a></li>
+                    <li><a href="#stack"><span class="num">02</span> The stack, in plain terms</a></li>
+                    <li><a href="#map"><span class="num">03</span> The architecture map</a></li>
+                    <li><a href="#load"><span class="num">04</span> What happens on one page load</a></li>
+                    <li><a href="#flows"><span class="num">05</span> The three data flows</a></li>
+                    <li><a href="#db"><span class="num">06</span> The database</a></li>
+                    <li><a href="#rls"><span class="num">07</span> Who can do what <em>(try it)</em></a></li>
+                    <li><a href="#reveal"><span class="num">08</span> The signature 3-tier reveal</a></li>
+                    <li><a href="#admin"><span class="num">09</span> The admin console</a></li>
+                    <li><a href="#tricks"><span class="num">10</span> Shipping &amp; little tricks</a></li>
+                </ol>
+            </nav>
+
+            <p>Most portfolio sites are a stack of static pages. This one looks like a stack of static pages —
+                that's deliberate, because static is fast and search engines love it — but the project cards,
+                the contact form, the visitor analytics, and the password-protected admin panel are all wired to
+                a live <strong>Postgres database</strong>. There is no API server in the middle that I wrote and
+                maintain. The browser talks to the database directly.</p>
+
+            <p>That sounds reckless until you see how it's locked down. The rest of this post is the guided tour:
+                skim the diagrams, poke the interactive bits, and open the <em>"for the curious"</em> drawers if
+                you want the gritty detail.</p>
+
+            <!-- ============ 01 THE ONE IDEA ============ -->
+            <section class="ht-sec" id="idea">
+                <h2><span class="num">01</span> The one idea that explains everything</h2>
+                <div class="ht-big">
+                    <div class="k">// The whole site in one sentence</div>
+                    <p>There is <b>no custom backend server</b>. My JavaScript, running in your browser, calls a
+                        database's auto-generated API directly — and a security layer <em>inside</em> the database
+                        decides, row by row, what each visitor is allowed to read or write.</p>
+                </div>
+                <p>Everything else is a detail of that idea. The "API key" shipped in the page is public on
+                    purpose; it only says <em>"this request is an anonymous visitor."</em> It grants no powers by
+                    itself. The actual gatekeeper is <strong>Row Level Security</strong> (RLS) in Postgres, and
+                    we'll play with it in <a href="#rls">section&nbsp;07</a>.</p>
+            </section>
+
+            <!-- ============ 02 STACK ============ -->
+            <section class="ht-sec" id="stack">
+                <h2><span class="num">02</span> The stack, in plain terms</h2>
+                <p>No framework, no build step, no bundler. It's hand-written HTML, CSS, and JavaScript — the
+                    "vanilla" stack — with one managed database doing the heavy lifting.</p>
+                <table class="ht-table">
+                    <tr><th>Layer</th><th>What it is</th><th>Its job here</th></tr>
+                    <tr><td>Pages</td><td>Hand-written HTML</td><td>One file per page. Server-rendered-by-default = great SEO, with JSON-LD, a sitemap, and an <code>llms.txt</code>.</td></tr>
+                    <tr><td>Styling</td><td>Plain CSS</td><td>A small design system built on CSS variables (colour, spacing). No Tailwind, no Sass.</td></tr>
+                    <tr><td>Behaviour</td><td>Vanilla JavaScript</td><td>Custom cursor, carousels, overlays, the project reveal, two little games. No React or Vue.</td></tr>
+                    <tr><td>Backend</td><td>Supabase (managed Postgres&nbsp;17)</td><td>Database + login + an auto-generated REST API, all in one. This is the only moving part.</td></tr>
+                    <tr><td>Hosting</td><td>Vercel</td><td>Serves the static files from a global CDN. A <code>git push</code> deploys.</td></tr>
+                    <tr><td>Analytics</td><td>Home-grown</td><td>Cookieless, no personal data, honours Do-Not-Track. The data is mine, not a third party's.</td></tr>
+                </table>
+                <div class="ht-note"><b>Why bother going framework-free?</b> A recruiter opening this on hotel
+                    Wi-Fi gets plain HTML that paints instantly. There's no hydration, no megabyte of JavaScript,
+                    nothing to "warm up." The one thing that needs a network round-trip — the project list — has
+                    an offline fallback baked in, so the page never shows up empty.</div>
+            </section>
+
+            <!-- ============ 03 MAP ============ -->
+            <section class="ht-sec" id="map">
+                <h2><span class="num">03</span> The architecture map</h2>
+                <p>Three zones. Your <span style="color:var(--ht-browser);font-weight:600">browser</span> runs the
+                    whole app. <span style="color:var(--ht-host);font-weight:600">Vercel</span> only hands over
+                    files. <span style="color:var(--ht-db);font-weight:600">Supabase</span> is the entire backend.
+                    The teal lines are the live data calls that travel straight from the browser to the database.</p>
+
+                <figure class="ht-fig">
+                    <svg viewBox="0 0 940 430" role="img" aria-label="Architecture: browser, Vercel host, and Supabase backend">
+                        <defs>
+                            <marker id="ha" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#0d9488"/></marker>
+                            <marker id="hb" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#94a3b8"/></marker>
+                        </defs>
+                        <style>
+                          .zt{font:600 12px 'Share Tech Mono',monospace; letter-spacing:.1em; text-transform:uppercase}
+                          .bx{fill:#ffffff; stroke:#e4e4e7; stroke-width:1.2; rx:8}
+                          .bt{fill:#18181b; font:600 12.5px 'Inter',sans-serif}
+                          .bs{fill:#6d6d75; font:10.5px 'Share Tech Mono',monospace}
+                          .el{fill:#0d9488; font:10px 'Share Tech Mono',monospace}
+                          .eg{fill:#94a3b8; font:10px 'Share Tech Mono',monospace}
+                        </style>
+
+                        <!-- browser zone -->
+                        <rect x="18" y="20" width="280" height="392" rx="12" fill="#f8fafc" stroke="#2563eb" stroke-width="1.4"/>
+                        <text class="zt" x="34" y="44" fill="#2563eb">Your browser</text>
+                        <rect class="bx" x="34" y="58" width="248" height="50"/>
+                        <text class="bt" x="48" y="80">The pages (HTML + CSS)</text>
+                        <text class="bs" x="48" y="97">home · projects · contact · blog · admin</text>
+                        <rect class="bx" x="34" y="120" width="248" height="78"/>
+                        <text class="bt" x="48" y="142">The JavaScript</text>
+                        <text class="bs" x="48" y="159">missions.js · analytics.js · contact.js</text>
+                        <text class="bs" x="48" y="175">main.js · admin.js · the games</text>
+                        <text class="bs" x="48" y="191">+ a tiny database client</text>
+                        <rect class="bx" x="34" y="210" width="248" height="48"/>
+                        <text class="bt" x="48" y="231">localStorage</text>
+                        <text class="bs" x="48" y="248">anonymous id · your login token</text>
+                        <rect class="bx" x="34" y="270" width="248" height="56" fill="#f1f5f9" stroke="#cbd5e1"/>
+                        <text class="bt" x="48" y="291">Offline fallback</text>
+                        <text class="bs" x="48" y="308">a bundled copy of the project list,</text>
+                        <text class="bs" x="48" y="322">used if the database is unreachable</text>
+                        <rect class="bx" x="34" y="338" width="248" height="54" fill="#fffaf2" stroke="#e2c08a"/>
+                        <text class="bt" x="48" y="359">Loaded from public CDNs</text>
+                        <text class="bs" x="48" y="376">the database client · web fonts ·</text>
+                        <text class="bs" x="48" y="389">a charting library (admin only)</text>
+
+                        <!-- vercel zone -->
+                        <rect x="340" y="150" width="218" height="150" rx="12" fill="#faf7ff" stroke="#7c3aed" stroke-width="1.4"/>
+                        <text class="zt" x="356" y="174" fill="#7c3aed">Vercel — file host</text>
+                        <rect class="bx" x="356" y="188" width="186" height="46"/>
+                        <text class="bt" x="370" y="208">Global CDN</text>
+                        <text class="bs" x="370" y="224">serves the static files, fast</text>
+                        <rect class="bx" x="356" y="244" width="186" height="46"/>
+                        <text class="bt" x="370" y="264">git push → deploy</text>
+                        <text class="bs" x="370" y="280">push to main, it auto-builds</text>
+
+                        <!-- supabase zone -->
+                        <rect x="600" y="20" width="322" height="392" rx="12" fill="#f0fdfa" stroke="#0d9488" stroke-width="1.4"/>
+                        <text class="zt" x="616" y="44" fill="#0d9488">Supabase — the backend</text>
+                        <rect class="bx" x="616" y="58" width="290" height="58"/>
+                        <text class="bt" x="630" y="80">Auto REST API</text>
+                        <text class="bs" x="630" y="97">every table becomes an HTTPS</text>
+                        <text class="bs" x="630" y="111">endpoint automatically</text>
+                        <rect class="bx" x="616" y="128" width="290" height="46"/>
+                        <text class="bt" x="630" y="148">Login (Auth)</text>
+                        <text class="bs" x="630" y="165">email + password, for the admin</text>
+                        <rect class="bx" x="616" y="186" width="290" height="96" fill="#e7f9f4" stroke="#5eead4"/>
+                        <text class="bt" x="630" y="207">Postgres database</text>
+                        <text class="bs" x="630" y="226">projects — the cards you see</text>
+                        <text class="bs" x="630" y="242">messages — the contact inbox</text>
+                        <text class="bs" x="630" y="258">events — the analytics log</text>
+                        <text class="bs" x="630" y="274">+ one function that builds the dashboard</text>
+                        <rect class="bx" x="616" y="294" width="290" height="62" fill="#fff5ef" stroke="#e8956a"/>
+                        <text class="bt" x="630" y="315" fill="#c43c00">🔒 Row Level Security</text>
+                        <text class="bs" x="630" y="332">the real gatekeeper — decides per row</text>
+                        <text class="bs" x="630" y="347">who may read or write what</text>
+
+                        <!-- edges: browser -> vercel (grey static) -->
+                        <path d="M298 110 C 320 110, 326 196, 354 200" fill="none" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#hb)"/>
+                        <text class="eg" x="300" y="150">GET files</text>
+                        <path d="M354 250 C 326 262, 320 200, 300 168" fill="none" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#hb)"/>
+
+                        <!-- edges: browser -> supabase (teal live) -->
+                        <path d="M282 150 C 460 96, 470 90, 614 86" fill="none" stroke="#0d9488" stroke-width="1.8" marker-end="url(#ha)"/>
+                        <text class="el" x="372" y="96">read the projects</text>
+                        <path d="M282 168 C 460 150, 470 150, 614 150" fill="none" stroke="#0d9488" stroke-width="1.8" marker-end="url(#ha)"/>
+                        <text class="el" x="372" y="140">log in (admin)</text>
+                        <path d="M282 230 C 460 250, 470 238, 614 232" fill="none" stroke="#0d9488" stroke-width="1.8" marker-end="url(#ha)"/>
+                        <text class="el" x="360" y="252">send a message / log an event</text>
+                    </svg>
+                    <figcaption class="ht-cap">The browser is the app. Vercel hands over files; Supabase is the backend. Teal lines = live data calls.</figcaption>
+                </figure>
+            </section>
+
+            <!-- ============ 04 PAGE LOAD ============ -->
+            <section class="ht-sec" id="load">
+                <h2><span class="num">04</span> What happens on one page load</h2>
+                <p>Follow a single visitor from typing the URL to seeing project cards. This is the order things
+                    actually run in:</p>
+                <ol class="ht-steps">
+                    <li><b>The browser asks Vercel for the page.</b>
+                        <p>It gets back the HTML, CSS, and images straight from the nearest CDN edge — no server thinking required.</p></li>
+                    <li><b>The scripts load, in a fixed order.</b>
+                        <p>The database client first, then the config, then analytics, then the UI, then the data layer. Each one needs the one before it.</p></li>
+                    <li><b>Analytics fires a quiet "pageview."</b>
+                        <p>One write to the database. If it fails, nothing breaks — analytics is designed to fail silently.</p></li>
+                    <li><b>The data layer asks for the projects.</b>
+                        <p>It requests the published project rows. The database returns only those — drafts never leave the building.</p></li>
+                    <li><b>The cards render, and the page is interactive.</b>
+                        <p>If the database was unreachable, it quietly falls back to a bundled copy of the list so you still see cards.</p></li>
+                </ol>
+                <div class="ht-note"><b>Built to not break:</b> if the database is down or the key is blank, the
+                    page still renders from the offline fallback and analytics turns into a no-op. The site is
+                    designed to work even with the backend completely unplugged.</div>
+            </section>
+
+            <!-- ============ 05 DATA FLOWS ============ -->
+            <section class="ht-sec" id="flows">
+                <h2><span class="num">05</span> The three data flows</h2>
+                <p>Everything dynamic on the site is one of three round-trips to the database. Tap each one:</p>
+                <div class="ht-tabs" role="tablist">
+                    <button class="ht-tab active" data-tab="A" role="tab">A · Read projects</button>
+                    <button class="ht-tab" data-tab="B" role="tab">B · Log an event</button>
+                    <button class="ht-tab" data-tab="C" role="tab">C · Send a message</button>
+                </div>
+
+                <div class="ht-panel active" data-panel="A">
+                    <h4>Reading the projects</h4>
+                    <div class="who">Public · happens on every homepage load</div>
+                    <p style="margin:0 0 6px !important">The data layer asks for projects where <code>published = true</code>.
+                        The database applies the read rule and returns only those rows.</p>
+                    <div class="ht-flow">
+                        <div class="box"><div class="t">missions.js</div><div class="s">"give me the projects"</div></div>
+                        <div class="arr">&rarr;</div>
+                        <div class="box lock"><div class="t">🔒 read rule</div><div class="s">"public sees published only"</div></div>
+                        <div class="arr">&rarr;</div>
+                        <div class="box"><div class="t">projects table</div><div class="s">returns the visible rows</div></div>
+                    </div>
+                    <p style="margin:10px 0 0 !important; font-size:.92rem !important; color:var(--ht-muted)">Drafts stay invisible to the public — not hidden by CSS, actually filtered out before they leave the database.</p>
+                </div>
+
+                <div class="ht-panel" data-panel="B">
+                    <h4>Logging an analytics event</h4>
+                    <div class="who">Public · fire-and-forget, write-only</div>
+                    <p style="margin:0 0 6px !important">A pageview, a project click, time-on-page — each becomes one
+                        insert into the events log. The public can <em>write</em> events but can never <em>read</em>
+                        them back.</p>
+                    <div class="ht-flow">
+                        <div class="box"><div class="t">analytics.js</div><div class="s">click / pageview / tab-hide</div></div>
+                        <div class="arr">&rarr;</div>
+                        <div class="box lock"><div class="t">🔒 write rule</div><div class="s">size + numeric guards</div></div>
+                        <div class="arr">&rarr;</div>
+                        <div class="box"><div class="t">events table</div><div class="s">append-only</div></div>
+                    </div>
+                    <p style="margin:10px 0 0 !important; font-size:.92rem !important; color:var(--ht-muted)">No read-back, and errors are swallowed — analytics can never slow down or break the page.</p>
+                </div>
+
+                <div class="ht-panel" data-panel="C">
+                    <h4>Sending a contact message</h4>
+                    <div class="who">Public · guarded write you can't read back</div>
+                    <p style="margin:0 0 6px !important">The form runs client-side checks first (a honeypot for bots, a
+                        disposable-email blocklist, a typo-fixer), then inserts one message. Only the logged-in admin
+                        can ever read the inbox.</p>
+                    <div class="ht-flow">
+                        <div class="box"><div class="t">contact.js</div><div class="s">honeypot + email checks</div></div>
+                        <div class="arr">&rarr;</div>
+                        <div class="box lock"><div class="t">🔒 write rule</div><div class="s">body length 1–5000</div></div>
+                        <div class="arr">&rarr;</div>
+                        <div class="box"><div class="t">messages table</div><div class="s">admin reads it later</div></div>
+                    </div>
+                    <p style="margin:10px 0 0 !important; font-size:.92rem !important; color:var(--ht-muted)">If the insert ever fails, the form builds a pre-filled email instead — so it's never a dead end.</p>
+                </div>
+            </section>
+
+            <!-- ============ 06 DATABASE ============ -->
+            <section class="ht-sec" id="db">
+                <h2><span class="num">06</span> The database</h2>
+                <p>Three tables, each a simple ledger. They don't reference each other — think of them as three
+                    independent notebooks the front end reads from and writes to.</p>
+                <div class="ht-db-grid">
+                    <div class="ht-db-card">
+                        <h4>projects <span class="rows">9 rows</span></h4>
+                        <div class="role">The cards on the homepage. Public can read the published ones; admin has full control.</div>
+                        <ul>
+                            <li>code <span>· MSN-01</span></li>
+                            <li>title · summary</li>
+                            <li>role · method · outcome</li>
+                            <li>chips <span>· metric pills</span></li>
+                            <li>github_url <span>· optional</span></li>
+                            <li>published <span>· the gate</span></li>
+                        </ul>
+                    </div>
+                    <div class="ht-db-card" style="border-top-color:#2563eb">
+                        <h4>messages <span class="rows">3 rows</span></h4>
+                        <div class="role">The contact inbox. Public can insert; only admin can read, triage, or delete.</div>
+                        <ul>
+                            <li>name · email · phone</li>
+                            <li>body</li>
+                            <li>status <span>· received…</span></li>
+                            <li>flagged <span>· priority star</span></li>
+                            <li>created_at</li>
+                        </ul>
+                    </div>
+                    <div class="ht-db-card" style="border-top-color:#b45309">
+                        <h4>events <span class="rows">946 rows</span></h4>
+                        <div class="role">The analytics log. Public can insert (write-only); admin reads it as aggregates.</div>
+                        <ul>
+                            <li>type <span>· pageview…</span></li>
+                            <li>path · source</li>
+                            <li>session_id <span>· anon id</span></li>
+                            <li>meta <span>· flexible JSON</span></li>
+                            <li>created_at</li>
+                        </ul>
+                    </div>
+                </div>
+                <details class="ht-more">
+                    <summary>For the curious: the one clever bit</summary>
+                    <div class="ht-more-body">
+                        <p>The admin dashboard could run a dozen separate queries against the raw events. Instead,
+                            a single database <em>function</em> does all the counting and grouping server-side and
+                            hands back one tidy JSON blob — KPIs, top pages, a daily series, the game leaderboard.</p>
+                        <p>It's set up so the public can <em>write</em> events but can never <em>read</em> the
+                            analytics back out: permission to run that function is granted to logged-in users only.</p>
+                        <pre><span class="c">-- the whole dashboard, one call, admin-only</span>
+select intel_dashboard();
+<span class="c">-- → { kpis, traffic, topPages, daily, leaderboard }</span></pre>
+                    </div>
+                </details>
+            </section>
+
+            <!-- ============ 07 RLS — INTERACTIVE ============ -->
+            <section class="ht-sec" id="rls">
+                <h2><span class="num">07</span> Who can do what <span style="font-size:.7em;color:var(--ht-accent)">— try it</span></h2>
+                <p>This is the part that makes "no backend server" safe. Pick who you are, pick what you want to do,
+                    and see whether the database lets you — and why. This mirrors the <em>actual</em> rules.</p>
+
+                <div class="ht-sim" id="ht-sim">
+                    <div class="ht-sim-head">
+                        <span class="lab">// Permission simulator</span>
+                    </div>
+                    <div class="ht-sim-body">
+                        <div class="ht-row">
+                            <span class="lab">I am…</span>
+                            <div class="ht-seg" id="ht-role">
+                                <button data-role="anon" class="on">A public visitor</button>
+                                <button data-role="auth">Me, logged in</button>
+                            </div>
+                        </div>
+                        <div class="ht-row">
+                            <span class="lab">I want to…</span>
+                            <div class="ht-chip-group" id="ht-acts">
+                                <button class="ht-chip on" data-act="read_pub">See published projects</button>
+                                <button class="ht-chip" data-act="read_draft">See draft projects</button>
+                                <button class="ht-chip" data-act="send_msg">Send a contact message</button>
+                                <button class="ht-chip" data-act="read_inbox">Read the message inbox</button>
+                                <button class="ht-chip" data-act="log_event">Log an analytics event</button>
+                                <button class="ht-chip" data-act="read_stats">Read the analytics</button>
+                                <button class="ht-chip" data-act="edit_proj">Edit a project</button>
+                            </div>
+                        </div>
+                        <div class="ht-result" id="ht-result">
+                            <span class="ht-verdict ok" id="ht-verdict">ALLOWED</span>
+                            <span class="ht-why" id="ht-why">Published projects are public, so anyone can read them.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ht-note"><b>The takeaway:</b> the public key in the page can't do anything dangerous,
+                    because every request is checked against these rules inside the database. The powerful key (the
+                    one that <em>would</em> bypass them) never touches the browser — it lives only in the Supabase
+                    dashboard.</div>
+            </section>
+
+            <!-- ============ 08 REVEAL ============ -->
+            <section class="ht-sec" id="reveal">
+                <h2><span class="num">08</span> The signature 3-tier reveal</h2>
+                <p>The nicest interaction on the site is how a project unfolds in three stages. Each tier shows more
+                    of the <em>same</em> record that was already loaded — so there are zero extra network calls.
+                    Try it for real on the <a href="/#projects-grid">homepage project grid</a>; here's the anatomy:</p>
+
+                <figure class="ht-fig">
+                    <svg viewBox="0 0 940 320" role="img" aria-label="The three-tier project reveal: card, hover sheet, full modal">
+                        <defs>
+                            <marker id="ra" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#0d9488"/></marker>
+                        </defs>
+                        <style>
+                          .tnum{font:600 9.5px 'Share Tech Mono',monospace; letter-spacing:.12em; fill:#0d9488}
+                          .code{font:700 9px 'Share Tech Mono',monospace; fill:#c43c00}
+                          .ttl{font:700 12px 'Inter',sans-serif; fill:#18181b}
+                          .mono{font:9px 'Share Tech Mono',monospace; fill:#6d6d75}
+                          .body{font:9.5px 'Inter',sans-serif; fill:#52525b}
+                          .lbl{font:7.5px 'Share Tech Mono',monospace; fill:#9ca3af; letter-spacing:.06em}
+                          .val{font:600 8.5px 'Inter',sans-serif; fill:#27272a}
+                          .frame{fill:none; stroke:#0d9488; stroke-width:1.4}
+                          .scr{fill:#ffffff; stroke:#e4e4e7; stroke-width:1.2; rx:8}
+                          .chip{fill:none; stroke:#d4d4d8; stroke-width:1; rx:3}
+                        </style>
+
+                        <!-- TIER 1: card -->
+                        <text class="tnum" x="20" y="22">TIER 1 — ALWAYS VISIBLE</text>
+                        <rect class="scr" x="20" y="34" width="250" height="150"/>
+                        <text class="code" x="38" y="62">MSN-01</text>
+                        <text class="ttl" x="38" y="88">Fraud Triage</text>
+                        <text class="mono" x="38" y="108">XGBoost / Gemini</text>
+                        <text class="body" x="38" y="134">0.978 AUC; caught fraud the</text>
+                        <text class="body" x="38" y="148">base model missed.</text>
+                        <text class="mono" x="38" y="172" fill="#9ca3af">in the grid →</text>
+
+                        <!-- TIER 2: hover sheet -->
+                        <text class="tnum" x="345" y="22">TIER 2 — ON HOVER</text>
+                        <rect class="frame" x="356" y="44" width="240" height="150" rx="8"/>
+                        <rect class="scr" x="348" y="34" width="240" height="150"/>
+                        <text class="code" x="366" y="60">MSN-01</text>
+                        <text class="ttl" x="366" y="84">Fraud Triage</text>
+                        <text class="body" x="366" y="104">A two-stage pipeline that</text>
+                        <text class="body" x="366" y="118">catches what the model misses.</text>
+                        <rect class="chip" x="366" y="132" width="64" height="16"/><text class="mono" x="374" y="143">0.978 AUC</text>
+                        <rect class="chip" x="436" y="132" width="66" height="16"/><text class="mono" x="444" y="143">84% RECALL</text>
+                        <text class="mono" x="366" y="172" fill="#9ca3af">a floating preview · no network</text>
+
+                        <!-- TIER 3: modal -->
+                        <text class="tnum" x="672" y="22">TIER 3 — ON CLICK</text>
+                        <rect class="frame" x="680" y="44" width="240" height="250" rx="8"/>
+                        <rect class="scr" x="672" y="34" width="240" height="250"/>
+                        <text class="mono" x="690" y="54">← ALL MISSIONS</text>
+                        <text class="code" x="690" y="76">MSN-01</text>
+                        <text class="ttl" x="690" y="98" font-size="11">Fraud Triage</text>
+                        <text class="body" x="690" y="116" font-size="8.5">A pipeline that catches what the</text>
+                        <text class="body" x="690" y="128" font-size="8.5">model misses.</text>
+                        <rect x="690" y="140" width="204" height="34" rx="4" fill="none" stroke="#e4e4e7"/>
+                        <text class="lbl" x="700" y="155">ROLE</text><text class="val" x="700" y="168">Solo build, end to end</text>
+                        <rect x="690" y="180" width="204" height="34" rx="4" fill="none" stroke="#e4e4e7"/>
+                        <text class="lbl" x="700" y="195">METHOD</text><text class="val" x="700" y="208">Weighted-loss model + triage</text>
+                        <rect x="690" y="220" width="204" height="34" rx="4" fill="none" stroke="#e4e4e7"/>
+                        <text class="lbl" x="700" y="235">OUTCOME</text><text class="val" x="700" y="248">Auditable reasoning trail</text>
+                        <rect class="chip" x="690" y="262" width="56" height="15"/><text class="mono" x="697" y="273" font-size="8">0.978 AUC</text>
+                        <rect class="chip" x="752" y="262" width="66" height="15"/><text class="mono" x="759" y="273" font-size="8">284K RECORDS</text>
+
+                        <!-- arrows -->
+                        <path d="M272 110 L344 110" fill="none" stroke="#0d9488" stroke-width="1.6" marker-end="url(#ra)"/>
+                        <text class="mono" x="285" y="103" fill="#0d9488">hover</text>
+                        <path d="M596 130 L668 130" fill="none" stroke="#0d9488" stroke-width="1.6" marker-end="url(#ra)"/>
+                        <text class="mono" x="612" y="123" fill="#0d9488">click</text>
+                    </svg>
+                    <figcaption class="ht-cap">One record, revealed in three depths: card → hover preview → full modal. The click is the only one that logs an event.</figcaption>
+                </figure>
+                <p style="font-size:.92rem; color:var(--ht-muted)">It's a classic UX pattern — <em>progressive
+                    disclosure</em> — done without a single extra request, because the full record is already in
+                    memory from the first load.</p>
+            </section>
+
+            <!-- ============ 09 ADMIN ============ -->
+            <section class="ht-sec" id="admin">
+                <h2><span class="num">09</span> The admin console</h2>
+                <p>Behind a login at <code>/admin</code> is the one page only I can use. To the public it's just a
+                    login screen; once authenticated, the database's rules flip open and the page becomes a small
+                    content-management system for the whole site.</p>
+
+                <figure class="ht-fig">
+                    <svg viewBox="0 0 940 300" role="img" aria-label="The admin console: login screen and the unlocked dashboard">
+                        <style>
+                          .wt{fill:#ffffff; stroke:#e4e4e7; stroke-width:1.2; rx:9}
+                          .bar{fill:#f4f4f5}
+                          .dot{fill:#d4d4d8}
+                          .h{font:700 12px 'Inter',sans-serif; fill:#18181b}
+                          .k{font:9px 'Share Tech Mono',monospace; fill:#9ca3af; letter-spacing:.1em}
+                          .s{font:9.5px 'Inter',sans-serif; fill:#6d6d75}
+                          .tab{font:600 9px 'Share Tech Mono',monospace; fill:#6d6d75}
+                          .tabon{font:600 9px 'Share Tech Mono',monospace; fill:#0d9488}
+                          .field{fill:#ffffff; stroke:#d4d4d8; stroke-width:1; rx:4}
+                          .btn{fill:#0d9488; rx:5}
+                          .btxt{font:600 9px 'Share Tech Mono',monospace; fill:#ffffff}
+                          .row{stroke:#ececef; stroke-width:1}
+                          .bar2{fill:#5eead4}
+                        </style>
+
+                        <!-- LOGIN -->
+                        <text class="k" x="20" y="20" fill="#9ca3af">// WHAT THE PUBLIC SEES</text>
+                        <rect class="wt" x="20" y="30" width="280" height="240"/>
+                        <rect class="wt" x="80" y="78" width="160" height="150" fill="#ffffff" stroke="#e4e4e7"/>
+                        <text class="k" x="96" y="104">// RESTRICTED</text>
+                        <text class="h" x="96" y="124">OPS CONSOLE</text>
+                        <text class="s" x="96" y="140" font-size="8">Authenticate to continue.</text>
+                        <text class="k" x="96" y="160" font-size="7">OPERATOR EMAIL</text>
+                        <rect class="field" x="96" y="166" width="128" height="16"/>
+                        <text class="k" x="96" y="198" font-size="7">PASSPHRASE</text>
+                        <rect class="field" x="96" y="204" width="128" height="16"/>
+
+                        <!-- arrow -->
+                        <text class="tabon" x="312" y="155">login →</text>
+
+                        <!-- DASHBOARD -->
+                        <text class="k" x="372" y="20" fill="#9ca3af">// WHAT I SEE ONCE LOGGED IN</text>
+                        <rect class="wt" x="372" y="30" width="548" height="240"/>
+                        <rect class="bar" x="372" y="30" width="548" height="26" rx="9"/>
+                        <circle class="dot" cx="390" cy="43" r="4"/><circle class="dot" cx="404" cy="43" r="4"/><circle class="dot" cx="418" cy="43" r="4"/>
+                        <text class="tab" x="440" y="46">OPS CONSOLE</text>
+                        <!-- sidebar -->
+                        <rect x="372" y="56" width="120" height="214" fill="#fafafa" stroke="#ececef"/>
+                        <text class="tabon" x="388" y="84">▸ PROJECTS</text>
+                        <text class="tab" x="388" y="110">MESSAGES</text>
+                        <text class="tab" x="388" y="136">INTEL</text>
+                        <text class="k" x="388" y="170" font-size="7">SIGNED IN AS</text>
+                        <text class="s" x="388" y="184" font-size="8">admin</text>
+                        <!-- main: project rows + edit -->
+                        <text class="h" x="510" y="80" font-size="11">Projects</text>
+                        <text class="s" x="700" y="80" font-size="8" fill="#0d9488">+ new</text>
+                        <line class="row" x1="510" y1="92" x2="900" y2="92"/>
+                        <text class="s" x="512" y="108" font-size="9">MSN-01 · Fraud Triage</text>
+                        <text class="tab" x="828" y="108" fill="#0d9488">edit</text>
+                        <line class="row" x1="510" y1="118" x2="900" y2="118"/>
+                        <text class="s" x="512" y="134" font-size="9">MSN-02 · Demand Forecasting</text>
+                        <text class="tab" x="828" y="134" fill="#0d9488">edit</text>
+                        <line class="row" x1="510" y1="144" x2="900" y2="144"/>
+                        <text class="s" x="512" y="160" font-size="9">MSN-03 · Hospital Readmission</text>
+                        <text class="tab" x="828" y="160" fill="#0d9488">edit</text>
+                        <line class="row" x1="510" y1="170" x2="900" y2="170"/>
+                        <!-- mini chart -->
+                        <text class="k" x="510" y="196" font-size="7">VISITORS · LAST 14 DAYS</text>
+                        <rect class="bar2" x="512" y="232" width="14" height="20"/>
+                        <rect class="bar2" x="532" y="222" width="14" height="30"/>
+                        <rect class="bar2" x="552" y="238" width="14" height="14"/>
+                        <rect class="bar2" x="572" y="214" width="14" height="38"/>
+                        <rect class="bar2" x="592" y="226" width="14" height="26"/>
+                        <rect class="bar2" x="612" y="206" width="14" height="46"/>
+                        <rect class="bar2" x="632" y="220" width="14" height="32"/>
+                        <rect class="bar2" x="652" y="234" width="14" height="18"/>
+                        <rect class="btn" x="800" y="232" width="92" height="20"/>
+                        <text class="btxt" x="816" y="245">SAVE CHANGES</text>
+                    </svg>
+                    <figcaption class="ht-cap">Left: the login everyone sees. Right: the unlocked console — edit projects, read the inbox, and view visitor stats.</figcaption>
+                </figure>
+
+                <p>From the console I can:</p>
+                <ul class="ops-points">
+                    <li><b>Edit the live site's content.</b> Add, edit, reorder, publish, or unpublish a project — and the homepage updates instantly, with no redeploy. (That edit writes straight to the database the public reads from.)</li>
+                    <li><b>Read and triage the inbox.</b> See contact messages, flag the important ones, mark them handled, delete spam. The public can send mail but can never see this.</li>
+                    <li><b>Watch the visitors.</b> A dashboard of KPIs, top pages, traffic sources, a daily trend, and even a leaderboard for the hidden games — all from that one server-side function.</li>
+                </ul>
+                <div class="ht-note"><b>Why this is genuinely safe:</b> the console doesn't have secret powers baked
+                    into the page. It logs in, gets a token, and from then on the <em>database</em> recognises the
+                    request as "the owner" and applies the owner's rules. Log out and the exact same page can do
+                    nothing but show the login box again.</div>
+            </section>
+
+            <!-- ============ 10 TRICKS ============ -->
+            <section class="ht-sec" id="tricks">
+                <h2><span class="num">10</span> Shipping &amp; little tricks</h2>
+
+                <p>A few details I'm fond of, for anyone building something similar.</p>
+
+                <p><b>Two separate update paths.</b> Design and code changes ship through <code>git push</code> →
+                    Vercel. Content changes (project copy, reading messages) happen live in the database via the
+                    admin console. That separation means a recruiter never catches the site mid-redeploy.</p>
+
+                <p><b>Analytics you actually own.</b> No Google Analytics, no third-party script watching visitors.
+                    A tiny home-grown tracker writes cookieless events — no IP, no name, just a random id in your
+                    browser's storage — and it honours Do-Not-Track. The data lives in <em>my</em> database, and I
+                    read it through the admin dashboard.</p>
+
+                <p><b>Hidden games.</b> There's a little driving game and a tic-tac-toe tucked into the site as
+                    easter eggs. Beat them and your score quietly joins the leaderboard in the admin dashboard —
+                    the same analytics pipe, just having fun with it.</p>
+
+                <div class="ht-pills">
+                    <span>Custom crosshair cursor</span>
+                    <span>Hover-swap headings</span>
+                    <span>Focus-trapped modals</span>
+                    <span>Reduced-motion fallbacks</span>
+                    <span>Skip link + AA contrast</span>
+                    <span>JSON-LD + sitemap + llms.txt</span>
+                    <span>Offline fallback</span>
+                    <span>Pre-filled mailto safety net</span>
+                </div>
+
+                <p><b>Accessibility and SEO weren't afterthoughts.</b> Skip link, visible focus rings, a
+                    reduced-motion mode, and colour contrast that clears the standard. Because the pages are real
+                    HTML (not rendered by JavaScript), search engines and even language models can read them
+                    cleanly — there's a hand-written <code>llms.txt</code> for exactly that.</p>
+
+                <blockquote>The whole point: a portfolio that's fast and simple on the surface, but quietly runs on
+                    a real database — and stays safe doing it because the rules live where the data lives.</blockquote>
+
+                <p style="margin-top:8px"><a class="ht-backtop" href="#main">↑ back to top</a></p>
+            </section>
+
+        </article>
+
+        <section class="section">
+            <div class="interests-simple-box">
+                <h3 class="beyond-title">MORE NOTES</h3>
+                <p class="beyond-subtitle">More on how things actually got built.</p>
+                <a href="/blog" class="btn btn-secondary interactive-element no-underline">ALL POSTS</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">&copy; <span id="year"></span> Pranav Kaja. All rights reserved.</footer>
+    <div class="custom-cursor" id="custom-cursor"></div>
+    <div class="crosshair-h"></div>
+    <div class="crosshair-v"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="/config.js" defer></script>
+    <script src="/analytics.js" defer></script>
+    <script src="/main.js" defer></script>
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+    <!-- post-specific interactions, scoped so they can't collide with site JS -->
+    <script>
+    (function () {
+        var root = document.getElementById('howto');
+        if (!root) return;
+
+        /* reading-progress bar */
+        var bar = document.getElementById('ht-progress');
+        function onScroll() {
+            var d = document.documentElement;
+            var max = d.scrollHeight - d.clientHeight;
+            bar.style.width = (max > 0 ? (d.scrollTop / max) * 100 : 0).toFixed(1) + '%';
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+
+        /* dot rail — highlight the section currently in view */
+        var dots = [].slice.call(document.querySelectorAll('.ht-rail a'));
+        var secs = [].slice.call(document.querySelectorAll('.ht-sec'));
+        if (window.IntersectionObserver && secs.length) {
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (e.isIntersecting) {
+                        var id = '#' + e.target.id;
+                        dots.forEach(function (d) {
+                            d.classList.toggle('active', d.getAttribute('href') === id);
+                        });
+                    }
+                });
+            }, { rootMargin: '-45% 0px -50% 0px' });
+            secs.forEach(function (s) { io.observe(s); });
+        }
+
+        /* tabs — the three data flows */
+        var tabs = [].slice.call(document.querySelectorAll('.ht-tab'));
+        var panels = [].slice.call(document.querySelectorAll('.ht-panel'));
+        tabs.forEach(function (t) {
+            t.addEventListener('click', function () {
+                var key = t.getAttribute('data-tab');
+                tabs.forEach(function (x) { x.classList.toggle('active', x === t); });
+                panels.forEach(function (p) {
+                    p.classList.toggle('active', p.getAttribute('data-panel') === key);
+                });
+            });
+        });
+
+        /* permission simulator */
+        var RULES = {
+            read_pub: {
+                anon: [true, 'Published projects are public — the read rule lets a visitor see any project marked published.'],
+                auth: [true, 'You can read everything, published or not.']
+            },
+            read_draft: {
+                anon: [false, 'Drafts have published = false. The read rule filters them out, so they never leave the database — there is nothing on the page to "inspect."'],
+                auth: [true, 'Logged in, you can see drafts too. That is how you preview a project before publishing it.']
+            },
+            send_msg: {
+                anon: [true, 'Anyone can submit one message. The write rule caps the body at 1–5000 characters so the form can\'t be abused for bulk storage.'],
+                auth: [true, 'You can too — though normally you are on the reading end of the inbox.']
+            },
+            read_inbox: {
+                anon: [false, 'There is no read rule on messages for the public. You can send mail, but the inbox is invisible to everyone but the owner.'],
+                auth: [true, 'Only the logged-in admin can read, flag, and delete contact messages.']
+            },
+            log_event: {
+                anon: [true, 'Visitors can insert analytics events (write-only), with guards on the type length and numeric fields.'],
+                auth: [true, 'Allowed — though the interesting part is reading them, not writing them.']
+            },
+            read_stats: {
+                anon: [false, 'The public can\'t read the events table at all. The dashboard comes from a function granted to logged-in users only.'],
+                auth: [true, 'You read the analytics as tidy aggregates through that one server-side function.']
+            },
+            edit_proj: {
+                anon: [false, 'The public key grants no write power on projects — no insert, update, or delete. This is why shipping it in the page is safe.'],
+                auth: [true, 'Full control. This is exactly what the admin console uses to edit the live site.']
+            }
+        };
+
+        var role = 'anon';
+        var act = 'read_pub';
+        var verdict = document.getElementById('ht-verdict');
+        var why = document.getElementById('ht-why');
+
+        function render() {
+            var r = RULES[act][role];
+            var allowed = r[0];
+            verdict.textContent = allowed ? 'ALLOWED' : 'BLOCKED';
+            verdict.className = 'ht-verdict ' + (allowed ? 'ok' : 'no');
+            why.textContent = r[1];
+        }
+
+        document.querySelectorAll('#ht-role button').forEach(function (b) {
+            b.addEventListener('click', function () {
+                role = b.getAttribute('data-role');
+                document.querySelectorAll('#ht-role button').forEach(function (x) {
+                    x.classList.toggle('on', x === b);
+                });
+                render();
+            });
+        });
+        document.querySelectorAll('#ht-acts .ht-chip').forEach(function (c) {
+            c.addEventListener('click', function () {
+                act = c.getAttribute('data-act');
+                document.querySelectorAll('#ht-acts .ht-chip').forEach(function (x) {
+                    x.classList.toggle('on', x === c);
+                });
+                render();
+            });
+        });
+        render();
+    })();
+    </script>
+</body>
+
+</html>
