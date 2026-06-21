@@ -48,13 +48,131 @@
       ]
     }
     </script>
+
+    <style>
+    /* ============================================================
+       Scoped styles for this post only (prefix: ht-).
+       Calm teal interactive accent, the site's orange kept for highlights.
+       ============================================================ */
+    #howto{
+      --ht-ink:#18181b; --ht-muted:#6d6d75; --ht-line:#e4e4e7;
+      --ht-panel:#f7f7f8; --ht-card:#ffffff;
+      --ht-accent:#0d9488;      /* teal, primary interactive colour */
+      --ht-accent-soft:#f0fdfa; /* teal tint */
+      --ht-warn:#b45309;        /* muted amber */
+      --ht-orange:#c43c00;      /* the site accent, used sparingly */
+      max-width:840px;
+    }
+    #howto.post-body p{ font-size:1.05rem; line-height:1.75; }
+    #howto a{ color:var(--ht-accent); text-underline-offset:3px; }
+
+    /* thin reading-progress bar pinned to the very top */
+    .ht-progress{ position:fixed; top:0; left:0; height:3px; width:0;
+      background:var(--ht-accent); z-index:200; transition:width .08s linear; }
+
+    /* fixed dot rail (desktop only), click a dot to jump, current section lights up */
+    .ht-rail{ position:fixed; right:18px; top:50%; transform:translateY(-50%);
+      z-index:90; display:flex; flex-direction:column; gap:13px; }
+    .ht-rail a{ position:relative; width:11px; height:11px; border-radius:50%;
+      border:1.6px solid var(--ht-muted); background:transparent; transition:.18s; }
+    .ht-rail a:hover, .ht-rail a.active{ background:var(--ht-accent);
+      border-color:var(--ht-accent); transform:scale(1.3); }
+    .ht-rail a span{ position:absolute; right:22px; top:50%; transform:translateY(-50%);
+      white-space:nowrap; background:var(--ht-ink); color:#fff;
+      font:600 11px/1 'Inter',sans-serif; padding:6px 9px; border-radius:6px;
+      opacity:0; pointer-events:none; transition:.18s; }
+    .ht-rail a:hover span{ opacity:1; }
+    @media(max-width:1180px){ .ht-rail{ display:none; } }
+
+    /* contents card */
+    .ht-toc{ border:1px solid var(--ht-line); background:var(--ht-panel);
+      border-radius:12px; padding:18px 20px 8px; margin:8px 0 30px; }
+    .ht-toc .ht-toc-h{ font-family:'Share Tech Mono',monospace; font-size:.78rem;
+      letter-spacing:.14em; text-transform:uppercase; color:var(--ht-muted); margin-bottom:6px; }
+    .ht-toc ol{ list-style:none; margin:0; padding:0;
+      display:grid; grid-template-columns:1fr 1fr; gap:2px 22px; }
+    @media(max-width:620px){ .ht-toc ol{ grid-template-columns:1fr; } }
+    .ht-toc li a{ display:flex; gap:10px; align-items:baseline; padding:8px 4px;
+      border-bottom:1px solid transparent; text-decoration:none; color:var(--ht-ink);
+      font-size:.95rem; transition:.15s; }
+    .ht-toc li a:hover{ color:var(--ht-accent); }
+    .ht-toc li a .num{ font-family:'Share Tech Mono',monospace; font-size:.8rem;
+      color:var(--ht-accent); min-width:22px; }
+
+    /* section anchors clear the fixed top-nav */
+    .ht-sec{ scroll-margin-top:84px; }
+    #howto h2 .num{ font-family:'Share Tech Mono',monospace; color:var(--ht-accent);
+      font-size:.85rem; margin-right:10px; vertical-align:1px; }
+
+    /* big-idea callout */
+    .ht-big{ border:1px solid var(--ht-line); border-left:4px solid var(--ht-accent);
+      background:linear-gradient(180deg,var(--ht-accent-soft),#fff);
+      border-radius:0 12px 12px 0; padding:20px 24px; margin:6px 0 4px; }
+    .ht-big .k{ font-family:'Share Tech Mono',monospace; font-size:.72rem;
+      letter-spacing:.16em; text-transform:uppercase; color:var(--ht-accent); }
+    .ht-big p{ margin:6px 0 0 !important; font-size:1.12rem !important; }
+
+    /* teal note */
+    .ht-note{ border-left:3px solid var(--ht-accent); background:var(--ht-accent-soft);
+      padding:13px 17px; border-radius:0 9px 9px 0; margin:18px 0; font-size:.96rem;
+      line-height:1.6; color:#1f3a37; }
+    .ht-note b{ color:var(--ht-accent); }
+    .ht-note.warn{ border-left-color:var(--ht-warn); background:#fffaf2; color:#52391c; }
+    .ht-note.warn b{ color:var(--ht-warn); }
+
+    /* figure cards for the SVG diagrams */
+    .ht-fig{ border:1px solid var(--ht-line); background:var(--ht-card);
+      border-radius:12px; padding:12px; margin:20px 0; }
+    .ht-fig svg{ display:block; width:100%; height:auto; }
+    .ht-cap{ font-family:'Share Tech Mono',monospace; font-size:.74rem; line-height:1.5;
+      color:var(--ht-muted); text-align:center; padding:10px 12px 2px; }
+
+    /* stepper */
+    .ht-steps{ margin:18px 0; padding:0; list-style:none; counter-reset:s; }
+    .ht-steps li{ position:relative; padding:0 0 20px 46px; border-left:2px solid var(--ht-line);
+      margin-left:14px; }
+    .ht-steps li:last-child{ border-left-color:transparent; padding-bottom:0; }
+    .ht-steps li::before{ counter-increment:s; content:counter(s);
+      position:absolute; left:-15px; top:-2px; width:28px; height:28px; border-radius:50%;
+      background:var(--ht-accent); color:#fff; font:700 .82rem 'Share Tech Mono',monospace;
+      display:flex; align-items:center; justify-content:center; }
+    .ht-steps li b{ font:700 .98rem 'Inter',sans-serif; }
+    .ht-steps li p{ margin:3px 0 0 !important; font-size:.95rem !important; color:var(--ht-muted); line-height:1.55; }
+    .ht-steps code{ background:var(--ht-panel); border:1px solid var(--ht-line);
+      padding:1px 5px; border-radius:4px; font-family:'Share Tech Mono',monospace; font-size:.82em; }
+
+    /* dark code block */
+    .ht-code{ background:#0e0e10; color:#e9e9ee; border-radius:10px; padding:16px 18px;
+      overflow:auto; font:0.82rem/1.65 'Share Tech Mono',monospace; margin:14px 0; }
+    .ht-code .k{ color:#7fb5a8; }
+
+    .ht-pills{ display:flex; flex-wrap:wrap; gap:8px; margin:16px 0; }
+    .ht-pills span{ font:600 .76rem 'Share Tech Mono',monospace; letter-spacing:.03em;
+      padding:6px 11px; border:1px solid var(--ht-line); border-radius:20px;
+      color:var(--ht-ink); background:var(--ht-card); }
+    .ht-backtop{ display:inline-block; margin-top:6px; font-family:'Share Tech Mono',monospace;
+      font-size:.8rem; color:var(--ht-muted); }
+    </style>
 </head>
 
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
+    <div class="ht-progress" id="ht-progress" aria-hidden="true"></div>
+
     <nav class="top-nav">
         <a href="/" class="nav-logo interactive-element no-underline text-inherit">SUBJECT // PRANAV KAJA</a>
         <div class="nav-links"><a href="/blog"><span class="nav-num">&larr; </span>ALL POSTS</a></div>
+    </nav>
+
+    <!-- dot rail: jump between sections, current one lights up -->
+    <nav class="ht-rail" id="ht-rail" aria-label="Section navigation">
+        <a href="#problem"><span>The problem</span></a>
+        <a href="#pipeline"><span>The pipeline</span></a>
+        <a href="#stage1"><span>Stage 1: XGBoost</span></a>
+        <a href="#stage2"><span>Stage 2: the LLM</span></a>
+        <a href="#catch"><span>The case that proved it</span></a>
+        <a href="#arc"><span>The engineering arc</span></a>
+        <a href="#why"><span>Why the shape matters</span></a>
     </nav>
 
     <main class="container" id="main">
@@ -66,57 +184,193 @@
                 what it misses, and tells the analyst why.</p>
         </header>
 
-        <article class="section post-body">
+        <article class="section post-body" id="howto">
+
             <p>Most fraud systems hand the analyst a number. The model scores a transaction <code>0.87</code> and the
-                analyst has to figure out, from scratch, <em>why</em> it looks suspicious and what to do about it. That's
-                fine at low volume and brutal at scale. Card networks see millions of transactions a day, under 1% of
-                them fraud, each one real money.</p>
-            <p>So I built a two-stage pipeline that splits the job between two systems that are each good at different
-                things.</p>
+                analyst has to figure out, from scratch, <em>why</em> it looks suspicious and what to do about it. So I
+                built a pipeline that splits the job between two systems that are each good at different things, and
+                gives the analyst a decision instead of a number.</p>
 
-            <h2>Stage 1: XGBoost scores everything</h2>
-            <p>A gradient-boosted model trained on 284,807 historical card transactions scores every transaction with a
-                fraud probability. It's fast and cheap, so it scales to the full firehose and flags only the highest-risk
-                handful for review.</p>
+            <nav class="ht-toc" aria-label="Table of contents">
+                <div class="ht-toc-h">// Contents, jump anywhere</div>
+                <ol>
+                    <li><a href="#problem"><span class="num">01</span> A number is not a decision</a></li>
+                    <li><a href="#pipeline"><span class="num">02</span> The pipeline at a glance</a></li>
+                    <li><a href="#stage1"><span class="num">03</span> Stage 1: XGBoost scores everything</a></li>
+                    <li><a href="#stage2"><span class="num">04</span> Stage 2: the LLM reasons about the few</a></li>
+                    <li><a href="#catch"><span class="num">05</span> The case that justified it</a></li>
+                    <li><a href="#arc"><span class="num">06</span> The engineering arc</a></li>
+                    <li><a href="#why"><span class="num">07</span> Why the shape matters</a></li>
+                </ol>
+            </nav>
 
-            <h2>Stage 2: an LLM reasons about the few</h2>
-            <p>Each flagged transaction goes to a Google Gemini triage agent that reads the raw feature values and writes
-                a structured case file in a fixed JSON shape. It gives the verdict, the confidence, the primary signals,
-                the reasoning, and a recommended action:</p>
-            <blockquote><code>{ "verdict": "block", "confidence": 0.92, "primary_signals": ["V14","V10","V12"],
-                "reasoning": "Multiple anomalous patterns coincide with an elevated model score, consistent with
-                card-testing fraud.", "recommended_action": "Block and trigger SMS verification." }</code></blockquote>
-            <p>The analyst reviews a <em>decision</em> instead of a bare number. What used to take ~5 minutes of
-                investigation per case becomes ~30 seconds of verification. And because the LLM only sees the small slice
-                the model already flagged, you only pay its cost where it earns its keep.</p>
+            <div class="ht-big">
+                <div class="k">// The whole pipeline in one sentence</div>
+                <p>A fast model scores <b>every</b> transaction and flags only the risky handful. A reasoning model
+                    reads <b>those few</b> in detail and writes a verdict with its reasoning. Speed where you need
+                    volume, judgment where you need a human to trust it.</p>
+            </div>
 
-            <h2>The case that justified the whole thing</h2>
-            <p>During testing, one transaction scored <code>0.000000</code>. The model was certain it was legitimate. It
-                was actually fraud. The model would have let it through. The LLM, reading the raw features rather than the
-                model's confidence, noticed several anomalous signals and flagged it anyway.</p>
-            <p>That's the entire argument for two layers: the model is excellent on the bulk of cases but has occasional
-                blind spots, and a second opinion that reasons differently sometimes catches what it missed.</p>
+            <!-- ============ 01 PROBLEM ============ -->
+            <section class="ht-sec" id="problem">
+                <h2><span class="num">01</span> A number is not a decision</h2>
+                <p>A bare score is fine at low volume and brutal at scale. Card networks see millions of transactions a
+                    day, under 1% of them fraud, each one real money. Handing a reviewer <code>0.87</code> and asking
+                    them to reconstruct the case from scratch does not scale, and it leaves no audit trail of why a
+                    transaction was blocked.</p>
+            </section>
 
-            <h2>The engineering arc</h2>
-            <p>It didn't start clean. A vanilla gradient-boosting baseline stalled at 0.60 AUC, barely better than a coin
-                flip. The cause wasn't the algorithm. It was the data: a 577-to-1 class imbalance was drowning the loss
-                function, and 1,081 duplicate rows pushed it toward bimodal predictions that broke the metric.</p>
-            <ul class="ops-points">
-                <li>Switching to XGBoost with <code>scale_pos_weight=577</code> told the model to weight fraud examples
-                    577&times; during training. L2 regularization smoothed the duplicate-row impact. AUC jumped from 0.60
-                    to <strong>0.978</strong>, at 84% recall and 84% precision on the rare class.</li>
-                <li>The LLM layer enforces JSON with <code>response_mime_type="application/json"</code>. No regex
-                    parsing, no markdown fences to strip.</li>
-                <li>Only the top 5 most anomalous features go in the prompt, not all 30. Focused prompts, lower tokens.</li>
-                <li>A rate-limited batch processor handles 100 transactions in ~10 minutes with caching, so a dropped
-                    session loses no work, and projects cost across 1K to 1M daily volumes (~$30/month at 100K/day).</li>
-            </ul>
+            <!-- ============ 02 PIPELINE ============ -->
+            <section class="ht-sec" id="pipeline">
+                <h2><span class="num">02</span> The pipeline at a glance</h2>
+                <p>Two stages. The classical model handles the firehose; the language model handles the few cases that
+                    actually reach a human. You only pay the expensive model where it earns its keep.</p>
 
-            <h2>Why it matters</h2>
-            <p>The interesting part isn't the AUC. It's the shape. This is how major payments teams are starting to
-                deploy LLMs internally: as a reasoning layer <em>on top of</em> traditional ML, not as a replacement.
-                The model gives you speed. The LLM gives you explainability and an audit trail. You don't have to pick.</p>
-            <p style="margin-top: 26px;"><a href="/projects/fraud-triage" style="color: var(--accent-text); font-weight: 600;">&rarr; See the full project case file</a></p>
+                <figure class="ht-fig">
+                    <svg viewBox="0 0 940 200" role="img" aria-label="Two-stage pipeline: every transaction goes through XGBoost, only the top-risk few go to the Gemini LLM, the analyst reviews a decision">
+                        <defs>
+                            <marker id="fa" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#0d9488"/></marker>
+                            <marker id="fg" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#94a3b8"/></marker>
+                        </defs>
+                        <style>
+                          .ft{fill:#18181b; font:600 13px 'Inter',sans-serif}
+                          .fs{fill:#6d6d75; font:10.5px 'Share Tech Mono',monospace}
+                          .fk{font:600 9.5px 'Share Tech Mono',monospace; letter-spacing:.12em}
+                          .fe{fill:#0d9488; font:9.5px 'Share Tech Mono',monospace}
+                          .feg{fill:#94a3b8; font:9.5px 'Share Tech Mono',monospace}
+                        </style>
+
+                        <!-- 1 input -->
+                        <text class="fk" x="16" y="46" fill="#94a3b8">INPUT</text>
+                        <rect x="14" y="56" width="190" height="104" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.3"/>
+                        <text class="ft" x="30" y="88">Every transaction</text>
+                        <text class="fs" x="30" y="112">284,807 scored / day</text>
+                        <text class="fs" x="30" y="129">under 1% are fraud</text>
+                        <text class="fs" x="30" y="146">each one is real money</text>
+
+                        <!-- 2 xgboost -->
+                        <text class="fk" x="252" y="46" fill="#0d9488">STAGE 1</text>
+                        <rect x="250" y="56" width="190" height="104" rx="10" fill="#fff" stroke="#0d9488" stroke-width="1.5"/>
+                        <rect x="250" y="56" width="190" height="4" rx="2" fill="#0d9488"/>
+                        <text class="ft" x="266" y="90">XGBoost</text>
+                        <text class="fs" x="266" y="114">scores all, fast + cheap</text>
+                        <text class="fs" x="266" y="131">0.978 AUC</text>
+                        <text class="fs" x="266" y="148">flags the highest risk</text>
+
+                        <!-- 3 LLM -->
+                        <text class="fk" x="488" y="46" fill="#0d9488">STAGE 2</text>
+                        <rect x="486" y="56" width="190" height="104" rx="10" fill="#f0fdfa" stroke="#0d9488" stroke-width="1.5"/>
+                        <rect x="486" y="56" width="190" height="4" rx="2" fill="#0d9488"/>
+                        <text class="ft" x="502" y="90">Gemini LLM</text>
+                        <text class="fs" x="502" y="114">reads the raw features</text>
+                        <text class="fs" x="502" y="131">writes a JSON verdict</text>
+                        <text class="fs" x="502" y="148">plus its reasoning</text>
+
+                        <!-- 4 analyst -->
+                        <text class="fk" x="724" y="46" fill="#94a3b8">OUTPUT</text>
+                        <rect x="722" y="56" width="204" height="104" rx="10" fill="#fff" stroke="#e4e4e7" stroke-width="1.3"/>
+                        <text class="ft" x="738" y="90">Analyst</text>
+                        <text class="fs" x="738" y="114">reviews a decision</text>
+                        <text class="fs" x="738" y="131">~30s, not ~5min</text>
+                        <text class="fs" x="738" y="148">with an audit trail</text>
+
+                        <!-- arrows -->
+                        <path d="M204 108 L248 108" fill="none" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#fg)"/>
+                        <text class="feg" x="206" y="100">all</text>
+                        <path d="M440 108 L484 108" fill="none" stroke="#0d9488" stroke-width="1.9" marker-end="url(#fa)"/>
+                        <text class="fe" x="438" y="100">top few</text>
+                        <path d="M676 108 L720 108" fill="none" stroke="#0d9488" stroke-width="1.9" marker-end="url(#fa)"/>
+                        <text class="fe" x="678" y="100">verdict</text>
+                    </svg>
+                    <figcaption class="ht-cap">Every transaction goes through Stage 1. Only the top-risk few reach Stage 2. Teal = the reasoning path.</figcaption>
+                </figure>
+            </section>
+
+            <!-- ============ 03 STAGE 1 ============ -->
+            <section class="ht-sec" id="stage1">
+                <h2><span class="num">03</span> Stage 1: XGBoost scores everything</h2>
+                <p>A gradient-boosted model trained on 284,807 historical card transactions scores every transaction
+                    with a fraud probability. It is fast and cheap, so it scales to the full firehose and flags only the
+                    highest-risk handful for review. Most of the volume never needs a second look.</p>
+            </section>
+
+            <!-- ============ 04 STAGE 2 ============ -->
+            <section class="ht-sec" id="stage2">
+                <h2><span class="num">04</span> Stage 2: the LLM reasons about the few</h2>
+                <p>Each flagged transaction goes to a Google Gemini triage agent that reads the raw feature values and
+                    writes a structured case file in a fixed JSON shape. It gives the verdict, the confidence, the
+                    primary signals, the reasoning, and a recommended action:</p>
+                <pre class="ht-code">{
+  <span class="k">"verdict"</span>: "block",
+  <span class="k">"confidence"</span>: 0.92,
+  <span class="k">"primary_signals"</span>: ["V14", "V10", "V12"],
+  <span class="k">"reasoning"</span>: "Multiple anomalous patterns coincide with an
+                elevated model score, consistent with card-testing fraud.",
+  <span class="k">"recommended_action"</span>: "Block and trigger SMS verification."
+}</pre>
+                <p>The analyst reviews a <em>decision</em> instead of a bare number. What used to take ~5 minutes of
+                    investigation per case becomes ~30 seconds of verification. And because the LLM only sees the small
+                    slice the model already flagged, you only pay its cost where it earns its keep.</p>
+            </section>
+
+            <!-- ============ 05 THE CASE ============ -->
+            <section class="ht-sec" id="catch">
+                <h2><span class="num">05</span> The case that justified the whole thing</h2>
+                <div class="ht-note warn">
+                    <b>Score: 0.000000.</b> During testing, one transaction scored a perfect zero. The model was certain
+                    it was legitimate. It was actually fraud, and the model would have let it straight through.
+                </div>
+                <p>The LLM, reading the raw features rather than the model's confidence, noticed several anomalous
+                    signals and flagged it anyway. That is the entire argument for two layers: the model is excellent on
+                    the bulk of cases but has occasional blind spots, and a second opinion that reasons differently
+                    sometimes catches what it missed.</p>
+            </section>
+
+            <!-- ============ 06 ENGINEERING ARC ============ -->
+            <section class="ht-sec" id="arc">
+                <h2><span class="num">06</span> The engineering arc</h2>
+                <p>It did not start clean. Here is how a coin-flip baseline became a 0.978 model.</p>
+                <ol class="ht-steps">
+                    <li><b>Baseline stalled at 0.60 AUC</b>
+                        <p>A vanilla gradient-boosting baseline was barely better than a coin flip. The cause was not the
+                            algorithm, it was the data: a 577-to-1 class imbalance drowned the loss function, and 1,081
+                            duplicate rows pushed it toward bimodal predictions that broke the metric.</p></li>
+                    <li><b>Weight the rare class</b>
+                        <p>Switching to XGBoost with <code>scale_pos_weight=577</code> told the model to weight fraud
+                            examples 577&times; during training. L2 regularization smoothed the duplicate-row impact. AUC
+                            jumped from 0.60 to <strong>0.978</strong>, at 84% recall and 84% precision on the rare class.</p></li>
+                    <li><b>Force clean JSON</b>
+                        <p>The LLM layer enforces JSON with <code>response_mime_type="application/json"</code>. No regex
+                            parsing, no markdown fences to strip.</p></li>
+                    <li><b>Keep the prompt tight</b>
+                        <p>Only the top 5 most anomalous features go in the prompt, not all 30. Focused prompts, lower
+                            tokens, sharper reasoning.</p></li>
+                    <li><b>Batch and cache</b>
+                        <p>A rate-limited processor handles 100 transactions in ~10 minutes with caching, so a dropped
+                            session loses no work. Cost projects cleanly across 1K to 1M daily volumes (about $30/month
+                            at 100K/day).</p></li>
+                </ol>
+                <div class="ht-pills">
+                    <span>XGBoost</span>
+                    <span>Google Gemini</span>
+                    <span>scale_pos_weight=577</span>
+                    <span>JSON mode</span>
+                    <span>L2 regularization</span>
+                    <span>Batch + caching</span>
+                </div>
+            </section>
+
+            <!-- ============ 07 WHY ============ -->
+            <section class="ht-sec" id="why">
+                <h2><span class="num">07</span> Why the shape matters</h2>
+                <p>The interesting part is not the AUC. It is the shape. This is how major payments teams are starting
+                    to deploy LLMs internally: as a reasoning layer <em>on top of</em> traditional ML, not as a
+                    replacement. The model gives you speed. The LLM gives you explainability and an audit trail. You do
+                    not have to pick.</p>
+                <p style="margin-top: 22px;"><a href="/projects/fraud-triage" style="font-weight: 600;">&rarr; See the full project case file</a></p>
+                <p style="margin-top:4px"><a class="ht-backtop" href="#main">&uarr; back to top</a></p>
+            </section>
+
         </article>
 
         <section class="section">
@@ -137,6 +391,41 @@
     <script src="/analytics.js" defer></script>
     <script src="/main.js" defer></script>
     <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+    <!-- post-specific interactions, scoped so they can't collide with site JS -->
+    <script>
+    (function () {
+        var root = document.getElementById('howto');
+        if (!root) return;
+
+        /* reading-progress bar */
+        var bar = document.getElementById('ht-progress');
+        function onScroll() {
+            var d = document.documentElement;
+            var max = d.scrollHeight - d.clientHeight;
+            bar.style.width = (max > 0 ? (d.scrollTop / max) * 100 : 0).toFixed(1) + '%';
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+
+        /* dot rail, highlight the section currently in view */
+        var dots = [].slice.call(document.querySelectorAll('.ht-rail a'));
+        var secs = [].slice.call(document.querySelectorAll('.ht-sec'));
+        if (window.IntersectionObserver && secs.length) {
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (e.isIntersecting) {
+                        var id = '#' + e.target.id;
+                        dots.forEach(function (d) {
+                            d.classList.toggle('active', d.getAttribute('href') === id);
+                        });
+                    }
+                });
+            }, { rootMargin: '-45% 0px -50% 0px' });
+            secs.forEach(function (s) { io.observe(s); });
+        }
+    })();
+    </script>
 </body>
 
 </html>

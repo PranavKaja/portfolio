@@ -48,13 +48,143 @@
       ]
     }
     </script>
+
+    <style>
+    /* ============================================================
+       Scoped styles for this post only (prefix: ht-).
+       Calm teal interactive accent, the site's orange kept for highlights.
+       ============================================================ */
+    #howto{
+      --ht-ink:#18181b; --ht-muted:#6d6d75; --ht-line:#e4e4e7;
+      --ht-panel:#f7f7f8; --ht-card:#ffffff;
+      --ht-accent:#0d9488;      /* teal, primary interactive colour */
+      --ht-accent-soft:#f0fdfa; /* teal tint */
+      --ht-warn:#b45309;        /* muted amber */
+      --ht-orange:#c43c00;      /* the site accent, used sparingly */
+      max-width:840px;
+    }
+    #howto.post-body p{ font-size:1.05rem; line-height:1.75; }
+    #howto a{ color:var(--ht-accent); text-underline-offset:3px; }
+
+    /* thin reading-progress bar pinned to the very top */
+    .ht-progress{ position:fixed; top:0; left:0; height:3px; width:0;
+      background:var(--ht-accent); z-index:200; transition:width .08s linear; }
+
+    /* fixed dot rail (desktop only), click a dot to jump, current section lights up */
+    .ht-rail{ position:fixed; right:18px; top:50%; transform:translateY(-50%);
+      z-index:90; display:flex; flex-direction:column; gap:13px; }
+    .ht-rail a{ position:relative; width:11px; height:11px; border-radius:50%;
+      border:1.6px solid var(--ht-muted); background:transparent; transition:.18s; }
+    .ht-rail a:hover, .ht-rail a.active{ background:var(--ht-accent);
+      border-color:var(--ht-accent); transform:scale(1.3); }
+    .ht-rail a span{ position:absolute; right:22px; top:50%; transform:translateY(-50%);
+      white-space:nowrap; background:var(--ht-ink); color:#fff;
+      font:600 11px/1 'Inter',sans-serif; padding:6px 9px; border-radius:6px;
+      opacity:0; pointer-events:none; transition:.18s; }
+    .ht-rail a:hover span{ opacity:1; }
+    @media(max-width:1180px){ .ht-rail{ display:none; } }
+
+    /* contents card */
+    .ht-toc{ border:1px solid var(--ht-line); background:var(--ht-panel);
+      border-radius:12px; padding:18px 20px 8px; margin:8px 0 30px; }
+    .ht-toc .ht-toc-h{ font-family:'Share Tech Mono',monospace; font-size:.78rem;
+      letter-spacing:.14em; text-transform:uppercase; color:var(--ht-muted); margin-bottom:6px; }
+    .ht-toc ol{ list-style:none; margin:0; padding:0;
+      display:grid; grid-template-columns:1fr 1fr; gap:2px 22px; }
+    @media(max-width:620px){ .ht-toc ol{ grid-template-columns:1fr; } }
+    .ht-toc li a{ display:flex; gap:10px; align-items:baseline; padding:8px 4px;
+      border-bottom:1px solid transparent; text-decoration:none; color:var(--ht-ink);
+      font-size:.95rem; transition:.15s; }
+    .ht-toc li a:hover{ color:var(--ht-accent); }
+    .ht-toc li a .num{ font-family:'Share Tech Mono',monospace; font-size:.8rem;
+      color:var(--ht-accent); min-width:22px; }
+
+    /* section anchors clear the fixed top-nav */
+    .ht-sec{ scroll-margin-top:84px; }
+    #howto h2 .num{ font-family:'Share Tech Mono',monospace; color:var(--ht-accent);
+      font-size:.85rem; margin-right:10px; vertical-align:1px; }
+
+    /* big-idea callout */
+    .ht-big{ border:1px solid var(--ht-line); border-left:4px solid var(--ht-accent);
+      background:linear-gradient(180deg,var(--ht-accent-soft),#fff);
+      border-radius:0 12px 12px 0; padding:20px 24px; margin:6px 0 4px; }
+    .ht-big .k{ font-family:'Share Tech Mono',monospace; font-size:.72rem;
+      letter-spacing:.16em; text-transform:uppercase; color:var(--ht-accent); }
+    .ht-big p{ margin:6px 0 0 !important; font-size:1.12rem !important; }
+
+    /* teal note */
+    .ht-note{ border-left:3px solid var(--ht-accent); background:var(--ht-accent-soft);
+      padding:13px 17px; border-radius:0 9px 9px 0; margin:18px 0; font-size:.96rem;
+      line-height:1.6; color:#1f3a37; }
+    .ht-note b{ color:var(--ht-accent); }
+
+    /* figure cards for the SVG diagrams */
+    .ht-fig{ border:1px solid var(--ht-line); background:var(--ht-card);
+      border-radius:12px; padding:12px; margin:20px 0; }
+    .ht-fig svg{ display:block; width:100%; height:auto; }
+    .ht-cap{ font-family:'Share Tech Mono',monospace; font-size:.74rem; line-height:1.5;
+      color:var(--ht-muted); text-align:center; padding:10px 12px 2px; }
+
+    /* stat band */
+    .ht-stat{ display:flex; flex-wrap:wrap; align-items:center; gap:6px 18px; margin:18px 0;
+      border:1px solid var(--ht-line); border-radius:12px; padding:16px 20px; background:var(--ht-panel); }
+    .ht-stat .big{ font:800 1.7rem 'Inter',sans-serif; color:var(--ht-ink); }
+    .ht-stat .arrow{ color:var(--ht-accent); font:700 1.2rem 'Share Tech Mono',monospace; }
+    .ht-stat .lab{ font-family:'Share Tech Mono',monospace; font-size:.74rem;
+      letter-spacing:.08em; text-transform:uppercase; color:var(--ht-muted); }
+
+    /* stepper */
+    .ht-steps{ margin:18px 0; padding:0; list-style:none; counter-reset:s; }
+    .ht-steps li{ position:relative; padding:0 0 20px 46px; border-left:2px solid var(--ht-line);
+      margin-left:14px; }
+    .ht-steps li:last-child{ border-left-color:transparent; padding-bottom:0; }
+    .ht-steps li::before{ counter-increment:s; content:counter(s);
+      position:absolute; left:-15px; top:-2px; width:28px; height:28px; border-radius:50%;
+      background:var(--ht-accent); color:#fff; font:700 .82rem 'Share Tech Mono',monospace;
+      display:flex; align-items:center; justify-content:center; }
+    .ht-steps li b{ font:700 .98rem 'Inter',sans-serif; }
+    .ht-steps li p{ margin:3px 0 0 !important; font-size:.95rem !important; color:var(--ht-muted); line-height:1.55; }
+
+    /* live-tool call to action */
+    .ht-cta{ border:1px solid var(--ht-accent); border-radius:14px; overflow:hidden;
+      background:linear-gradient(180deg,var(--ht-accent-soft),#fff); margin:22px 0; }
+    .ht-cta .body{ padding:20px 24px; }
+    .ht-cta .k{ font-family:'Share Tech Mono',monospace; font-size:.72rem;
+      letter-spacing:.16em; text-transform:uppercase; color:var(--ht-accent); }
+    .ht-cta h3{ margin:6px 0 6px; font:800 1.2rem 'Inter',sans-serif; color:var(--ht-ink); }
+    .ht-cta p{ margin:0 0 14px !important; font-size:.98rem !important; color:#334; line-height:1.6; }
+    #howto .ht-cta .go{ display:inline-block; background:var(--ht-accent); color:#fff;
+      font:700 .82rem 'Share Tech Mono',monospace; letter-spacing:.04em; text-transform:uppercase;
+      padding:11px 20px; border-radius:8px; text-decoration:none; }
+    #howto .ht-cta .go:hover{ background:#0b7c72; color:#fff; }
+
+    .ht-pills{ display:flex; flex-wrap:wrap; gap:8px; margin:16px 0; }
+    .ht-pills span{ font:600 .76rem 'Share Tech Mono',monospace; letter-spacing:.03em;
+      padding:6px 11px; border:1px solid var(--ht-line); border-radius:20px;
+      color:var(--ht-ink); background:var(--ht-card); }
+    .ht-backtop{ display:inline-block; margin-top:6px; font-family:'Share Tech Mono',monospace;
+      font-size:.8rem; color:var(--ht-muted); }
+    </style>
 </head>
 
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
+    <div class="ht-progress" id="ht-progress" aria-hidden="true"></div>
+
     <nav class="top-nav">
         <a href="/" class="nav-logo interactive-element no-underline text-inherit">SUBJECT // PRANAV KAJA</a>
         <div class="nav-links"><a href="/blog"><span class="nav-num">&larr; </span>ALL POSTS</a></div>
+    </nav>
+
+    <!-- dot rail: jump between sections, current one lights up -->
+    <nav class="ht-rail" id="ht-rail" aria-label="Section navigation">
+        <a href="#problem"><span>The two-hour problem</span></a>
+        <a href="#pipeline"><span>The pipeline</span></a>
+        <a href="#extract"><span>Extract</span></a>
+        <a href="#transform"><span>Transform</span></a>
+        <a href="#load"><span>Load</span></a>
+        <a href="#payoff"><span>The real payoff</span></a>
+        <a href="#tool"><span>The live tool</span></a>
     </nav>
 
     <main class="container" id="main">
@@ -66,50 +196,188 @@
                 deleting toil and making the numbers trustworthy.</p>
         </header>
 
-        <article class="section post-body">
+        <article class="section post-body" id="howto">
+
             <p>At UMass Amherst Dining, reporting across 37 locations used to eat about two hours a day. Someone pulled
                 numbers from each location, pasted them into a master sheet, reconciled the inevitable mismatches, and
                 only then could anyone ask an actual question of the data. By the time the report was ready, it was
-                already stale.</p>
-            <p>None of that was a modeling problem. It was an <strong>ETL</strong> problem (extract, transform, load),
-                and it was being done by hand. So I automated it.</p>
+                already stale. None of that was a modeling problem. It was an <strong>ETL</strong> problem (extract,
+                transform, load), done by hand. So I automated it.</p>
 
-            <h2>Extract: meet the data where it lives</h2>
-            <p>Thirty-seven locations means thirty-seven slightly different habits. Different column orders, different
-                names for the same thing, the occasional missing day. The first job wasn't transformation, it was
-                building extraction that tolerates that mess instead of breaking on it. Standardize on ingest, log what
-                doesn't fit, and never silently drop a row.</p>
+            <nav class="ht-toc" aria-label="Table of contents">
+                <div class="ht-toc-h">// Contents, jump anywhere</div>
+                <ol>
+                    <li><a href="#problem"><span class="num">01</span> The two-hour problem</a></li>
+                    <li><a href="#pipeline"><span class="num">02</span> The pipeline at a glance</a></li>
+                    <li><a href="#extract"><span class="num">03</span> Extract: meet the data where it lives</a></li>
+                    <li><a href="#transform"><span class="num">04</span> Transform: boring and repeatable</a></li>
+                    <li><a href="#load"><span class="num">05</span> Load: one source of truth</a></li>
+                    <li><a href="#payoff"><span class="num">06</span> The real payoff</a></li>
+                    <li><a href="#tool"><span class="num">07</span> The live tool it became</a></li>
+                </ol>
+            </nav>
 
-            <h2>Transform: make it boring and repeatable</h2>
-            <p>The transform layer normalizes everything into one shape: consistent keys, consistent units, consistent
-                location IDs. The rule I held onto was <strong>idempotency</strong>. Running the pipeline twice on the
-                same inputs produces exactly the same output. That's what lets you re-run it without fear when a
-                location submits a correction at 4pm.</p>
-            <ul class="ops-points">
-                <li>Validate at the edges: row counts, value ranges, and "does every location actually show up today?"
-                    checks that fail loudly instead of producing a quietly wrong number.</li>
-                <li>Keep an audit trail of what ran, when, and what it touched, so the next person (or future me) can
-                    actually read what happened.</li>
-                <li>Write the logic so a teammate can follow it. A pipeline only one person understands is a liability,
-                    not an asset.</li>
-            </ul>
+            <div class="ht-big">
+                <div class="k">// The whole point in one sentence</div>
+                <p>The win was not a clever model. It was deleting two hours of manual reporting a day and making the
+                    numbers trustworthy enough to forecast on.</p>
+            </div>
 
-            <h2>Load: one source of truth</h2>
-            <p>Everything lands in a single reporting layer, so leadership stops reconciling spreadsheets and starts
-                asking questions. The two hours of manual reporting dropped to about <strong>12 minutes</strong>, and
-                most of that is now review, not assembly.</p>
+            <!-- ============ 01 PROBLEM ============ -->
+            <section class="ht-sec" id="problem">
+                <h2><span class="num">01</span> The two-hour problem</h2>
+                <p>Thirty-seven locations, one master sheet, and a person stitching it together by hand every morning.
+                    The work was slow, easy to get wrong, and stale by the time it landed. Worst of all, nobody trusted
+                    the numbers enough to plan on them. The fix was not a fancier dashboard. It was making the boring
+                    part disappear.</p>
+            </section>
 
-            <h2>The real payoff: forecasting on data you trust</h2>
-            <p>Once the numbers were consistent and current, they were good enough to <strong>forecast on</strong>. That
-                opened the door to data-driven inventory forecasting across locations, anticipating demand instead of
-                reacting to last week's stockout. You can't forecast on data you don't trust, and you can't trust data
-                that's reassembled by hand every morning.</p>
+            <!-- ============ 02 PIPELINE ============ -->
+            <section class="ht-sec" id="pipeline">
+                <h2><span class="num">02</span> The pipeline at a glance</h2>
+                <p>Three stages, each with one job. The messy reality of 37 locations goes in one end; a single
+                    trustworthy reporting layer comes out the other.</p>
 
-            <blockquote>The lesson I keep relearning: the highest-leverage data work is often the least glamorous.
-                Remove the toil, make the inputs trustworthy, and the interesting analysis becomes possible.</blockquote>
+                <figure class="ht-fig">
+                    <svg viewBox="0 0 940 200" role="img" aria-label="ETL pipeline: 37 locations feed Extract, then Transform, then Load into one source of truth">
+                        <defs>
+                            <marker id="fa" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#0d9488"/></marker>
+                            <marker id="fg" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#94a3b8"/></marker>
+                        </defs>
+                        <style>
+                          .ft{fill:#18181b; font:600 13px 'Inter',sans-serif}
+                          .fs{fill:#6d6d75; font:10.5px 'Share Tech Mono',monospace}
+                          .fk{font:600 9.5px 'Share Tech Mono',monospace; letter-spacing:.12em}
+                          .fe{fill:#0d9488; font:9.5px 'Share Tech Mono',monospace}
+                          .feg{fill:#94a3b8; font:9.5px 'Share Tech Mono',monospace}
+                        </style>
 
-            <p style="margin-top: 8px; font-size: 0.92rem; color: var(--text-muted);"><em>Working draft. I'll expand
-                this with the specific tooling and a before/after diagram.</em></p>
+                        <!-- 1 input -->
+                        <text class="fk" x="16" y="46" fill="#b45309">INPUT</text>
+                        <rect x="14" y="56" width="190" height="104" rx="10" fill="#fffaf2" stroke="#e2c08a" stroke-width="1.3"/>
+                        <text class="ft" x="30" y="88">37 locations</text>
+                        <text class="fs" x="30" y="112">different formats</text>
+                        <text class="fs" x="30" y="129">missing days</text>
+                        <text class="fs" x="30" y="146">stitched by hand</text>
+
+                        <!-- 2 extract -->
+                        <text class="fk" x="252" y="46" fill="#0d9488">EXTRACT</text>
+                        <rect x="250" y="56" width="190" height="104" rx="10" fill="#fff" stroke="#0d9488" stroke-width="1.5"/>
+                        <rect x="250" y="56" width="190" height="4" rx="2" fill="#0d9488"/>
+                        <text class="ft" x="266" y="90">Tolerant ingest</text>
+                        <text class="fs" x="266" y="114">accepts the mess</text>
+                        <text class="fs" x="266" y="131">logs what does not fit</text>
+                        <text class="fs" x="266" y="148">never drops a row</text>
+
+                        <!-- 3 transform -->
+                        <text class="fk" x="488" y="46" fill="#0d9488">TRANSFORM</text>
+                        <rect x="486" y="56" width="190" height="104" rx="10" fill="#f0fdfa" stroke="#0d9488" stroke-width="1.5"/>
+                        <rect x="486" y="56" width="190" height="4" rx="2" fill="#0d9488"/>
+                        <text class="ft" x="502" y="90">One shape</text>
+                        <text class="fs" x="502" y="114">consistent keys + units</text>
+                        <text class="fs" x="502" y="131">idempotent</text>
+                        <text class="fs" x="502" y="148">validated at the edges</text>
+
+                        <!-- 4 load -->
+                        <text class="fk" x="724" y="46" fill="#0d9488">LOAD</text>
+                        <rect x="722" y="56" width="204" height="104" rx="10" fill="#fff" stroke="#0d9488" stroke-width="1.5"/>
+                        <rect x="722" y="56" width="204" height="4" rx="2" fill="#0d9488"/>
+                        <text class="ft" x="738" y="90">One source of truth</text>
+                        <text class="fs" x="738" y="114">leadership asks questions</text>
+                        <text class="fs" x="738" y="131">~12 min, mostly review</text>
+                        <text class="fs" x="738" y="148">ready to forecast on</text>
+
+                        <!-- arrows -->
+                        <path d="M204 108 L248 108" fill="none" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#fg)"/>
+                        <text class="feg" x="206" y="100">raw</text>
+                        <path d="M440 108 L484 108" fill="none" stroke="#0d9488" stroke-width="1.9" marker-end="url(#fa)"/>
+                        <text class="fe" x="442" y="100">clean</text>
+                        <path d="M676 108 L720 108" fill="none" stroke="#0d9488" stroke-width="1.9" marker-end="url(#fa)"/>
+                        <text class="fe" x="678" y="100">trusted</text>
+                    </svg>
+                    <figcaption class="ht-cap">Messy in, trustworthy out. Two hours of manual reporting a day became about twelve. Teal = the automated path.</figcaption>
+                </figure>
+            </section>
+
+            <!-- ============ 03 EXTRACT ============ -->
+            <section class="ht-sec" id="extract">
+                <h2><span class="num">03</span> Extract: meet the data where it lives</h2>
+                <p>Thirty-seven locations means thirty-seven slightly different habits. Different column orders, different
+                    names for the same thing, the occasional missing day. The first job was not transformation, it was
+                    building extraction that tolerates that mess instead of breaking on it.</p>
+                <div class="ht-note"><b>The one rule:</b> standardize on ingest, log what does not fit, and never
+                    silently drop a row. A pipeline that hides bad data is worse than one that stops and tells you.</div>
+            </section>
+
+            <!-- ============ 04 TRANSFORM ============ -->
+            <section class="ht-sec" id="transform">
+                <h2><span class="num">04</span> Transform: make it boring and repeatable</h2>
+                <p>The transform layer normalizes everything into one shape: consistent keys, consistent units,
+                    consistent location IDs. The rule I held onto was <strong>idempotency</strong>. Running the pipeline
+                    twice on the same inputs produces exactly the same output. That is what lets you re-run it without
+                    fear when a location submits a correction at 4pm.</p>
+                <ol class="ht-steps">
+                    <li><b>Validate at the edges</b>
+                        <p>Row counts, value ranges, and a "does every location actually show up today?" check that
+                            fails loudly instead of producing a quietly wrong number.</p></li>
+                    <li><b>Keep an audit trail</b>
+                        <p>What ran, when, and what it touched, so the next person (or future me) can actually read what
+                            happened.</p></li>
+                    <li><b>Write it so a teammate can follow</b>
+                        <p>A pipeline only one person understands is a liability, not an asset.</p></li>
+                </ol>
+            </section>
+
+            <!-- ============ 05 LOAD ============ -->
+            <section class="ht-sec" id="load">
+                <h2><span class="num">05</span> Load: one source of truth</h2>
+                <p>Everything lands in a single reporting layer, so leadership stops reconciling spreadsheets and starts
+                    asking questions. The two hours of manual reporting dropped to about twelve minutes, and most of that
+                    is now review, not assembly.</p>
+                <div class="ht-stat">
+                    <span class="big">2 hours</span>
+                    <span class="arrow">&rarr;</span>
+                    <span class="big">12 minutes</span>
+                    <span class="lab">a day, mostly review now</span>
+                </div>
+            </section>
+
+            <!-- ============ 06 PAYOFF ============ -->
+            <section class="ht-sec" id="payoff">
+                <h2><span class="num">06</span> The real payoff: forecasting on data you trust</h2>
+                <p>Once the numbers were consistent and current, they were good enough to <strong>forecast on</strong>.
+                    That opened the door to data-driven inventory forecasting across locations, anticipating demand
+                    instead of reacting to last week's stockout. You can't forecast on data you don't trust, and you
+                    can't trust data that's reassembled by hand every morning.</p>
+                <blockquote>The lesson I keep relearning: the highest-leverage data work is often the least glamorous.
+                    Remove the toil, make the inputs trustworthy, and the interesting analysis becomes possible.</blockquote>
+                <div class="ht-pills">
+                    <span>ETL</span>
+                    <span>Idempotency</span>
+                    <span>Edge validation</span>
+                    <span>Audit trail</span>
+                    <span>Inventory forecasting</span>
+                </div>
+            </section>
+
+            <!-- ============ 07 LIVE TOOL ============ -->
+            <section class="ht-sec" id="tool">
+                <h2><span class="num">07</span> The live tool it became</h2>
+                <p>The same kitchen operation ran another job on a hand-built 39-tab spreadsheet: turning the day's order
+                    report into production sheets. I rebuilt that as a tool you can actually use, the same "kill the
+                    toil" idea pushed one step further.</p>
+                <div class="ht-cta">
+                    <div class="body">
+                        <div class="k">// Live tool, try it</div>
+                        <h3>CPK Production Planner</h3>
+                        <p>Paste a commissary kitchen's daily order report and get the make list and per-station pick
+                            sheets across 36 locations, instantly, entirely in your browser. Nothing is sent anywhere.</p>
+                        <a class="go" href="/projects/cpk-production">Try the CPK Production Planner &rarr;</a>
+                    </div>
+                </div>
+                <p style="margin-top:6px"><a class="ht-backtop" href="#main">&uarr; back to top</a></p>
+            </section>
+
         </article>
 
         <section class="section">
@@ -130,6 +398,41 @@
     <script src="/analytics.js" defer></script>
     <script src="/main.js" defer></script>
     <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+    <!-- post-specific interactions, scoped so they can't collide with site JS -->
+    <script>
+    (function () {
+        var root = document.getElementById('howto');
+        if (!root) return;
+
+        /* reading-progress bar */
+        var bar = document.getElementById('ht-progress');
+        function onScroll() {
+            var d = document.documentElement;
+            var max = d.scrollHeight - d.clientHeight;
+            bar.style.width = (max > 0 ? (d.scrollTop / max) * 100 : 0).toFixed(1) + '%';
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+
+        /* dot rail, highlight the section currently in view */
+        var dots = [].slice.call(document.querySelectorAll('.ht-rail a'));
+        var secs = [].slice.call(document.querySelectorAll('.ht-sec'));
+        if (window.IntersectionObserver && secs.length) {
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (e.isIntersecting) {
+                        var id = '#' + e.target.id;
+                        dots.forEach(function (d) {
+                            d.classList.toggle('active', d.getAttribute('href') === id);
+                        });
+                    }
+                });
+            }, { rootMargin: '-45% 0px -50% 0px' });
+            secs.forEach(function (s) { io.observe(s); });
+        }
+    })();
+    </script>
 </body>
 
 </html>
