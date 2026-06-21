@@ -152,5 +152,23 @@
     "status": "archived",
     "sort_order": 90,
     "published": true
+  },
+  {
+    "code": "MSN-10",
+    "title": "CPK Production Planner",
+    "tech": "In-Browser Tool / JS",
+    "summary": "Order report in, make lists and pick sheets out, across 36 locations.",
+    "stack": "Vanilla JS / In-Browser",
+    "hook": "Paste the day's order report, get every production sheet.",
+    "brief": "A live tool that replaces a hand-built 39-tab spreadsheet for a commissary kitchen. Paste the daily order recap and it builds the DC and retail make lists, plus bread, prep, fruit, packout and stickers, across 36 campus locations. It runs entirely in the browser, nothing is sent anywhere.",
+    "role": "Solo build, end to end",
+    "method": "Parses the order recap and pivots it into per-station production sheets, all client-side",
+    "outcome": "A 39-tab manual spreadsheet replaced by an instant, in-browser planner",
+    "chips": ["Live Tool", "36 Locations", "In-Browser", "Zero Backend"],
+    "status": "deployed",
+    "sort_order": 100,
+    "published": true,
+    "github_url": "https://pranavkaja.vercel.app/projects/cpk-production",
+    "show_github": true
   }
 ]
