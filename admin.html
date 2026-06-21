@@ -13,6 +13,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Share+Tech+Mono&display=swap"
         rel="stylesheet">
+    <style>
+        /* Skills + Certifications inline editor cards */
+        .sc-list { display: flex; flex-direction: column; gap: 14px; }
+        .sc-card { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px;
+            background: var(--panel-bg); display: flex; flex-direction: column; gap: 12px; }
+        .sc-grid { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+        .sc-f { display: flex; flex-direction: column; gap: 5px; font-size: 0.66rem;
+            letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+        .sc-grow { flex: 1 1 220px; }
+        .sc-num { width: 96px; }
+        .sc-pub { flex-direction: row; align-items: center; gap: 8px; white-space: nowrap; }
+        .sc-f textarea { min-height: 54px; resize: vertical; }
+        .sc-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    </style>
 </head>
 
 <body>
@@ -61,6 +75,8 @@
                 <button class="tab active" data-tab="projects">Projects</button>
                 <button class="tab" data-tab="transmissions">Transmissions<span id="tx-unread" class="tab-badge hidden"></span></button>
                 <button class="tab" data-tab="intel">Intel</button>
+                <button class="tab" data-tab="skills">Skills</button>
+                <button class="tab" data-tab="certifications">Certs</button>
                 <div class="spacer"></div>
                 <button class="ghost" id="universal-refresh-btn" title="Refresh all data" style="font-size: 1.1rem; padding: 2px 8px; border: none; align-self: center;">⟳</button>
             </div>
@@ -92,6 +108,30 @@
                 </table>
                 <div class="empty hidden" id="empty">// NO MISSION RECORDS</div>
                 <div id="projects-cards" class="proj-cards hidden"></div>
+            </div>
+
+            <!-- SKILLS PANEL -->
+            <div id="panel-skills" class="hidden">
+                <div class="row" style="margin-bottom:18px">
+                    <button class="primary" id="new-skill-btn">+ New Category</button>
+                    <div class="spacer"></div>
+                    <span class="console-label" id="skills-count"></span>
+                </div>
+                <div class="msg" id="skills-msg"></div>
+                <div id="skills-list" class="sc-list"></div>
+                <div class="empty hidden" id="skills-empty">// NO SKILL CATEGORIES</div>
+            </div>
+
+            <!-- CERTIFICATIONS PANEL -->
+            <div id="panel-certifications" class="hidden">
+                <div class="row" style="margin-bottom:18px">
+                    <button class="primary" id="new-cert-btn">+ New Certification</button>
+                    <div class="spacer"></div>
+                    <span class="console-label" id="certs-admin-count"></span>
+                </div>
+                <div class="msg" id="certs-admin-msg"></div>
+                <div id="certs-list" class="sc-list"></div>
+                <div class="empty hidden" id="certs-empty">// NO CERTIFICATIONS</div>
             </div>
 
             <!-- TRANSMISSIONS PANEL -->

@@ -591,7 +591,7 @@
   // ============================================================
   // Tabs
   // ============================================================
-  const PANELS = { projects: 'panel-projects', transmissions: 'panel-transmissions', intel: 'panel-intel' };
+  const PANELS = { projects: 'panel-projects', transmissions: 'panel-transmissions', intel: 'panel-intel', skills: 'panel-skills', certifications: 'panel-certifications' };
   document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -600,7 +600,126 @@
       Object.keys(PANELS).forEach(k => $(PANELS[k]).classList.toggle('hidden', k !== which));
       if (which === 'transmissions') loadTransmissions();
       if (which === 'intel') loadIntel(true);
+      if (which === 'skills') Sections.skills.load();
+      if (which === 'certifications') Sections.certs.load();
     });
+  });
+
+  // ============================================================
+  // Skills + Certifications: inline editable cards (mini-CRUD)
+  // ============================================================
+  function makeSection(cfg) {
+    let cache = [];
+    const setMsg = (t, k) => msg($(cfg.msg), t, k);
+
+    function collect(card) {
+      const p = {};
+      card.querySelectorAll('[data-f]').forEach(el => {
+        const f = el.getAttribute('data-f');
+        if (el.type === 'checkbox') p[f] = el.checked;
+        else if (el.type === 'number') p[f] = parseInt(el.value, 10) || 0;
+        else if (el.hasAttribute('data-arr')) p[f] = el.value.split(/[,\n]/).map(s => s.trim()).filter(Boolean);
+        else { const v = el.value.trim(); p[f] = v || (el.hasAttribute('data-null') ? null : ''); }
+      });
+      return p;
+    }
+
+    function wire(scope) {
+      scope.querySelectorAll('.sc-card').forEach(card => {
+        const saveBtn = card.querySelector('.sc-save');
+        const delBtn = card.querySelector('.sc-del');
+        if (saveBtn) saveBtn.onclick = async () => {
+          const payload = collect(card);
+          if (!cfg.valid(payload)) { setMsg(cfg.validMsg, 'err'); return; }
+          saveBtn.disabled = true; setMsg('Saving…');
+          const id = card.getAttribute('data-id');
+          const { error } = id
+            ? await db.from(cfg.table).update(payload).eq('id', id)
+            : await db.from(cfg.table).insert(payload);
+          saveBtn.disabled = false;
+          if (error) { setMsg(error.message, 'err'); return; }
+          setMsg('Saved.', 'ok');
+          load();
+        };
+        if (delBtn) delBtn.onclick = async () => {
+          const id = card.getAttribute('data-id');
+          if (!id) { card.remove(); return; }
+          if (!confirm('Delete this ' + cfg.noun + '?')) return;
+          const { error } = await db.from(cfg.table).delete().eq('id', id);
+          if (error) { setMsg(error.message, 'err'); return; }
+          setMsg('Deleted.', 'ok');
+          load();
+        };
+      });
+    }
+
+    function render() {
+      const el = $(cfg.list);
+      $(cfg.count).textContent = cache.length + ' ' + cfg.unit(cache.length);
+      if ($(cfg.empty)) $(cfg.empty).classList.toggle('hidden', cache.length > 0);
+      el.innerHTML = cache.map(cfg.card).join('');
+      wire(el);
+    }
+
+    async function load() {
+      const { data, error } = await db.from(cfg.table).select('*').order('sort_order', { ascending: true });
+      if (error) { setMsg(error.message, 'err'); return; }
+      cache = data || [];
+      render();
+    }
+
+    function addNew() {
+      const nextOrder = cache.length ? Math.max(...cache.map(x => x.sort_order || 0)) + 10 : 10;
+      const el = $(cfg.list);
+      const wrap = document.createElement('div');
+      wrap.innerHTML = cfg.card(Object.assign({ sort_order: nextOrder, published: true }, cfg.blank));
+      el.insertBefore(wrap.firstElementChild, el.firstChild);
+      if ($(cfg.empty)) $(cfg.empty).classList.add('hidden');
+      wire(el);
+      const f = el.querySelector('.sc-card [data-f]'); if (f) f.focus();
+    }
+
+    if ($(cfg.newBtn)) $(cfg.newBtn).addEventListener('click', addNew);
+    return { load };
+  }
+
+  const Sections = {};
+  Sections.skills = makeSection({
+    table: 'skills', list: 'skills-list', count: 'skills-count', empty: 'skills-empty',
+    msg: 'skills-msg', newBtn: 'new-skill-btn', noun: 'category',
+    unit: n => 'CATEGOR' + (n === 1 ? 'Y' : 'IES'),
+    valid: p => !!p.category, validMsg: 'Category name is required.',
+    blank: { category: '', items: [] },
+    card: s => `<div class="sc-card" data-id="${esc(s.id || '')}">
+      <div class="sc-grid">
+        <label class="sc-f sc-grow">Category<input class="hl" data-f="category" value="${esc(s.category || '')}"></label>
+        <label class="sc-f sc-num">Order<input class="hl" type="number" data-f="sort_order" value="${s.sort_order != null ? s.sort_order : 0}"></label>
+        <label class="sc-f sc-pub">Public<input type="checkbox" data-f="published" ${s.published !== false ? 'checked' : ''}></label>
+      </div>
+      <label class="sc-f">Items (comma or one per line)<textarea class="hl" data-f="items" data-arr>${esc((s.items || []).join(', '))}</textarea></label>
+      <div class="sc-actions"><button type="button" class="primary sc-save">Save</button><button type="button" class="danger sc-del">Delete</button></div>
+    </div>`
+  });
+  Sections.certs = makeSection({
+    table: 'certifications', list: 'certs-list', count: 'certs-admin-count', empty: 'certs-empty',
+    msg: 'certs-admin-msg', newBtn: 'new-cert-btn', noun: 'certification',
+    unit: n => 'CERT' + (n === 1 ? '' : 'S'),
+    valid: p => !!p.name, validMsg: 'Certification name is required.',
+    blank: { name: '', issuer: '', link: null, in_progress: false, progress: 100 },
+    card: c => `<div class="sc-card" data-id="${esc(c.id || '')}">
+      <div class="sc-grid">
+        <label class="sc-f sc-grow">Name<input class="hl" data-f="name" value="${esc(c.name || '')}"></label>
+        <label class="sc-f sc-grow">Issuer<input class="hl" data-f="issuer" value="${esc(c.issuer || '')}"></label>
+      </div>
+      <label class="sc-f">Proof link (optional)<input class="hl" type="url" data-f="link" data-null value="${esc(c.link || '')}" placeholder="https://… credential URL"></label>
+      <div class="sc-grid">
+        <label class="sc-f sc-pub">In progress<input type="checkbox" data-f="in_progress" ${c.in_progress ? 'checked' : ''}></label>
+        <label class="sc-f sc-num">Progress %<input class="hl" type="number" min="0" max="100" data-f="progress" value="${c.progress != null ? c.progress : 100}"></label>
+        <label class="sc-f sc-num">Order<input class="hl" type="number" data-f="sort_order" value="${c.sort_order != null ? c.sort_order : 0}"></label>
+        <label class="sc-f sc-pub">Public<input type="checkbox" data-f="published" ${c.published !== false ? 'checked' : ''}></label>
+      </div>
+      <div class="sc-actions"><button type="button" class="primary sc-save">Save</button><button type="button" class="danger sc-del">Delete</button></div>
+    </div>`
   });
 
   // ============================================================
