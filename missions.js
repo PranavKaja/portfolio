@@ -105,12 +105,17 @@
       const ghBox = el('msn-d-github');
       if (ghBox) {
         if (m.github_url && m.show_github !== false) {
+          // link_type 'site' shows my portfolio crosshair mark; anything else shows the GitHub logo
+          const isSite = m.link_type === 'site';
+          const icon = isSite
+            ? `<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><g fill="currentColor"><rect x="11" y="2" width="2" height="5"/><rect x="11" y="17" width="2" height="5"/><rect x="2" y="11" width="5" height="2"/><rect x="17" y="11" width="5" height="2"/></g><circle cx="12" cy="12" r="2.6" fill="#ff4500"/></svg>`
+            : `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>`;
+          const tDef = isSite ? 'Live page' : 'Case file';
+          const tHov = isSite ? 'Open' : 'GitHub';
           ghBox.innerHTML = `<a href="${esc(m.github_url)}" target="_blank" rel="noopener noreferrer" class="github-btn">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-            </svg>
-            <span class="gh-text-default">Case file</span>
-            <span class="gh-text-hover">GitHub</span>
+            ${icon}
+            <span class="gh-text-default">${esc(tDef)}</span>
+            <span class="gh-text-hover">${esc(tHov)}</span>
             </a>`;
         } else {
           ghBox.innerHTML = '';

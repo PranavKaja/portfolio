@@ -234,8 +234,17 @@
     stack: $('f-stack'), summary: $('f-summary'), hook: $('f-hook'), brief: $('f-brief'),
     role: $('f-role'), method: $('f-method'), outcome: $('f-outcome'), chips: $('f-chips'),
     show_status: $('f-show-status'), sort: $('f-sort'), published: $('f-published'), 
-    github: $('f-github'), show_github: $('f-show-github')
+    github: $('f-github'), show_github: $('f-show-github'), link_type: $('f-link-type')
   };
+
+  // dim the inactive link icon so the chosen logo (GitHub vs my page) is obvious
+  function syncLinkTypeIcons() {
+    const site = F.link_type && F.link_type.checked;
+    const gh = $('lt-ic-gh'), st = $('lt-ic-site');
+    if (gh) gh.style.opacity = site ? '0.35' : '1';
+    if (st) st.style.opacity = site ? '1' : '0.35';
+  }
+  if (F.link_type) F.link_type.addEventListener('change', syncLinkTypeIcons);
 
   function getStatus() {
     const checked = document.querySelector('input[name="f-status"]:checked');
@@ -266,6 +275,8 @@
     F.outcome.value = p ? (p.outcome || '') : '';
     F.github.value = p ? (p.github_url || '') : '';
     F.show_github.checked = p ? (p.show_github !== false) : true;
+    F.link_type.checked = p ? (p.link_type === 'site') : false;
+    syncLinkTypeIcons();
 
     F.chips.value = p && p.chips ? p.chips.join('\n') : '';
     renderChipsEditor();
@@ -331,6 +342,7 @@
       outcome: F.outcome.value.trim(),
       github_url: F.github.value.trim() || null,
       show_github: F.show_github.checked,
+      link_type: F.link_type.checked ? 'site' : 'github',
       chips: F.chips.value.split('\n').map(s => s.trim()).filter(Boolean),
       status: STATUS.includes(getStatus()) ? getStatus() : 'deployed',
       show_status: F.show_status.checked,
@@ -477,7 +489,8 @@
       role: F.role.value.trim(), method: F.method.value.trim(), outcome: F.outcome.value.trim(),
       chips: F.chips.value.split('\n').filter(Boolean),
       status: getStatus(), show_status: F.show_status.checked, 
-      github_url: F.github.value, show_github: F.show_github.checked
+      github_url: F.github.value, show_github: F.show_github.checked,
+      link_type: F.link_type.checked ? 'site' : 'github'
     };
 
     const num = String(p.code || '').match(/(\d+)/)?.[1] || '';
@@ -516,12 +529,14 @@
       </div>`;
     }
     
+    const _isSite = p.link_type === 'site';
+    const _linkIcon = _isSite
+      ? `<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><g fill="currentColor"><rect x="11" y="2" width="2" height="5"/><rect x="11" y="17" width="2" height="5"/><rect x="2" y="11" width="5" height="2"/><rect x="17" y="11" width="5" height="2"/></g><circle cx="12" cy="12" r="2.6" fill="#ff4500"/></svg>`
+      : `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>`;
     const githubBtn = (p.github_url && p.show_github) ? `<a href="${esc(p.github_url)}" target="_blank" rel="noopener noreferrer" class="github-btn">
-          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-          </svg>
-          <span class="gh-text-default">Case file</span>
-          <span class="gh-text-hover">GitHub</span>
+          ${_linkIcon}
+          <span class="gh-text-default">${_isSite ? 'Live page' : 'Case file'}</span>
+          <span class="gh-text-hover">${_isSite ? 'Open' : 'GitHub'}</span>
           </a>` : '';
 
     $('prev-popup-card').innerHTML = `

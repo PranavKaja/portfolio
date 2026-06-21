@@ -169,6 +169,7 @@
     "sort_order": 100,
     "published": true,
     "github_url": "https://pranavkaja.vercel.app/projects/cpk-production",
-    "show_github": true
+    "show_github": true,
+    "link_type": "site"
   }
 ]

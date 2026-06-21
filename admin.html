@@ -263,17 +263,29 @@
                         <input type="text" id="f-outcome" class="hl hl-pop">
                     </label>
                     <label class="field">
-                        <span style="display:flex; align-items:center; gap: 15px;">
-                            <div>GitHub URL</div>
+                        <span style="display:flex; align-items:center; gap: 15px; flex-wrap:wrap;">
+                            <div>Project Link</div>
                             <div style="display:flex; align-items:center; gap:6px;">
                                 <span style="font-size: 0.65rem; color: var(--text-muted); margin-bottom:0;">Visible</span>
-                                <label class="toggle-switch" title="Show GitHub link on live site">
+                                <label class="toggle-switch" title="Show the link on the live site">
                                     <input type="checkbox" id="f-show-github" checked>
                                     <span class="slider"></span>
                                 </label>
                             </div>
+                            <div style="display:flex; align-items:center; gap:6px;" title="Pick the icon: GitHub repo, or my portfolio page">
+                                <span id="lt-ic-gh" style="display:inline-flex; align-items:center; transition:opacity .15s;" title="GitHub repo">
+                                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                                </span>
+                                <label class="toggle-switch" title="Icon: GitHub (left) or my page (right)">
+                                    <input type="checkbox" id="f-link-type">
+                                    <span class="slider"></span>
+                                </label>
+                                <span id="lt-ic-site" style="display:inline-flex; align-items:center; opacity:0.35; transition:opacity .15s;" title="My portfolio page">
+                                    <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><g fill="currentColor"><rect x="11" y="2" width="2" height="5"/><rect x="11" y="17" width="2" height="5"/><rect x="2" y="11" width="5" height="2"/><rect x="17" y="11" width="5" height="2"/></g><circle cx="12" cy="12" r="2.6" fill="#ff4500"/></svg>
+                                </span>
+                            </div>
                         </span>
-                        <input type="url" id="f-github" class="hl hl-pop" placeholder="https://github.com/username/repo">
+                        <input type="url" id="f-github" class="hl hl-pop" placeholder="https://github.com/username/repo, or your page URL">
                     </label>
                 </div>
 
