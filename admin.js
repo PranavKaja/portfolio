@@ -234,7 +234,8 @@
     stack: $('f-stack'), summary: $('f-summary'), hook: $('f-hook'), brief: $('f-brief'),
     role: $('f-role'), method: $('f-method'), outcome: $('f-outcome'), chips: $('f-chips'),
     show_status: $('f-show-status'), sort: $('f-sort'), published: $('f-published'), 
-    github: $('f-github'), show_github: $('f-show-github'), link_type: $('f-link-type')
+    github: $('f-github'), show_github: $('f-show-github'), link_type: $('f-link-type'),
+    skills: $('f-skills')
   };
 
   // dim the inactive link icon so the chosen logo (GitHub vs my page) is obvious
@@ -279,6 +280,7 @@
     syncLinkTypeIcons();
 
     F.chips.value = p && p.chips ? p.chips.join('\n') : '';
+    F.skills.value = p && p.skills ? p.skills.join('\n') : '';
     renderChipsEditor();
     setStatus(p ? p.status : 'deployed');
     F.show_status.checked = p ? (p.show_status !== false) : true;
@@ -344,6 +346,7 @@
       show_github: F.show_github.checked,
       link_type: F.link_type.checked ? 'site' : 'github',
       chips: F.chips.value.split('\n').map(s => s.trim()).filter(Boolean),
+      skills: F.skills.value.split('\n').map(s => s.trim()).filter(Boolean),
       status: STATUS.includes(getStatus()) ? getStatus() : 'deployed',
       show_status: F.show_status.checked,
       sort_order: parseInt(F.sort.value, 10) || 0,
@@ -488,7 +491,8 @@
       summary: F.summary.value, hook: F.hook.value, brief: F.brief.value,
       role: F.role.value.trim(), method: F.method.value.trim(), outcome: F.outcome.value.trim(),
       chips: F.chips.value.split('\n').filter(Boolean),
-      status: getStatus(), show_status: F.show_status.checked, 
+      skills: F.skills.value.split('\n').filter(Boolean),
+      status: getStatus(), show_status: F.show_status.checked,
       github_url: F.github.value, show_github: F.show_github.checked,
       link_type: F.link_type.checked ? 'site' : 'github'
     };
@@ -496,7 +500,10 @@
     const num = String(p.code || '').match(/(\d+)/)?.[1] || '';
     const statusHtml = (p.status === 'none' || !p.show_status) ? '' : `<span class="proj-status proj-status--${esc(p.status)}">${esc(STATUS_LABEL[p.status] || p.status)}</span>`;
     const chipsHtml = (p.chips || []).map(c => `<span>${esc(c)}</span>`).join('');
-    
+    const skillsHtml = (p.skills || []).map(c => `<span>${esc(c)}</span>`).join('');
+    const hoverList = (p.skills && p.skills.length) ? p.skills : (p.chips || []);
+    const hoverTagsHtml = hoverList.map(c => `<span>${esc(c)}</span>`).join('');
+
     // Default Card
     $('prev-default-card').innerHTML = `
       <div class="project-panel">
@@ -515,7 +522,7 @@
             <h3>${esc(p.title)}</h3>
             <p class="pp-hook">${esc(p.hook)}</p>
             <p class="pp-brief">${esc(p.brief)}</p>
-            <div class="pp-chips">${chipsHtml}</div>
+            <div class="pp-chips">${hoverTagsHtml}</div>
         </div>
     `;
 
@@ -551,6 +558,7 @@
               <div class="msn-d-hook">${esc(p.hook)}</div>
               <div class="msn-d-brief">${esc(p.brief)}</div>
               ${rmoHtml}
+              ${p.skills && p.skills.length ? `<div style="margin-top:16px;"><div style="font-family:'Share Tech Mono',monospace; font-size:0.7rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;">Skills used / learnt</div><div class="pp-chips" style="display:inline-flex;">${skillsHtml}</div></div>` : ''}
               <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top: 15px;">
                   <div class="pp-chips" style="display:inline-flex;">${chipsHtml}</div>
                   <div>${githubBtn}</div>
