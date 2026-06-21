@@ -1,0 +1,12 @@
+[
+  { "name": "Data Analysis with Python", "issuer": "IBM", "link": null, "in_progress": false, "progress": 100, "sort_order": 10, "published": true },
+  { "name": "Intro to Big Data with Spark & Hadoop", "issuer": "IBM", "link": null, "in_progress": false, "progress": 100, "sort_order": 20, "published": true },
+  { "name": "Supervised Learning with scikit-learn", "issuer": "DATACAMP", "link": null, "in_progress": false, "progress": 100, "sort_order": 30, "published": true },
+  { "name": "Ensemble Methods in Python", "issuer": "DATACAMP", "link": null, "in_progress": false, "progress": 100, "sort_order": 40, "published": true },
+  { "name": "Introduction to Power BI", "issuer": "DATACAMP", "link": null, "in_progress": false, "progress": 100, "sort_order": 50, "published": true },
+  { "name": "Working with Hugging Face", "issuer": "DATACAMP", "link": null, "in_progress": false, "progress": 100, "sort_order": 60, "published": true },
+  { "name": "Database Management Essentials", "issuer": "UC COLORADO", "link": null, "in_progress": false, "progress": 100, "sort_order": 70, "published": true },
+  { "name": "Intro to Regression with statsmodels", "issuer": "DATACAMP", "link": null, "in_progress": true, "progress": 65, "sort_order": 80, "published": true },
+  { "name": "Web Scraping in Python", "issuer": "DATACAMP", "link": null, "in_progress": true, "progress": 30, "sort_order": 90, "published": true },
+  { "name": "Intro to APIs in Python", "issuer": "DATACAMP", "link": null, "in_progress": true, "progress": 85, "sort_order": 100, "published": true }
+]
