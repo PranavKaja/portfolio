@@ -791,11 +791,11 @@ document.addEventListener('DOMContentLoaded', () => {
             dates: 'SEP 2024 - MAY 2026',
             role: 'Student Supervisor',
             company: 'UMASS AMHERST DINING',
-            brief: 'Automated a 37-location ETL pipeline, cutting manual reporting from 2 hrs/day to 12 min/day. Led a team of 15+ student employees and implemented data-driven inventory forecasting.',
+            brief: 'Automated a 37-location ETL pipeline, cutting manual reporting from 2 hrs/day to 12 min/day. Led a team of student employees and implemented data-driven inventory forecasting.',
             points: [
                 'Automated a 37-location ETL pipeline',
                 'Cut manual reporting from 2 hrs/day to 12 min/day',
-                'Led a team of 15+ student employees',
+                'Led a team of student employees',
                 'Implemented data-driven inventory forecasting'
             ]
         },

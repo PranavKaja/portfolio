@@ -19,7 +19,7 @@ only look good on a slide.
 ## Experience
 - Student Supervisor, UMass Amherst Dining (Sep 2024 - May 2026): automated a
   37-location ETL pipeline, cutting manual reporting from 2 hrs/day to 12 min/day;
-  led 15+ student employees; built data-driven inventory forecasting.
+  led a team of student employees; built data-driven inventory forecasting.
 - Data Science Intern, Acmegrade (May 2022 - Jul 2022): built a Random Forest
   churn predictor on 100K records, improving accuracy 15% over baseline.
 
