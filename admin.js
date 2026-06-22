@@ -1260,6 +1260,42 @@
       '</tbody>' + tfoot + '</table>';
   }
 
+  // ---- Today view: hourly pageview breakdown (queries the events table directly) ----
+  async function loadTodayHourly() {
+    const startUTC = new Date().toISOString().slice(0, 10) + 'T00:00:00.000Z';
+    const buckets = new Array(24).fill(0);
+    try {
+      const { data, error } = await db.from('events')
+        .select('created_at').eq('type', 'pageview').gte('created_at', startUTC).limit(5000);
+      if (!error && data) data.forEach(ev => { buckets[new Date(ev.created_at).getUTCHours()]++; });
+    } catch (e) { /* leave zeros */ }
+    return buckets;
+  }
+  const pad2 = n => String(n).padStart(2, '0');
+  function renderHourlyTable(buckets) {
+    const rows = buckets.map((v, h) => [pad2(h) + ':00', v]);
+    const total = buckets.reduce((s, v) => s + v, 0);
+    return detailTable(['Hour (UTC)', 'Views'], rows, ['Total', total]);
+  }
+  function renderHourlyChart(buckets) {
+    const max = Math.max.apply(null, buckets) || 1;
+    const W = 800, H = 250, pad = 20, bw = (W - pad * 2) / 24;
+    const bars = buckets.map((v, h) => {
+      const x = pad + h * bw, w = Math.max(1, bw - 2), cx = x + w / 2;
+      if (v === 0) {
+        return `<rect x="${x.toFixed(1)}" y="${(H - 20).toFixed(1)}" width="${w.toFixed(1)}" height="2" style="fill:var(--text-muted);opacity:0.3"><title>0 views at ${pad2(h)}:00</title></rect>`;
+      }
+      const ht = Math.max(2, Math.round(v / max * (H - 40)));
+      const label = ht > 14
+        ? `<text x="${cx.toFixed(1)}" y="${(H - 20 - ht + 11).toFixed(1)}" fill="#fff" text-anchor="middle" font-size="10" font-family="'Share Tech Mono',monospace" font-weight="bold">${v}</text>`
+        : `<text x="${cx.toFixed(1)}" y="${(H - 20 - ht - 4).toFixed(1)}" fill="currentColor" text-anchor="middle" font-size="10" font-family="'Share Tech Mono',monospace" font-weight="bold">${v}</text>`;
+      return `<rect x="${x.toFixed(1)}" y="${(H - 20 - ht).toFixed(1)}" width="${w.toFixed(1)}" height="${ht}" fill="var(--accent,#ff4500)"><title>${v} views at ${pad2(h)}:00</title></rect>${label}`;
+    }).join('');
+    const ticks = [0, 6, 12, 18, 23].map(h =>
+      `<text x="${(pad + h * bw + bw / 2).toFixed(1)}" y="${H - 2}" text-anchor="middle" font-size="11" fill="currentColor" font-family="'Share Tech Mono',monospace">${pad2(h)}:00</text>`).join('');
+    return `<svg viewBox="0 0 ${W} ${H}" class="spark" preserveAspectRatio="none" style="width:100%;height:auto;max-height:300px;overflow:visible;margin-top:10px;">${bars}${ticks}</svg>`;
+  }
+
   function openIntelDetail(kind) {
     const d = intelData || {};
     let title = '', body = '';
@@ -1391,15 +1427,23 @@
       let currentView = 'table';
       
       if (filters) {
-        filters.addEventListener('click', e => {
-          if (e.target.classList.contains('filter-btn')) {
-            currentDays = parseInt(e.target.dataset.days);
+        filters.addEventListener('click', async e => {
+          if (!e.target.classList.contains('filter-btn')) return;
+          currentDays = parseInt(e.target.dataset.days);
+          filters.querySelectorAll('.filter-btn').forEach(b => {
+            b.classList.toggle('primary', parseInt(b.dataset.days) === currentDays);
+            b.classList.toggle('ghost', parseInt(b.dataset.days) !== currentDays);
+          });
+          if (currentDays === 1) {
+            // Today: hourly breakdown (fetched live from the events table)
+            $('daily-table-container').innerHTML = '<div class="bl-empty">// loading hourly…</div>';
+            $('daily-chart-container').innerHTML = '<div class="bl-empty">// loading hourly…</div>';
+            const buckets = await loadTodayHourly();
+            $('daily-table-container').innerHTML = renderHourlyTable(buckets);
+            $('daily-chart-container').innerHTML = renderHourlyChart(buckets);
+          } else {
             $('daily-table-container').innerHTML = window._renderDailyTable(currentDays);
             $('daily-chart-container').innerHTML = window._renderDetailedChart(currentDays);
-            filters.querySelectorAll('.filter-btn').forEach(b => {
-              b.classList.toggle('primary', parseInt(b.dataset.days) === currentDays);
-              b.classList.toggle('ghost', parseInt(b.dataset.days) !== currentDays);
-            });
           }
         });
       }
