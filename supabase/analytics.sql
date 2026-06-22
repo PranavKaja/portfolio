@@ -49,7 +49,12 @@ create policy "admin clears events"
 -- SECURITY INVOKER + execute granted only to `authenticated`, so the public
 -- can WRITE events but can never READ the analytics back.
 -- ============================================================
-create or replace function public.intel_dashboard()
+-- p_since filters every aggregate to created_at >= p_since (null = all time).
+-- The Intel dashboard's global range filter passes this; `daily` stays a full
+-- 365-day series so the time-series drilldown keeps its own range buttons.
+drop function if exists public.intel_dashboard();
+
+create or replace function public.intel_dashboard(p_since timestamptz default null)
 returns json
 language sql
 security invoker
@@ -71,15 +76,17 @@ as $$
             select session_id, sum((meta->>'seconds')::numeric) as t
             from public.events
             where type = 'page_time' and session_id <> '' and (meta->>'seconds') ~ '^[0-9]+([.][0-9]+)?$'
+              and (p_since is null or created_at >= p_since)
             group by session_id
           ) s
         )
       ) from public.events
+      where (p_since is null or created_at >= p_since)
     ),
     'traffic', (
       select coalesce(json_agg(t), '[]'::json) from (
         select source, count(*) as n
-        from public.events where type = 'pageview'
+        from public.events where type = 'pageview' and (p_since is null or created_at >= p_since)
         group by source order by n desc limit 8
       ) t
     ),
@@ -87,7 +94,7 @@ as $$
       select coalesce(json_agg(p), '[]'::json) from (
         select meta->>'code' as code, max(meta->>'title') as title, count(*) as n
         from public.events
-        where type = 'project_click' and (meta->>'code') is not null
+        where type = 'project_click' and (meta->>'code') is not null and (p_since is null or created_at >= p_since)
         group by meta->>'code' order by n desc limit 10
       ) p
     ),
@@ -96,12 +103,13 @@ as $$
         select v.path, v.n, coalesce(round(t.avg_sec), 0) as avg_sec
         from (
           select path, count(*) as n
-          from public.events where type = 'pageview'
+          from public.events where type = 'pageview' and (p_since is null or created_at >= p_since)
           group by path order by n desc limit 12
         ) v
         left join (
           select path, avg((meta->>'seconds')::numeric) as avg_sec
           from public.events where type = 'page_time' and (meta->>'seconds') ~ '^[0-9]+([.][0-9]+)?$'
+            and (p_since is null or created_at >= p_since)
           group by path
         ) t on t.path = v.path
         order by v.n desc
@@ -126,7 +134,7 @@ as $$
         'players', count(distinct session_id) filter (where session_id <> ''),
         'high',    coalesce(max((meta->>'score')::int) filter (where (meta->>'score') ~ '^[0-9]+$'), 0),
         'avg',     coalesce(round(avg((meta->>'score')::numeric) filter (where (meta->>'score') ~ '^[0-9]+$'), 1), 0)
-      ) from public.events where type = 'game_score'
+      ) from public.events where type = 'game_score' and (p_since is null or created_at >= p_since)
     ),
     'tictactoe', (
       select json_build_object(
@@ -135,7 +143,7 @@ as $$
         'user_wins', count(*) filter (where meta->>'result' = 'U'),
         'system_wins', count(*) filter (where meta->>'result' = 'P'),
         'draws', count(*) filter (where meta->>'result' = 'D')
-      ) from public.events where type = 'ttt_match'
+      ) from public.events where type = 'ttt_match' and (p_since is null or created_at >= p_since)
     ),
     -- one row per distinct anonymous player, their best score + how many times they played
     'leaderboard', (
@@ -145,6 +153,7 @@ as $$
                count(*) as plays
         from public.events
         where type = 'game_score' and session_id <> '' and (meta->>'score') ~ '^[0-9]+$'
+          and (p_since is null or created_at >= p_since)
         group by session_id
         order by best desc
         limit 10
@@ -153,5 +162,5 @@ as $$
   );
 $$;
 
-revoke all on function public.intel_dashboard() from anon, public;
-grant execute on function public.intel_dashboard() to authenticated;
+revoke all on function public.intel_dashboard(timestamptz) from anon, public;
+grant execute on function public.intel_dashboard(timestamptz) to authenticated;

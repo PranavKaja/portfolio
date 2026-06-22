@@ -1100,15 +1100,32 @@
 
   let currentGameTab = 'wasd';
 
+  let intelRange = 0; // 0 = all time; otherwise day window (1 = today, 7, 30, 365)
+  function intelSince() {
+    if (!intelRange) return null;                       // Total
+    if (intelRange === 1) { const d = new Date(); d.setHours(0, 0, 0, 0); return d.toISOString(); } // local today
+    return new Date(Date.now() - intelRange * 86400000).toISOString();
+  }
   async function loadIntel(force) {
     if (intelLoaded && !force) return;
     msg($('intel-msg'), '', '');
-    const { data, error } = await db.rpc('intel_dashboard');
+    const { data, error } = await db.rpc('intel_dashboard', { p_since: intelSince() });
     if (error) { msg($('intel-msg'), error.message, 'err'); return; }
     intelLoaded = true;
     renderIntel(data || {});
     $('intel-updated').textContent = '// updated ' + new Date().toLocaleString();
   }
+  $('intel-range')?.addEventListener('click', e => {
+    const btn = e.target.closest('.intel-range-btn');
+    if (!btn) return;
+    intelRange = parseInt(btn.dataset.range, 10) || 0;
+    document.querySelectorAll('#intel-range .intel-range-btn').forEach(b => {
+      const on = parseInt(b.dataset.range, 10) === intelRange;
+      b.classList.toggle('primary', on);
+      b.classList.toggle('ghost', !on);
+    });
+    loadIntel(true);
+  });
 
   function renderIntel(d) {
     intelData = d || {};

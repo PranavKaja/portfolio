@@ -234,7 +234,14 @@
 
             <!-- INTEL PANEL -->
             <div id="panel-intel" class="hidden">
-                <div class="row" style="margin-bottom:18px">
+                <div class="row" style="margin-bottom:18px; flex-wrap:wrap; gap:10px;">
+                    <div id="intel-range">
+                        <button class="ghost intel-range-btn" data-range="1">Today</button>
+                        <button class="ghost intel-range-btn" data-range="7">1 Week</button>
+                        <button class="ghost intel-range-btn" data-range="30">1 Month</button>
+                        <button class="ghost intel-range-btn" data-range="365">1 Year</button>
+                        <button class="primary intel-range-btn" data-range="0">Total</button>
+                    </div>
                     <div class="spacer"></div>
                     <span class="console-label" id="intel-updated"></span>
                 </div>
