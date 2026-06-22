@@ -72,8 +72,8 @@
             </div>
 
             <div class="tabbar">
-                <button class="tab active" data-tab="projects">Projects</button>
-                <button class="tab" data-tab="transmissions">Transmissions<span id="tx-unread" class="tab-badge hidden"></span></button>
+                <button class="tab active" data-tab="transmissions">Transmissions<span id="tx-unread" class="tab-badge hidden"></span></button>
+                <button class="tab" data-tab="projects">Projects</button>
                 <button class="tab" data-tab="intel">Intel</button>
                 <button class="tab" data-tab="skills">Skills</button>
                 <button class="tab" data-tab="certifications">Certs</button>
@@ -82,7 +82,7 @@
             </div>
 
             <!-- PROJECTS PANEL -->
-            <div id="panel-projects">
+            <div id="panel-projects" class="hidden">
                 <div class="row" style="margin-bottom:18px">
                     <button class="primary" id="new-btn">+ New Project</button>
                     <button class="ghost" id="view-toggle-btn" title="Toggle view">☰</button>
@@ -168,7 +168,7 @@
             </div>
 
             <!-- TRANSMISSIONS PANEL -->
-            <div id="panel-transmissions" class="hidden">
+            <div id="panel-transmissions">
                 <div class="row" style="margin-bottom:18px">
                     <button class="ghost" id="tx-unread-btn">Unread only</button>
                     <div class="spacer"></div>
