@@ -104,8 +104,21 @@
         }
 
         .cpk-upload {
-            padding: 12px 20px;
             cursor: pointer;
+        }
+
+        .cpk-controls .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+            padding: 0 20px;
+            line-height: 1;
+            margin: 0;
+        }
+
+        #cpk-gen {
+            padding: 0 26px !important;
         }
 
         .cpk-controls {
@@ -401,13 +414,12 @@
                         (sample is loaded — just hit Generate)</label>
                     <textarea id="cpk-input" spellcheck="false" aria-label="Order report input"></textarea>
                     <div class="cpk-controls">
-                        <button class="btn btn-primary" id="cpk-gen" style="padding:12px 26px;">GENERATE</button>
+                        <button class="btn btn-primary" id="cpk-gen">GENERATE</button>
                         <label class="btn btn-secondary cpk-upload" for="cpk-file">UPLOAD FILE</label>
                         <input type="file" id="cpk-file" accept=".txt,.csv,.tsv,text/plain"
                             aria-label="Upload order report file">
-                        <button class="btn btn-secondary" id="cpk-sample" style="padding:12px 20px;">LOAD
-                            SAMPLE</button>
-                        <button class="btn btn-secondary" id="cpk-clear" style="padding:12px 20px;">CLEAR</button>
+                        <button class="btn btn-secondary" id="cpk-sample">LOAD SAMPLE</button>
+                        <button class="btn btn-secondary" id="cpk-clear">CLEAR</button>
                         <span class="cpk-meta" id="cpk-meta"></span>
                     </div>
                 </div>
