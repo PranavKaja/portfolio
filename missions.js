@@ -53,8 +53,10 @@
     const showStatus = p.show_status !== false;
     const chips = (p.chips || []).map(c => `<span>${esc(c)}</span>`).join('');
     // hover card shows skills used/learnt; falls back to the metric chips until skills are set
-    const hoverList = (p.skills && p.skills.length) ? p.skills : (p.chips || []);
+    const hasSkills = p.skills && p.skills.length > 0;
+    const hoverList = hasSkills ? p.skills : (p.chips || []);
     const hoverTags = hoverList.map(c => `<span>${esc(c)}</span>`).join('');
+    const chipClass = hasSkills ? 'skill-chips' : 'pp-chips';
     const statusHtml = (status === 'none' || !showStatus) ? '' : `<span class="proj-status proj-status--${esc(status)}">${esc(STATUS_LABELS[status] || status)}</span>`;
     return `
     <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="${esc(num)}"
@@ -70,7 +72,7 @@
             <h3>${esc(p.title)}</h3>
             <p class="pp-hook">${esc(p.hook)}</p>
             <p class="pp-brief">${esc(p.brief)}</p>
-            <div class="pp-chips">${hoverTags}</div>
+            <div class="${chipClass}">${hoverTags}</div>
         </div>
     </div>`;
   }
@@ -98,12 +100,15 @@
       el('msn-d-method').textContent = m.method;
       el('msn-d-outcome').textContent = m.outcome;
       const chipBox = el('msn-d-chips');
+      const chipsRow = el('msn-d-chips-row');
       chipBox.innerHTML = '';
-      (m.chips || []).forEach(c => {
+      const ch = m.chips || [];
+      ch.forEach(c => {
         const s = document.createElement('span');
         s.textContent = c;
         chipBox.appendChild(s);
       });
+      if (chipsRow) chipsRow.style.display = ch.length ? '' : 'none';
 
       // Skills used / learnt row (hidden when a project has no skills)
       const skillBox = el('msn-d-skills');

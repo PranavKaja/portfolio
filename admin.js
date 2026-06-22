@@ -501,8 +501,10 @@
     const statusHtml = (p.status === 'none' || !p.show_status) ? '' : `<span class="proj-status proj-status--${esc(p.status)}">${esc(STATUS_LABEL[p.status] || p.status)}</span>`;
     const chipsHtml = (p.chips || []).map(c => `<span>${esc(c)}</span>`).join('');
     const skillsHtml = (p.skills || []).map(c => `<span>${esc(c)}</span>`).join('');
-    const hoverList = (p.skills && p.skills.length) ? p.skills : (p.chips || []);
+    const hasSkills = p.skills && p.skills.length > 0;
+    const hoverList = hasSkills ? p.skills : (p.chips || []);
     const hoverTagsHtml = hoverList.map(c => `<span>${esc(c)}</span>`).join('');
+    const chipClass = hasSkills ? 'skill-chips' : 'pp-chips';
 
     // Default Card
     $('prev-default-card').innerHTML = `
@@ -522,7 +524,7 @@
             <h3>${esc(p.title)}</h3>
             <p class="pp-hook">${esc(p.hook)}</p>
             <p class="pp-brief">${esc(p.brief)}</p>
-            <div class="pp-chips">${hoverTagsHtml}</div>
+            <div class="${chipClass}">${hoverTagsHtml}</div>
         </div>
     `;
 
@@ -558,8 +560,8 @@
               <div class="msn-d-hook">${esc(p.hook)}</div>
               <div class="msn-d-brief">${esc(p.brief)}</div>
               ${rmoHtml}
-              ${p.skills && p.skills.length ? `<div style="margin-top:16px;"><div style="font-family:'Share Tech Mono',monospace; font-size:0.7rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;">Skills used / learnt</div><div class="pp-chips" style="display:inline-flex;">${skillsHtml}</div></div>` : ''}
-              <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top: 15px;">
+              ${p.skills && p.skills.length ? `<div style="margin-top:16px;"><div style="font-family:'Share Tech Mono',monospace; font-size:0.7rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;">Skills used / learnt</div><div class="skill-chips">${skillsHtml}</div></div>` : ''}
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border);">
                   <div class="pp-chips" style="display:inline-flex;">${chipsHtml}</div>
                   <div>${githubBtn}</div>
               </div>

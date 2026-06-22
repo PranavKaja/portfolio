@@ -1634,6 +1634,24 @@ body.ttt-active .container, body.ttt-active .top-nav {
     background: var(--bg);
 }
 
+.skill-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.skill-chips span {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-main);
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 4px 10px;
+    white-space: nowrap;
+}
+
 @media (hover: hover) and (pointer: fine) and (min-width: 1025px) {
     #projects .project-panel {
         transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s,
