@@ -1360,6 +1360,7 @@
       body = `
         <div class="row" style="margin-bottom: 16px; justify-content: space-between; align-items: center;" id="daily-controls">
           <div id="daily-filters">
+            <button class="ghost filter-btn" data-days="1">Today</button>
             <button class="ghost filter-btn" data-days="7">7 Days</button>
             <button class="primary filter-btn" data-days="30">30 Days</button>
             <button class="ghost filter-btn" data-days="90">90 Days</button>
