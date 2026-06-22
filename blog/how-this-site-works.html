@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -6,17 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>How This Site Works: A Tour Under the Hood | Pranav Kaja</title>
     <meta name="description"
-        content="A guided, interactive tour of how pranavkaja.vercel.app is actually built — a static front end on Vercel talking straight to a Supabase Postgres database, the security model that makes that safe, the signature project reveal, and the admin console behind it.">
+        content="A guided, interactive tour of how pranavkaja.vercel.app is actually built - a static front end on Vercel talking straight to a Supabase Postgres database, the security model that makes that safe, the signature project reveal, and the admin console behind it.">
     <meta name="author" content="Pranav Kaja">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <meta property="og:title" content="How This Site Works: A Tour Under the Hood">
-    <meta property="og:description" content="No backend server, yet a real database. How a static site talks straight to Postgres — safely — plus the admin console and the tricks worth knowing.">
+    <meta property="og:description" content="No backend server, yet a real database. How a static site talks straight to Postgres - safely - plus the admin console and the tricks worth knowing.">
     <meta property="og:image" content="https://pranavkaja.vercel.app/images/og-card.png">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://pranavkaja.vercel.app/blog/how-this-site-works">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="How This Site Works: A Tour Under the Hood">
-    <meta name="twitter:description" content="A static front end talking straight to Postgres — safely. The architecture, the database, the admin console, and the tricks.">
+    <meta name="twitter:description" content="A static front end talking straight to Postgres - safely. The architecture, the database, the admin console, and the tricks.">
     <meta name="twitter:image" content="https://pranavkaja.vercel.app/images/og-card.png">
     <link rel="canonical" href="https://pranavkaja.vercel.app/blog/how-this-site-works">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -52,20 +52,20 @@
     <style>
     /* ============================================================
        Scoped styles for this post only (prefix: ht-).
-       Deliberately light on orange — the interactive accent is a
+       Deliberately light on orange - the interactive accent is a
        calm teal, with the site's orange kept for tiny highlights.
        ============================================================ */
     #howto{
       --ht-ink:#18181b; --ht-muted:#6d6d75; --ht-line:#e4e4e7;
       --ht-panel:#f7f7f8; --ht-card:#ffffff;
-      --ht-accent:#0d9488;      /* teal — primary interactive colour */
+      --ht-accent:#0d9488;      /* teal - primary interactive colour */
       --ht-accent-soft:#f0fdfa; /* teal tint */
       --ht-browser:#2563eb;     /* blue  */
       --ht-host:#7c3aed;        /* violet */
       --ht-db:#0d9488;          /* teal  */
       --ht-warn:#b45309;        /* muted amber */
       --ht-ok:#059669; --ht-no:#dc2626;
-      --ht-orange:#c43c00;      /* the site accent — used sparingly */
+      --ht-orange:#c43c00;      /* the site accent - used sparingly */
       max-width:840px;
     }
     #howto.post-body p{ font-size:1.05rem; line-height:1.75; }
@@ -75,7 +75,7 @@
     .ht-progress{ position:fixed; top:0; left:0; height:3px; width:0;
       background:var(--ht-accent); z-index:200; transition:width .08s linear; }
 
-    /* fixed dot rail (desktop only) — click a dot to jump, current section lights up */
+    /* fixed dot rail (desktop only) - click a dot to jump, current section lights up */
     .ht-rail{ position:fixed; right:18px; top:50%; transform:translateY(-50%);
       z-index:90; display:flex; flex-direction:column; gap:13px; }
     .ht-rail a{ position:relative; width:11px; height:11px; border-radius:50%;
@@ -275,7 +275,7 @@
             <div class="post-meta mb-20">Jun 2026 &middot; Engineering &middot; ~9 min read</div>
             <h1 class="hero-title" style="font-size: 2.5rem; line-height: 1.12;">How This Site Works: A Tour
                 Under the Hood</h1>
-            <p class="hero-subtitle">You're reading a page that has no backend server — and yet it has a real
+            <p class="hero-subtitle">You're reading a page that has no backend server - and yet it has a real
                 database, a login, and an analytics dashboard. Here's how that's possible, what you can do here,
                 and the tricks worth stealing.</p>
         </header>
@@ -283,7 +283,7 @@
         <article class="section post-body" id="howto">
 
             <nav class="ht-toc" aria-label="Table of contents">
-                <div class="ht-toc-h">// Contents — jump anywhere</div>
+                <div class="ht-toc-h">// Contents - jump anywhere</div>
                 <ol>
                     <li><a href="#idea"><span class="num">01</span> The one idea that explains everything</a></li>
                     <li><a href="#stack"><span class="num">02</span> The stack, in plain terms</a></li>
@@ -298,8 +298,8 @@
                 </ol>
             </nav>
 
-            <p>Most portfolio sites are a stack of static pages. This one looks like a stack of static pages —
-                that's deliberate, because static is fast and search engines love it — but the project cards,
+            <p>Most portfolio sites are a stack of static pages. This one looks like a stack of static pages -
+                that's deliberate, because static is fast and search engines love it - but the project cards,
                 the contact form, the visitor analytics, and the password-protected admin panel are all wired to
                 a live <strong>Postgres database</strong>. There is no API server in the middle that I wrote and
                 maintain. The browser talks to the database directly.</p>
@@ -318,7 +318,7 @@
                         <div class="ht-big" style="margin-top:0">
                             <div class="k">// The whole site in one sentence</div>
                             <p>There is <b>no custom backend server</b>. My JavaScript, running in your browser, calls a
-                                database's auto-generated API directly — and a security layer <em>inside</em> the database
+                                database's auto-generated API directly - and a security layer <em>inside</em> the database
                                 decides, row by row, what each visitor is allowed to read or write.</p>
                         </div>
                         <p>Everything else is a detail of that idea. The "API key" shipped in the page is public on
@@ -332,7 +332,7 @@
             <!-- ============ 02 STACK ============ -->
             <section class="ht-sec" id="stack">
                 <h2><span class="num">02</span> The stack, in plain terms</h2>
-                <p>No framework, no build step, no bundler. It's hand-written HTML, CSS, and JavaScript — the "vanilla" stack — with Supabase (managed Postgres) doing the heavy lifting.</p>
+                <p>No framework, no build step, no bundler. It's hand-written HTML, CSS, and JavaScript - the "vanilla" stack - with Supabase (managed Postgres) doing the heavy lifting.</p>
                 <details class="ht-more">
                     <summary>Deep dive: The stack breakdown</summary>
                     <div class="ht-more-body">
@@ -347,7 +347,7 @@
                         </table>
                         <div class="ht-note"><b>Why bother going framework-free?</b> A recruiter opening this on hotel
                             Wi-Fi gets plain HTML that paints instantly. There's no hydration, no megabyte of JavaScript,
-                            nothing to "warm up." The one thing that needs a network round-trip — the project list — has
+                            nothing to "warm up." The one thing that needs a network round-trip - the project list - has
                             an offline fallback baked in, so the page never shows up empty.</div>
                     </div>
                 </details>
@@ -405,7 +405,7 @@
 
                         <!-- vercel zone -->
                         <rect x="340" y="150" width="218" height="150" rx="12" fill="#faf7ff" stroke="#7c3aed" stroke-width="1.4"/>
-                        <text class="zt" x="356" y="174" fill="#7c3aed">Vercel — file host</text>
+                        <text class="zt" x="356" y="174" fill="#7c3aed">Vercel - file host</text>
                         <rect class="bx" x="356" y="188" width="186" height="46"/>
                         <text class="bt" x="370" y="208">Global CDN</text>
                         <text class="bs" x="370" y="224">serves the static files, fast</text>
@@ -415,7 +415,7 @@
 
                         <!-- supabase zone -->
                         <rect x="600" y="20" width="322" height="392" rx="12" fill="#f0fdfa" stroke="#0d9488" stroke-width="1.4"/>
-                        <text class="zt" x="616" y="44" fill="#0d9488">Supabase — the backend</text>
+                        <text class="zt" x="616" y="44" fill="#0d9488">Supabase - the backend</text>
                         <rect class="bx" x="616" y="58" width="290" height="58"/>
                         <text class="bt" x="630" y="80">Auto REST API</text>
                         <text class="bs" x="630" y="97">every table becomes an HTTPS</text>
@@ -425,13 +425,13 @@
                         <text class="bs" x="630" y="165">email + password, for the admin</text>
                         <rect class="bx" x="616" y="186" width="290" height="96" fill="#e7f9f4" stroke="#5eead4"/>
                         <text class="bt" x="630" y="207">Postgres database</text>
-                        <text class="bs" x="630" y="226">projects &amp; skills — interactive UI</text>
-                        <text class="bs" x="630" y="242">messages — the contact inbox</text>
-                        <text class="bs" x="630" y="258">events — the analytics log</text>
+                        <text class="bs" x="630" y="226">projects &amp; skills - interactive UI</text>
+                        <text class="bs" x="630" y="242">messages - the contact inbox</text>
+                        <text class="bs" x="630" y="258">events - the analytics log</text>
                         <text class="bs" x="630" y="274">+ one function that builds the dashboard</text>
                         <rect class="bx" x="616" y="294" width="290" height="62" fill="#fff5ef" stroke="#e8956a"/>
                         <text class="bt" x="630" y="315" fill="#c43c00">🔒 Row Level Security</text>
-                        <text class="bs" x="630" y="332">the real gatekeeper — decides per row</text>
+                        <text class="bs" x="630" y="332">the real gatekeeper - decides per row</text>
                         <text class="bs" x="630" y="347">who may read or write what</text>
 
                         <!-- edges: browser -> vercel (grey static) -->
@@ -456,20 +456,20 @@
             <!-- ============ 04 PAGE LOAD ============ -->
             <section class="ht-sec" id="load">
                 <h2><span class="num">04</span> What happens on one page load</h2>
-                <p>The browser fetches static files, scripts load in order, analytics logs silently, data is fetched, and the UI renders — with offline fallbacks if the database is down.</p>
+                <p>The browser fetches static files, scripts load in order, analytics logs silently, data is fetched, and the UI renders - with offline fallbacks if the database is down.</p>
                 <details class="ht-more">
                     <summary>Deep dive: The load sequence</summary>
                     <div class="ht-more-body">
                         <p style="margin-top:0">Follow a single visitor from typing the URL to seeing project cards. This is the order things actually run in:</p>
                 <ol class="ht-steps">
                     <li><b>The browser asks Vercel for the page.</b>
-                        <p>It gets back the HTML, CSS, and images straight from the nearest CDN edge — no server thinking required.</p></li>
+                        <p>It gets back the HTML, CSS, and images straight from the nearest CDN edge - no server thinking required.</p></li>
                     <li><b>The scripts load, in a fixed order.</b>
                         <p>The database client first, then the config, then analytics, then the UI, then the data layer. Each one needs the one before it.</p></li>
                     <li><b>Analytics fires a quiet "pageview."</b>
-                        <p>One write to the database. If it fails, nothing breaks — analytics is designed to fail silently.</p></li>
+                        <p>One write to the database. If it fails, nothing breaks - analytics is designed to fail silently.</p></li>
                     <li><b>The data layer asks for the projects.</b>
-                        <p>It requests the published project rows. The database returns only those — drafts never leave the building.</p></li>
+                        <p>It requests the published project rows. The database returns only those - drafts never leave the building.</p></li>
                     <li><b>The cards render, and the page is interactive.</b>
                         <p>If the database was unreachable, it quietly falls back to a bundled copy of the list so you still see cards.</p></li>
                 </ol>
@@ -506,13 +506,13 @@
                         <div class="arr">&rarr;</div>
                         <div class="box"><div class="t">projects table</div><div class="s">returns the visible rows</div></div>
                     </div>
-                    <p style="margin:10px 0 0 !important; font-size:.92rem !important; color:var(--ht-muted)">Drafts stay invisible to the public — not hidden by CSS, actually filtered out before they leave the database.</p>
+                    <p style="margin:10px 0 0 !important; font-size:.92rem !important; color:var(--ht-muted)">Drafts stay invisible to the public - not hidden by CSS, actually filtered out before they leave the database.</p>
                 </div>
 
                 <div class="ht-panel" data-panel="B">
                     <h4>Logging an analytics event</h4>
                     <div class="who">Public · fire-and-forget, write-only</div>
-                    <p style="margin:0 0 6px !important">A pageview, a project click, time-on-page — each becomes one
+                    <p style="margin:0 0 6px !important">A pageview, a project click, time-on-page - each becomes one
                         insert into the events log. The public can <em>write</em> events but can never <em>read</em>
                         them back.</p>
                     <div class="ht-flow">
@@ -522,7 +522,7 @@
                         <div class="arr">&rarr;</div>
                         <div class="box"><div class="t">events table</div><div class="s">append-only</div></div>
                     </div>
-                    <p style="margin:10px 0 0 !important; font-size:.92rem !important; color:var(--ht-muted)">No read-back, and errors are swallowed — analytics can never slow down or break the page.</p>
+                    <p style="margin:10px 0 0 !important; font-size:.92rem !important; color:var(--ht-muted)">No read-back, and errors are swallowed - analytics can never slow down or break the page.</p>
                 </div>
 
                 <div class="ht-panel" data-panel="C">
@@ -538,7 +538,7 @@
                         <div class="arr">&rarr;</div>
                         <div class="box"><div class="t">messages table</div><div class="s">admin reads it later</div></div>
                     </div>
-                    <p style="margin:10px 0 0 !important; font-size:.92rem !important; color:var(--ht-muted)">If the insert ever fails, the form builds a pre-filled email instead — so it's never a dead end.</p>
+                    <p style="margin:10px 0 0 !important; font-size:.92rem !important; color:var(--ht-muted)">If the insert ever fails, the form builds a pre-filled email instead - so it's never a dead end.</p>
                 </div>
                     </div>
                 </details>
@@ -601,7 +601,7 @@
                     <div class="ht-more-body">
                         <p>The admin dashboard could run a dozen separate queries against the raw events. Instead,
                             a single database <em>function</em> does all the counting and grouping server-side and
-                            hands back one tidy JSON blob — KPIs, top pages, a daily series, the game leaderboard.</p>
+                            hands back one tidy JSON blob - KPIs, top pages, a daily series, the game leaderboard.</p>
                         <p>It's set up so the public can <em>write</em> events but can never <em>read</em> the
                             analytics back out: permission to run that function is granted to logged-in users only.</p>
                         <pre><span class="c">-- the whole dashboard, one call, admin-only</span>
@@ -613,15 +613,15 @@ select intel_dashboard();
                 </details>
             </section>
 
-            <!-- ============ 07 RLS — INTERACTIVE ============ -->
+            <!-- ============ 07 RLS - INTERACTIVE ============ -->
             <section class="ht-sec" id="rls">
-                <h2><span class="num">07</span> Who can do what <span style="font-size:.7em;color:var(--ht-accent)">— try it</span></h2>
+                <h2><span class="num">07</span> Who can do what <span style="font-size:.7em;color:var(--ht-accent)">- try it</span></h2>
                 <p>A live simulator showing how Row Level Security blocks unauthorized reads and writes.</p>
                 <details class="ht-more">
                     <summary>Deep dive: Interactive RLS simulator</summary>
                     <div class="ht-more-body">
                         <p style="margin-top:0">This is the part that makes "no backend server" safe. Pick who you are, pick what you want to do,
-                            and see whether the database lets you — and why. This mirrors the <em>actual</em> rules.</p>
+                            and see whether the database lets you - and why. This mirrors the <em>actual</em> rules.</p>
 
                 <div class="ht-sim" id="ht-sim">
                     <div class="ht-sim-head">
@@ -656,7 +656,7 @@ select intel_dashboard();
 
                 <div class="ht-note"><b>The takeaway:</b> the public key in the page can't do anything dangerous,
                     because every request is checked against these rules inside the database. The powerful key (the
-                    one that <em>would</em> bypass them) never touches the browser — it lives only in the Supabase
+                    one that <em>would</em> bypass them) never touches the browser - it lives only in the Supabase
                     dashboard.</div>
                     </div>
                 </details>
@@ -670,7 +670,7 @@ select intel_dashboard();
                     <summary>Deep dive: The reveal pattern</summary>
                     <div class="ht-more-body">
                         <p style="margin-top:0">The nicest interaction on the site is how a project unfolds in three stages. Each tier shows more
-                            of the <em>same</em> record that was already loaded — so there are zero extra network calls.
+                            of the <em>same</em> record that was already loaded - so there are zero extra network calls.
                             Try it for real on the <a href="/#projects-grid">homepage project grid</a>; here's the anatomy:</p>
 
                 <figure class="ht-fig">
@@ -692,7 +692,7 @@ select intel_dashboard();
                         </style>
 
                         <!-- TIER 1: card -->
-                        <text class="tnum" x="20" y="22">TIER 1 — ALWAYS VISIBLE</text>
+                        <text class="tnum" x="20" y="22">TIER 1 - ALWAYS VISIBLE</text>
                         <rect class="scr" x="20" y="34" width="250" height="150"/>
                         <text class="code" x="38" y="62">MSN-01</text>
                         <text class="ttl" x="38" y="88">Fraud Triage</text>
@@ -702,7 +702,7 @@ select intel_dashboard();
                         <text class="mono" x="38" y="172" fill="#9ca3af">in the grid →</text>
 
                         <!-- TIER 2: hover sheet -->
-                        <text class="tnum" x="345" y="22">TIER 2 — ON HOVER</text>
+                        <text class="tnum" x="345" y="22">TIER 2 - ON HOVER</text>
                         <rect class="frame" x="356" y="44" width="240" height="150" rx="8"/>
                         <rect class="scr" x="348" y="34" width="240" height="150"/>
                         <text class="code" x="366" y="60">MSN-01</text>
@@ -714,7 +714,7 @@ select intel_dashboard();
                         <text class="mono" x="366" y="172" fill="#9ca3af">a floating preview · no network</text>
 
                         <!-- TIER 3: modal -->
-                        <text class="tnum" x="672" y="22">TIER 3 — ON CLICK</text>
+                        <text class="tnum" x="672" y="22">TIER 3 - ON CLICK</text>
                         <rect class="frame" x="680" y="44" width="240" height="250" rx="8"/>
                         <rect class="scr" x="672" y="34" width="240" height="250"/>
                         <text class="mono" x="690" y="54">← ALL MISSIONS</text>
@@ -739,8 +739,8 @@ select intel_dashboard();
                     </svg>
                     <figcaption class="ht-cap">One record, revealed in three depths: card → hover preview → full modal. The click is the only one that logs an event.</figcaption>
                 </figure>
-                <p style="font-size:.92rem; color:var(--ht-muted)">It's a classic UX pattern — <em>progressive
-                    disclosure</em> — done without a single extra request, because the full record is already in
+                <p style="font-size:.92rem; color:var(--ht-muted)">It's a classic UX pattern - <em>progressive
+                    disclosure</em> - done without a single extra request, because the full record is already in
                     memory from the first load.</p>
                     </div>
                 </details>
@@ -829,14 +829,14 @@ select intel_dashboard();
                         <rect class="btn" x="800" y="232" width="92" height="20"/>
                         <text class="btxt" x="816" y="245">SAVE CHANGES</text>
                     </svg>
-                    <figcaption class="ht-cap">Left: the login everyone sees. Right: the unlocked console — edit projects, read the inbox, and view visitor stats.</figcaption>
+                    <figcaption class="ht-cap">Left: the login everyone sees. Right: the unlocked console - edit projects, read the inbox, and view visitor stats.</figcaption>
                 </figure>
 
                 <p>From the console I can:</p>
                 <ul class="ops-points">
-                    <li><b>Edit the live site's content.</b> Add, edit, reorder, publish, or unpublish a project — and the homepage updates instantly. Same goes for the new inline Skills and Certifications editor canvases!</li>
+                    <li><b>Edit the live site's content.</b> Add, edit, reorder, publish, or unpublish a project - and the homepage updates instantly. Same goes for the new inline Skills and Certifications editor canvases!</li>
                     <li><b>Read and triage the inbox.</b> See contact messages, flag the important ones, mark them handled, delete spam. The public can send mail but can never see this.</li>
-                    <li><b>Watch the visitors.</b> A dashboard of KPIs, top pages, traffic sources, a daily trend, and even a leaderboard for the hidden games — all from that one server-side function.</li>
+                    <li><b>Watch the visitors.</b> A dashboard of KPIs, top pages, traffic sources, a daily trend, and even a leaderboard for the hidden games - all from that one server-side function.</li>
                 </ul>
                 <div class="ht-note"><b>Why this is genuinely safe:</b> the console doesn't have secret powers baked
                     into the page. It logs in, gets a token, and from then on the <em>database</em> recognises the
@@ -858,12 +858,12 @@ select intel_dashboard();
                     admin console. That separation means a recruiter never catches the site mid-redeploy.</p>
 
                 <p><b>Analytics you actually own.</b> No Google Analytics, no third-party script watching visitors.
-                    A tiny home-grown tracker writes cookieless events — no IP, no name, just a random id in your
-                    browser's storage — and it honours Do-Not-Track. The data lives in <em>my</em> database, and I
+                    A tiny home-grown tracker writes cookieless events - no IP, no name, just a random id in your
+                    browser's storage - and it honours Do-Not-Track. The data lives in <em>my</em> database, and I
                     read it through the admin dashboard.</p>
 
                 <p><b>Hidden games.</b> There's a little driving game and a tic-tac-toe tucked into the site as
-                    easter eggs. Beat them and your score quietly joins the leaderboard in the admin dashboard —
+                    easter eggs. Beat them and your score quietly joins the leaderboard in the admin dashboard -
                     the same analytics pipe, just having fun with it.</p>
 
                 <div class="ht-pills">
@@ -880,10 +880,10 @@ select intel_dashboard();
                 <p><b>Accessibility and SEO weren't afterthoughts.</b> Skip link, visible focus rings, a
                     reduced-motion mode, and colour contrast that clears the standard. Because the pages are real
                     HTML (not rendered by JavaScript), search engines and even language models can read them
-                    cleanly — there's a hand-written <code>llms.txt</code> for exactly that.</p>
+                    cleanly - there's a hand-written <code>llms.txt</code> for exactly that.</p>
 
                 <blockquote>The whole point: a portfolio that's fast and simple on the surface, but quietly runs on
-                    a real database — and stays safe doing it because the rules live where the data lives.</blockquote>
+                    a real database - and stays safe doing it because the rules live where the data lives.</blockquote>
                     </div>
                 </details>
 
@@ -928,7 +928,7 @@ select intel_dashboard();
         window.addEventListener('scroll', onScroll, { passive: true });
         onScroll();
 
-        /* dot rail — highlight the section currently in view */
+        /* dot rail - highlight the section currently in view */
         var dots = [].slice.call(document.querySelectorAll('.ht-rail a'));
         var secs = [].slice.call(document.querySelectorAll('.ht-sec'));
         if (window.IntersectionObserver && secs.length) {
@@ -945,7 +945,7 @@ select intel_dashboard();
             secs.forEach(function (s) { io.observe(s); });
         }
 
-        /* tabs — the three data flows */
+        /* tabs - the three data flows */
         var tabs = [].slice.call(document.querySelectorAll('.ht-tab'));
         var panels = [].slice.call(document.querySelectorAll('.ht-panel'));
         tabs.forEach(function (t) {
@@ -961,16 +961,16 @@ select intel_dashboard();
         /* permission simulator */
         var RULES = {
             read_pub: {
-                anon: [true, 'Published projects are public — the read rule lets a visitor see any project marked published.'],
+                anon: [true, 'Published projects are public - the read rule lets a visitor see any project marked published.'],
                 auth: [true, 'You can read everything, published or not.']
             },
             read_draft: {
-                anon: [false, 'Drafts have published = false. The read rule filters them out, so they never leave the database — there is nothing on the page to "inspect."'],
+                anon: [false, 'Drafts have published = false. The read rule filters them out, so they never leave the database - there is nothing on the page to "inspect."'],
                 auth: [true, 'Logged in, you can see drafts too. That is how you preview a project before publishing it.']
             },
             send_msg: {
                 anon: [true, 'Anyone can submit one message. The write rule caps the body at 1–5000 characters so the form can\'t be abused for bulk storage.'],
-                auth: [true, 'You can too — though normally you are on the reading end of the inbox.']
+                auth: [true, 'You can too - though normally you are on the reading end of the inbox.']
             },
             read_inbox: {
                 anon: [false, 'There is no read rule on messages for the public. You can send mail, but the inbox is invisible to everyone but the owner.'],
@@ -978,14 +978,14 @@ select intel_dashboard();
             },
             log_event: {
                 anon: [true, 'Visitors can insert analytics events (write-only), with guards on the type length and numeric fields.'],
-                auth: [true, 'Allowed — though the interesting part is reading them, not writing them.']
+                auth: [true, 'Allowed - though the interesting part is reading them, not writing them.']
             },
             read_stats: {
                 anon: [false, 'The public can\'t read the events table at all. The dashboard comes from a function granted to logged-in users only.'],
                 auth: [true, 'You read the analytics as tidy aggregates through that one server-side function.']
             },
             edit_proj: {
-                anon: [false, 'The public key grants no write power on projects — no insert, update, or delete. This is why shipping it in the page is safe.'],
+                anon: [false, 'The public key grants no write power on projects - no insert, update, or delete. This is why shipping it in the page is safe.'],
                 auth: [true, 'Full control. This is exactly what the admin console uses to edit the live site.']
             }
         };
