@@ -730,12 +730,24 @@
         this.render();
     },
 
+    getColor(categoryId) {
+        if (!categoryId) return 'var(--text-muted)';
+        const colors = ['#2b8a3e', '#e67700', '#1864ab', '#c92a2a', '#5f3dc4', '#087f5b', '#c0eb75', '#ff922b'];
+        let hash = 0;
+        for (let i = 0; i < categoryId.length; i++) {
+            hash = categoryId.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return colors[Math.abs(hash) % colors.length];
+    },
+
     render() {
         // 1. Render Categories in Center
         const canvas = $('category-canvas');
-        canvas.innerHTML = this.categories.map(c => `
+        canvas.innerHTML = this.categories.map(c => {
+            const color = this.getColor(c.id);
+            return `
             <div class="category-card" data-cat-id="${c.id}">
-                <div class="category-header">
+                <div class="category-header" style="border-top: 3px solid ${color};">
                     <input type="text" value="${esc(c.name)}" onchange="SkillsCanvas.renameCategory('${c.id}', this.value)">
                     <button class="ghost" style="padding: 2px 6px; font-size: 0.8rem; height: auto;" onclick="SkillsCanvas.deleteCategory('${c.id}')">×</button>
                 </div>
@@ -743,7 +755,7 @@
                     ${this.nodes.filter(n => n.category_id === c.id && n.is_active).map(n => this.renderNode(n)).join('')}
                 </div>
             </div>
-        `).join('');
+        `}).join('');
 
         // 2. Render Active Skills (Left)
         const activeZone = $('active-skills-zone');
@@ -763,7 +775,8 @@
     },
 
     renderNode(n) {
-        return `<div class="skill-node" draggable="true" ondragstart="SkillsCanvas.onDragStart(event, '${n.id}')">
+        const color = this.getColor(n.category_id);
+        return `<div class="skill-node" style="border-left-color: ${color}" draggable="true" ondragstart="SkillsCanvas.onDragStart(event, '${n.id}')">
             <input type="text" value="${esc(n.name)}" onchange="SkillsCanvas.renameNode('${n.id}', this.value)" onfocus="this.parentElement.classList.add('highlighted')" onblur="this.parentElement.classList.remove('highlighted')">
             <button class="ghost" style="padding: 0 4px; border: none; font-size: 0.8rem; height: auto; min-height: 0;" onclick="SkillsCanvas.deleteNode('${n.id}')">×</button>
         </div>`;
