@@ -720,7 +720,7 @@
 
         const [catsRes, nodesRes] = await Promise.all([
             db.from('skill_categories').select('*').order('sort_order', { ascending: true }),
-            db.from('skill_nodes').select('*').order('name', { ascending: true })
+            db.from('skill_nodes').select('*').order('sort_order', { ascending: true }).order('name', { ascending: true })
         ]);
         if (catsRes.error) return msg($('skills-msg'), catsRes.error.message, 'err');
         if (nodesRes.error) return msg($('skills-msg'), nodesRes.error.message, 'err');
@@ -732,6 +732,8 @@
 
     getColor(categoryId) {
         if (!categoryId) return 'var(--text-muted)';
+        const cat = this.categories.find(c => c.id === categoryId);
+        if (cat && cat.color) return cat.color;
         const colors = ['#2b8a3e', '#e67700', '#1864ab', '#c92a2a', '#5f3dc4', '#087f5b', '#c0eb75', '#ff922b'];
         let hash = 0;
         for (let i = 0; i < categoryId.length; i++) {
@@ -747,19 +749,29 @@
             const color = this.getColor(c.id);
             return `
             <div class="category-card" data-cat-id="${c.id}">
-                <div class="category-header" style="border-top: 3px solid ${color};">
+                <div class="category-header" style="border-top: 3px solid ${color};" oncontextmenu="SkillsCanvas.showColorPicker(event, '${c.id}')">
                     <input type="text" value="${esc(c.name)}" onchange="SkillsCanvas.renameCategory('${c.id}', this.value)">
                     <button class="ghost" style="padding: 2px 6px; font-size: 0.8rem; height: auto;" onclick="SkillsCanvas.deleteCategory('${c.id}')">×</button>
                 </div>
                 <div class="category-body" ondragover="SkillsCanvas.onDragOver(event)" ondrop="SkillsCanvas.onDrop(event, '${c.id}')">
-                    ${this.nodes.filter(n => n.category_id === c.id && n.is_active).map(n => this.renderNode(n)).join('')}
+                    ${this.nodes.filter(n => n.category_id === c.id && n.is_active).sort((a,b)=> (a.sort_order||0)-(b.sort_order||0)).map(n => this.renderNode(n)).join('')}
                 </div>
             </div>
         `}).join('');
 
         // 2. Render Active Skills (Left)
         const activeZone = $('active-skills-zone');
-        const activeNodes = this.nodes.filter(n => n.is_active);
+        let activeNodes = this.nodes.filter(n => n.is_active);
+        
+        activeNodes.sort((a, b) => {
+            const catA = this.categories.find(c => c.id === a.category_id);
+            const catB = this.categories.find(c => c.id === b.category_id);
+            const orderA = catA ? catA.sort_order : 999;
+            const orderB = catB ? catB.sort_order : 999;
+            if (orderA !== orderB) return orderA - orderB;
+            return (a.sort_order || 0) - (b.sort_order || 0);
+        });
+
         $('active-skills-count').textContent = activeNodes.length;
         activeZone.innerHTML = activeNodes.map(n => this.renderNode(n)).join('');
         activeZone.ondragover = this.onDragOver;
@@ -767,11 +779,43 @@
 
         // 3. Render Archive Skills (Right)
         const archiveZone = $('archive-skills-zone');
-        const archiveNodes = this.nodes.filter(n => !n.is_active);
+        let archiveNodes = this.nodes.filter(n => !n.is_active);
+        archiveNodes.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
         $('archived-skills-count').textContent = archiveNodes.length;
         archiveZone.innerHTML = archiveNodes.map(n => this.renderNode(n)).join('');
         archiveZone.ondragover = this.onDragOver;
         archiveZone.ondrop = (e) => this.onDrop(e, 'archive');
+    },
+
+    showColorPicker(e, catId) {
+        e.preventDefault();
+        const menu = $('color-picker-menu');
+        const colors = ['#2b8a3e', '#e67700', '#1864ab', '#c92a2a', '#5f3dc4', '#087f5b', '#c0eb75', '#ff922b'];
+        menu.innerHTML = colors.map(c => `
+            <div style="width: 24px; height: 24px; border-radius: 50%; background: ${c}; cursor: pointer; border: 2px solid transparent;" 
+                 onmouseover="this.style.borderColor='var(--text-main)'" 
+                 onmouseout="this.style.borderColor='transparent'"
+                 onclick="SkillsCanvas.setCategoryColor('${catId}', '${c}')"></div>
+        `).join('');
+        
+        menu.style.left = e.pageX + 'px';
+        menu.style.top = e.pageY + 'px';
+        menu.classList.remove('hidden');
+
+        const closeMenu = () => {
+            menu.classList.add('hidden');
+            document.removeEventListener('click', closeMenu);
+        };
+        setTimeout(() => document.addEventListener('click', closeMenu), 0);
+    },
+
+    async setCategoryColor(catId, color) {
+        const cat = this.categories.find(c => c.id === catId);
+        if (cat) {
+            cat.color = color;
+            this.render();
+            await db.from('skill_categories').update({ color }).eq('id', catId);
+        }
     },
 
     renderNode(n) {
@@ -796,13 +840,13 @@
         e.preventDefault();
         if (!this.draggedNodeId) return;
         const id = this.draggedNodeId;
+        const node = this.nodes.find(n => n.id === id);
         this.draggedNodeId = null;
         
         let updates = {};
         if (target === 'archive') {
             updates = { is_active: false, category_id: null };
         } else if (target === 'active') {
-            const node = this.nodes.find(n => n.id === id);
             updates = { is_active: true };
             if (!node.category_id && this.categories.length > 0) {
                 updates.category_id = this.categories[0].id;
@@ -811,14 +855,58 @@
             updates = { is_active: true, category_id: target };
         }
 
-        const node = this.nodes.find(n => n.id === id);
+        const dropzone = e.target.closest('.skills-dropzone, .category-body');
+        let insertIdx = -1;
+        if (dropzone) {
+            const nodesDOM = [...dropzone.querySelectorAll('.skill-node:not(.dragging)')];
+            const afterElement = nodesDOM.find(n => {
+                const rect = n.getBoundingClientRect();
+                return e.clientY < rect.top + rect.height / 2;
+            });
+            if (afterElement) {
+                const afterIdStr = afterElement.getAttribute('ondragstart');
+                const match = afterIdStr && afterIdStr.match(/'([^']+)'/);
+                if (match) {
+                    const afterId = match[1];
+                    const subset = this.nodes.filter(n => 
+                        (target === 'archive' ? !n.is_active : 
+                        target === 'active' ? n.is_active && n.category_id === updates.category_id : 
+                        n.category_id === target && n.is_active)
+                    ).filter(n => n.id !== id);
+                    subset.sort((a,b) => (a.sort_order||0) - (b.sort_order||0));
+                    insertIdx = subset.findIndex(n => n.id === afterId);
+                }
+            }
+        }
+
         Object.assign(node, updates);
+        
+        const subset = this.nodes.filter(n => 
+            (target === 'archive' ? !n.is_active : 
+            target === 'active' ? n.is_active && n.category_id === node.category_id : 
+            n.category_id === target && n.is_active)
+        ).filter(n => n.id !== id);
+        
+        subset.sort((a,b) => (a.sort_order||0) - (b.sort_order||0));
+        
+        if (insertIdx === -1) insertIdx = subset.length;
+        subset.splice(insertIdx, 0, node);
+        
+        subset.forEach((n, idx) => {
+            n.sort_order = idx * 10;
+        });
+
         this.render();
 
         const { error } = await db.from('skill_nodes').update(updates).eq('id', id);
         if (error) {
             msg($('skills-msg'), error.message, 'err');
             this.load();
+            return;
+        }
+
+        for (let n of subset) {
+            await db.from('skill_nodes').update({ sort_order: n.sort_order }).eq('id', n.id);
         }
     },
 

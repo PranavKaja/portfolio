@@ -37,7 +37,7 @@
       try {
         const [catsRes, nodesRes] = await Promise.all([
           db.from('skill_categories').select('*').order('sort_order', { ascending: true }),
-          db.from('skill_nodes').select('*').eq('is_active', true)
+          db.from('skill_nodes').select('*').eq('is_active', true).order('sort_order', { ascending: true })
         ]);
         if (catsRes.error) throw catsRes.error;
         if (nodesRes.error) throw nodesRes.error;
@@ -47,7 +47,7 @@
         
         return cats.map(c => ({
             category: c.name,
-            items: nodes.filter(n => n.category_id === c.id).map(n => n.name)
+            items: nodes.filter(n => n.category_id === c.id).sort((a,b) => (a.sort_order||0)-(b.sort_order||0)).map(n => n.name)
         }));
       } catch (e) {
         console.warn('[skills canvas] Supabase load failed, using fallback:', e.message || e);
