@@ -1262,12 +1262,12 @@
 
   // ---- Today view: hourly pageview breakdown (queries the events table directly) ----
   async function loadTodayHourly() {
-    const startUTC = new Date().toISOString().slice(0, 10) + 'T00:00:00.000Z';
+    const start = new Date(); start.setHours(0, 0, 0, 0); // local midnight, in the viewer's timezone
     const buckets = new Array(24).fill(0);
     try {
       const { data, error } = await db.from('events')
-        .select('created_at').eq('type', 'pageview').gte('created_at', startUTC).limit(5000);
-      if (!error && data) data.forEach(ev => { buckets[new Date(ev.created_at).getUTCHours()]++; });
+        .select('created_at').eq('type', 'pageview').gte('created_at', start.toISOString()).limit(5000);
+      if (!error && data) data.forEach(ev => { buckets[new Date(ev.created_at).getHours()]++; });
     } catch (e) { /* leave zeros */ }
     return buckets;
   }
@@ -1275,7 +1275,7 @@
   function renderHourlyTable(buckets) {
     const rows = buckets.map((v, h) => [pad2(h) + ':00', v]);
     const total = buckets.reduce((s, v) => s + v, 0);
-    return detailTable(['Hour (UTC)', 'Views'], rows, ['Total', total]);
+    return detailTable(['Hour', 'Views'], rows, ['Total', total]);
   }
   function renderHourlyChart(buckets) {
     const max = Math.max.apply(null, buckets) || 1;
