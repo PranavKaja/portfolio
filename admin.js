@@ -363,6 +363,25 @@
     }
     btn.disabled = false;
     if (error) { msg($('form-msg'), error.message, 'err'); return; }
+    
+    // Auto-create missing skills in the node pool
+    if (payload.skills && payload.skills.length > 0) {
+        const { data: existingNodes } = await db.from('skill_nodes').select('name');
+        const existingNames = new Set((existingNodes || []).map(n => n.name.toLowerCase()));
+        
+        const missingSkills = payload.skills.filter(s => !existingNames.has(s.toLowerCase()));
+        if (missingSkills.length > 0) {
+            const inserts = missingSkills.map(name => ({
+                name: name,
+                is_active: false,
+                category_id: null
+            }));
+            await db.from('skill_nodes').insert(inserts);
+            // Reload skills canvas if it's currently initialized
+            if (window.SkillsCanvas) window.SkillsCanvas.load();
+        }
+    }
+
     isDirty = false;
     closeEditor();
     loadProjects();
@@ -691,22 +710,164 @@
   }
 
   const Sections = {};
-  Sections.skills = makeSection({
-    table: 'skills', list: 'skills-list', count: 'skills-count', empty: 'skills-empty',
-    msg: 'skills-msg', newBtn: 'new-skill-btn', noun: 'category',
-    unit: n => 'CATEGOR' + (n === 1 ? 'Y' : 'IES'),
-    valid: p => !!p.category, validMsg: 'Category name is required.',
-    blank: { category: '', items: [] },
-    card: s => `<div class="sc-card" data-id="${esc(s.id || '')}">
-      <div class="sc-grid">
-        <label class="sc-f sc-grow">Category<input class="hl" data-f="category" value="${esc(s.category || '')}"></label>
-        <label class="sc-f sc-num">Order<input class="hl" type="number" data-f="sort_order" value="${s.sort_order != null ? s.sort_order : 0}"></label>
-        <label class="sc-f sc-pub">Public<input type="checkbox" data-f="published" ${s.published !== false ? 'checked' : ''}></label>
-      </div>
-      <label class="sc-f">Items (comma or one per line)<textarea class="hl" data-f="items" data-arr>${esc((s.items || []).join(', '))}</textarea></label>
-      <div class="sc-actions"><button type="button" class="primary sc-save">Save</button><button type="button" class="danger sc-del">Delete</button></div>
-    </div>`
+  const SkillsCanvas = {
+    categories: [],
+    nodes: [],
+    
+    async load() {
+        // Reset floating active nodes to archive on load (per requirements)
+        await db.from('skill_nodes').update({ is_active: false }).eq('is_active', true).is('category_id', null);
+
+        const [catsRes, nodesRes] = await Promise.all([
+            db.from('skill_categories').select('*').order('sort_order', { ascending: true }),
+            db.from('skill_nodes').select('*').order('name', { ascending: true })
+        ]);
+        if (catsRes.error) return msg($('skills-msg'), catsRes.error.message, 'err');
+        if (nodesRes.error) return msg($('skills-msg'), nodesRes.error.message, 'err');
+        
+        this.categories = catsRes.data || [];
+        this.nodes = nodesRes.data || [];
+        this.render();
+    },
+
+    render() {
+        // 1. Render Categories in Center
+        const canvas = $('category-canvas');
+        canvas.innerHTML = this.categories.map(c => `
+            <div class="category-card" data-cat-id="${c.id}">
+                <div class="category-header">
+                    <input type="text" value="${esc(c.name)}" onchange="SkillsCanvas.renameCategory('${c.id}', this.value)">
+                    <button class="ghost" style="padding: 2px 6px; font-size: 0.8rem; height: auto;" onclick="SkillsCanvas.deleteCategory('${c.id}')">×</button>
+                </div>
+                <div class="category-body" ondragover="SkillsCanvas.onDragOver(event)" ondrop="SkillsCanvas.onDrop(event, '${c.id}')">
+                    ${this.nodes.filter(n => n.category_id === c.id && n.is_active).map(n => this.renderNode(n)).join('')}
+                </div>
+            </div>
+        `).join('');
+
+        // 2. Render Active Skills (Left)
+        const activeZone = $('active-skills-zone');
+        const activeNodes = this.nodes.filter(n => n.is_active);
+        $('active-skills-count').textContent = activeNodes.length;
+        activeZone.innerHTML = activeNodes.map(n => this.renderNode(n)).join('');
+        activeZone.ondragover = this.onDragOver;
+        activeZone.ondrop = (e) => this.onDrop(e, 'active');
+
+        // 3. Render Archive Skills (Right)
+        const archiveZone = $('archive-skills-zone');
+        const archiveNodes = this.nodes.filter(n => !n.is_active);
+        $('archived-skills-count').textContent = archiveNodes.length;
+        archiveZone.innerHTML = archiveNodes.map(n => this.renderNode(n)).join('');
+        archiveZone.ondragover = this.onDragOver;
+        archiveZone.ondrop = (e) => this.onDrop(e, 'archive');
+    },
+
+    renderNode(n) {
+        return \`<div class="skill-node" draggable="true" ondragstart="SkillsCanvas.onDragStart(event, '\${n.id}')">
+            <input type="text" value="\${esc(n.name)}" onchange="SkillsCanvas.renameNode('\${n.id}', this.value)" onfocus="this.parentElement.classList.add('highlighted')" onblur="this.parentElement.classList.remove('highlighted')">
+            <button class="ghost" style="padding: 0 4px; border: none; font-size: 0.8rem; height: auto; min-height: 0;" onclick="SkillsCanvas.deleteNode('\${n.id}')">×</button>
+        </div>\`;
+    },
+
+    draggedNodeId: null,
+    onDragStart(e, id) {
+        this.draggedNodeId = id;
+        e.dataTransfer.effectAllowed = 'move';
+        setTimeout(() => e.target.classList.add('dragging'), 0);
+    },
+    onDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    },
+    async onDrop(e, target) {
+        e.preventDefault();
+        if (!this.draggedNodeId) return;
+        const id = this.draggedNodeId;
+        this.draggedNodeId = null;
+        
+        let updates = {};
+        if (target === 'archive') {
+            updates = { is_active: false, category_id: null };
+        } else if (target === 'active') {
+            const node = this.nodes.find(n => n.id === id);
+            updates = { is_active: true };
+            if (!node.category_id && this.categories.length > 0) {
+                updates.category_id = this.categories[0].id;
+            }
+        } else {
+            updates = { is_active: true, category_id: target };
+        }
+
+        const node = this.nodes.find(n => n.id === id);
+        Object.assign(node, updates);
+        this.render();
+
+        const { error } = await db.from('skill_nodes').update(updates).eq('id', id);
+        if (error) {
+            msg($('skills-msg'), error.message, 'err');
+            this.load();
+        }
+    },
+
+    async renameNode(id, newName) {
+        if (!newName.trim()) return;
+        const node = this.nodes.find(n => n.id === id);
+        node.name = newName.trim();
+        await db.from('skill_nodes').update({ name: node.name }).eq('id', id);
+        this.render();
+    },
+    async deleteNode(id) {
+        if (!confirm('Delete this skill? It will also disappear from the public site if active.')) return;
+        this.nodes = this.nodes.filter(n => n.id !== id);
+        this.render();
+        await db.from('skill_nodes').delete().eq('id', id);
+    },
+    async renameCategory(id, newName) {
+        if (!newName.trim()) return;
+        const cat = this.categories.find(c => c.id === id);
+        cat.name = newName.trim();
+        await db.from('skill_categories').update({ name: cat.name }).eq('id', id);
+    },
+    async deleteCategory(id) {
+        if (!confirm('Delete this category? Skills inside will be moved to the archive.')) return;
+        this.categories = this.categories.filter(c => c.id !== id);
+        this.nodes.forEach(n => { if (n.category_id === id) { n.category_id = null; n.is_active = false; } });
+        this.render();
+        await db.from('skill_categories').delete().eq('id', id);
+        await db.from('skill_nodes').update({ is_active: false, category_id: null }).eq('category_id', id);
+    },
+    async addCategory() {
+        const nextOrder = this.categories.length ? Math.max(...this.categories.map(c => c.sort_order || 0)) + 10 : 10;
+        const payload = { name: 'NEW CATEGORY', sort_order: nextOrder };
+        const { data, error } = await db.from('skill_categories').insert(payload).select().single();
+        if (error) return msg($('skills-msg'), error.message, 'err');
+        this.categories.push(data);
+        this.render();
+    },
+    async addNode(name) {
+        if (!name.trim()) return;
+        let node = this.nodes.find(n => n.name.toLowerCase() === name.trim().toLowerCase());
+        if (node) {
+            msg($('skills-msg'), 'Skill already exists.', 'err');
+            return;
+        }
+        const payload = { name: name.trim(), is_active: false, category_id: null };
+        const { data, error } = await db.from('skill_nodes').insert(payload).select().single();
+        if (error) return msg($('skills-msg'), error.message, 'err');
+        this.nodes.push(data);
+        this.render();
+    }
+  };
+
+  $('new-category-btn').addEventListener('click', () => SkillsCanvas.addCategory());
+  $('new-skill-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      SkillsCanvas.addNode($('new-skill-input').value);
+      $('new-skill-input').value = '';
   });
+
+  window.SkillsCanvas = SkillsCanvas;
+  Sections.skills = SkillsCanvas;
   Sections.certs = makeSection({
     table: 'certifications', list: 'certs-list', count: 'certs-admin-count', empty: 'certs-empty',
     msg: 'certs-admin-msg', newBtn: 'new-cert-btn', noun: 'certification',

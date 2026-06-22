@@ -112,14 +112,47 @@
 
             <!-- SKILLS PANEL -->
             <div id="panel-skills" class="hidden">
-                <div class="row" style="margin-bottom:18px">
-                    <button class="primary" id="new-skill-btn">+ New Category</button>
-                    <div class="spacer"></div>
-                    <span class="console-label" id="skills-count"></span>
+                <div class="skills-canvas-container">
+                    <!-- Left: Skills in Use -->
+                    <div class="skills-sidebar left-sidebar">
+                        <div class="sidebar-header">
+                            <h3>Skills in Use</h3>
+                            <span class="count-badge" id="active-skills-count">0</span>
+                        </div>
+                        <div class="skills-dropzone" id="active-skills-zone">
+                            <!-- Active skill chips go here -->
+                        </div>
+                    </div>
+
+                    <!-- Center: Category Canvas -->
+                    <div class="skills-canvas-main">
+                        <div class="canvas-header">
+                            <h2>Category Canvas</h2>
+                            <button class="ghost" id="new-category-btn" style="font-size: 0.75rem; padding: 6px 12px;">+ Add Category</button>
+                        </div>
+                        <div class="msg" id="skills-msg" style="padding: 0 24px;"></div>
+                        <div class="category-cards-container" id="category-canvas">
+                            <!-- Category Cards go here -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Archive -->
+                    <div class="skills-sidebar right-sidebar">
+                        <div class="sidebar-header">
+                            <h3>Archive</h3>
+                            <span class="count-badge" id="archived-skills-count">0</span>
+                        </div>
+                        <div class="skills-dropzone" id="archive-skills-zone">
+                            <!-- Inactive/Unsorted skill chips go here -->
+                        </div>
+                        <div class="archive-footer">
+                            <form id="new-skill-form">
+                                <input type="text" id="new-skill-input" placeholder="New skill..." required style="padding: 6px 10px; font-size: 0.8rem;">
+                                <button type="submit" class="ghost" style="padding: 6px 12px; font-size: 0.8rem;">+</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div class="msg" id="skills-msg"></div>
-                <div id="skills-list" class="sc-list"></div>
-                <div class="empty hidden" id="skills-empty">// NO SKILL CATEGORIES</div>
             </div>
 
             <!-- CERTIFICATIONS PANEL -->

@@ -31,6 +31,36 @@
     } catch (e) { return null; }
   }
 
+  async function loadSkillsCanvas() {
+    const db = window.getSupabase && window.getSupabase();
+    if (db) {
+      try {
+        const [catsRes, nodesRes] = await Promise.all([
+          db.from('skill_categories').select('*').order('sort_order', { ascending: true }),
+          db.from('skill_nodes').select('*').eq('is_active', true)
+        ]);
+        if (catsRes.error) throw catsRes.error;
+        if (nodesRes.error) throw nodesRes.error;
+
+        const cats = catsRes.data || [];
+        const nodes = nodesRes.data || [];
+        
+        return cats.map(c => ({
+            category: c.name,
+            items: nodes.filter(n => n.category_id === c.id).map(n => n.name)
+        }));
+      } catch (e) {
+        console.warn('[skills canvas] Supabase load failed, using fallback:', e.message || e);
+      }
+    }
+    try {
+      const res = await fetch('data/skills.json', { cache: 'no-store' });
+      const json = await res.json();
+      return json.filter(x => x.published !== false)
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+    } catch (e) { return null; }
+  }
+
   function renderSkills(rows) {
     const grid = document.getElementById('core-skills-grid');
     if (!grid || !rows) return;
@@ -90,7 +120,7 @@
 
   document.addEventListener('DOMContentLoaded', async () => {
     const [skills, certs] = await Promise.all([
-      loadTable('skills', 'data/skills.json'),
+      loadSkillsCanvas(),
       loadTable('certifications', 'data/certifications.json')
     ]);
     if (skills) renderSkills(skills);
