@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture Breakdown | Pranav Kaja</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+    /* Scoped styles replicating the blog aesthetic */
+    #howto {
+      --ht-ink:#18181b; --ht-muted:#6d6d75; --ht-line:#e4e4e7;
+      --ht-panel:#f7f7f8; --ht-card:#ffffff;
+      --ht-accent:#0d9488;      /* teal */
+      --ht-accent-soft:#f0fdfa;
+      --ht-browser:#2563eb;     /* blue  */
+      --ht-host:#7c3aed;        /* violet */
+      --ht-db:#0d9488;          /* teal  */
+      --ht-warn:#b45309;        /* amber */
+      max-width:840px;
+    }
+    #howto p { font-size:1.05rem; line-height:1.75; }
+    #howto a { color:var(--ht-accent); text-underline-offset:3px; }
+
+    .ht-toc { border:1px solid var(--ht-line); background:var(--ht-panel);
+      border-radius:12px; padding:18px 20px 8px; margin:8px 0 30px; }
+    .ht-toc-h { font-family:'Share Tech Mono',monospace; font-size:.78rem;
+      letter-spacing:.14em; text-transform:uppercase; color:var(--ht-muted); margin-bottom:6px; }
+    .ht-toc ol { list-style:none; margin:0; padding:0;
+      display:grid; grid-template-columns:1fr; gap:2px 22px; }
+    .ht-toc li a { display:flex; gap:10px; align-items:baseline; padding:8px 4px;
+      border-bottom:1px solid transparent; text-decoration:none; color:var(--ht-ink);
+      font-size:.95rem; transition:.15s; }
+    .ht-toc li a:hover { color:var(--ht-accent); }
+    .ht-toc li a .num { font-family:'Share Tech Mono',monospace; font-size:.8rem;
+      color:var(--ht-accent); min-width:22px; }
+
+    .ht-sec { scroll-margin-top:84px; }
+    h2 .num { font-family:'Share Tech Mono',monospace; color:var(--ht-accent);
+      font-size:.85rem; margin-right:10px; vertical-align:1px; }
+
+    .ht-big { border:1px solid var(--ht-line); border-left:4px solid var(--ht-accent);
+      background:linear-gradient(180deg,var(--ht-accent-soft),#fff);
+      border-radius:0 12px 12px 0; padding:20px 24px; margin:6px 0 4px; }
+    .ht-big .k { font-family:'Share Tech Mono',monospace; font-size:.72rem;
+      letter-spacing:.16em; text-transform:uppercase; color:var(--ht-accent); }
+    .ht-big p { margin:6px 0 0 !important; font-size:1.12rem !important; }
+
+    .ht-note { border-left:3px solid var(--ht-accent); background:var(--ht-accent-soft);
+      padding:13px 17px; border-radius:0 9px 9px 0; margin:18px 0; font-size:.96rem;
+      line-height:1.6; color:#1f3a37; }
+    .ht-note b { color:var(--ht-accent); }
+
+    /* Tables */
+    .ht-table { border-collapse:collapse; width:100%; font-size:.9rem; margin:16px 0;
+      border:1px solid var(--ht-line); border-radius:10px; overflow:hidden; }
+    .ht-table th, .ht-table td { text-align:left; padding:10px 13px;
+      border-bottom:1px solid var(--ht-line); vertical-align:top; }
+    .ht-table th { background:var(--ht-panel); font-family:'Share Tech Mono',monospace;
+      font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ht-muted); }
+    .ht-table tr:last-child td { border-bottom:none; }
+    .ht-table code { background:var(--ht-panel); border:1px solid var(--ht-line);
+      padding:1px 5px; border-radius:4px; font-family:'Share Tech Mono',monospace; font-size:.85em; }
+
+    /* Flow interaction */
+    .ht-tabs { display:flex; gap:8px; flex-wrap:wrap; margin:18px 0 0; }
+    .ht-tab { font:600 .82rem/1 'Share Tech Mono',monospace; letter-spacing:.03em;
+      padding:10px 15px; border:1px solid var(--ht-line); background:var(--ht-card);
+      border-radius:9px; cursor:pointer; color:var(--ht-muted); transition:.15s; }
+    .ht-tab:hover { border-color:var(--ht-accent); color:var(--ht-accent); }
+    .ht-tab.active { border-color:var(--ht-accent); color:#fff; background:var(--ht-accent); }
+    .ht-panel { display:none; border:1px solid var(--ht-line); border-radius:0 12px 12px 12px;
+      background:var(--ht-card); padding:20px 22px; margin-top:-1px; }
+    .ht-panel.active { display:block; animation:htFade .25s ease; }
+    @keyframes htFade { from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+    
+    .ht-flow { display:flex; flex-wrap:wrap; align-items:stretch; gap:8px; margin:14px 0 4px; }
+    .ht-flow .box { flex:1 1 0; min-width:120px; border:1px solid var(--ht-line);
+      border-radius:9px; padding:10px 12px; background:var(--ht-panel); }
+    .ht-flow .box .t { font:600 .82rem 'Share Tech Mono',monospace; color:var(--ht-ink); }
+    .ht-flow .box .s { font-size:.78rem; color:var(--ht-muted); margin-top:3px; line-height:1.4; }
+    .ht-flow .box.lock { border-color:var(--ht-accent); background:var(--ht-accent-soft); }
+    .ht-flow .arr { align-self:center; color:var(--ht-accent); font-weight:700;
+      font-family:'Share Tech Mono',monospace; }
+    </style>
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <nav class="top-nav">
+        <a href="/" class="nav-logo interactive-element no-underline text-inherit">SUBJECT // PRANAV KAJA</a>
+        <div class="nav-links"><a href="/"><span class="nav-num">&larr; </span>MAIN_DB</a></div>
+    </nav>
+
+    <main class="container" id="main">
+        <header class="hero">
+            <div class="hero-label mb-20"><span class="status-dot"></span>[ DEV DOCUMENTATION ]</div>
+            <h1 class="hero-title" style="font-size: 3.4rem;">SITE ARCHITECTURE</h1>
+            <p class="hero-subtitle">The complete developer guide to how this repository connects to the internet.</p>
+        </header>
+
+        <article class="section post-body" id="howto">
+            <nav class="ht-toc" aria-label="Table of contents">
+                <div class="ht-toc-h">// Contents</div>
+                <ol>
+                    <li><a href="#pipeline"><span class="num">01</span> The CI/CD Pipeline (Git &rarr; Vercel)</a></li>
+                    <li><a href="#filestructure"><span class="num">02</span> The File Structure Explained</a></li>
+                    <li><a href="#backend"><span class="num">03</span> The Database Connection (Supabase)</a></li>
+                </ol>
+            </nav>
+
+            <section class="ht-sec" id="pipeline">
+                <h2><span class="num">01</span> The CI/CD Pipeline (Git &rarr; Vercel)</h2>
+                <div class="ht-big">
+                    <div class="k">// The Deployment Flow</div>
+                    <p>There are no FTP uploads or manual server restarts. <b>Vercel watches your GitHub repository.</b> When you push code to the `main` branch, Vercel automatically deploys it.</p>
+                </div>
+                
+                <div class="ht-flow" style="margin-top: 24px;">
+                    <div class="box"><div class="t">1. Local Machine</div><div class="s">You edit HTML/JS files in this repository.</div></div>
+                    <div class="arr">&rarr;</div>
+                    <div class="box lock"><div class="t">2. Git Push</div><div class="s">You run `git push origin main`. GitHub receives the code.</div></div>
+                    <div class="arr">&rarr;</div>
+                    <div class="box"><div class="t">3. Vercel Webhook</div><div class="s">Vercel is notified by GitHub. It pulls the code, optimizes assets, and deploys to a global CDN.</div></div>
+                </div>
+
+                <div class="ht-note"><b>Why Vercel?</b> Vercel provides a CDN (Content Delivery Network). When a user in Tokyo visits your site, Vercel serves the HTML files from a server in Tokyo, not New York. This makes load times nearly instantaneous. The <code>vercel.json</code> file in your root folder contains small configuration tweaks for how Vercel handles routing.</div>
+            </section>
+
+            <section class="ht-sec" id="filestructure">
+                <h2><span class="num">02</span> The File Structure Explained</h2>
+                <p>Because there is no framework (like React or Next.js), the repository structure maps exactly to what the browser loads.</p>
+                <table class="ht-table">
+                    <tr><th>File/Folder</th><th>Role</th></tr>
+                    <tr><td><code>index.html</code></td><td>The homepage. It outlines the UI for the hero, the project grid, and the contact footer.</td></tr>
+                    <tr><td><code>admin.html</code> &amp; <code>admin.css</code></td><td>The private dashboard UI. Includes the login screen and the tabbed interface for managing projects and skills.</td></tr>
+                    <tr><td><code>style.css</code></td><td>The global stylesheet. Contains all CSS variables (colors, fonts) and the core design system used across every page.</td></tr>
+                    <tr><td><code>config.js</code></td><td>Stores your public Supabase URL and anonymous key. Loaded on every page to initialize the database connection.</td></tr>
+                    <tr><td><code>main.js</code></td><td>Global logic: custom cursor, mobile menu, layout animations, and utility functions used everywhere.</td></tr>
+                    <tr><td><code>sections.js</code></td><td>Fetches dynamic data for the public homepage (like the list of Skills or Projects) from Supabase.</td></tr>
+                    <tr><td><code>admin.js</code></td><td>The brains of the admin panel. Handles authentication, fetching secured data, the drag-and-drop skills canvas, and saving changes back to the database.</td></tr>
+                    <tr><td><code>analytics.js</code></td><td>Custom tracking script. Silently logs pageviews and clicks to Supabase without using cookies.</td></tr>
+                </table>
+            </section>
+
+            <section class="ht-sec" id="backend">
+                <h2><span class="num">03</span> The Database Connection (Supabase)</h2>
+                <p>Supabase acts as your "Backend as a Service". It hosts a PostgreSQL database and wraps it in a REST API that your frontend JavaScript can call directly.</p>
+                
+                <div class="ht-tabs" role="tablist">
+                    <button class="ht-tab active" data-tab="A" role="tab">The Connection</button>
+                    <button class="ht-tab" data-tab="B" role="tab">The Security (RLS)</button>
+                </div>
+
+                <div class="ht-panel active" data-panel="A">
+                    <h4>How the Browser talks to the Database</h4>
+                    <p>Every HTML file includes two critical scripts at the bottom:</p>
+                    <ol>
+                        <li><code>https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2</code> - The Supabase library.</li>
+                        <li><code>config.js</code> - Your project keys.</li>
+                    </ol>
+                    <p>Inside your JavaScript files (like <code>sections.js</code>), you simply write code like:<br>
+                    <code>const { data } = await db.from('projects').select('*')</code></p>
+                    <p>This translates into an HTTPS request sent directly from the user's browser to Supabase's servers, returning JSON data that your JavaScript then renders into the DOM.</p>
+                </div>
+
+                <div class="ht-panel" data-panel="B">
+                    <h4>Why isn't this dangerous?</h4>
+                    <p>The keys in <code>config.js</code> are public. Anyone can see them. So why can't a hacker delete all your projects?</p>
+                    <p>Because of <b>Row Level Security (RLS)</b> inside Postgres.</p>
+                    <p>When the browser sends a request using the public key, Supabase applies RLS policies. For the <code>projects</code> table, the policy says: <i>"If the user is anonymous, only let them read rows where published=true. Do not let them update or delete."</i></p>
+                    <p>When you log in via <code>admin.html</code>, Supabase gives your browser a secure JWT (JSON Web Token). When you make requests with that token, the database policy says: <i>"This user is authenticated. Let them read, insert, update, and delete everything."</i></p>
+                </div>
+            </section>
+        </article>
+    </main>
+
+    <footer class="main-footer">&copy; <span id="year"></span> Pranav Kaja. All rights reserved.</footer>
+    <div class="custom-cursor" id="custom-cursor"></div>
+    <div class="crosshair-h"></div>
+    <div class="crosshair-v"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="/config.js" defer></script>
+    <script src="/main.js" defer></script>
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+        
+        // Tab interaction
+        document.querySelectorAll('.ht-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.dataset.tab;
+                tab.parentElement.querySelectorAll('.ht-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                tab.parentElement.nextElementSibling.parentElement.querySelectorAll('.ht-panel').forEach(p => {
+                    p.classList.remove('active');
+                    if (p.dataset.panel === target) p.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
