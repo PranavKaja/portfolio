@@ -763,10 +763,10 @@
     },
 
     renderNode(n) {
-        return \`<div class="skill-node" draggable="true" ondragstart="SkillsCanvas.onDragStart(event, '\${n.id}')">
-            <input type="text" value="\${esc(n.name)}" onchange="SkillsCanvas.renameNode('\${n.id}', this.value)" onfocus="this.parentElement.classList.add('highlighted')" onblur="this.parentElement.classList.remove('highlighted')">
-            <button class="ghost" style="padding: 0 4px; border: none; font-size: 0.8rem; height: auto; min-height: 0;" onclick="SkillsCanvas.deleteNode('\${n.id}')">×</button>
-        </div>\`;
+        return `<div class="skill-node" draggable="true" ondragstart="SkillsCanvas.onDragStart(event, '${n.id}')">
+            <input type="text" value="${esc(n.name)}" onchange="SkillsCanvas.renameNode('${n.id}', this.value)" onfocus="this.parentElement.classList.add('highlighted')" onblur="this.parentElement.classList.remove('highlighted')">
+            <button class="ghost" style="padding: 0 4px; border: none; font-size: 0.8rem; height: auto; min-height: 0;" onclick="SkillsCanvas.deleteNode('${n.id}')">×</button>
+        </div>`;
     },
 
     draggedNodeId: null,
