@@ -39,7 +39,7 @@ body::before {
 
 .mono { font-family: 'Share Tech Mono', monospace; }
 
-.wrap { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+.wrap { max-width: 100%; margin: 0 auto; padding: 40px 32px 80px; }
 
 /* ---- shared controls ---- */
 .console-label {
@@ -170,9 +170,9 @@ button:focus-visible, .tab:focus-visible, .star:focus-visible {
 }
 .console-head-inner {
   display: flex; align-items: center; gap: 16px;
-  max-width: 1100px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 16px 24px;
+  padding: 16px 32px;
   width: 100%;
 }
 .console-head-inner h1 { font-size: 1.5rem; letter-spacing: -0.5px; margin: 0; }
@@ -504,7 +504,7 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
 }
 
 .skills-sidebar {
-    width: 260px;
+    width: 220px;
     display: flex;
     flex-direction: column;
     background: var(--bg);
@@ -599,7 +599,7 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
 }
 
 .category-card {
-    min-width: 280px;
+    min-width: 200px;
     max-width: 320px;
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(10px);

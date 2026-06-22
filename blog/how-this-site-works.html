@@ -311,45 +311,59 @@
             <!-- ============ 01 THE ONE IDEA ============ -->
             <section class="ht-sec" id="idea">
                 <h2><span class="num">01</span> The one idea that explains everything</h2>
-                <div class="ht-big">
-                    <div class="k">// The whole site in one sentence</div>
-                    <p>There is <b>no custom backend server</b>. My JavaScript, running in your browser, calls a
-                        database's auto-generated API directly — and a security layer <em>inside</em> the database
-                        decides, row by row, what each visitor is allowed to read or write.</p>
-                </div>
-                <p>Everything else is a detail of that idea. The "API key" shipped in the page is public on
-                    purpose; it only says <em>"this request is an anonymous visitor."</em> It grants no powers by
-                    itself. The actual gatekeeper is <strong>Row Level Security</strong> (RLS) in Postgres, and
-                    we'll play with it in <a href="#rls">section&nbsp;07</a>.</p>
+                <p>There is no custom backend server. My JavaScript calls a database API directly, and a security layer inside the database decides who can read or write.</p>
+                <details class="ht-more">
+                    <summary>Deep dive: The whole site in one sentence</summary>
+                    <div class="ht-more-body">
+                        <div class="ht-big" style="margin-top:0">
+                            <div class="k">// The whole site in one sentence</div>
+                            <p>There is <b>no custom backend server</b>. My JavaScript, running in your browser, calls a
+                                database's auto-generated API directly — and a security layer <em>inside</em> the database
+                                decides, row by row, what each visitor is allowed to read or write.</p>
+                        </div>
+                        <p>Everything else is a detail of that idea. The "API key" shipped in the page is public on
+                            purpose; it only says <em>"this request is an anonymous visitor."</em> It grants no powers by
+                            itself. The actual gatekeeper is <strong>Row Level Security</strong> (RLS) in Postgres, and
+                            we'll play with it in <a href="#rls">section&nbsp;07</a>.</p>
+                    </div>
+                </details>
             </section>
 
             <!-- ============ 02 STACK ============ -->
             <section class="ht-sec" id="stack">
                 <h2><span class="num">02</span> The stack, in plain terms</h2>
-                <p>No framework, no build step, no bundler. It's hand-written HTML, CSS, and JavaScript — the
-                    "vanilla" stack — with one managed database doing the heavy lifting.</p>
-                <table class="ht-table">
-                    <tr><th>Layer</th><th>What it is</th><th>Its job here</th></tr>
-                    <tr><td>Pages</td><td>Hand-written HTML</td><td>One file per page. Server-rendered-by-default = great SEO, with JSON-LD, a sitemap, and an <code>llms.txt</code>.</td></tr>
-                    <tr><td>Styling</td><td>Plain CSS</td><td>A small design system built on CSS variables (colour, spacing). No Tailwind, no Sass.</td></tr>
-                    <tr><td>Behaviour</td><td>Vanilla JavaScript</td><td>Custom cursor, carousels, overlays, the project reveal, two little games. No React or Vue.</td></tr>
-                    <tr><td>Backend</td><td>Supabase (managed Postgres&nbsp;17)</td><td>Database + login + an auto-generated REST API, all in one. This is the only moving part.</td></tr>
-                    <tr><td>Hosting</td><td>Vercel</td><td>Serves the static files from a global CDN. A <code>git push</code> deploys.</td></tr>
-                    <tr><td>Analytics</td><td>Home-grown</td><td>Cookieless, no personal data, honours Do-Not-Track. The data is mine, not a third party's.</td></tr>
-                </table>
-                <div class="ht-note"><b>Why bother going framework-free?</b> A recruiter opening this on hotel
-                    Wi-Fi gets plain HTML that paints instantly. There's no hydration, no megabyte of JavaScript,
-                    nothing to "warm up." The one thing that needs a network round-trip — the project list — has
-                    an offline fallback baked in, so the page never shows up empty.</div>
+                <p>No framework, no build step, no bundler. It's hand-written HTML, CSS, and JavaScript — the "vanilla" stack — with Supabase (managed Postgres) doing the heavy lifting.</p>
+                <details class="ht-more">
+                    <summary>Deep dive: The stack breakdown</summary>
+                    <div class="ht-more-body">
+                        <table class="ht-table" style="margin-top:0">
+                            <tr><th>Layer</th><th>What it is</th><th>Its job here</th></tr>
+                            <tr><td>Pages</td><td>Hand-written HTML</td><td>One file per page. Server-rendered-by-default = great SEO, with JSON-LD, a sitemap, and an <code>llms.txt</code>.</td></tr>
+                            <tr><td>Styling</td><td>Plain CSS</td><td>A small design system built on CSS variables (colour, spacing). No Tailwind, no Sass.</td></tr>
+                            <tr><td>Behaviour</td><td>Vanilla JavaScript</td><td>Custom cursor, carousels, overlays, the project reveal, two little games. No React or Vue.</td></tr>
+                            <tr><td>Backend</td><td>Supabase (managed Postgres&nbsp;17)</td><td>Database + login + an auto-generated REST API, all in one. This is the only moving part.</td></tr>
+                            <tr><td>Hosting</td><td>Vercel</td><td>Serves the static files from a global CDN. A <code>git push</code> deploys.</td></tr>
+                            <tr><td>Analytics</td><td>Home-grown</td><td>Cookieless, no personal data, honours Do-Not-Track. The data is mine, not a third party's.</td></tr>
+                        </table>
+                        <div class="ht-note"><b>Why bother going framework-free?</b> A recruiter opening this on hotel
+                            Wi-Fi gets plain HTML that paints instantly. There's no hydration, no megabyte of JavaScript,
+                            nothing to "warm up." The one thing that needs a network round-trip — the project list — has
+                            an offline fallback baked in, so the page never shows up empty.</div>
+                    </div>
+                </details>
             </section>
 
             <!-- ============ 03 MAP ============ -->
             <section class="ht-sec" id="map">
                 <h2><span class="num">03</span> The architecture map</h2>
-                <p>Three zones. Your <span style="color:var(--ht-browser);font-weight:600">browser</span> runs the
-                    whole app. <span style="color:var(--ht-host);font-weight:600">Vercel</span> only hands over
-                    files. <span style="color:var(--ht-db);font-weight:600">Supabase</span> is the entire backend.
-                    The teal lines are the live data calls that travel straight from the browser to the database.</p>
+                <p>Three zones: Your browser runs the app, Vercel hosts files, and Supabase handles all data (projects, messages, analytics, skills, and certs).</p>
+                <details class="ht-more">
+                    <summary>Deep dive: Architecture diagram</summary>
+                    <div class="ht-more-body">
+                        <p style="margin-top:0">Your <span style="color:var(--ht-browser);font-weight:600">browser</span> runs the
+                            whole app. <span style="color:var(--ht-host);font-weight:600">Vercel</span> only hands over
+                            files. <span style="color:var(--ht-db);font-weight:600">Supabase</span> is the entire backend.
+                            The teal lines are the live data calls that travel straight from the browser to the database.</p>
 
                 <figure class="ht-fig">
                     <svg viewBox="0 0 940 430" role="img" aria-label="Architecture: browser, Vercel host, and Supabase backend">
@@ -411,7 +425,7 @@
                         <text class="bs" x="630" y="165">email + password, for the admin</text>
                         <rect class="bx" x="616" y="186" width="290" height="96" fill="#e7f9f4" stroke="#5eead4"/>
                         <text class="bt" x="630" y="207">Postgres database</text>
-                        <text class="bs" x="630" y="226">projects — the cards you see</text>
+                        <text class="bs" x="630" y="226">projects &amp; skills — interactive UI</text>
                         <text class="bs" x="630" y="242">messages — the contact inbox</text>
                         <text class="bs" x="630" y="258">events — the analytics log</text>
                         <text class="bs" x="630" y="274">+ one function that builds the dashboard</text>
@@ -435,13 +449,18 @@
                     </svg>
                     <figcaption class="ht-cap">The browser is the app. Vercel hands over files; Supabase is the backend. Teal lines = live data calls.</figcaption>
                 </figure>
+                    </div>
+                </details>
             </section>
 
             <!-- ============ 04 PAGE LOAD ============ -->
             <section class="ht-sec" id="load">
                 <h2><span class="num">04</span> What happens on one page load</h2>
-                <p>Follow a single visitor from typing the URL to seeing project cards. This is the order things
-                    actually run in:</p>
+                <p>The browser fetches static files, scripts load in order, analytics logs silently, data is fetched, and the UI renders — with offline fallbacks if the database is down.</p>
+                <details class="ht-more">
+                    <summary>Deep dive: The load sequence</summary>
+                    <div class="ht-more-body">
+                        <p style="margin-top:0">Follow a single visitor from typing the URL to seeing project cards. This is the order things actually run in:</p>
                 <ol class="ht-steps">
                     <li><b>The browser asks Vercel for the page.</b>
                         <p>It gets back the HTML, CSS, and images straight from the nearest CDN edge — no server thinking required.</p></li>
@@ -457,12 +476,18 @@
                 <div class="ht-note"><b>Built to not break:</b> if the database is down or the key is blank, the
                     page still renders from the offline fallback and analytics turns into a no-op. The site is
                     designed to work even with the backend completely unplugged.</div>
+                    </div>
+                </details>
             </section>
 
             <!-- ============ 05 DATA FLOWS ============ -->
             <section class="ht-sec" id="flows">
                 <h2><span class="num">05</span> The three data flows</h2>
-                <p>Everything dynamic on the site is one of three round-trips to the database. Tap each one:</p>
+                <p>Everything dynamic is a direct round-trip from the browser to the database, governed by strict read/write rules.</p>
+                <details class="ht-more">
+                    <summary>Deep dive: The data flows</summary>
+                    <div class="ht-more-body">
+                        <p style="margin-top:0">Everything dynamic on the site is one of three round-trips to the database. Tap each one:</p>
                 <div class="ht-tabs" role="tablist">
                     <button class="ht-tab active" data-tab="A" role="tab">A · Read projects</button>
                     <button class="ht-tab" data-tab="B" role="tab">B · Log an event</button>
@@ -515,13 +540,17 @@
                     </div>
                     <p style="margin:10px 0 0 !important; font-size:.92rem !important; color:var(--ht-muted)">If the insert ever fails, the form builds a pre-filled email instead — so it's never a dead end.</p>
                 </div>
+                    </div>
+                </details>
             </section>
 
             <!-- ============ 06 DATABASE ============ -->
             <section class="ht-sec" id="db">
                 <h2><span class="num">06</span> The database</h2>
-                <p>Three tables, each a simple ledger. They don't reference each other — think of them as three
-                    independent notebooks the front end reads from and writes to.</p>
+                <p>Six tables. Three are simple ledgers (projects, messages, events), while the rest power the new dynamic Skills &amp; Certifications modules.</p>
+                <details class="ht-more">
+                    <summary>Deep dive: The schema</summary>
+                    <div class="ht-more-body">
                 <div class="ht-db-grid">
                     <div class="ht-db-card">
                         <h4>projects <span class="rows">9 rows</span></h4>
@@ -557,6 +586,15 @@
                             <li>created_at</li>
                         </ul>
                     </div>
+                    <div class="ht-db-card" style="border-top-color:#7c3aed">
+                        <h4>skills &amp; certs</h4>
+                        <div class="role">Powers the interactive canvas. Admin curates; public reads.</div>
+                        <ul>
+                            <li>skill_categories</li>
+                            <li>skill_nodes</li>
+                            <li>certifications</li>
+                        </ul>
+                    </div>
                 </div>
                 <details class="ht-more">
                     <summary>For the curious: the one clever bit</summary>
@@ -571,13 +609,19 @@ select intel_dashboard();
 <span class="c">-- → { kpis, traffic, topPages, daily, leaderboard }</span></pre>
                     </div>
                 </details>
+                    </div>
+                </details>
             </section>
 
             <!-- ============ 07 RLS — INTERACTIVE ============ -->
             <section class="ht-sec" id="rls">
                 <h2><span class="num">07</span> Who can do what <span style="font-size:.7em;color:var(--ht-accent)">— try it</span></h2>
-                <p>This is the part that makes "no backend server" safe. Pick who you are, pick what you want to do,
-                    and see whether the database lets you — and why. This mirrors the <em>actual</em> rules.</p>
+                <p>A live simulator showing how Row Level Security blocks unauthorized reads and writes.</p>
+                <details class="ht-more">
+                    <summary>Deep dive: Interactive RLS simulator</summary>
+                    <div class="ht-more-body">
+                        <p style="margin-top:0">This is the part that makes "no backend server" safe. Pick who you are, pick what you want to do,
+                            and see whether the database lets you — and why. This mirrors the <em>actual</em> rules.</p>
 
                 <div class="ht-sim" id="ht-sim">
                     <div class="ht-sim-head">
@@ -614,14 +658,20 @@ select intel_dashboard();
                     because every request is checked against these rules inside the database. The powerful key (the
                     one that <em>would</em> bypass them) never touches the browser — it lives only in the Supabase
                     dashboard.</div>
+                    </div>
+                </details>
             </section>
 
             <!-- ============ 08 REVEAL ============ -->
             <section class="ht-sec" id="reveal">
                 <h2><span class="num">08</span> The signature 3-tier reveal</h2>
-                <p>The nicest interaction on the site is how a project unfolds in three stages. Each tier shows more
-                    of the <em>same</em> record that was already loaded — so there are zero extra network calls.
-                    Try it for real on the <a href="/#projects-grid">homepage project grid</a>; here's the anatomy:</p>
+                <p>Projects unfold in three stages (card → hover → modal) without extra network calls.</p>
+                <details class="ht-more">
+                    <summary>Deep dive: The reveal pattern</summary>
+                    <div class="ht-more-body">
+                        <p style="margin-top:0">The nicest interaction on the site is how a project unfolds in three stages. Each tier shows more
+                            of the <em>same</em> record that was already loaded — so there are zero extra network calls.
+                            Try it for real on the <a href="/#projects-grid">homepage project grid</a>; here's the anatomy:</p>
 
                 <figure class="ht-fig">
                     <svg viewBox="0 0 940 320" role="img" aria-label="The three-tier project reveal: card, hover sheet, full modal">
@@ -692,14 +742,20 @@ select intel_dashboard();
                 <p style="font-size:.92rem; color:var(--ht-muted)">It's a classic UX pattern — <em>progressive
                     disclosure</em> — done without a single extra request, because the full record is already in
                     memory from the first load.</p>
+                    </div>
+                </details>
             </section>
 
             <!-- ============ 09 ADMIN ============ -->
             <section class="ht-sec" id="admin">
                 <h2><span class="num">09</span> The admin console</h2>
-                <p>Behind a login at <code>/admin</code> is the one page only I can use. To the public it's just a
-                    login screen; once authenticated, the database's rules flip open and the page becomes a small
-                    content-management system for the whole site.</p>
+                <p>The protected CMS where I edit projects, manage skills &amp; certs, read messages, and view analytics.</p>
+                <details class="ht-more">
+                    <summary>Deep dive: The Ops Console</summary>
+                    <div class="ht-more-body">
+                        <p style="margin-top:0">Behind a login at <code>/admin</code> is the one page only I can use. To the public it's just a
+                            login screen; once authenticated, the database's rules flip open and the page becomes a small
+                            content-management system for the whole site.</p>
 
                 <figure class="ht-fig">
                     <svg viewBox="0 0 940 300" role="img" aria-label="The admin console: login screen and the unlocked dashboard">
@@ -778,7 +834,7 @@ select intel_dashboard();
 
                 <p>From the console I can:</p>
                 <ul class="ops-points">
-                    <li><b>Edit the live site's content.</b> Add, edit, reorder, publish, or unpublish a project — and the homepage updates instantly, with no redeploy. (That edit writes straight to the database the public reads from.)</li>
+                    <li><b>Edit the live site's content.</b> Add, edit, reorder, publish, or unpublish a project — and the homepage updates instantly. Same goes for the new inline Skills and Certifications editor canvases!</li>
                     <li><b>Read and triage the inbox.</b> See contact messages, flag the important ones, mark them handled, delete spam. The public can send mail but can never see this.</li>
                     <li><b>Watch the visitors.</b> A dashboard of KPIs, top pages, traffic sources, a daily trend, and even a leaderboard for the hidden games — all from that one server-side function.</li>
                 </ul>
@@ -786,15 +842,18 @@ select intel_dashboard();
                     into the page. It logs in, gets a token, and from then on the <em>database</em> recognises the
                     request as "the owner" and applies the owner's rules. Log out and the exact same page can do
                     nothing but show the login box again.</div>
+                    </div>
+                </details>
             </section>
 
             <!-- ============ 10 TRICKS ============ -->
             <section class="ht-sec" id="tricks">
                 <h2><span class="num">10</span> Shipping &amp; little tricks</h2>
-
                 <p>A few details I'm fond of, for anyone building something similar.</p>
-
-                <p><b>Two separate update paths.</b> Design and code changes ship through <code>git push</code> →
+                <details class="ht-more">
+                    <summary>Deep dive: The little details</summary>
+                    <div class="ht-more-body">
+                        <p style="margin-top:0"><b>Two separate update paths.</b> Design and code changes ship through <code>git push</code> →
                     Vercel. Content changes (project copy, reading messages) happen live in the database via the
                     admin console. That separation means a recruiter never catches the site mid-redeploy.</p>
 
@@ -825,6 +884,8 @@ select intel_dashboard();
 
                 <blockquote>The whole point: a portfolio that's fast and simple on the surface, but quietly runs on
                     a real database — and stays safe doing it because the rules live where the data lives.</blockquote>
+                    </div>
+                </details>
 
                 <p style="margin-top:8px"><a class="ht-backtop" href="#main">↑ back to top</a></p>
             </section>
