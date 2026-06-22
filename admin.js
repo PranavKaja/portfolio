@@ -560,9 +560,14 @@
               <div class="msn-d-hook">${esc(p.hook)}</div>
               <div class="msn-d-brief">${esc(p.brief)}</div>
               ${rmoHtml}
-              ${p.skills && p.skills.length ? `<div style="margin-top:16px;"><div style="font-family:'Share Tech Mono',monospace; font-size:0.7rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;">Skills used / learnt</div><div class="skill-chips">${skillsHtml}</div></div>` : ''}
-              <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border);">
+              <div style="margin-top:16px; ${chipsHtml ? '' : 'display:none;'}">
+                  <div style="font-family:'Share Tech Mono',monospace; font-size:0.7rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;">Project Highlights</div>
                   <div class="pp-chips" style="display:inline-flex;">${chipsHtml}</div>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top: ${chipsHtml ? '22px' : '16px'}; ${chipsHtml ? 'padding-top: 18px; border-top: 1px dashed var(--border);' : ''}">
+                  <div>
+                      ${skillsHtml ? `<div style="font-family:'Share Tech Mono',monospace; font-size:0.7rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;">Skills used / learnt</div><div class="skill-chips">${skillsHtml}</div>` : ''}
+                  </div>
                   <div>${githubBtn}</div>
               </div>
           </div>

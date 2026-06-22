@@ -99,6 +99,7 @@
       el('msn-d-role').textContent = m.role;
       el('msn-d-method').textContent = m.method;
       el('msn-d-outcome').textContent = m.outcome;
+      // Project Highlights (chips) row
       const chipBox = el('msn-d-chips');
       const chipsRow = el('msn-d-chips-row');
       chipBox.innerHTML = '';
@@ -110,9 +111,10 @@
       });
       if (chipsRow) chipsRow.style.display = ch.length ? '' : 'none';
 
-      // Skills used / learnt row (hidden when a project has no skills)
+      // Skills used / learnt row
       const skillBox = el('msn-d-skills');
-      const skillRow = el('msn-d-skills-row');
+      const skillsRow = el('msn-d-skills-row');
+      const skillsHeader = el('msn-d-skills-header');
       if (skillBox) {
         skillBox.innerHTML = '';
         const sk = m.skills || [];
@@ -121,7 +123,19 @@
           s.textContent = c;
           skillBox.appendChild(s);
         });
-        if (skillRow) skillRow.style.display = sk.length ? '' : 'none';
+        if (skillsHeader) skillsHeader.style.display = sk.length ? '' : 'none';
+
+        if (skillsRow) {
+            if (!ch.length) {
+                skillsRow.style.borderTop = 'none';
+                skillsRow.style.paddingTop = '0';
+                skillsRow.style.marginTop = '18px';
+            } else {
+                skillsRow.style.borderTop = '1px dashed var(--border)';
+                skillsRow.style.paddingTop = '18px';
+                skillsRow.style.marginTop = '22px';
+            }
+        }
       }
 
       const ghBox = el('msn-d-github');
