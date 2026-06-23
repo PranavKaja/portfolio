@@ -30,5 +30,5 @@ only look good on a slide.
 - Programming: Python, SQL, R, VBA, REST APIs, LLM Integration
 
 ## Links
-- LinkedIn: https://www.linkedin.com/in/balajipranav
+- LinkedIn: https://www.linkedin.com/in/pranavkaja
 - GitHub: https://github.com/PranavKaja
