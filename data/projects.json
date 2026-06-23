@@ -11,7 +11,7 @@
     "chips": ["0.978 AUC", "84% Recall", "84% Precision", "284K Records", "~2s Latency"],
     "skills": ["XGBoost", "Google Gemini", "Python"],
     "status": "in_progress", "sort_order": 10, "published": true,
-    "github_url": "https://github.com/PranavKaja/fraud-triage", "show_status": true, "show_github": false
+    "github_url": "https://github.com/PranavKaja/fraud-triage", "show_status": true, "show_github": true
   },
   {
     "code": "MSN-02", "title": "Corporate Analytics", "tech": "Power BI / SQL",

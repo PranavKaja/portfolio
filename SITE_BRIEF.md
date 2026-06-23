@@ -177,10 +177,10 @@ second copy. Harmless but untidy.
 | Mission | Site claim | Verified (rebuilt repo) | Action |
 |--------|-----------|--------------------------|--------|
 | **MSN-01 Fraud** | 0.978 AUC · 84/84 · 284K | AUC 0.977 · 84/84 · 284,807 | ✅ keep |
-| **MSN-03 Heart** | **92% on 70K+ records** · SHAP | RF **93.4%**, ensemble **90.7%**, **1.3K rows**, 6 models + Flask | ⚠️ "70K+" is wrong → **"~1.3K-record clinical dataset"**; drop SHAP (used feature importances) |
+| **MSN-03 Heart** | **92% on 70K+ records** · SHAP | RF **~82%**, ensemble **~82%**, **~1.3K-row** clinical dataset, 5 models + Flask | ✅ applied: site now "~82% accuracy (Random Forest), five-model comparison" (notebook tops out at 82.2%; old 93% was unsupported) |
 | **MSN-04 Hospital** | 73% detection · 25K · SHAP | HGB AUC 0.66, tuned **recall 0.91**, 25,000 | ⚠️ update to **"91% recall (threshold-tuned), ROC-AUC 0.66"** |
 | **MSN-05 Churn** | 18%→11% · **350K policyholders** | GB **AUC 0.70**, **92,849 rows**, 11.5% churn, SMOTE | ⚠️ "350K" is wrong → **"92,849 policyholders, ROC-AUC 0.70"** |
-| **MSN-08 Prime Air** | hub-and-spoke · 12-mo | 3 hubs, 7.5-mi radius, **~1,650 pkgs/day**, 7.9% of MA, map | ⚠️ enrich with the concrete figures |
+| **MSN-08 Prime Air** | hub-and-spoke · 12-mo | 3 hubs, 7.5-mi radius, **~1,900 pkgs/day**, 7.9% of MA, map | ✅ applied: ~1,900 pkgs/day, multi-criteria scoring model, repo wired |
 | MSN-02 Corp Analytics | 30% faster reviews | _not rebuilt (work project)_ | verify yourself |
 | MSN-06/07 Supply sims | 34% / 54% margin | _not rebuilt (sim writeups)_ | verify yourself |
 | MSN-09 Strategy Summit | 483% recovery | _not rebuilt (CAPSIM)_ | verify yourself |
