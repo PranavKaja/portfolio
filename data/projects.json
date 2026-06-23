@@ -85,14 +85,14 @@
     "summary": "3-hub network covering 7.9% of Massachusetts.",
     "stack": "Geospatial Analysis / Folium / Python",
     "hook": "A hub-and-spoke drone network covering 7.9% of Massachusetts.",
-    "brief": "Last-mile feasibility study for suburban drone delivery in Massachusetts. Geospatial and demographic analysis sites three hubs (Worcester, Springfield, Cambridge) within the MK30's 7.5-mile radius; a reproducible coverage model projects ~1,650 packages/day across 550,000 residents, rendered as an interactive map.",
+    "brief": "Last-mile feasibility study for suburban drone delivery in Massachusetts. A multi-criteria scoring model (demand, tech/income readiness, operational feasibility) ranks candidate cities and sites three hubs (Cambridge, Worcester, Springfield), one per region, within the MK30's 7.5-mile radius; a reproducible coverage model projects ~1,900 packages/day across 550,000 residents, rendered as an interactive map.",
     "role": "Network designer",
-    "method": "Geospatial + demographic constraint analysis with a reproducible coverage model",
+    "method": "Multi-criteria scoring (demand, readiness, feasibility) with a reproducible coverage model",
     "outcome": "Three-hub model reaching ~550K residents (7.9% of MA), with an interactive map",
-    "chips": ["3 Hubs", "7.5-mi Radius", "~1,650 Pkgs/Day", "Interactive Map"],
+    "chips": ["3 Hubs", "7.5-mi Radius", "~1,900 Pkgs/Day", "Interactive Map"],
     "skills": ["Geospatial Analysis", "Folium", "Python"],
     "status": "deployed", "sort_order": 70, "published": true,
-    "github_url": "https://github.com/PranavKaja/prime-air-coverage", "show_status": false, "show_github": false
+    "github_url": "https://github.com/PranavKaja/prime-air-coverage", "show_status": false, "show_github": true
   },
   {
     "code": "MSN-09", "title": "Strategy Summit", "tech": "CAPSIM Simulation / Strategy",
@@ -110,17 +110,17 @@
   },
   {
     "code": "MSN-03", "title": "Analysis on Heart Disease Predictors", "tech": "Python / Scikit-learn",
-    "summary": "93% accuracy (Random Forest); ensemble + Flask app.",
+    "summary": "~82% accuracy (Random Forest); ensemble + Flask app.",
     "stack": "Python / Scikit-learn / Flask",
-    "hook": "93% accuracy, deployed as a Flask app.",
-    "brief": "End-to-end capstone comparing six classifiers on the 13-feature clinical heart dataset. Random Forest reached 93% accuracy; the three strongest models combine by majority vote (91% ensemble accuracy), served through a Flask web app that scores risk from a 13-field form.",
+    "hook": "~82% accuracy, deployed as a Flask app.",
+    "brief": "End-to-end capstone comparing five classifiers on the 13-feature clinical heart dataset. Random Forest was the strongest at ~82% accuracy; a top-3 majority-vote ensemble landed just behind, served through a Flask web app that scores risk from a 13-field form.",
     "role": "Capstone lead",
-    "method": "Six-model comparison with a top-3 majority-vote ensemble, served via Flask",
-    "outcome": "93% Random Forest accuracy; 91% from the ensemble, in a live app",
-    "chips": ["93% Accuracy", "6 Models", "Top-3 Ensemble", "Flask App"],
+    "method": "Five-model comparison with a top-3 majority-vote ensemble, served via Flask",
+    "outcome": "~82% Random Forest accuracy; ensemble just behind, in a live app",
+    "chips": ["~82% Accuracy", "5 Models", "Top-3 Ensemble", "Flask App"],
     "skills": ["Python", "Scikit-learn", "Flask"],
     "status": "archived", "sort_order": 90, "published": true,
-    "github_url": "https://github.com/PranavKaja/heart-disease", "show_status": false, "show_github": false
+    "github_url": "https://github.com/PranavKaja/heart-disease", "show_status": false, "show_github": true
   },
   {
     "code": "MSN-10", "title": "CPK Production Planner", "tech": "In-Browser Tool / JS",
