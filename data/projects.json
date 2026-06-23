@@ -52,7 +52,7 @@
     "chips": ["92.8K Records", "ROC-AUC 0.70", "SMOTE Pipeline", "GB Champion"],
     "skills": ["Scikit-learn", "Gradient Boosting", "SMOTE"],
     "status": "deployed", "sort_order": 40, "published": true,
-    "github_url": "https://github.com/PranavKaja/insurance-churn", "show_status": false, "show_github": false
+    "github_url": "https://github.com/PranavKaja/insurance-churn", "show_status": false, "show_github": true
   },
   {
     "code": "MSN-06", "title": "Supply Chain Opt.", "tech": "HBP Simulation / Python",
