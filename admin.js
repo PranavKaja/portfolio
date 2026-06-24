@@ -1227,7 +1227,7 @@
     const days = [];
     for (let i = 6; i >= 0; i--) {
       const dt = new Date(); dt.setDate(dt.getDate() - i);
-      const key = dt.toISOString().slice(0, 10);
+      const key = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
       days.push([key, byDay[key] || 0]);
     }
     const total = days.reduce((s, d) => s + d[1], 0);
@@ -1344,11 +1344,11 @@
         let tTimeSec = 0;
         for (let i = 0; i < daysCount; i++) {            // newest day first
           const dt = new Date(); dt.setDate(dt.getDate() - i);
-          const key = dt.toISOString().slice(0, 10);
           
           const mm = String(dt.getMonth() + 1).padStart(2, '0');
           const dd = String(dt.getDate()).padStart(2, '0');
           const yy = String(dt.getFullYear()).slice(-2);
+          const key = `${dt.getFullYear()}-${mm}-${dd}`;
           const formattedDate = `${mm}/${dd}/${yy}`;
 
           const data = byDay[key] || { views: 0, time_sec: 0, game_plays: 0, downloads: 0, contact_clicks: 0 };

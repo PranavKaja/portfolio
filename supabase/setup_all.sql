@@ -390,7 +390,7 @@ as $$
     ),
     'daily', (
       select coalesce(json_agg(d order by d.day), '[]'::json) from (
-        select to_char(created_at, 'YYYY-MM-DD') as day,
+        select to_char(created_at at time zone 'America/New_York', 'YYYY-MM-DD') as day,
                count(*) filter (where type = 'pageview') as views,
                count(*) filter (where type = 'game_score' or type = 'ttt_match') as game_plays,
                count(*) filter (where type = 'resume_download') as downloads,
