@@ -28,17 +28,17 @@
   },
   {
     "code": "MSN-04", "title": "Hospital Readmission", "tech": "Python / Gradient Boosting",
-    "summary": "91% recall on readmissions via threshold tuning.",
+    "summary": "90% recall on readmissions via threshold tuning.",
     "stack": "Python / Scikit-learn / Gradient Boosting",
-    "hook": "91% recall on readmissions through threshold tuning.",
-    "brief": "Readmission risk on 25,000 anonymized encounters, a Python rebuild of a tool-based analysis. Logistic Regression, Random Forest, and Gradient Boosting were compared; the champion (HistGradientBoosting, ROC-AUC 0.66) was threshold-tuned to catch 91% of readmissions, the costly case to miss. Prior inpatient and emergency visits were the dominant drivers.",
+    "hook": "90% recall on readmissions through threshold tuning.",
+    "brief": "Readmission risk on 25,000 anonymized encounters, a Python rebuild of a tool-based analysis. Logistic Regression, Random Forest, and Gradient Boosting were compared; the champion (Gradient Boosting, ROC-AUC 0.66) was threshold-tuned to catch 90% of readmissions, the costly case to miss. Prior inpatient visits, medication count, and lab procedures were the dominant drivers.",
     "role": "Solo analysis",
     "method": "Three-model comparison with a recall-tuned decision threshold",
-    "outcome": "91% of readmissions caught (ROC-AUC 0.66) before discharge",
-    "chips": ["25K Records", "91% Recall", "ROC-AUC 0.66", "Threshold Tuned"],
+    "outcome": "90% of readmissions caught (ROC-AUC 0.66) before discharge",
+    "chips": ["25K Records", "90% Recall", "ROC-AUC 0.66", "Threshold Tuned"],
     "skills": ["Python", "Scikit-learn", "Gradient Boosting"],
     "status": "deployed", "sort_order": 30, "published": true,
-    "github_url": "https://github.com/PranavKaja/hospital-readmission", "show_status": false, "show_github": false
+    "github_url": "https://github.com/PranavKaja/hospital-readmission", "show_status": false, "show_github": true
   },
   {
     "code": "MSN-05", "title": "Auto Insurance Churn", "tech": "Gradient Boosting / SMOTE",

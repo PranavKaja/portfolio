@@ -4,19 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hospital Readmission Risk — 73% Critical-Case Detection | Pranav Kaja</title>
+    <title>Hospital Readmission Risk — 90% Recall, Gradient Boosting | Pranav Kaja</title>
     <meta name="description"
-        content="Hospital readmission risk scoring by Pranav Kaja: logistic regression with tuned probability thresholds lifts critical-case detection to 73% on 25,000 records; SHAP surfaces the drivers.">
+        content="Hospital readmission risk scoring by Pranav Kaja: three models compared on ROC-AUC, a Gradient Boosting champion (0.66) threshold-tuned to catch 90% of readmissions on 25,000 records; inpatient visits lead the drivers.">
     <meta name="author" content="Pranav Kaja">
     <meta name="robots" content="index, follow, max-image-preview:large">
-    <meta property="og:title" content="Hospital Readmission Risk — 73% Critical-Case Detection | Pranav Kaja">
-    <meta property="og:description" content="Threshold-tuned logistic regression catches 73% of critical readmission cases before discharge.">
+    <meta property="og:title" content="Hospital Readmission Risk — 90% Recall, Gradient Boosting | Pranav Kaja">
+    <meta property="og:description" content="A Gradient Boosting model (ROC-AUC 0.66), threshold-tuned to catch 90% of readmissions before discharge.">
     <meta property="og:image" content="https://pranavkaja.vercel.app/images/og-card.png">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://pranavkaja.vercel.app/projects/hospital-readmission">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Hospital Readmission Risk — 73% Critical-Case Detection | Pranav Kaja">
-    <meta name="twitter:description" content="Threshold-tuned logistic regression catches 73% of critical readmission cases before discharge.">
+    <meta name="twitter:title" content="Hospital Readmission Risk — 90% Recall, Gradient Boosting | Pranav Kaja">
+    <meta name="twitter:description" content="A Gradient Boosting model (ROC-AUC 0.66), threshold-tuned to catch 90% of readmissions before discharge.">
     <meta name="twitter:image" content="https://pranavkaja.vercel.app/images/og-card.png">
     <link rel="canonical" href="https://pranavkaja.vercel.app/projects/hospital-readmission">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -31,12 +31,12 @@
     {
       "@context": "https://schema.org",
       "@graph": [
-        { "@type": "TechArticle", "headline": "Hospital Readmission Risk — 73% Critical-Case Detection",
-          "description": "Logistic regression with tuned probability thresholds lifts critical-case detection to 73% on 25,000 anonymized records; SHAP surfaces inpatient-visit count and age as dominant predictors.",
+        { "@type": "TechArticle", "headline": "Hospital Readmission Risk — 90% Recall with Gradient Boosting",
+          "description": "Three models compared on ROC-AUC; a Gradient Boosting champion (0.66) is threshold-tuned to catch 90% of readmissions on 25,000 anonymized records, with inpatient visits, medications, and lab procedures as the dominant drivers.",
           "author": { "@type": "Person", "name": "Pranav Kaja", "url": "https://pranavkaja.vercel.app/" },
           "url": "https://pranavkaja.vercel.app/projects/hospital-readmission",
           "image": "https://pranavkaja.vercel.app/images/og-card.png",
-          "keywords": "hospital readmission, logistic regression, threshold tuning, SHAP, healthcare analytics, Pranav Kaja",
+          "keywords": "hospital readmission, gradient boosting, ROC-AUC, threshold tuning, feature importance, healthcare analytics, Pranav Kaja",
           "about": ["Healthcare Analytics", "Machine Learning", "Explainable AI"], "inLanguage": "en" },
         { "@type": "BreadcrumbList", "itemListElement": [
           { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://pranavkaja.vercel.app/" },
@@ -58,20 +58,24 @@
         <header class="hero">
             <div class="hero-label mb-20"><span class="status-dot"></span>MSN-04 // DEPLOYED</div>
             <h1 class="hero-title" style="font-size: 3rem; line-height: 1.05;">HOSPITAL READMISSION</h1>
-            <p class="hero-subtitle">73% critical-case detection through deliberate threshold tuning.</p>
+            <p class="hero-subtitle">90% recall on readmissions, from a Gradient Boosting model tuned for the costly miss.</p>
             <div class="pp-chips" style="margin-top: 8px;">
-                <span>25K Records</span><span>73% Detection</span><span>SHAP Drivers</span><span>Threshold Tuning</span>
+                <span>25K Records</span><span>90% Recall</span><span>ROC-AUC 0.66</span><span>Threshold Tuned</span>
+            </div>
+            <div class="hero-actions" style="margin-top: 18px;">
+                <a href="https://github.com/PranavKaja/hospital-readmission" target="_blank" rel="noopener noreferrer" class="btn btn-secondary interactive-element no-underline">VIEW CODE &nearr;</a>
             </div>
         </header>
 
         <section class="section">
             <div class="section-header"><h2>BRIEFING</h2><div class="line"></div></div>
             <p style="font-size: 1.05rem; line-height: 1.7; max-width: 760px;">
-                Readmission risk scoring on 25,000 anonymized records. Rather than accept the default 0.5 cutoff,
-                probability thresholds were tuned to lift critical-case detection to <strong>73%</strong> while
-                consciously balancing the precision&ndash;recall trade-off — in a clinical setting, a missed high-risk
-                patient costs far more than a false alarm. SHAP surfaced inpatient-visit count and age as the dominant
-                predictors, pointing discharge planning at the right patients.
+                Readmission risk scoring on 25,000 anonymized records. Three models were compared on ROC-AUC,
+                Logistic Regression, Random Forest, and Gradient Boosting, and the Gradient Boosting champion
+                (ROC-AUC <strong>0.66</strong>) was threshold-tuned to catch <strong>90%</strong> of readmissions.
+                In a clinical setting a missed high-risk patient costs far more than a false alarm, so recall is the
+                right target. The model's feature importances surfaced prior inpatient visits, medication count, and
+                lab procedures as the dominant drivers, pointing discharge planning at the right patients.
             </p>
         </section>
 
@@ -79,11 +83,11 @@
             <div class="section-header"><h2>ROLE / METHOD / OUTCOME</h2><div class="line"></div></div>
             <div class="msn-rmo">
                 <div class="rmo-cell"><div class="k">Role</div><div class="v">Solo analysis.</div></div>
-                <div class="rmo-cell"><div class="k">Method</div><div class="v">Logistic regression with tuned probability thresholds.</div></div>
-                <div class="rmo-cell"><div class="k">Outcome</div><div class="v">73% of critical cases caught before discharge.</div></div>
+                <div class="rmo-cell"><div class="k">Method</div><div class="v">Three-model comparison ranked by ROC-AUC, champion threshold-tuned for recall.</div></div>
+                <div class="rmo-cell"><div class="k">Outcome</div><div class="v">90% of readmissions caught before discharge (ROC-AUC 0.66).</div></div>
             </div>
             <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 20px; font-family: 'Share Tech Mono', monospace;">
-                STACK: Python &middot; Logistic Regression &middot; SHAP
+                STACK: Python &middot; scikit-learn &middot; Gradient Boosting
             </p>
         </section>
 
