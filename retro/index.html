@@ -2,10 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script>
+    /* When served under /retro (live on Vercel, which strips the trailing slash
+       to /retro), pin a <base> so relative css/js/asset paths still resolve.
+       At the site root (local dev) this does nothing, so the same file works
+       both places and the bundle can be a straight copy of this one. */
+    (function () {
+      var p = location.pathname, i = p.indexOf("/retro");
+      if (i >= 0) { var b = document.createElement("base"); b.href = p.slice(0, i) + "/retro/"; document.head.appendChild(b); }
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- This page lives at /retro/ but Vercel strips the trailing slash to /retro,
-       which would break relative asset paths. Pin them to /retro/ so css/js load. -->
-  <base href="/retro/">
   <title>Pranav Kaja — PranavOS 95</title>
   <meta name="description" content="The portfolio of Pranav Kaja, Data & Analytics Engineer, rebuilt as a retro Windows 95 desktop. Boot it up and explore.">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
