@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pranav Kaja — PranavOS 95</title>
+  <meta name="description" content="The portfolio of Pranav Kaja, Data & Analytics Engineer, rebuilt as a retro Windows 95 desktop. Boot it up and explore.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/favicon.png" type="image/png">
+  <link rel="stylesheet" href="css/win95.css">
+  <link rel="stylesheet" href="css/scene.css">
+</head>
+<body>
+
+  <!-- ===== WELCOME / LOGIN (the entry point) ===== -->
+  <div id="crt-login">
+    <div class="cl-dialog" role="dialog" aria-label="Log on to PranavOS 95">
+      <div class="cl-title">Welcome to PranavOS&nbsp;95 <span class="x">&times;</span></div>
+      <div class="cl-body">
+        <div class="cl-key">&#128273;</div>
+        <div>
+          <div class="cl-logo2">PranavOS<span>95</span></div>
+          <div class="cl-sub">Type a user name and password to log on to PranavOS.</div>
+          <div class="cl-field"><label>User name:</label><input type="text" value="GUEST" spellcheck="false"></div>
+          <div class="cl-field"><label>Password:</label><input type="password" value="pranav95"></div>
+          <div class="cl-actions">
+            <button class="cl-btn primary" id="login-btn" type="button">OK</button>
+            <button class="cl-btn cl-cancel" id="login-cancel" type="button">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BOOT (BIOS POST) ===== -->
+  <div id="boot">
+    <div class="bios"></div>
+    <!-- power gate: first gesture, unlocks audio -->
+    <div id="power-gate" class="hidden">
+      <div class="pg-inner">
+        <button id="power-btn" aria-label="Power on">⏻</button>
+        <div class="pg-label">PRESS POWER</div>
+        <div class="pg-sub">click the button or press any key</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== WIN95 SPLASH ===== -->
+  <div id="splash">
+    <div class="logo">PranavOS<span>DATA &amp; ANALYTICS EDITION</span></div>
+    <div class="loadbar"><i></i></div>
+  </div>
+
+  <!-- ===== DESKTOP ===== -->
+  <div id="desktop" class="hidden"></div>
+
+  <!-- ===== START MENU ===== -->
+  <div id="start-menu"></div>
+
+  <!-- ===== TASKBAR ===== -->
+  <div id="taskbar" class="hidden">
+    <button id="start-btn"><span class="flag">🪟</span> Start</button>
+    <span class="tb-divider"></span>
+    <div id="task-buttons"></div>
+    <div id="tray">
+      <span class="tray-ico" id="mute-btn" title="Mute / unmute" style="cursor:pointer">🔊</span>
+      <span class="tray-ico" title="Network">📡</span>
+      <span id="clock">12:00 PM</span>
+    </div>
+  </div>
+
+  <!-- ===== SHUTDOWN ===== -->
+  <div id="shutdown" class="hidden">
+    <div class="sd-inner">
+      <div class="sd-msg">It's now safe to turn off<br>your computer.</div>
+      <button id="reboot-btn" class="btn95" style="margin-top:24px">Restart PranavOS</button>
+    </div>
+  </div>
+
+  <!-- ===== CRT SCANLINES ===== -->
+  <div id="scanlines"></div>
+
+  <!-- scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/wm.js"></script>
+  <script src="js/apps.js"></script>
+  <script src="js/desktop.js"></script>
+</body>
+</html>
