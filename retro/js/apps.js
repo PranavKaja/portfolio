@@ -232,15 +232,34 @@
   }
 
   /* ---- README (Welcome / help) ---------------------------------------- */
-  function readme() {
-    const body = `
-      <div class="app" style="padding:16px 20px; font-family:var(--mono); font-size:13px; line-height:1.7; background:#fff">
-        <pre style="white-space:pre-wrap; margin:0">  ____  ____  ____  _  _  ____  _  _     ___  ____
- (  _ \\(  _ \\(  _ \\( \\( )(  _ \\( \\/ )   / __)(  _ \\
-  )___/ )   / )   / )  (  )   / \\  /   ( (_-. )___/
- (__)  (_)\\_)(_)\\_)(_)\\_)(_)\\_)  \\/     \\___/(__)
+  // Block-letter font, assembled in code so the banner can't come out garbled.
+  const BANNER_FONT = {
+    "P": ["█████", "█   █", "█████", "█    ", "█    "],
+    "R": ["█████", "█   █", "████ ", "█  █ ", "█   █"],
+    "A": [" ███ ", "█   █", "█████", "█   █", "█   █"],
+    "N": ["█   █", "██  █", "█ █ █", "█  ██", "█   █"],
+    "V": ["█   █", "█   █", "█   █", " █ █ ", "  █  "],
+    "O": [" ███ ", "█   █", "█   █", "█   █", " ███ "],
+    "S": [" ████", "█    ", " ███ ", "    █", "████ "],
+    "9": [" ███ ", "█   █", " ████", "    █", " ███ "],
+    "5": ["█████", "█    ", "████ ", "    █", "████ "],
+    " ": ["  ", "  ", "  ", "  ", "  "],
+  };
+  function asciiBanner(text) {
+    const rows = ["", "", "", "", ""];
+    text.toUpperCase().split("").forEach((ch) => {
+      const g = BANNER_FONT[ch] || BANNER_FONT[" "];
+      for (let r = 0; r < 5; r++) rows[r] += g[r] + " ";
+    });
+    return rows.join("\n");
+  }
 
- W I N D O W S   9 5   E D I T I O N
+  function readme() {
+    const banner = asciiBanner("PranavOS 95");
+    const body = `
+      <div class="app" style="padding:14px 18px; font-family:var(--mono); background:#fff; color:#000">
+        <pre style="margin:0; font-size:11px; line-height:1.02; color:#000080">${banner}</pre>
+        <pre style="margin:10px 0 0; font-size:13px; line-height:1.6; white-space:pre-wrap">        Windows 95 Edition
 ========================================
 Welcome. You're inside Pranav Kaja's portfolio,
 rebuilt as a retro desktop.
@@ -264,7 +283,7 @@ normal portfolio.
 
 — Built ${new Date().getFullYear()} · type \`help\` anytime</pre>
       </div>`;
-    return { id: "readme", title: "readme.txt — Notepad", icon: "📄", width: 460, height: 430,
+    return { id: "readme", title: "readme.txt — Notepad", icon: "📄", width: 600, height: 450,
       menubar: `<span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>S</u>earch</span><span><u>H</u>elp</span>`,
       body, bodyClass: "", status: `<div class="cell grow">Ln 1, Col 1</div>` };
   }
