@@ -24,45 +24,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pranav Kaja — PranavOS 95</title>
   <meta name="description" content="The portfolio of Pranav Kaja, Data & Analytics Engineer, rebuilt as a retro Windows 95 desktop. Boot it up and explore.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="PranavOS 95 — Pranav Kaja's portfolio as a Windows 95 desktop">
+  <meta property="og:description" content="Boot up PranavOS 95 and explore Pranav Kaja's data &amp; analytics work as a retro Windows 95 desktop.">
+  <meta property="og:url" content="https://pranavkaja.vercel.app/retro">
+  <meta property="og:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PranavOS 95 — Pranav Kaja">
+  <meta name="twitter:description" content="Pranav Kaja's portfolio, rebuilt as a retro Windows 95 desktop.">
+  <meta name="twitter:image" content="https://pranavkaja.vercel.app/images/og-card.png">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="assets/favicon.png" type="image/png">
   <link rel="stylesheet" href="css/win95.css">
-  <link rel="stylesheet" href="css/scene.css">
 </head>
 <body>
 
-  <!-- ===== WELCOME / LOGIN (the entry point) ===== -->
-  <div id="crt-login">
-    <div class="cl-dialog" role="dialog" aria-label="Log on to PranavOS 95">
-      <div class="cl-title">Welcome to PranavOS&nbsp;95 <span class="x">&times;</span></div>
-      <div class="cl-body">
-        <div class="cl-key">&#128273;</div>
-        <div>
-          <div class="cl-logo2">PranavOS<span>95</span></div>
-          <div class="cl-sub">Type a user name and password to log on to PranavOS.</div>
-          <div class="cl-field"><label>User name:</label><input type="text" value="GUEST" spellcheck="false"></div>
-          <div class="cl-field"><label>Password:</label><input type="password" value="pranav95"></div>
-          <div class="cl-actions">
-            <button class="cl-btn primary" id="login-btn" type="button">OK</button>
-            <button class="cl-btn cl-cancel" id="login-cancel" type="button">Cancel</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- ===== BOOT (BIOS POST) ===== -->
-  <div id="boot">
-    <div class="bios"></div>
-    <!-- power gate: first gesture, unlocks audio -->
-    <div id="power-gate" class="hidden">
-      <div class="pg-inner">
-        <button id="power-btn" aria-label="Power on">⏻</button>
-        <div class="pg-label">PRESS POWER</div>
-        <div class="pg-sub">click the button or press any key</div>
-      </div>
-    </div>
-  </div>
+  <div id="boot"><div class="bios"></div></div>
 
   <!-- ===== WIN95 SPLASH ===== -->
   <div id="splash">

@@ -182,54 +182,18 @@
     $("#splash").classList.remove("show");
     $("#desktop").classList.remove("hidden");
     $("#taskbar").classList.remove("hidden");
-    startupChime();
+    // Audio can't autoplay without a user gesture (there's no login click
+    // anymore), so play the startup chime on the first interaction instead.
+    const firstGesture = () => {
+      window.removeEventListener("pointerdown", firstGesture, true);
+      window.removeEventListener("keydown", firstGesture, true);
+      try { window.RETRO_SOUND.unlock(); } catch (e) {}
+      startupChime();
+    };
+    window.addEventListener("pointerdown", firstGesture, true);
+    window.addEventListener("keydown", firstGesture, true);
     // auto-open the welcome note the first time
     setTimeout(() => WM.open(window.APPS.readme()), 400);
-  }
-
-  /* ---- power gate (first user gesture, unlocks audio) ------------------ */
-  function showPowerGate() {
-    const boot = $("#boot");
-    boot.classList.remove("hidden");
-    boot.querySelector(".bios").textContent = "";
-    const gate = $("#power-gate");
-    gate.classList.remove("hidden");
-    const go = () => {
-      gate.classList.add("hidden");
-      audio(); // unlock
-      runBoot();
-    };
-    gate.querySelector("#power-btn").addEventListener("click", go);
-    document.addEventListener("keydown", function once(e) {
-      if (!gate.classList.contains("hidden")) { document.removeEventListener("keydown", once); go(); }
-    });
-  }
-
-  /* ---- login screen (the entry point) --------------------------------- */
-  function showLogin() {
-    $("#boot").classList.add("hidden");
-    $("#splash").classList.remove("show");
-    const login = $("#crt-login");
-    if (!login) { enterDesktop(); return; } // safety: no markup, just go in
-    login.classList.add("show");
-    let done = false;
-    const proceed = () => {
-      if (done) return; done = true;
-      audio(); // unlock audio on the click/keypress gesture
-      beep(660, 0.05, "square", 0.04);
-      login.classList.remove("show");
-      enterDesktop();
-    };
-    const ok = login.querySelector("#login-btn");
-    const cancel = login.querySelector("#login-cancel");
-    if (ok) ok.addEventListener("click", proceed);
-    if (cancel) cancel.addEventListener("click", proceed);
-    document.addEventListener("keydown", function onkey(e) {
-      if (login.classList.contains("show") && e.key === "Enter") {
-        e.preventDefault(); document.removeEventListener("keydown", onkey); proceed();
-      }
-    });
-    if (ok) setTimeout(() => ok.focus(), 60);
   }
 
   /* ---- wire global controls ------------------------------------------- */
@@ -261,5 +225,5 @@
     }
   });
 
-  window.RETRO = { launch, enterDesktop, runBoot, showPowerGate };
+  window.RETRO = { launch, enterDesktop, runBoot };
 })();

@@ -627,7 +627,10 @@
         // so keep the logo as plain scroll-to-top instead of linking into /retro.
         if (Math.min(screen.width, screen.height) < 600) {
             var navLogo = document.querySelector('.nav-logo');
-            if (navLogo) navLogo.setAttribute('href', '#');
+            if (navLogo) {
+                navLogo.setAttribute('href', '#');
+                navLogo.setAttribute('aria-label', 'Pranav Kaja — back to top');
+            }
         }
     </script>
 </body>

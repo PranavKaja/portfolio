@@ -198,14 +198,14 @@ window.PRANAV = {
   ],
 
   interests: [
-    { name: "Automotive", img: "assets/images/car.webp", desc: "I like vehicles of all kinds and how design, aerodynamics, and mechanics come together to move them." },
-    { name: "Cooking", img: "assets/images/cooking.webp", desc: "I cook to learn where a dish comes from. The cuisines, the flavors, and the science behind them." },
-    { name: "Adventure", img: "assets/images/adventure.webp", desc: "New trails, harder routes, places I haven't been. Half the fun is the trip, half is the problem-solving." },
-    { name: "Photography", img: "assets/images/photography.webp", desc: "Light and framing do most of the work. I shoot architecture, nature, and moments that don't wait around." },
-    { name: "Gaming", img: "assets/images/gaming.webp", desc: "For me, gaming is big open worlds, tight gunplay, and the kind of lobbies that keep you saying one more." },
-    { name: "Music", img: "assets/images/music.webp", desc: "I listen for how a track is built. Rhythm, texture, melody, and the way sound sets a mood." },
-    { name: "Technology", img: "assets/images/technology.webp", desc: "I enjoy following new tech and digging into how it actually works under the hood." },
-    { name: "Plants", img: "assets/images/plants.webp", desc: "I keep a small indoor jungle and enjoy learning how each plant reacts to light, water, and care." },
+    { name: "Automotive", img: "assets/images/car.jpg", desc: "I like vehicles of all kinds and how design, aerodynamics, and mechanics come together to move them." },
+    { name: "Cooking", img: "assets/images/cooking.jpg", desc: "I cook to learn where a dish comes from. The cuisines, the flavors, and the science behind them." },
+    { name: "Adventure", img: "assets/images/adventure.jpg", desc: "New trails, harder routes, places I haven't been. Half the fun is the trip, half is the problem-solving." },
+    { name: "Photography", img: "assets/images/photography.jpg", desc: "Light and framing do most of the work. I shoot architecture, nature, and moments that don't wait around." },
+    { name: "Gaming", img: "assets/images/gaming.jpg", desc: "For me, gaming is big open worlds, tight gunplay, and the kind of lobbies that keep you saying one more." },
+    { name: "Music", img: "assets/images/music.jpg", desc: "I listen for how a track is built. Rhythm, texture, melody, and the way sound sets a mood." },
+    { name: "Technology", img: "assets/images/technology.jpg", desc: "I enjoy following new tech and digging into how it actually works under the hood." },
+    { name: "Plants", img: "assets/images/plants.jpg", desc: "I keep a small indoor jungle and enjoy learning how each plant reacts to light, water, and care." },
   ],
 
   blog: [
