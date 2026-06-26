@@ -174,7 +174,7 @@
     let w = 0;
     const iv = setInterval(() => {
       w += 4 + Math.random() * 9; bar.style.width = Math.min(100, w) + "%";
-      if (w >= 100) { clearInterval(iv); setTimeout(showLogin, 400); }
+      if (w >= 100) { clearInterval(iv); setTimeout(enterDesktop, 450); }
     }, 110);
   }
 

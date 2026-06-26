@@ -3,6 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <script>
+    /* Phones don't get the retro desktop (it's a landscape, mouse experience).
+       Bounce them to the normal portfolio. Orientation-proof: a phone's
+       smaller screen dimension is well under 600 CSS px. */
+    (function () {
+      if (Math.min(screen.width, screen.height) < 600) {
+        var p = location.pathname, i = p.indexOf("/retro");
+        if (i >= 0) { location.replace(p.slice(0, i) + "/" + location.hash); }
+      }
+    })();
     /* When served under /retro (live on Vercel, which strips the trailing slash
        to /retro), pin a <base> so relative css/js/asset paths still resolve.
        At the site root (local dev) this does nothing, so the same file works

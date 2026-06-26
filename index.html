@@ -623,6 +623,12 @@
     <script>
         // Self-updating copyright year
         document.getElementById('year').textContent = new Date().getFullYear();
+        // On phones the retro desktop (a landscape, mouse experience) isn't shown,
+        // so keep the logo as plain scroll-to-top instead of linking into /retro.
+        if (Math.min(screen.width, screen.height) < 600) {
+            var navLogo = document.querySelector('.nav-logo');
+            if (navLogo) navLogo.setAttribute('href', '#');
+        }
     </script>
 </body>
 
