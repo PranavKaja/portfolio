@@ -524,13 +524,14 @@ textarea.field { resize: none; }
 .asst-bubble {
   position: relative; max-width: 250px;
   background: #ffffe1; color: #000; border: 1px solid #000;
-  padding: 12px 12px 10px; box-shadow: 2px 2px 0 rgba(0,0,0,.35);
+  padding: 22px 14px 12px; box-shadow: 2px 2px 0 rgba(0,0,0,.35);
   font-family: var(--font); font-size: 12.5px; line-height: 1.45;
 }
-.asst-bubble::after { content: ""; position: absolute; right: -8px; bottom: 16px;
-  border: 8px solid transparent; border-left-color: #000; }
-.asst-bubble::before { content: ""; position: absolute; right: -6px; bottom: 17px;
-  border: 7px solid transparent; border-left-color: #ffffe1; z-index: 1; }
+/* speech tail: a clean black-bordered triangle aimed at the mascot's face */
+.asst-bubble::after { content: ""; position: absolute; right: -10px; bottom: 27px;
+  border: 10px solid transparent; border-left-color: #000; }
+.asst-bubble::before { content: ""; position: absolute; right: -7px; bottom: 29px;
+  border: 8px solid transparent; border-left-color: #ffffe1; z-index: 1; }
 .asst-text b { color: var(--navy); }
 .asst-actions { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
 .asst-btn {
@@ -541,9 +542,13 @@ textarea.field { resize: none; }
 .asst-btn:active { border-color: var(--black) var(--white) var(--white) var(--black); box-shadow: inset 1px 1px 0 var(--gray); }
 .asst-btn.primary { font-weight: 700; }
 .asst-close {
-  position: absolute; top: 3px; right: 4px; width: 16px; height: 14px; font-size: 9px; line-height: 1; cursor: pointer; color: #000;
+  position: absolute; top: 5px; right: 5px; width: 18px; height: 16px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; line-height: 1; cursor: pointer; color: #000;
   background: var(--silver); border: 2px solid; border-color: var(--white) var(--black) var(--black) var(--white);
+  box-shadow: inset 1px 1px 0 var(--silver-light), inset -1px -1px 0 var(--gray);
 }
+.asst-close:active { border-color: var(--black) var(--white) var(--white) var(--black); box-shadow: inset 1px 1px 0 var(--gray); }
 .asst-char { width: 62px; height: 62px; flex-shrink: 0; cursor: default;
   filter: drop-shadow(1px 2px 2px rgba(0,0,0,.4)); animation: asstBob 2.6s ease-in-out infinite; }
 @keyframes asstBob { 50% { transform: translateY(-5px); } }
