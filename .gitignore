@@ -1,12 +1,8 @@
-.agents/
 test-event.html
 test.html
 test2.html
-apply_gamer_theme.ps1
 # local OG-card design variants; the chosen one lives in images/og-card.png
 /og-*.png
-# local dev tooling (preview server, launch config)
-.claude/
 # local CPK source data — kept out of the repo (raw orders + manager workbook)
 projects/*.xlsx
 projects/*.xlsm

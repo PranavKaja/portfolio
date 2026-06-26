@@ -90,11 +90,11 @@ You create your admin manually (step 4), so you never need self-signup.
 
 ## Run it locally
 
-Any static server works. This folder ships one:
+It's a static site, so any static file server works:
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .claude\server.ps1
-# serves http://localhost:8741/
+```bash
+python -m http.server 8741
+# or any equivalent, e.g.  npx serve .  /  php -S localhost:8741
 ```
 
 - Site: <http://localhost:8741/>  → projects now load from Supabase.
