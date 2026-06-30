@@ -1128,8 +1128,13 @@
     intelRange = parseInt(btn.dataset.range, 10) || 0;
     document.querySelectorAll('#intel-range .intel-range-btn').forEach(b => {
       const on = parseInt(b.dataset.range, 10) === intelRange;
-      b.classList.toggle('primary', on);
-      b.classList.toggle('ghost', !on);
+      if (on) {
+          b.classList.add('active');
+          b.classList.remove('ghost');
+      } else {
+          b.classList.remove('active');
+          b.classList.add('ghost');
+      }
     });
     loadIntel(true);
   });
@@ -1333,8 +1338,14 @@
   }
 
   async function loadVisitorsLog(daysCount = 7) {
-    const start = new Date(); start.setDate(start.getDate() - daysCount);
-    start.setHours(0, 0, 0, 0);
+    const start = new Date(); 
+    if (daysCount > 0) {
+        start.setDate(start.getDate() - daysCount);
+        start.setHours(0, 0, 0, 0);
+    } else {
+        start.setFullYear(2000);
+    }
+    
     const { data, error } = await db.from('events')
       .select('type, created_at, session_id, meta')
       .in('type', ['pageview', 'page_time'])
@@ -1350,6 +1361,7 @@
       const sid = ev.session_id || 'unknown';
       if (!sessions[sid]) {
         sessions[sid] = {
+          sid: sid,
           code: sid.length > 8 ? sid.substring(0, 6).toUpperCase() : sid.toUpperCase(),
           views: 0,
           time: 0,
@@ -1365,14 +1377,33 @@
       if (ev.type === 'pageview') {
         s.views++;
         const tDate = new Date(ev.created_at);
-        s.timestamps.push(tDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
+        s.timestamps.push(tDate.toLocaleDateString([], {month:'short', day:'numeric'}) + ' ' + tDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
       } else if (ev.type === 'page_time' && ev.meta && ev.meta.seconds) {
         s.time += ev.meta.seconds;
       }
     });
+
+    const sessionIds = Object.keys(sessions);
+    if (sessionIds.length > 0) {
+        const { data: firstVisits } = await db.from('events')
+            .select('session_id, created_at')
+            .eq('type', 'pageview')
+            .in('session_id', sessionIds)
+            .order('created_at', { ascending: true });
+            
+        if (firstVisits) {
+            const absoluteFirsts = {};
+            firstVisits.forEach(fv => {
+                if (!absoluteFirsts[fv.session_id]) absoluteFirsts[fv.session_id] = fv.created_at;
+            });
+            Object.values(sessions).forEach(s => {
+                if (absoluteFirsts[s.sid]) s.absolute_first_seen = absoluteFirsts[s.sid];
+            });
+        }
+    }
     
     return Object.values(sessions).map(s => {
-      const firstStr = new Date(s.first_seen).toISOString().slice(0, 10);
+      const firstStr = new Date(s.absolute_first_seen || s.first_seen).toISOString().slice(0, 10);
       s.is_new_today = (firstStr === todayStr);
       s.timestamps = [...new Set(s.timestamps)].sort();
       return s;
@@ -1500,12 +1531,13 @@
         </div>
       `;
     } else if (kind === 'visitors') {
-      title = 'Recent Visitors — session logs & durations (last 7 days)';
+      const rangeLabel = intelRange === 0 ? 'all time' : (intelRange === 1 ? 'today' : `last ${intelRange} days`);
+      title = `Recent Visitors — session logs (${rangeLabel})`;
       $('intel-modal-body').innerHTML = '<div class="bl-empty">// loading visitor data…</div>';
       $('intel-modal-title').textContent = title;
       $('intel-modal-bg').classList.remove('hidden');
       
-      loadVisitorsLog(7).then(sessions => {
+      loadVisitorsLog(intelRange).then(sessions => {
         if (!sessions.length) {
             $('intel-modal-body').innerHTML = '<div class="bl-empty">// no visitors found in timeframe</div>';
             return;
@@ -1516,13 +1548,22 @@
             const typeBadge = s.is_new_today 
                 ? '<span class="badge badge--deployed">New Today</span>' 
                 : '<span class="badge badge--archived">Returning</span>';
-            const times = s.timestamps.join(', ') || '-';
-            return [
-                `${codeBadge}<br>${typeBadge}`,
-                s.views,
-                fmtTime(s.time),
-                `<div style="font-family:'Share Tech Mono', monospace; font-size:0.75rem; color:var(--text-muted); max-width:200px; line-height:1.4;">${esc(times)}</div>`
-            ];
+            const times = s.timestamps.join('<br>') || '-';
+            return `
+              <tr onclick="this.nextElementSibling.classList.toggle('hidden')" style="cursor:pointer; transition: background 0.2s;" onmouseover="this.style.background='var(--panel-bg)'" onmouseout="this.style.background='transparent'">
+                  <td>${codeBadge}<br>${typeBadge}</td>
+                  <td class="num">${s.views}</td>
+                  <td class="num">${fmtTime(s.time)}</td>
+              </tr>
+              <tr class="hidden">
+                  <td colspan="3" style="padding: 12px; background: var(--panel-bg); border-bottom: 1px solid var(--border);">
+                      <div style="font-family:'Share Tech Mono', monospace; font-size:0.75rem; color:var(--text-muted); line-height:1.6;">
+                          <strong>Timestamps:</strong><br>
+                          ${times}
+                      </div>
+                  </td>
+              </tr>
+            `;
         });
         
         const totalViews = sessions.reduce((sum, s) => sum + s.views, 0);
@@ -1532,16 +1573,10 @@
             <td style="font-weight: normal; border-top: 2px solid var(--border) !important; border-bottom: none !important; padding-top: 8px;">Total (${sessions.length})</td>
             <td class="num" style="font-weight: bold; border-top: 2px solid var(--border) !important; border-bottom: none !important; padding-top: 8px;">${totalViews}</td>
             <td class="num" style="font-weight: bold; border-top: 2px solid var(--border) !important; border-bottom: none !important; padding-top: 8px;">${fmtTimeHM(totalTime)}</td>
-            <td style="border-top: 2px solid var(--border) !important; border-bottom: none !important; padding-top: 8px;"></td>
         </tr></tfoot>`;
         
-        const tableHtml = '<table class="detail-table"><thead><tr><th>Visitor ID</th><th class="num">Views</th><th class="num">Time Spent</th><th>Timestamps</th></tr></thead><tbody>' +
-          rows.map(r => `<tr>
-              <td>${r[0]}</td>
-              <td class="num">${r[1]}</td>
-              <td class="num">${r[2]}</td>
-              <td>${r[3]}</td>
-          </tr>`).join('') +
+        const tableHtml = '<table class="detail-table" style="width:100%; border-collapse:collapse;"><thead><tr><th style="text-align:left">Visitor ID</th><th class="num">Views</th><th class="num">Time Spent</th></tr></thead><tbody>' +
+          rows.join('') +
           '</tbody>' + tfoot + '</table>';
           
         $('intel-modal-body').innerHTML = tableHtml;

@@ -703,3 +703,30 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
     flex: 1;
     min-width: 0;
 }
+
+/* Intel Range Subtle Tabs */
+#intel-range {
+    display: flex;
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0;
+}
+#intel-range .intel-range-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    padding: 8px 4px;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    transition: all 0.2s;
+}
+#intel-range .intel-range-btn:hover {
+    color: var(--text-main);
+    background: transparent;
+}
+#intel-range .intel-range-btn.active {
+    color: var(--accent);
+    border-bottom: 2px solid var(--accent);
+    background: transparent;
+}
