@@ -345,6 +345,59 @@ body.custom-cursor-active button {
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
 
+/* PC Horizontal Scrolling for Projects */
+#projects .grid-3 {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 30px;
+    padding-bottom: 20px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+#projects .grid-3::-webkit-scrollbar {
+    display: none;
+}
+.project-page {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    min-width: 100%;
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+}
+
+/* custom carousel scrollbar (built by main.js) */
+.proj-scrollbar {
+    display: block;
+    position: relative;
+    height: 14px;
+    margin-top: -8px; 
+    touch-action: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: auto;
+}
+.proj-scrollbar.visible { opacity: 1; }
+.proj-scrollbar::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; top: 50%;
+    height: 4px;
+    transform: translateY(-50%);
+    background: var(--border);
+    border-radius: 2px;
+}
+.proj-scrollbar-thumb {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 4px;
+    background: var(--accent);
+    border-radius: 2px;
+}
+
 /* Panels */
 .panel {
     background: var(--panel-bg);
@@ -1191,22 +1244,17 @@ body.ttt-active .container, body.ttt-active .top-nav {
         gap: 15px;
     }
     
-    /* Horizontal Swipe Carousel for Projects */
+    /* Horizontal Swipe Carousel Overrides for Mobile */
+    .project-page {
+        display: contents; /* Unwrap chunks so panels become direct flex children */
+    }
+    
     #projects .grid-3 {
-        display: flex !important;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
         gap: 15px;
-        padding-bottom: 20px;
-        -webkit-overflow-scrolling: touch;
-        /* native indicator off: main.js draws its own transient bar
-           that can also be dragged, and that survives bfcache restores */
-        scrollbar-width: none;
         margin-left: -15px;
         margin-right: -15px;
-        padding-left: 15px; /* Ensure first card is inset */
-        padding-right: 15px; /* Ensure last card has space */
+        padding-left: 15px; 
+        padding-right: 15px; 
     }
 
     #projects .project-panel {
@@ -1214,45 +1262,6 @@ body.ttt-active .container, body.ttt-active .top-nav {
         scroll-snap-align: center;
         padding: 25px 20px;
     }
-
-    #projects .grid-3::-webkit-scrollbar {
-        display: none;
-    }
-
-    /* custom carousel scrollbar (built by main.js): invisible at rest,
-       flashes while swiping, and the thumb is drag-to-scroll. The bar
-       is a 14px touch target drawn as a 4px hairline */
-    .proj-scrollbar {
-        display: block;
-        position: relative;
-        height: 14px;
-        margin-top: -8px; /* tucks into the carousel's bottom padding */
-        touch-action: none;
-        opacity: 0;
-        transition: opacity 0.25s ease;
-        pointer-events: auto;
-    }
-    .proj-scrollbar.visible {
-        opacity: 1;
-    }
-    .proj-scrollbar::before {
-        content: '';
-        position: absolute;
-        left: 0; right: 0; top: 50%;
-        height: 4px;
-        transform: translateY(-50%);
-        background: var(--panel-bg);
-        border-radius: 2px;
-    }
-    .proj-scrollbar-thumb {
-        position: absolute;
-        top: 50%;
-        left: 0;
-        height: 4px;
-        background: var(--accent);
-        border-radius: 2px;
-    }
-
     /* Interests Page Mobile Overrides */
     .interests-section {
         height: 100vh !important;
