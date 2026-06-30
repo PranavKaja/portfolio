@@ -529,26 +529,25 @@
     </div>
 
     <!-- Custom Date Picker Modal -->
-    <div class="modal-bg hidden" id="custom-date-modal-bg" style="z-index: 200;"></div>
-    <div class="modal hidden" id="custom-date-modal" style="max-width: 400px; z-index: 201;">
-        <div class="modal-head">
-            <h3>Select Custom Range</h3>
-            <div class="modal-close" id="custom-date-close">&times;</div>
-        </div>
-        <div class="modal-body">
-            <div class="row" style="margin-bottom: 12px; gap: 10px;">
-                <div style="flex: 1;">
-                    <label style="display: block; font-size: 11px; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em;">Start Date</label>
-                    <input type="date" id="custom-date-start" class="editor-input" style="width: 100%;">
+    <div class="modal-bg hidden" id="custom-date-modal-bg" style="z-index: 200;">
+        <div class="modal" id="custom-date-modal" style="max-width: 400px; padding: 24px;">
+            <h2 style="font-size: 1.1rem; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">Select Custom Range</h2>
+            <div>
+                <div class="row" style="margin-bottom: 16px; gap: 12px;">
+                    <div style="flex: 1;">
+                        <label style="display: block; font-size: 11px; color: var(--text-muted); font-weight: 700; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Start Date</label>
+                        <input type="date" id="custom-date-start" class="editor-input" style="width: 100%;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display: block; font-size: 11px; color: var(--text-muted); font-weight: 700; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">End Date</label>
+                        <input type="date" id="custom-date-end" class="editor-input" style="width: 100%;">
+                    </div>
                 </div>
-                <div style="flex: 1;">
-                    <label style="display: block; font-size: 11px; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em;">End Date</label>
-                    <input type="date" id="custom-date-end" class="editor-input" style="width: 100%;">
+                <div id="custom-date-msg" style="color: var(--err); font-size: 12px; margin-bottom: 10px; min-height: 18px;"></div>
+                <div class="modal-actions" style="margin-top: 0; padding-top: 12px; justify-content: flex-end;">
+                    <button class="ghost" id="custom-date-close" style="margin-right: 8px;">Cancel</button>
+                    <button class="primary" id="custom-date-apply">Apply Range</button>
                 </div>
-            </div>
-            <div id="custom-date-msg" style="color: var(--err); font-size: 12px; margin-bottom: 10px; min-height: 18px;"></div>
-            <div class="row" style="justify-content: flex-end;">
-                <button class="primary" id="custom-date-apply">Apply Range</button>
             </div>
         </div>
     </div>
