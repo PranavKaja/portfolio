@@ -1356,8 +1356,10 @@
       
     if (error || !data) return [];
     
+    // Sort chronologically so page_time events follow their corresponding pageviews
+    data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    
     const sessions = {};
-    const todayStr = new Date().toISOString().slice(0, 10);
     
     data.forEach(ev => {
       const sid = ev.session_id || 'unknown';
@@ -1369,7 +1371,8 @@
           time: 0,
           first_seen: ev.created_at,
           last_seen: ev.created_at,
-          timestamps: []
+          timestamps: [],
+          _currentTs: null
         };
       }
       const s = sessions[sid];
@@ -1379,9 +1382,14 @@
       if (ev.type === 'pageview') {
         s.views++;
         const tDate = new Date(ev.created_at);
-        s.timestamps.push(tDate.toLocaleDateString([], {month:'short', day:'numeric'}) + ' ' + tDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
+        const timeStr = tDate.toLocaleDateString([], {month:'short', day:'numeric'}) + ' ' + tDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        s._currentTs = { ts: timeStr, seconds: 0, ms: tDate.getTime() };
+        s.timestamps.push(s._currentTs);
       } else if (ev.type === 'page_time' && ev.meta && ev.meta.seconds) {
         s.time += ev.meta.seconds;
+        if (s._currentTs) {
+            s._currentTs.seconds += ev.meta.seconds;
+        }
       }
     });
 
@@ -1423,7 +1431,16 @@
           firstDate.getDate() === todayDate.getDate()
       );
       
-      s.timestamps = [...new Set(s.timestamps)].sort();
+      const tsMap = new Map();
+      s.timestamps.forEach(t => {
+          if (!tsMap.has(t.ts)) tsMap.set(t.ts, { seconds: 0, ms: t.ms });
+          tsMap.get(t.ts).seconds += t.seconds;
+      });
+      s.timestamps = Array.from(tsMap.entries())
+          .sort((a, b) => a[1].ms - b[1].ms)
+          .map(([tsStr, d]) => `${tsStr} &mdash; <span style="color:var(--text-main); font-weight:bold;">${fmtTime(d.seconds)}</span>`);
+          
+      delete s._currentTs;
       return s;
     }).sort((a, b) => new Date(b.last_seen) - new Date(a.last_seen));
   }
