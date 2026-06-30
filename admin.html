@@ -135,10 +135,10 @@
             </div>
 
             <div class="tabbar">
-                <button class="tab active" data-tab="transmissions">Transmissions<span id="tx-unread"
+                <button class="tab" data-tab="transmissions">Transmissions<span id="tx-unread"
                         class="tab-badge hidden"></span></button>
                 <button class="tab" data-tab="projects">Projects</button>
-                <button class="tab" data-tab="intel">Intel</button>
+                <button class="tab active" data-tab="intel">Intel</button>
                 <button class="tab" data-tab="skills">Skills</button>
                 <button class="tab" data-tab="certifications">Certs</button>
                 <div class="spacer"></div>
@@ -241,7 +241,7 @@
             </div>
 
             <!-- TRANSMISSIONS PANEL -->
-            <div id="panel-transmissions">
+            <div id="panel-transmissions" class="hidden">
                 <div class="row" style="margin-bottom:18px">
                     <button class="ghost" id="tx-unread-btn">Unread only</button>
                     <div class="spacer"></div>
@@ -253,7 +253,7 @@
             </div>
 
             <!-- INTEL PANEL -->
-            <div id="panel-intel" class="hidden">
+            <div id="panel-intel">
                 <div class="row" style="margin-bottom:18px; flex-wrap:wrap; gap:10px;">
                     <div id="intel-range">
                         <button class="intel-range-btn active" data-range="1">Today</button>

@@ -54,6 +54,7 @@
       show('console');
       loadProjects();
       loadTransmissions();
+      loadIntel(true);
     } else {
       // Clear anything corrupt
       try {
