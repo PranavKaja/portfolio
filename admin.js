@@ -1337,19 +1337,21 @@
     return `<svg viewBox="0 0 ${W} ${H}" class="spark" preserveAspectRatio="none" style="width:100%;height:auto;max-height:300px;overflow:visible;margin-top:10px;">${bars}${ticks}</svg>`;
   }
 
-  async function loadVisitorsLog(daysCount = 7) {
-    const start = new Date(); 
-    if (daysCount > 0) {
-        start.setDate(start.getDate() - daysCount);
-        start.setHours(0, 0, 0, 0);
+  async function loadVisitorsLog(intelRange = 7) {
+    let startIso = null;
+    if (intelRange === 1) {
+        const d = new Date(); d.setHours(0, 0, 0, 0);
+        startIso = d.toISOString();
+    } else if (intelRange > 0) {
+        startIso = new Date(Date.now() - intelRange * 86400000).toISOString();
     } else {
-        start.setFullYear(2000);
+        startIso = new Date('2000-01-01').toISOString();
     }
     
     const { data, error } = await db.from('events')
       .select('type, created_at, session_id, meta')
       .in('type', ['pageview', 'page_time'])
-      .gte('created_at', start.toISOString())
+      .gte('created_at', startIso)
       .limit(10000);
       
     if (error || !data) return [];
@@ -1403,8 +1405,13 @@
     }
     
     return Object.values(sessions).map(s => {
-      const firstStr = new Date(s.absolute_first_seen || s.first_seen).toISOString().slice(0, 10);
-      s.is_new_today = (firstStr === todayStr);
+      const firstDate = new Date(s.absolute_first_seen || s.first_seen);
+      const todayDate = new Date();
+      s.is_new_today = (
+          firstDate.getFullYear() === todayDate.getFullYear() &&
+          firstDate.getMonth() === todayDate.getMonth() &&
+          firstDate.getDate() === todayDate.getDate()
+      );
       s.timestamps = [...new Set(s.timestamps)].sort();
       return s;
     }).sort((a, b) => new Date(b.last_seen) - new Date(a.last_seen));
