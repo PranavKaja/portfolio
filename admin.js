@@ -1106,8 +1106,7 @@
   }
 
   let currentGameTab = 'wasd';
-
-  let intelRange = 0; // 0 = all time; otherwise day window (1 = today, 7, 30, 365)
+  let intelRange = 1; // 1 = today; otherwise day window (7, 30, 365, or 0 = all time)
   function intelSince() {
     if (!intelRange) return null;                       // Total
     if (intelRange === 1) { const d = new Date(); d.setHours(0, 0, 0, 0); return d.toISOString(); } // local today
