@@ -685,6 +685,7 @@
       if ($(cfg.empty)) $(cfg.empty).classList.toggle('hidden', cache.length > 0);
       el.innerHTML = cache.map(cfg.card).join('');
       wire(el);
+      if (cfg.onRender) cfg.onRender(cache);
     }
 
     async function load() {
@@ -975,6 +976,25 @@
     unit: n => 'CERT' + (n === 1 ? '' : 'S'),
     valid: p => !!p.name, validMsg: 'Certification name is required.',
     blank: { name: '', issuer: '', link: null, in_progress: false, progress: 100 },
+    onRender: (items) => {
+        const outline = $('certs-outline-list');
+        if (!outline) return;
+        if (!items.length) {
+            outline.innerHTML = '<div style="color:var(--text-muted); font-size:0.8rem; font-family:\'Share Tech Mono\', monospace;">// NO CERTIFICATIONS</div>';
+            return;
+        }
+        outline.innerHTML = items.map((c, i) => {
+            const name = esc(c.name || '(Untitled)');
+            const statusColor = c.in_progress ? 'var(--accent)' : '#2b8a3e';
+            return `<div style="display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:6px; cursor:pointer;" 
+                         onmouseover="this.style.background='var(--panel-bg)'" 
+                         onmouseout="this.style.background='transparent'" 
+                         onclick="const card = document.querySelector('.sc-card[data-id=\\'${c.id || ''}\\']'); if(card) { card.scrollIntoView({behavior:'smooth', block:'center'}); card.style.boxShadow='0 0 0 2px var(--accent)'; setTimeout(()=>card.style.boxShadow='', 1500); }">
+                <div style="width:6px; height:6px; border-radius:50%; background:${statusColor}; flex-shrink:0;"></div>
+                <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:600;" title="${name}">${name}</div>
+            </div>`;
+        }).join('');
+    },
     card: c => `<div class="sc-card" data-id="${esc(c.id || '')}">
       <div class="sc-grid">
         <label class="sc-f sc-grow">Name<input class="hl" data-f="name" value="${esc(c.name || '')}"></label>
