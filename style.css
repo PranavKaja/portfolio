@@ -686,9 +686,7 @@ h2.hover-swap {
     text-transform: uppercase;
     color: var(--bg); /* White text on dark bg */
     text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    max-width: 100%;
+    white-space: nowrap;
 }
 
 .detail-desc-box {
