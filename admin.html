@@ -178,21 +178,13 @@
             <!-- SKILLS PANEL -->
             <div id="panel-skills" class="hidden">
                 <div class="skills-canvas-container">
-                    <!-- Left: Skills in Use -->
-                    <div class="skills-sidebar left-sidebar">
-                        <div class="sidebar-header">
-                            <h3>Skills in Use</h3>
-                            <span class="count-badge" id="active-skills-count">0</span>
-                        </div>
-                        <div class="skills-dropzone" id="active-skills-zone">
-                            <!-- Active skill chips go here -->
-                        </div>
-                    </div>
-
                     <!-- Center: Category Canvas -->
                     <div class="skills-canvas-main">
                         <div class="canvas-header">
-                            <h2>Category Canvas</h2>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <h2>Category Canvas</h2>
+                                <span class="count-badge" id="active-skills-count" title="Skills in Use">0</span>
+                            </div>
                             <button class="ghost" id="new-category-btn" style="font-size: 0.75rem; padding: 6px 12px;">+
                                 Add Category</button>
                         </div>

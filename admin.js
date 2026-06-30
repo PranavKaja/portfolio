@@ -760,23 +760,10 @@
             </div>
         `}).join('');
 
-        // 2. Render Active Skills (Left)
-        const activeZone = $('active-skills-zone');
+        // 2. Update Active Skills Count (Header)
         let activeNodes = this.nodes.filter(n => n.is_active);
-        
-        activeNodes.sort((a, b) => {
-            const catA = this.categories.find(c => c.id === a.category_id);
-            const catB = this.categories.find(c => c.id === b.category_id);
-            const orderA = catA ? catA.sort_order : 999;
-            const orderB = catB ? catB.sort_order : 999;
-            if (orderA !== orderB) return orderA - orderB;
-            return (a.sort_order || 0) - (b.sort_order || 0);
-        });
-
-        $('active-skills-count').textContent = activeNodes.length;
-        activeZone.innerHTML = activeNodes.map(n => this.renderNode(n)).join('');
-        activeZone.ondragover = this.onDragOver;
-        activeZone.ondrop = (e) => this.onDrop(e, 'active');
+        const countBadge = $('active-skills-count');
+        if (countBadge) countBadge.textContent = activeNodes.length;
 
         // 3. Render Archive Skills (Right)
         const archiveZone = $('archive-skills-zone');
