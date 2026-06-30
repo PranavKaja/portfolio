@@ -1406,12 +1406,23 @@
     
     return Object.values(sessions).map(s => {
       const firstDate = new Date(s.absolute_first_seen || s.first_seen);
+      const lastDate = new Date(s.last_seen);
       const todayDate = new Date();
-      s.is_new_today = (
+      
+      const sameDay = (
+          firstDate.getFullYear() === lastDate.getFullYear() &&
+          firstDate.getMonth() === lastDate.getMonth() &&
+          firstDate.getDate() === lastDate.getDate()
+      );
+      
+      s.is_returning = !sameDay;
+      
+      s.is_today = (
           firstDate.getFullYear() === todayDate.getFullYear() &&
           firstDate.getMonth() === todayDate.getMonth() &&
           firstDate.getDate() === todayDate.getDate()
       );
+      
       s.timestamps = [...new Set(s.timestamps)].sort();
       return s;
     }).sort((a, b) => new Date(b.last_seen) - new Date(a.last_seen));
@@ -1552,9 +1563,16 @@
         
         const rows = sessions.map(s => {
             const codeBadge = `<span style="font-family:'Space Mono', monospace; font-size:0.85rem; font-weight:700; color:var(--text-main);">#${esc(s.code)}</span>`;
-            const typeBadge = s.is_new_today 
-                ? '<span class="badge badge--deployed">New Today</span>' 
-                : '<span class="badge badge--archived">Returning</span>';
+            
+            let typeBadge;
+            if (s.is_returning) {
+                typeBadge = '<span class="badge badge--archived">Returning</span>';
+            } else if (s.is_today) {
+                typeBadge = '<span class="badge badge--deployed">New Today</span>';
+            } else {
+                typeBadge = '<span class="badge badge--deployed" style="background:transparent; color:var(--text-main); border:1px solid var(--border);">New</span>';
+            }
+            
             const times = s.timestamps.join('<br>') || '-';
             
             const lastVisitDate = new Date(s.last_seen);
