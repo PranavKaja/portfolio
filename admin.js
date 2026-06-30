@@ -1332,6 +1332,53 @@
     return `<svg viewBox="0 0 ${W} ${H}" class="spark" preserveAspectRatio="none" style="width:100%;height:auto;max-height:300px;overflow:visible;margin-top:10px;">${bars}${ticks}</svg>`;
   }
 
+  async function loadVisitorsLog(daysCount = 7) {
+    const start = new Date(); start.setDate(start.getDate() - daysCount);
+    start.setHours(0, 0, 0, 0);
+    const { data, error } = await db.from('events')
+      .select('type, created_at, session_id, meta')
+      .in('type', ['pageview', 'page_time'])
+      .gte('created_at', start.toISOString())
+      .limit(10000);
+      
+    if (error || !data) return [];
+    
+    const sessions = {};
+    const todayStr = new Date().toISOString().slice(0, 10);
+    
+    data.forEach(ev => {
+      const sid = ev.session_id || 'unknown';
+      if (!sessions[sid]) {
+        sessions[sid] = {
+          code: sid.length > 8 ? sid.substring(0, 6).toUpperCase() : sid.toUpperCase(),
+          views: 0,
+          time: 0,
+          first_seen: ev.created_at,
+          last_seen: ev.created_at,
+          timestamps: []
+        };
+      }
+      const s = sessions[sid];
+      if (ev.created_at < s.first_seen) s.first_seen = ev.created_at;
+      if (ev.created_at > s.last_seen) s.last_seen = ev.created_at;
+      
+      if (ev.type === 'pageview') {
+        s.views++;
+        const tDate = new Date(ev.created_at);
+        s.timestamps.push(tDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
+      } else if (ev.type === 'page_time' && ev.meta && ev.meta.seconds) {
+        s.time += ev.meta.seconds;
+      }
+    });
+    
+    return Object.values(sessions).map(s => {
+      const firstStr = new Date(s.first_seen).toISOString().slice(0, 10);
+      s.is_new_today = (firstStr === todayStr);
+      s.timestamps = [...new Set(s.timestamps)].sort();
+      return s;
+    }).sort((a, b) => new Date(b.last_seen) - new Date(a.last_seen));
+  }
+
   function openIntelDetail(kind) {
     const d = intelData || {};
     let title = '', body = '';
@@ -1452,7 +1499,56 @@
           </div>
         </div>
       `;
+    } else if (kind === 'visitors') {
+      title = 'Recent Visitors — session logs & durations (last 7 days)';
+      $('intel-modal-body').innerHTML = '<div class="bl-empty">// loading visitor data…</div>';
+      $('intel-modal-title').textContent = title;
+      $('intel-modal-bg').classList.remove('hidden');
+      
+      loadVisitorsLog(7).then(sessions => {
+        if (!sessions.length) {
+            $('intel-modal-body').innerHTML = '<div class="bl-empty">// no visitors found in timeframe</div>';
+            return;
+        }
+        
+        const rows = sessions.map(s => {
+            const codeBadge = `<span style="font-family:'Space Mono', monospace; font-size:0.85rem; font-weight:700; color:var(--text-main);">#${esc(s.code)}</span>`;
+            const typeBadge = s.is_new_today 
+                ? '<span class="badge badge--deployed">New Today</span>' 
+                : '<span class="badge badge--archived">Returning</span>';
+            const times = s.timestamps.join(', ') || '-';
+            return [
+                `${codeBadge}<br>${typeBadge}`,
+                s.views,
+                fmtTime(s.time),
+                `<div style="font-family:'Share Tech Mono', monospace; font-size:0.75rem; color:var(--text-muted); max-width:200px; line-height:1.4;">${esc(times)}</div>`
+            ];
+        });
+        
+        const totalViews = sessions.reduce((sum, s) => sum + s.views, 0);
+        const totalTime = sessions.reduce((sum, s) => sum + s.time, 0);
+        
+        let tfoot = `<tfoot style="border-bottom: none !important;"><tr style="border-bottom: none !important;">
+            <td style="font-weight: normal; border-top: 2px solid var(--border) !important; border-bottom: none !important; padding-top: 8px;">Total (${sessions.length})</td>
+            <td class="num" style="font-weight: bold; border-top: 2px solid var(--border) !important; border-bottom: none !important; padding-top: 8px;">${totalViews}</td>
+            <td class="num" style="font-weight: bold; border-top: 2px solid var(--border) !important; border-bottom: none !important; padding-top: 8px;">${fmtTimeHM(totalTime)}</td>
+            <td style="border-top: 2px solid var(--border) !important; border-bottom: none !important; padding-top: 8px;"></td>
+        </tr></tfoot>`;
+        
+        const tableHtml = '<table class="detail-table"><thead><tr><th>Visitor ID</th><th class="num">Views</th><th class="num">Time Spent</th><th>Timestamps</th></tr></thead><tbody>' +
+          rows.map(r => `<tr>
+              <td>${r[0]}</td>
+              <td class="num">${r[1]}</td>
+              <td class="num">${r[2]}</td>
+              <td>${r[3]}</td>
+          </tr>`).join('') +
+          '</tbody>' + tfoot + '</table>';
+          
+        $('intel-modal-body').innerHTML = tableHtml;
+      });
+      return;
     }
+    
     $('intel-modal-title').textContent = title || 'Detail';
     $('intel-modal-body').innerHTML = body || '<div class="bl-empty">// no data yet</div>';
     
