@@ -1287,24 +1287,35 @@
   // ---- Today view: hourly pageview breakdown (queries the events table directly) ----
   async function loadTodayHourly() {
     const start = new Date(); start.setHours(0, 0, 0, 0); // local midnight, in the viewer's timezone
-    const buckets = new Array(24).fill(0);
+    const buckets = new Array(24).fill(0).map(() => ({ views: 0, time: 0 }));
     try {
       const { data, error } = await db.from('events')
-        .select('created_at').eq('type', 'pageview').gte('created_at', start.toISOString()).limit(5000);
-      if (!error && data) data.forEach(ev => { buckets[new Date(ev.created_at).getHours()]++; });
+        .select('type, created_at, meta').in('type', ['pageview', 'page_time']).gte('created_at', start.toISOString()).limit(5000);
+      if (!error && data) {
+        data.forEach(ev => {
+          const h = new Date(ev.created_at).getHours();
+          if (ev.type === 'pageview') {
+            buckets[h].views++;
+          } else if (ev.type === 'page_time' && ev.meta && ev.meta.seconds) {
+            buckets[h].time += ev.meta.seconds;
+          }
+        });
+      }
     } catch (e) { /* leave zeros */ }
     return buckets;
   }
   const pad2 = n => String(n).padStart(2, '0');
   function renderHourlyTable(buckets) {
-    const rows = buckets.map((v, h) => [pad2(h) + ':00', v]);
-    const total = buckets.reduce((s, v) => s + v, 0);
-    return detailTable(['Hour', 'Views'], rows, ['Total', total]);
+    const rows = buckets.map((b, h) => [pad2(h) + ':00', b.views, fmtTime(b.time)]);
+    const totalViews = buckets.reduce((s, b) => s + b.views, 0);
+    const totalTime = buckets.reduce((s, b) => s + b.time, 0);
+    return detailTable(['Hour', 'Views', 'Time'], rows, ['Total', totalViews, fmtTimeHM(totalTime)]);
   }
   function renderHourlyChart(buckets) {
-    const max = Math.max.apply(null, buckets) || 1;
+    const max = Math.max.apply(null, buckets.map(b => b.views)) || 1;
     const W = 800, H = 250, pad = 20, bw = (W - pad * 2) / 24;
-    const bars = buckets.map((v, h) => {
+    const bars = buckets.map((b, h) => {
+      const v = b.views;
       const x = pad + h * bw, w = Math.max(1, bw - 2), cx = x + w / 2;
       if (v === 0) {
         return `<rect x="${x.toFixed(1)}" y="${(H - 20).toFixed(1)}" width="${w.toFixed(1)}" height="2" style="fill:var(--text-muted);opacity:0.3"><title>0 views at ${pad2(h)}:00</title></rect>`;
@@ -1313,7 +1324,8 @@
       const label = ht > 14
         ? `<text x="${cx.toFixed(1)}" y="${(H - 20 - ht + 11).toFixed(1)}" fill="#fff" text-anchor="middle" font-size="10" font-family="'Share Tech Mono',monospace" font-weight="bold">${v}</text>`
         : `<text x="${cx.toFixed(1)}" y="${(H - 20 - ht - 4).toFixed(1)}" fill="currentColor" text-anchor="middle" font-size="10" font-family="'Share Tech Mono',monospace" font-weight="bold">${v}</text>`;
-      return `<rect x="${x.toFixed(1)}" y="${(H - 20 - ht).toFixed(1)}" width="${w.toFixed(1)}" height="${ht}" fill="var(--accent,#ff4500)"><title>${v} views at ${pad2(h)}:00</title></rect>${label}`;
+      const timeStr = b.time ? ` (${fmtTime(b.time)} spent)` : '';
+      return `<rect x="${x.toFixed(1)}" y="${(H - 20 - ht).toFixed(1)}" width="${w.toFixed(1)}" height="${ht}" fill="var(--accent,#ff4500)"><title>${v} views${timeStr} at ${pad2(h)}:00</title></rect>${label}`;
     }).join('');
     const ticks = [0, 6, 12, 18, 23].map(h =>
       `<text x="${(pad + h * bw + bw / 2).toFixed(1)}" y="${H - 2}" text-anchor="middle" font-size="11" fill="currentColor" font-family="'Share Tech Mono',monospace">${pad2(h)}:00</text>`).join('');
