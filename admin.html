@@ -18,34 +18,37 @@
         .sc-list {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 16px;
         }
 
         .sc-card {
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 14px 16px;
-            background: var(--panel-bg);
+            border-radius: 12px;
+            padding: 24px;
+            background: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
+            max-width: 900px;
         }
 
         .sc-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 16px;
             align-items: flex-end;
         }
 
         .sc-f {
             display: flex;
             flex-direction: column;
-            gap: 5px;
-            font-size: 0.66rem;
-            letter-spacing: 0.06em;
+            gap: 6px;
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: var(--text-muted);
+            color: var(--text-main);
+            font-weight: 600;
         }
 
         .sc-grow {
@@ -53,25 +56,38 @@
         }
 
         .sc-num {
-            width: 96px;
+            width: 110px;
         }
 
         .sc-pub {
             flex-direction: row;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             white-space: nowrap;
+            height: 44px; /* match the input height for alignment */
+            padding-bottom: 2px;
+        }
+
+        .sc-f input.hl, .sc-f textarea {
+            padding: 12px 14px 12px 18px !important;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            border-radius: 8px;
+            border: 1px solid #d4d4d8;
         }
 
         .sc-f textarea {
-            min-height: 54px;
+            min-height: 64px;
             resize: vertical;
         }
 
         .sc-actions {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             justify-content: flex-end;
+            margin-top: 4px;
+            border-top: 1px dashed var(--border);
+            padding-top: 16px;
         }
     </style>
 </head>
