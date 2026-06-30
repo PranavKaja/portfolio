@@ -18,7 +18,7 @@
       ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
 
-  // 'MSN-02' -> '01' (overlay + data-msn key the original markup used)
+  // 'MSN-01' -> '01' (overlay + data-msn key the original markup used)
   function codeNum(code) {
     const m = String(code || '').match(/(\d+)/);
     return m ? m[1] : String(code || '');
@@ -220,14 +220,7 @@
     const byCode = {};
     projects.forEach(p => { byCode[codeNum(p.code)] = p; });
 
-    const cardsHTML = projects.map(cardHTML);
-    const chunkSize = 6;
-    let pagesHTML = '';
-    for (let i = 0; i < cardsHTML.length; i += chunkSize) {
-        const chunk = cardsHTML.slice(i, i + chunkSize).join('');
-        pagesHTML += `<div class="project-page">${chunk}</div>`;
-    }
-    grid.innerHTML = pagesHTML;
+    grid.innerHTML = projects.map(cardHTML).join('');
     grid.setAttribute('aria-busy', 'false');
     wireOverlay(byCode, grid);
 
