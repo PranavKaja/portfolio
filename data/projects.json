@@ -133,7 +133,7 @@
     "outcome": "A 39-tab manual spreadsheet replaced by an instant, in-browser planner",
     "chips": ["Live Tool", "36 Locations", "In-Browser", "Zero Backend"],
     "skills": [],
-    "status": "deployed", "sort_order": 100, "published": true,
+    "status": "deployed", "sort_order": 5, "published": true,
     "github_url": "https://pranavkaja.vercel.app/projects/cpk-production", "show_status": true, "show_github": true
   }
 ]
