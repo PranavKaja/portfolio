@@ -1549,14 +1549,19 @@
                 ? '<span class="badge badge--deployed">New Today</span>' 
                 : '<span class="badge badge--archived">Returning</span>';
             const times = s.timestamps.join('<br>') || '-';
+            
+            const lastVisitDate = new Date(s.last_seen);
+            const lastVisitStr = lastVisitDate.toLocaleDateString([], {month:'short', day:'numeric'}) + ' ' + lastVisitDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            
             return `
               <tr onclick="this.nextElementSibling.classList.toggle('hidden')" style="cursor:pointer; transition: background 0.2s;" onmouseover="this.style.background='var(--panel-bg)'" onmouseout="this.style.background='transparent'">
                   <td>${codeBadge}<br>${typeBadge}</td>
+                  <td><div style="font-family:'Share Tech Mono', monospace; font-size:0.8rem; color:var(--text-muted);">${lastVisitStr}</div></td>
                   <td class="num">${s.views}</td>
                   <td class="num">${fmtTime(s.time)}</td>
               </tr>
               <tr class="hidden">
-                  <td colspan="3" style="padding: 12px; background: var(--panel-bg); border-bottom: 1px solid var(--border);">
+                  <td colspan="4" style="padding: 12px; background: var(--panel-bg); border-bottom: 1px solid var(--border);">
                       <div style="font-family:'Share Tech Mono', monospace; font-size:0.75rem; color:var(--text-muted); line-height:1.6;">
                           <strong>Timestamps:</strong><br>
                           ${times}
@@ -1571,11 +1576,12 @@
         
         let tfoot = `<tfoot style="border-bottom: none !important;"><tr style="border-bottom: none !important;">
             <td style="font-weight: normal; border-top: 2px solid var(--border) !important; border-bottom: none !important; padding-top: 8px;">Total (${sessions.length})</td>
+            <td style="border-top: 2px solid var(--border) !important; border-bottom: none !important; padding-top: 8px;"></td>
             <td class="num" style="font-weight: bold; border-top: 2px solid var(--border) !important; border-bottom: none !important; padding-top: 8px;">${totalViews}</td>
             <td class="num" style="font-weight: bold; border-top: 2px solid var(--border) !important; border-bottom: none !important; padding-top: 8px;">${fmtTimeHM(totalTime)}</td>
         </tr></tfoot>`;
         
-        const tableHtml = '<table class="detail-table" style="width:100%; border-collapse:collapse;"><thead><tr><th style="text-align:left">Visitor ID</th><th class="num">Views</th><th class="num">Time Spent</th></tr></thead><tbody>' +
+        const tableHtml = '<table class="detail-table" style="width:100%; border-collapse:collapse;"><thead><tr><th style="text-align:left">Visitor ID</th><th style="text-align:left">Last Visit</th><th class="num">Views</th><th class="num">Time Spent</th></tr></thead><tbody>' +
           rows.join('') +
           '</tbody>' + tfoot + '</table>';
           
