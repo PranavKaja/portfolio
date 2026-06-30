@@ -261,6 +261,7 @@
                         <button class="ghost intel-range-btn" data-range="30">1 Month</button>
                         <button class="ghost intel-range-btn" data-range="365">1 Year</button>
                         <button class="ghost intel-range-btn" data-range="0">Total</button>
+                        <button class="ghost intel-range-btn" data-range="custom">Custom</button>
                     </div>
                     <div class="spacer"></div>
                     <span class="console-label" id="intel-updated"></span>
@@ -300,7 +301,7 @@
                 </div>
 
                 <div class="intel-card intel-wide intel-clickable" data-detail="daily">
-                    <h3>Page Views — last 7 days</h3>
+                    <h3 id="home-daily-views-title">Page Views — last 7 days</h3>
                     <div id="intel-daily"></div>
                 </div>
 
@@ -523,6 +524,31 @@
             <div class="modal-actions">
                 <div class="spacer"></div>
                 <button type="button" class="ghost" id="intel-modal-close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Date Picker Modal -->
+    <div class="modal-bg hidden" id="custom-date-modal-bg" style="z-index: 200;"></div>
+    <div class="modal hidden" id="custom-date-modal" style="max-width: 400px; z-index: 201;">
+        <div class="modal-head">
+            <h3>Select Custom Range</h3>
+            <div class="modal-close" id="custom-date-close">&times;</div>
+        </div>
+        <div class="modal-body">
+            <div class="row" style="margin-bottom: 12px; gap: 10px;">
+                <div style="flex: 1;">
+                    <label style="display: block; font-size: 11px; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em;">Start Date</label>
+                    <input type="date" id="custom-date-start" class="editor-input" style="width: 100%;">
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; font-size: 11px; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em;">End Date</label>
+                    <input type="date" id="custom-date-end" class="editor-input" style="width: 100%;">
+                </div>
+            </div>
+            <div id="custom-date-msg" style="color: var(--err); font-size: 12px; margin-bottom: 10px; min-height: 18px;"></div>
+            <div class="row" style="justify-content: flex-end;">
+                <button class="primary" id="custom-date-apply">Apply Range</button>
             </div>
         </div>
     </div>

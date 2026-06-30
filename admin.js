@@ -1107,25 +1107,61 @@
   }
 
   let currentGameTab = 'wasd';
-  let intelRange = 1; // 1 = today; otherwise day window (7, 30, 365, or 0 = all time)
+  let intelRange = 1; // 1 = today; otherwise day window (7, 30, 365, or 0 = all time, 'custom' = custom dates)
+  let intelCustomRange = null; // { start: 'YYYY-MM-DD', end: 'YYYY-MM-DD' }
+  
   function intelSince() {
+    if (intelRange === 'custom' && intelCustomRange) {
+        return new Date(intelCustomRange.start + 'T00:00:00').toISOString();
+    }
     if (!intelRange) return null;                       // Total
     if (intelRange === 1) { const d = new Date(); d.setHours(0, 0, 0, 0); return d.toISOString(); } // local today
     return new Date(Date.now() - intelRange * 86400000).toISOString();
   }
+  
+  function intelUntil() {
+    if (intelRange === 'custom' && intelCustomRange) {
+        const d = new Date(intelCustomRange.end + 'T00:00:00');
+        d.setDate(d.getDate() + 1); // up to the end of the selected day
+        return d.toISOString();
+    }
+    return null;
+  }
+
   async function loadIntel(force) {
     if (intelLoaded && !force) return;
     msg($('intel-msg'), '', '');
-    const { data, error } = await db.rpc('intel_dashboard', { p_since: intelSince() });
+    const { data, error } = await db.rpc('intel_dashboard', { p_since: intelSince(), p_until: intelUntil() });
     if (error) { msg($('intel-msg'), error.message, 'err'); return; }
     intelLoaded = true;
     renderIntel(data || {});
+    
+    // Update dashboard title
+    const tEl = $('home-daily-views-title');
+    if (tEl) {
+        if (intelRange === 'custom' && intelCustomRange) {
+            tEl.textContent = 'PAGE VIEWS — CUSTOM';
+        } else {
+            const rangeLabel = intelRange === 0 ? 'ALL TIME' : (intelRange === 1 ? 'TODAY' : `LAST ${intelRange} DAYS`);
+            tEl.textContent = `Page Views — ${rangeLabel.toLowerCase()}`;
+        }
+    }
+    
     $('intel-updated').textContent = '// updated ' + new Date().toLocaleString();
   }
+
   $('intel-range')?.addEventListener('click', e => {
     const btn = e.target.closest('.intel-range-btn');
     if (!btn) return;
-    intelRange = parseInt(btn.dataset.range, 10) || 0;
+    
+    const r = btn.dataset.range;
+    if (r === 'custom') {
+        $('custom-date-modal').classList.remove('hidden');
+        $('custom-date-modal-bg').classList.remove('hidden');
+        return;
+    }
+    
+    intelRange = parseInt(r, 10) || 0;
     document.querySelectorAll('#intel-range .intel-range-btn').forEach(b => {
       const on = parseInt(b.dataset.range, 10) === intelRange;
       if (on) {
@@ -1337,22 +1373,21 @@
     return `<svg viewBox="0 0 ${W} ${H}" class="spark" preserveAspectRatio="none" style="width:100%;height:auto;max-height:300px;overflow:visible;margin-top:10px;">${bars}${ticks}</svg>`;
   }
 
-  async function loadVisitorsLog(intelRange = 7) {
-    let startIso = null;
-    if (intelRange === 1) {
-        const d = new Date(); d.setHours(0, 0, 0, 0);
-        startIso = d.toISOString();
-    } else if (intelRange > 0) {
-        startIso = new Date(Date.now() - intelRange * 86400000).toISOString();
-    } else {
-        startIso = new Date('2000-01-01').toISOString();
-    }
+  async function loadVisitorsLog() {
+    let startIso = intelSince();
+    let endIso = intelUntil();
+    if (!startIso) startIso = new Date('2000-01-01').toISOString();
     
-    const { data, error } = await db.from('events')
+    let query = db.from('events')
       .select('type, created_at, session_id, meta')
       .in('type', ['pageview', 'page_time'])
-      .gte('created_at', startIso)
-      .limit(10000);
+      .gte('created_at', startIso);
+      
+    if (endIso) {
+      query = query.lt('created_at', endIso);
+    }
+    
+    const { data, error } = await query.limit(10000);
       
     if (error || !data) return [];
     
@@ -1550,6 +1585,7 @@
             <button class="primary filter-btn" data-days="30">30 Days</button>
             <button class="ghost filter-btn" data-days="90">90 Days</button>
             <button class="ghost filter-btn" data-days="365">1 Year</button>
+            <button class="ghost filter-btn" data-days="custom">Custom</button>
           </div>
           <div id="daily-view-toggle">
             <button class="primary view-btn" data-view="table">Table</button>
@@ -1566,8 +1602,9 @@
         </div>
       `;
     } else if (kind === 'visitors') {
-      const rangeLabel = intelRange === 0 ? 'all time' : (intelRange === 1 ? 'today' : `last ${intelRange} days`);
-      title = `Recent Visitors — session logs (${rangeLabel})`;
+      let rangeLabel = intelRange === 0 ? 'all time' : (intelRange === 1 ? 'today' : `last ${intelRange} days`);
+      if (intelRange === 'custom') rangeLabel = `${intelCustomRange.start} to ${intelCustomRange.end}`;
+      title = `Recent Visitors - session logs (${rangeLabel})`;
       $('intel-modal-body').innerHTML = '<div class="bl-empty">// loading visitor data…</div>';
       $('intel-modal-title').textContent = title;
       $('intel-modal-bg').classList.remove('hidden');
@@ -1642,17 +1679,26 @@
       let currentView = 'table';
       
       if (filters) {
-        filters.addEventListener('click', async e => {
+        $('daily-filters')?.addEventListener('click', async (e) => {
           if (!e.target.classList.contains('filter-btn')) return;
-          currentDays = parseInt(e.target.dataset.days);
-          filters.querySelectorAll('.filter-btn').forEach(b => {
-            b.classList.toggle('primary', parseInt(b.dataset.days) === currentDays);
-            b.classList.toggle('ghost', parseInt(b.dataset.days) !== currentDays);
+          const r = e.target.dataset.days;
+          
+          if (r === 'custom') {
+              $('custom-date-modal').classList.remove('hidden');
+              $('custom-date-modal-bg').classList.remove('hidden');
+              return;
+          }
+          
+          let currentDays = parseInt(r, 10);
+          
+          document.querySelectorAll('#daily-filters .filter-btn').forEach(b => {
+            b.classList.toggle('primary', b.dataset.days === r);
+            b.classList.toggle('ghost', b.dataset.days !== r);
           });
           if (currentDays === 1) {
             // Today: hourly breakdown (fetched live from the events table)
-            $('daily-table-container').innerHTML = '<div class="bl-empty">// loading hourly…</div>';
-            $('daily-chart-container').innerHTML = '<div class="bl-empty">// loading hourly…</div>';
+            $('daily-table-container').innerHTML = '<div class="bl-empty">// loading hourly.</div>';
+            $('daily-chart-container').innerHTML = '<div class="bl-empty">// loading hourly.</div>';
             const buckets = await loadTodayHourly();
             $('daily-table-container').innerHTML = renderHourlyTable(buckets);
             $('daily-chart-container').innerHTML = renderHourlyChart(buckets);
@@ -1687,6 +1733,54 @@
   });
   $('intel-modal-close')?.addEventListener('click', closeIntelModal);
   $('intel-modal-bg')?.addEventListener('click', e => { if (e.target === $('intel-modal-bg')) closeIntelModal(); });
+  
+  $('custom-date-close')?.addEventListener('click', () => {
+    $('custom-date-modal').classList.add('hidden');
+    $('custom-date-modal-bg').classList.add('hidden');
+  });
+
+  $('custom-date-apply')?.addEventListener('click', () => {
+    const start = $('custom-date-start').value;
+    const end = $('custom-date-end').value;
+    const msgEl = $('custom-date-msg');
+    
+    if (!start || !end) {
+        msgEl.textContent = 'Please select both dates.';
+        return;
+    }
+    if (new Date(start) > new Date(end)) {
+        msgEl.textContent = 'Start date cannot be after end date.';
+        return;
+    }
+    
+    msgEl.textContent = '';
+    intelCustomRange = { start, end };
+    intelRange = 'custom';
+    
+    $('custom-date-modal').classList.add('hidden');
+    $('custom-date-modal-bg').classList.add('hidden');
+    
+    // Update main buttons
+    document.querySelectorAll('#intel-range .intel-range-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.range === 'custom');
+        b.classList.toggle('ghost', b.dataset.range !== 'custom');
+    });
+    
+    // Update modal buttons if open
+    document.querySelectorAll('#daily-filters .filter-btn').forEach(b => {
+        b.classList.toggle('primary', b.dataset.days === 'custom');
+        b.classList.toggle('ghost', b.dataset.days !== 'custom');
+    });
+    
+    loadIntel(true);
+    
+    if (!$('intel-modal').classList.contains('hidden')) {
+        const titleText = $('intel-modal-title').textContent.toLowerCase();
+        if (titleText.includes('visitors')) openIntelDetail('visitors');
+        else if (titleText.includes('daily')) openIntelDetail('daily');
+    }
+  });
+
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && !$('intel-modal-bg').classList.contains('hidden')) closeIntelModal();
   });
