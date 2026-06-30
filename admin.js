@@ -1273,9 +1273,25 @@
     const byDay = {};
     rows.forEach(r => { byDay[r.day] = r.views; });
     const days = [];
-    for (let i = 6; i >= 0; i--) {
-      const dt = new Date(); dt.setDate(dt.getDate() - i);
-      const key = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+    
+    let daysCount = 7;
+    let endDt = new Date();
+    
+    if (intelRange === 'custom' && intelCustomRange) {
+        endDt = new Date(intelCustomRange.end + 'T00:00:00');
+        const startDt = new Date(intelCustomRange.start + 'T00:00:00');
+        daysCount = Math.round((endDt - startDt) / 86400000) + 1;
+    } else if (intelRange > 0 && intelRange !== 1) {
+        daysCount = intelRange;
+    } else if (intelRange === 0) {
+        daysCount = 365;
+    }
+
+    for (let i = daysCount - 1; i >= 0; i--) {
+      const dt = new Date(endDt); dt.setDate(dt.getDate() - i);
+      const mm = String(dt.getMonth() + 1).padStart(2, '0');
+      const dd = String(dt.getDate()).padStart(2, '0');
+      const key = `${dt.getFullYear()}-${mm}-${dd}`;
       days.push([key, byDay[key] || 0]);
     }
     const total = days.reduce((s, d) => s + d[1], 0);
@@ -1290,10 +1306,12 @@
                `<text x="${(x + w/2).toFixed(1)}" y="${(H - 22).toFixed(1)}" fill="currentColor" text-anchor="middle" font-size="10" font-family="'Share Tech Mono', monospace" opacity="0.6">0</text>`;
       }
       const h = Math.max(2, Math.round(d[1] / max * (H - 24)));
-      const barColor = '#ff4500'; // Assuming var(--accent) is orangeish, using pure orange here or currentColor if needed.
-      const textNode = h > 14 
-          ? `<text x="${(x + w/2).toFixed(1)}" y="${(H - 16 - h + 11).toFixed(1)}" fill="#fff" text-anchor="middle" font-size="10" font-family="'Share Tech Mono', monospace" font-weight="bold">${d[1]}</text>`
-          : `<text x="${(x + w/2).toFixed(1)}" y="${(H - 16 - h - 4).toFixed(1)}" fill="currentColor" text-anchor="middle" font-size="10" font-family="'Share Tech Mono', monospace" font-weight="bold">${d[1]}</text>`;
+      let textNode = '';
+      if (days.length <= 31) {
+          textNode = h > 14 
+              ? `<text x="${(x + w/2).toFixed(1)}" y="${(H - 16 - h + 11).toFixed(1)}" fill="#fff" text-anchor="middle" font-size="10" font-family="'Share Tech Mono', monospace" font-weight="bold">${d[1]}</text>`
+              : `<text x="${(x + w/2).toFixed(1)}" y="${(H - 16 - h - 4).toFixed(1)}" fill="currentColor" text-anchor="middle" font-size="10" font-family="'Share Tech Mono', monospace" font-weight="bold">${d[1]}</text>`;
+      }
       return `<rect x="${x.toFixed(1)}" y="${(H - 16 - h).toFixed(1)}" width="${w}" height="${h}"><title>${d[0]}: ${d[1]} views</title></rect>${textNode}`;
     }).join('');
     const first = days[0][0].slice(5), last = days[days.length - 1][0].slice(5);
@@ -1509,8 +1527,16 @@
         (d.daily || []).forEach(r => { byDay[r.day] = r; });
         const rows = [];
         let tTimeSec = 0;
+        
+        let endDt = new Date();
+        if (daysCount === 'custom' && intelCustomRange) {
+            endDt = new Date(intelCustomRange.end + 'T00:00:00');
+            const startDt = new Date(intelCustomRange.start + 'T00:00:00');
+            daysCount = Math.round((endDt - startDt) / 86400000) + 1;
+        }
+
         for (let i = 0; i < daysCount; i++) {            // newest day first
-          const dt = new Date(); dt.setDate(dt.getDate() - i);
+          const dt = new Date(endDt); dt.setDate(dt.getDate() - i);
           
           const mm = String(dt.getMonth() + 1).padStart(2, '0');
           const dd = String(dt.getDate()).padStart(2, '0');
@@ -1540,9 +1566,19 @@
         const byDay = {};
         (d.daily || []).forEach(r => { byDay[r.day] = r; });
         const days = [];
+        
+        let endDt = new Date();
+        if (daysCount === 'custom' && intelCustomRange) {
+            endDt = new Date(intelCustomRange.end + 'T00:00:00');
+            const startDt = new Date(intelCustomRange.start + 'T00:00:00');
+            daysCount = Math.round((endDt - startDt) / 86400000) + 1;
+        }
+        
         for (let i = daysCount - 1; i >= 0; i--) { // chronological
-          const dt = new Date(); dt.setDate(dt.getDate() - i);
-          const key = dt.toISOString().slice(0, 10);
+          const dt = new Date(endDt); dt.setDate(dt.getDate() - i);
+          const mm = String(dt.getMonth() + 1).padStart(2, '0');
+          const dd = String(dt.getDate()).padStart(2, '0');
+          const key = `${dt.getFullYear()}-${mm}-${dd}`;
           days.push([key, byDay[key] ? byDay[key].views : 0]);
         }
         
@@ -1675,7 +1711,7 @@
     if (kind === 'daily') {
       const filters = $('daily-filters');
       const viewToggle = $('daily-view-toggle');
-      let currentDays = 30;
+      let currentDays = intelRange === 'custom' ? 'custom' : (intelRange || 30);
       let currentView = 'table';
       
       if (filters) {
@@ -1689,7 +1725,7 @@
               return;
           }
           
-          let currentDays = parseInt(r, 10);
+          let currentDays = r === 'custom' ? 'custom' : parseInt(r, 10);
           
           document.querySelectorAll('#daily-filters .filter-btn').forEach(b => {
             b.classList.toggle('primary', b.dataset.days === r);
@@ -1777,7 +1813,7 @@
     if (!$('intel-modal').classList.contains('hidden')) {
         const titleText = $('intel-modal-title').textContent.toLowerCase();
         if (titleText.includes('visitors')) openIntelDetail('visitors');
-        else if (titleText.includes('daily')) openIntelDetail('daily');
+        else if (titleText.includes('page views')) openIntelDetail('daily');
     }
   });
 
