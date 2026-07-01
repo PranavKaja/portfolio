@@ -1,7 +1,7 @@
 [
   { "category": "DATA ENGINEERING", "items": ["SQL", "ETL/ELT", "Python", "Spark & Hadoop", "Data Warehousing"], "sort_order": 10, "published": true },
   { "category": "ANALYTICS & BI", "items": ["Power BI", "Tableau", "Power Query", "KPI Design", "Financial Modeling"], "sort_order": 20, "published": true },
-  { "category": "MACHINE LEARNING", "items": ["XGBoost", "Random Forest", "Logistic Regression", "SHAP", "SMOTE"], "sort_order": 30, "published": true },
+  { "category": "MACHINE LEARNING", "items": ["XGBoost", "Random Forest", "Logistic Regression", "SMOTE"], "sort_order": 30, "published": true },
   { "category": "PROGRAMMING", "items": ["Python", "SQL", "R", "VBA", "REST APIs", "LLM Integration"], "sort_order": 40, "published": true },
   { "category": "STRATEGY & OPS", "items": ["Demand Forecasting", "Supply Chain Optimization", "Capacity Planning"], "sort_order": 50, "published": true }
 ]

@@ -179,7 +179,7 @@ window.PRANAV = {
   skills: [
     { category: "Data Engineering", items: ["SQL", "ETL/ELT", "Python", "Spark & Hadoop", "Data Warehousing"] },
     { category: "Analytics & BI", items: ["Power BI", "Tableau", "Power Query", "KPI Design", "Financial Modeling"] },
-    { category: "Machine Learning", items: ["XGBoost", "Random Forest", "Logistic Regression", "SHAP", "SMOTE"] },
+    { category: "Machine Learning", items: ["XGBoost", "Random Forest", "Logistic Regression", "SMOTE"] },
     { category: "Programming", items: ["Python", "SQL", "R", "VBA", "REST APIs", "LLM Integration"] },
     { category: "Strategy & Ops", items: ["Demand Forecasting", "Supply Chain Optimization", "Capacity Planning"] },
   ],

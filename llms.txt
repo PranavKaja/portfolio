@@ -26,7 +26,7 @@ only look good on a slide.
 ## Skills
 - Data Engineering: SQL, ETL/ELT, Python, Spark & Hadoop, Data Warehousing
 - Analytics & BI: Power BI, Tableau, Power Query, KPI Design, Financial Modeling
-- Machine Learning: XGBoost, Random Forest, Logistic Regression, SHAP, SMOTE
+- Machine Learning: XGBoost, Random Forest, Logistic Regression, SMOTE
 - Programming: Python, SQL, R, VBA, REST APIs, LLM Integration
 
 ## Links
