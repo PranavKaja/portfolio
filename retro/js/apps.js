@@ -138,7 +138,7 @@
         <div class="row" style="padding:6px 8px; background:var(--silver); gap:8px">
           <a class="btn95" href="${esc(D.identity.resume)}" target="_blank" rel="noopener" style="text-decoration:none">Open in new tab ↗</a>
           <a class="btn95" href="${esc(D.identity.resume)}" download style="text-decoration:none">Download</a>
-          <span class="muted" style="margin-left:auto">Resume_Base.pdf</span>
+          <span class="muted" style="margin-left:auto">Resume_PranavKaja.pdf</span>
         </div>
         <iframe src="${esc(D.identity.resume)}" style="flex:1; border:0; background:#fff" title="Resume"></iframe>
       </div>`;

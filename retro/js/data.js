@@ -14,7 +14,7 @@ window.PRANAV = {
     linkedin: "https://linkedin.com/in/pranavkaja",
     github: "https://github.com/PranavKaja",
     portfolio: "https://pranavkaja.vercel.app",
-    resume: "assets/Resume_Base.pdf",
+    resume: "assets/Resume_PranavKaja.pdf",
   },
 
   about: {
@@ -55,7 +55,7 @@ window.PRANAV = {
   // Projects: ordered for display. Full data carried from projects.json.
   projects: [
     {
-      code: "MSN-01", title: "Fraud Triage", stack: "XGBoost / Google Gemini / Python",
+      code: "MSN-02", title: "Fraud Triage", stack: "XGBoost / Google Gemini / Python",
       status: "in_progress",
       hook: "A two-stage pipeline that catches what the model misses.",
       brief: "Built on 284,807 real card transactions. XGBoost scores every transaction at scale; a reasoning layer reviews only the high-risk flags and writes a structured, analyst-ready verdict. Weighted loss took AUC from 0.60 to 0.978, and in testing the second layer caught a fraud the model had scored a perfect 0.000000.",
@@ -67,7 +67,7 @@ window.PRANAV = {
       github: "https://github.com/PranavKaja/fraud-triage",
     },
     {
-      code: "MSN-02", title: "Corporate Analytics", stack: "Power BI / DAX / SQL",
+      code: "MSN-03", title: "Corporate Analytics", stack: "Power BI / DAX / SQL",
       status: "deployed",
       hook: "30% faster executive reviews via custom dashboards.",
       brief: "Executive Power BI dashboards built on live B2B data streams for TapInnovations, replacing a legacy spreadsheet workflow. Custom DAX measures gave leadership direct visibility into cross-functional throughput, and weekly performance reviews accelerated by 30%.",
@@ -79,7 +79,7 @@ window.PRANAV = {
       github: null,
     },
     {
-      code: "MSN-03", title: "Heart Disease Predictors", stack: "Python / Scikit-learn / Flask",
+      code: "MSN-10", title: "Heart Disease Predictors", stack: "Python / Scikit-learn / Flask",
       status: "archived",
       hook: "~82% accuracy, deployed as a Flask app.",
       brief: "End-to-end capstone comparing five classifiers on the 13-feature clinical heart dataset. Random Forest was the strongest at ~82% accuracy; a top-3 majority-vote ensemble landed just behind, served through a Flask web app that scores risk from a 13-field form.",
@@ -163,7 +163,7 @@ window.PRANAV = {
       github: "https://www.isenberg.umass.edu/news/2026-strategy-summit",
     },
     {
-      code: "MSN-10", title: "CPK Production Planner", stack: "Vanilla JS / In-Browser",
+      code: "MSN-01", title: "CPK Production Planner", stack: "Vanilla JS / In-Browser",
       status: "deployed",
       hook: "Paste the day's order report, get every production sheet.",
       brief: "A live tool that replaces a hand-built 39-tab spreadsheet for a commissary kitchen. Paste the daily order recap and it builds the DC and retail make lists, plus bread, prep, fruit, packout and stickers, across 36 campus locations. It runs entirely in the browser, nothing is sent anywhere.",
