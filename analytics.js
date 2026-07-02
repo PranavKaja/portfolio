@@ -65,7 +65,7 @@
 
   // resume downloads + project-card opens (delegated, survives dynamic cards)
   document.addEventListener('click', function (e) {
-    var resume = e.target.closest && e.target.closest('a[href*="Resume_Base.pdf"]');
+    var resume = e.target.closest && e.target.closest('a[href*="Resume"]');
     if (resume) { track('resume_download'); return; }
 
     var card = e.target.closest && e.target.closest('.project-panel[data-msn]');
