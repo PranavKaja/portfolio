@@ -1,7 +1,7 @@
 # Retro Portfolio (PranavOS 95)
 
 The portfolio rebuilt as a **Windows 95 desktop**, served at
-**pranavkaja.vercel.app/retro** and reached from the "PRANAV KAJA" logo on the
+**pranavkaja.com/retro** and reached from the "PRANAV KAJA" logo on the
 main site (desktop only). This folder is part of the main `portfolio` repo and
 deploys with it, no separate repo or build step.
 

@@ -19,7 +19,7 @@ end $$;
 
 create table if not exists public.projects (
   id          uuid primary key default gen_random_uuid(),
-  code        text not null unique,                 -- e.g. 'MSN-01'
+  code        text not null unique,                 -- e.g. 'MSN-02'
   title       text not null,
   tech        text not null default '',             -- short stack line on the card
   summary     text not null default '',             -- one-liner on the card ("desc")
@@ -107,7 +107,7 @@ create policy "admin deletes"
 insert into public.projects
   (code, title, tech, summary, stack, hook, brief, role, method, outcome, chips, status, sort_order, published)
 values
-  ('MSN-01', 'Fraud Triage', 'XGBoost / Gemini',
+  ('MSN-02', 'Fraud Triage', 'XGBoost / Gemini',
    '0.978 AUC; caught fraud the base model missed.',
    'XGBoost / Google Gemini / Python',
    'A two-stage pipeline that catches what the model misses.',
@@ -118,7 +118,7 @@ values
    array['0.978 AUC','84% Recall','84% Precision','284K Records','~2s Latency'],
    'deployed', 10, true),
 
-  ('MSN-02', 'Corporate Analytics', 'Power BI / SQL',
+  ('MSN-03', 'Corporate Analytics', 'Power BI / SQL',
    '30% faster executive reviews via custom dashboards.',
    'Power BI / DAX / SQL',
    '30% faster executive reviews via custom dashboards.',
@@ -129,7 +129,7 @@ values
    array['30% Faster Reviews','Live B2B Streams','Custom DAX','Exec-Ready'],
    'deployed', 20, true),
 
-  ('MSN-03', 'Heart Disease Prediction', 'Python / Scikit-learn',
+  ('MSN-10', 'Heart Disease Prediction', 'Python / Scikit-learn',
    '92% accuracy on 70K+ records; full-stack web app.',
    'Python / Scikit-learn / SHAP / Flask',
    '92% accuracy, deployed as a full-stack interface.',
@@ -292,7 +292,7 @@ create table if not exists public.events (
   path        text not null default '',
   source      text not null default 'Direct', -- normalized traffic source (Google, LinkedIn, Direct, ...)
   session_id  text not null default '',       -- anonymous, generated in the browser
-  meta        jsonb not null default '{}',    -- e.g. {"code":"MSN-01"} or {"score":12}
+  meta        jsonb not null default '{}',    -- e.g. {"code":"MSN-02"} or {"score":12}
   created_at  timestamptz not null default now()
 );
 create index if not exists events_type_idx on public.events (type);

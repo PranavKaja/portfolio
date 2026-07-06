@@ -13,7 +13,7 @@ window.PRANAV = {
     email: "balajipranavreddyk@gmail.com",
     linkedin: "https://linkedin.com/in/pranavkaja",
     github: "https://github.com/PranavKaja",
-    portfolio: "https://pranavkaja.vercel.app",
+    portfolio: "https://pranavkaja.com",
     resume: "assets/Resume_PranavKaja.pdf",
   },
 
@@ -172,7 +172,7 @@ window.PRANAV = {
       outcome: "A 39-tab manual spreadsheet replaced by an instant, in-browser planner",
       chips: ["Live Tool", "36 Locations", "In-Browser", "Zero Backend"],
       skills: ["JavaScript"],
-      github: "https://pranavkaja.vercel.app/projects/cpk-production",
+      github: "https://pranavkaja.com/projects/cpk-production",
     },
   ],
 
@@ -209,8 +209,8 @@ window.PRANAV = {
   ],
 
   blog: [
-    { title: "How This Site Works", url: "https://pranavkaja.vercel.app/blog/how-this-site-works" },
-    { title: "Two-Stage Fraud Detection", url: "https://pranavkaja.vercel.app/blog/two-stage-fraud-detection" },
-    { title: "Automating an ETL Pipeline", url: "https://pranavkaja.vercel.app/blog/automating-etl-pipeline" },
+    { title: "How This Site Works", url: "https://pranavkaja.com/blog/how-this-site-works" },
+    { title: "Two-Stage Fraud Detection", url: "https://pranavkaja.com/blog/two-stage-fraud-detection" },
+    { title: "Automating an ETL Pipeline", url: "https://pranavkaja.com/blog/automating-etl-pipeline" },
   ],
 };

@@ -11,10 +11,10 @@ and an audit trail — favoring models that ship and get monitored over ones tha
 only look good on a slide.
 
 ## Pages
-- [Home](https://pranavkaja.vercel.app/): Overview, experience, projects, and skills
-- [Why Pranav](https://pranavkaja.vercel.app/why-pranav): The short case for working with Pranav
-- [Contact](https://pranavkaja.vercel.app/contact): Email, LinkedIn, and a contact form
-- [Interests](https://pranavkaja.vercel.app/interests): Interests beyond work
+- [Home](https://pranavkaja.com/): Overview, experience, projects, and skills
+- [Why Pranav](https://pranavkaja.com/why-pranav): The short case for working with Pranav
+- [Contact](https://pranavkaja.com/contact): Email, LinkedIn, and a contact form
+- [Interests](https://pranavkaja.com/interests): Interests beyond work
 
 ## Experience
 - Student Supervisor, UMass Amherst Dining (Sep 2024 - May 2026): automated a

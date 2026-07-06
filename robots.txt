@@ -15,4 +15,4 @@ Allow: /
 User-agent: Google-Extended
 Allow: /
 
-Sitemap: https://pranavkaja.vercel.app/sitemap.xml
+Sitemap: https://pranavkaja.com/sitemap.xml

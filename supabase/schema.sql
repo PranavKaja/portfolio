@@ -13,7 +13,7 @@ end $$;
 
 create table if not exists public.projects (
   id          uuid primary key default gen_random_uuid(),
-  code        text not null unique,                 -- e.g. 'MSN-01'
+  code        text not null unique,                 -- e.g. 'MSN-02'
   title       text not null,
   tech        text not null default '',             -- short stack line on the card
   summary     text not null default '',             -- one-liner on the card ("desc")

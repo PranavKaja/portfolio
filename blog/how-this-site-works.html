@@ -6,19 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>How This Site Works: A Tour Under the Hood | Pranav Kaja</title>
     <meta name="description"
-        content="A guided, interactive tour of how pranavkaja.vercel.app is actually built - a static front end on Vercel talking straight to a Supabase Postgres database, the security model that makes that safe, the signature project reveal, and the admin console behind it.">
+        content="A guided, interactive tour of how pranavkaja.com is actually built - a static front end on Vercel talking straight to a Supabase Postgres database, the security model that makes that safe, the signature project reveal, and the admin console behind it.">
     <meta name="author" content="Pranav Kaja">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <meta property="og:title" content="How This Site Works: A Tour Under the Hood">
     <meta property="og:description" content="No backend server, yet a real database. How a static site talks straight to Postgres - safely - plus the admin console and the tricks worth knowing.">
-    <meta property="og:image" content="https://pranavkaja.vercel.app/images/og-card.png">
+    <meta property="og:image" content="https://pranavkaja.com/images/og-card.png">
     <meta property="og:type" content="article">
-    <meta property="og:url" content="https://pranavkaja.vercel.app/blog/how-this-site-works">
+    <meta property="og:url" content="https://pranavkaja.com/blog/how-this-site-works">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="How This Site Works: A Tour Under the Hood">
     <meta name="twitter:description" content="A static front end talking straight to Postgres - safely. The architecture, the database, the admin console, and the tricks.">
-    <meta name="twitter:image" content="https://pranavkaja.vercel.app/images/og-card.png">
-    <link rel="canonical" href="https://pranavkaja.vercel.app/blog/how-this-site-works">
+    <meta name="twitter:image" content="https://pranavkaja.com/images/og-card.png">
+    <link rel="canonical" href="https://pranavkaja.com/blog/how-this-site-works">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="stylesheet" href="/style.css">
@@ -33,18 +33,18 @@
       "@graph": [
         { "@type": "BlogPosting",
           "headline": "How This Site Works: A Tour Under the Hood",
-          "description": "An interactive walkthrough of how pranavkaja.vercel.app is built: a static front end on Vercel that talks straight to a Supabase Postgres database, the Row Level Security model that makes shipping the key safe, the three data flows, the signature 3-tier project reveal, and the admin console.",
-          "author": { "@type": "Person", "name": "Pranav Kaja", "url": "https://pranavkaja.vercel.app/" },
+          "description": "An interactive walkthrough of how pranavkaja.com is built: a static front end on Vercel that talks straight to a Supabase Postgres database, the Row Level Security model that makes shipping the key safe, the three data flows, the signature 3-tier project reveal, and the admin console.",
+          "author": { "@type": "Person", "name": "Pranav Kaja", "url": "https://pranavkaja.com/" },
           "publisher": { "@type": "Person", "name": "Pranav Kaja" },
           "datePublished": "2026-06-20", "dateModified": "2026-06-20",
-          "url": "https://pranavkaja.vercel.app/blog/how-this-site-works",
-          "image": "https://pranavkaja.vercel.app/images/og-card.png",
+          "url": "https://pranavkaja.com/blog/how-this-site-works",
+          "image": "https://pranavkaja.com/images/og-card.png",
           "keywords": "web architecture, static site, Supabase, Postgres, Row Level Security, RLS, PostgREST, serverless, Vercel, portfolio engineering, Pranav Kaja",
-          "mainEntityOfPage": "https://pranavkaja.vercel.app/blog/how-this-site-works", "inLanguage": "en" },
+          "mainEntityOfPage": "https://pranavkaja.com/blog/how-this-site-works", "inLanguage": "en" },
         { "@type": "BreadcrumbList", "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://pranavkaja.vercel.app/" },
-          { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://pranavkaja.vercel.app/blog" },
-          { "@type": "ListItem", "position": 3, "name": "How This Site Works", "item": "https://pranavkaja.vercel.app/blog/how-this-site-works" } ] }
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://pranavkaja.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://pranavkaja.com/blog" },
+          { "@type": "ListItem", "position": 3, "name": "How This Site Works", "item": "https://pranavkaja.com/blog/how-this-site-works" } ] }
       ]
     }
     </script>
@@ -556,7 +556,7 @@
                         <h4>projects <span class="rows">10 rows</span></h4>
                         <div class="role">The cards on the homepage. Public can read the published ones; admin has full control.</div>
                         <ul>
-                            <li>code <span>· MSN-01</span></li>
+                            <li>code <span>· MSN-02</span></li>
                             <li>title · summary</li>
                             <li>role · method · outcome</li>
                             <li>chips <span>· metric pills</span></li>
@@ -694,7 +694,7 @@ select intel_dashboard();
                         <!-- TIER 1: card -->
                         <text class="tnum" x="20" y="22">TIER 1 - ALWAYS VISIBLE</text>
                         <rect class="scr" x="20" y="34" width="250" height="150"/>
-                        <text class="code" x="38" y="62">MSN-01</text>
+                        <text class="code" x="38" y="62">MSN-02</text>
                         <text class="ttl" x="38" y="88">Fraud Triage</text>
                         <text class="mono" x="38" y="108">XGBoost / Gemini</text>
                         <text class="body" x="38" y="134">0.978 AUC; caught fraud the</text>
@@ -705,7 +705,7 @@ select intel_dashboard();
                         <text class="tnum" x="345" y="22">TIER 2 - ON HOVER</text>
                         <rect class="frame" x="356" y="44" width="240" height="150" rx="8"/>
                         <rect class="scr" x="348" y="34" width="240" height="150"/>
-                        <text class="code" x="366" y="60">MSN-01</text>
+                        <text class="code" x="366" y="60">MSN-02</text>
                         <text class="ttl" x="366" y="84">Fraud Triage</text>
                         <text class="body" x="366" y="104">A two-stage pipeline that</text>
                         <text class="body" x="366" y="118">catches what the model misses.</text>
@@ -718,7 +718,7 @@ select intel_dashboard();
                         <rect class="frame" x="680" y="44" width="240" height="270" rx="8"/>
                         <rect class="scr" x="672" y="34" width="240" height="280"/>
                         <text class="mono" x="690" y="54">← ALL MISSIONS</text>
-                        <text class="code" x="690" y="76">MSN-01</text>
+                        <text class="code" x="690" y="76">MSN-02</text>
                         <text class="ttl" x="690" y="98" font-size="11">Fraud Triage</text>
                         <text class="body" x="690" y="116" font-size="8.5">A pipeline that catches what the</text>
                         <text class="body" x="690" y="128" font-size="8.5">model misses.</text>
@@ -811,13 +811,13 @@ select intel_dashboard();
                         <text class="h" x="510" y="80" font-size="11">Projects</text>
                         <text class="s" x="700" y="80" font-size="8" fill="#0d9488">+ new</text>
                         <line class="row" x1="510" y1="92" x2="900" y2="92"/>
-                        <text class="s" x="512" y="108" font-size="9">MSN-01 · Fraud Triage</text>
+                        <text class="s" x="512" y="108" font-size="9">MSN-02 · Fraud Triage</text>
                         <text class="tab" x="828" y="108" fill="#0d9488">edit</text>
                         <line class="row" x1="510" y1="118" x2="900" y2="118"/>
-                        <text class="s" x="512" y="134" font-size="9">MSN-02 · Corporate Analytics</text>
+                        <text class="s" x="512" y="134" font-size="9">MSN-03 · Corporate Analytics</text>
                         <text class="tab" x="828" y="134" fill="#0d9488">edit</text>
                         <line class="row" x1="510" y1="144" x2="900" y2="144"/>
-                        <text class="s" x="512" y="160" font-size="9">MSN-03 · Heart Disease Prediction</text>
+                        <text class="s" x="512" y="160" font-size="9">MSN-10 · Heart Disease Prediction</text>
                         <text class="tab" x="828" y="160" fill="#0d9488">edit</text>
                         <line class="row" x1="510" y1="170" x2="900" y2="170"/>
                         <!-- mini chart -->

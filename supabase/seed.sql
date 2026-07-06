@@ -6,7 +6,7 @@
 insert into public.projects
   (code, title, tech, summary, stack, hook, brief, role, method, outcome, chips, status, sort_order, published)
 values
-  ('MSN-01', 'Fraud Triage', 'XGBoost / Gemini',
+  ('MSN-02', 'Fraud Triage', 'XGBoost / Gemini',
    '0.978 AUC; caught fraud the base model missed.',
    'XGBoost / Google Gemini / Python',
    'A two-stage pipeline that catches what the model misses.',
@@ -17,7 +17,7 @@ values
    array['0.978 AUC','84% Recall','84% Precision','284K Records','~2s Latency'],
    'deployed', 10, true),
 
-  ('MSN-02', 'Corporate Analytics', 'Power BI / SQL',
+  ('MSN-03', 'Corporate Analytics', 'Power BI / SQL',
    '30% faster executive reviews via custom dashboards.',
    'Power BI / DAX / SQL',
    '30% faster executive reviews via custom dashboards.',
@@ -28,7 +28,7 @@ values
    array['30% Faster Reviews','Live B2B Streams','Custom DAX','Exec-Ready'],
    'deployed', 20, true),
 
-  ('MSN-03', 'Heart Disease Prediction', 'Python / Scikit-learn',
+  ('MSN-10', 'Heart Disease Prediction', 'Python / Scikit-learn',
    '92% accuracy on 70K+ records; full-stack web app.',
    'Python / Scikit-learn / SHAP / Flask',
    '92% accuracy, deployed as a full-stack interface.',

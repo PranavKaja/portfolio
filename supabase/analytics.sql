@@ -11,7 +11,7 @@ create table if not exists public.events (
   path        text not null default '',
   source      text not null default 'Direct', -- normalized traffic source (Google, LinkedIn, Direct, ...)
   session_id  text not null default '',       -- anonymous, generated in the browser
-  meta        jsonb not null default '{}',    -- e.g. {"code":"MSN-01"} or {"score":12}
+  meta        jsonb not null default '{}',    -- e.g. {"code":"MSN-02"} or {"score":12}
   created_at  timestamptz not null default now()
 );
 create index if not exists events_type_idx on public.events (type);
