@@ -133,18 +133,49 @@
 
   /* ---- Resume viewer --------------------------------------------------- */
   function resume() {
+    const resumeUrl = esc(D.identity.resume);
     const body = `
       <div style="height:100%; display:flex; flex-direction:column">
         <div class="row" style="padding:6px 8px; background:var(--silver); gap:8px">
-          <a class="btn95" href="${esc(D.identity.resume)}" target="_blank" rel="noopener" style="text-decoration:none">Open in new tab ↗</a>
-          <a class="btn95" href="${esc(D.identity.resume)}" download style="text-decoration:none">Download</a>
+          <a class="btn95" href="${resumeUrl}" target="_blank" rel="noopener" style="text-decoration:none">Open in new tab ↗</a>
+          <a class="btn95" href="${resumeUrl}" download style="text-decoration:none">Download</a>
           <span class="muted" style="margin-left:auto">Resume_PranavKaja.pdf</span>
         </div>
-        <iframe src="${esc(D.identity.resume)}" style="flex:1; border:0; background:#fff" title="Resume"></iframe>
+        <div id="resume-frame-container" style="flex:1; display:flex; flex-direction:column; background:#fff">
+          <div style="flex:1; display:flex; align-items:center; justify-content:center; flex-direction:column; color:var(--text); background:var(--silver)">
+            <p>Loading document...</p>
+          </div>
+        </div>
       </div>`;
     return { id: "resume", title: "Resume — Document Viewer", icon: "📃", width: 620, height: 540,
       body, bodyClass: "",
-      status: `<div class="cell grow">Pranav Kaja — Resume</div><div class="cell">PDF</div>` };
+      status: `<div class="cell grow">Pranav Kaja — Resume</div><div class="cell">PDF</div>`,
+      onMount: (el) => {
+        const container = el.querySelector("#resume-frame-container");
+        fetch(resumeUrl, { method: 'HEAD' })
+          .then(r => {
+            if (r.ok) {
+              container.innerHTML = `<iframe src="${resumeUrl}" style="flex:1; border:0; background:#fff" title="Resume"></iframe>`;
+            } else {
+              container.innerHTML = `
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; text-align:center; background:var(--silver);">
+                  <div style="font-size:32px; margin-bottom:12px">⚠️</div>
+                  <h3 style="margin:0 0 8px 0;">Document Not Found</h3>
+                  <p style="margin:0; color:#444;">The server returned a ${r.status} error.</p>
+                  <p style="margin:4px 0 0 0; color:#444; font-size:12px">If the site is currently deploying, this will resolve shortly.</p>
+                </div>`;
+            }
+          })
+          .catch(() => {
+            container.innerHTML = `
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; text-align:center; background:var(--silver);">
+                <div style="font-size:32px; margin-bottom:12px">❌</div>
+                <h3 style="margin:0 0 8px 0;">Connection Error</h3>
+                <p style="margin:0; color:#444;">Could not connect to the server to load the document.</p>
+              </div>`;
+          });
+      }
+    };
   }
 
   /* ---- Interests (My Pictures) ---------------------------------------- */
