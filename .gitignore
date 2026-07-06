@@ -7,3 +7,6 @@ test2.html
 projects/*.xlsx
 projects/*.xlsm
 projects/cpktest.txt
+
+# scratch: v2/v3 previews, other local-only WIP
+/_local/
