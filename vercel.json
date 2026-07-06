@@ -3,9 +3,9 @@
   "trailingSlash": false,
   "redirects": [
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "has": [{ "type": "host", "value": "pranavkaja.vercel.app" }],
-      "destination": "https://pranavkaja.com/:path*",
+      "destination": "https://pranavkaja.com/$1",
       "permanent": true
     }
   ],
