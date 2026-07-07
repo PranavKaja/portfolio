@@ -8,8 +8,6 @@ Three environments. Never edit prod directly.
 | Test  | https://test.pranavkaja.com  | `test`  | Vercel auto-deploys on push to `test`     |
 | Prod  | https://pranavkaja.com       | `main`  | Vercel auto-deploys on push to `main`     |
 
-Non-prod pages show a small orange **TEST / PREVIEW / LOCAL** badge in the top-right corner. If you see it on `pranavkaja.com`, something is misconfigured.
-
 ## Making a change
 
 ```sh
