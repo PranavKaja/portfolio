@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pranav Kaja | The 60-Second Brief</title>
+    <meta name="description"
+        content="Who Pranav Kaja is, what he has shipped, and the fastest way to reach him. The 60-second version of the full site.">
+    <meta name="author" content="Pranav Kaja">
+    <!-- Resume-link landing page: kept out of search so it never competes with the homepage. -->
+    <meta name="robots" content="noindex, follow">
+    <link rel="canonical" href="https://pranavkaja.com/brief">
+    <meta property="og:title" content="Pranav Kaja | The 60-Second Brief">
+    <meta property="og:description" content="Who Pranav Kaja is, what he has shipped, and the fastest way to reach him.">
+    <meta property="og:image" content="https://pranavkaja.com/images/og-card.png?v=2">
+    <meta property="og:url" content="https://pranavkaja.com/brief">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Pranav Kaja | The 60-Second Brief">
+    <meta name="twitter:description" content="Who Pranav Kaja is, what he has shipped, and the fastest way to reach him.">
+    <meta name="twitter:image" content="https://pranavkaja.com/images/og-card.png?v=2">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* Page-local styles. The footer rules mirror the planned global footer
+           (BUILD-PLAN.md 1.4) so this page is complete before that lands. */
+        .nav-back {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+        }
+
+        .nav-back:hover { color: var(--accent); }
+
+        .brief-hero-actions { flex-wrap: wrap; }
+
+        .proof-row {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 10px 40px;
+            align-items: start;
+            padding: 30px 0;
+            border-top: 1px dashed var(--border);
+        }
+
+        .proof-row:last-of-type { border-bottom: 1px dashed var(--border); }
+
+        .proof-num {
+            font-family: 'Archivo', 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: clamp(2.1rem, 4vw, 2.9rem);
+            line-height: 1.05;
+            letter-spacing: -1px;
+        }
+
+        .proof-kicker {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .proof-copy {
+            max-width: 62ch;
+            margin-bottom: 12px;
+        }
+
+        .proof-link {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 2px;
+        }
+
+        .proof-link:hover { color: var(--accent); }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 40px;
+        }
+
+        .chip {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            background: var(--panel-bg);
+            white-space: nowrap;
+        }
+
+        .tl-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 20px;
+            padding: 16px 0;
+            border-top: 1px dashed var(--border);
+        }
+
+        .tl-row:last-of-type { border-bottom: 1px dashed var(--border); }
+
+        .tl-when {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            color: var(--accent);
+            padding-top: 3px;
+        }
+
+        .tl-what strong { font-weight: 600; }
+
+        .tl-what span { color: var(--text-muted); }
+
+        .more-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 30px;
+            margin-top: 6px;
+        }
+
+        .more-links a {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 2px;
+        }
+
+        .more-links a:hover { color: var(--accent); }
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 12px 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 22px;
+        }
+
+        .footer-links a { color: var(--text-muted); }
+
+        .footer-links a:hover { color: var(--accent); }
+
+        a:focus-visible, button:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
+        }
+
+        @media (max-width: 700px) {
+            .proof-row, .tl-row { grid-template-columns: 1fr; gap: 8px; }
+            .proof-num { font-size: 2.1rem; }
+            .footer-inner { justify-content: center; text-align: center; }
+        }
+    </style>
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <nav class="top-nav">
+        <a href="/" class="nav-logo no-underline text-inherit" data-cta="full_site">SUBJECT // PRANAV KAJA</a>
+        <a href="/" class="nav-back" data-cta="full_site">&larr; FULL SITE</a>
+    </nav>
+
+    <main class="container" id="main">
+        <header class="hero">
+            <div class="hero-label mb-20"><span class="status-dot"></span>[ OPERATOR BRIEF ]</div>
+            <h1 class="hero-title">PRANAV<br>KAJA</h1>
+            <p class="hero-subtitle">Data &amp; Analytics Engineer. I build pipelines, models, and dashboards that
+                survive contact with real data.</p>
+            <div class="hero-actions brief-hero-actions">
+                <a href="mailto:balajipranavreddyk@gmail.com" class="btn btn-primary" data-cta="email">EMAIL ME</a>
+                <a href="/Resume_PranavKaja.pdf" target="_blank" class="btn btn-secondary" data-cta="resume">RESUME (PDF)</a>
+                <a href="https://www.linkedin.com/in/pranavkaja" target="_blank" rel="noopener" class="btn btn-secondary"
+                    data-cta="linkedin">LINKEDIN</a>
+                <a href="https://github.com/PranavKaja" target="_blank" rel="noopener" class="btn btn-secondary"
+                    data-cta="github">GITHUB</a>
+            </div>
+        </header>
+
+        <div class="vitals">
+            <div class="vital">
+                <div class="k">Role</div>
+                <div class="v">Data &amp; Analytics Engineer</div>
+            </div>
+            <div class="vital">
+                <div class="k">Education</div>
+                <div class="v">MS Business Analytics, UMass Amherst &middot; GPA 4.00 &middot; May 2026</div>
+            </div>
+            <div class="vital">
+                <div class="k">Base</div>
+                <div class="v">Massachusetts &middot; Open to relocate (US)</div>
+            </div>
+            <div class="vital">
+                <div class="k">Status</div>
+                <div class="v live">Open to Full-Time Roles</div>
+            </div>
+        </div>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>Proof</h2>
+                <div class="line"></div>
+            </div>
+
+            <div class="proof-row">
+                <div class="proof-num">0.978 AUC</div>
+                <div>
+                    <div class="proof-kicker">Fraud Triage // XGBoost + Gemini</div>
+                    <p class="proof-copy">Fraud detection lifted from 0.60 to 0.978 AUC on 284,807 card transactions.
+                        A Gemini triage layer reviews each flag and writes a verdict an analyst can audit.</p>
+                    <a href="/projects/fraud-triage" class="proof-link no-underline" data-cta="fraud_case">READ THE CASE STUDY &rarr;</a>
+                </div>
+            </div>
+
+            <div class="proof-row">
+                <div class="proof-num">39 &rarr; 1</div>
+                <div>
+                    <div class="proof-kicker">CPK Production Planner // Live Tool</div>
+                    <p class="proof-copy">A 39-tab manual spreadsheet replaced with an in-browser planner: paste the
+                        day's order report, get every production sheet for 36 locations.</p>
+                    <a href="/projects/cpk-production" class="proof-link no-underline" data-cta="cpk_case">TRY THE LIVE TOOL &rarr;</a>
+                </div>
+            </div>
+
+            <div class="proof-row">
+                <div class="proof-num">-90%</div>
+                <div>
+                    <div class="proof-kicker">UMass Dining // ETL Automation</div>
+                    <p class="proof-copy">Automated daily transaction reporting across 37 retail locations serving
+                        15,000 patrons, cutting manual entry by 90% with VBA and Power Query.</p>
+                    <a href="/#experience" class="proof-link no-underline" data-cta="dining_more">THE FULL STORY &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>The 60-second version</h2>
+                <div class="line"></div>
+            </div>
+
+            <h3 class="subsection-title">SKILLS</h3>
+            <div class="chips">
+                <span class="chip">Python</span>
+                <span class="chip">SQL (PostgreSQL)</span>
+                <span class="chip">XGBoost</span>
+                <span class="chip">scikit-learn</span>
+                <span class="chip">Power BI + DAX</span>
+                <span class="chip">Excel (VBA, Power Query)</span>
+                <span class="chip">Flask</span>
+                <span class="chip">Supabase / Postgres</span>
+                <span class="chip">ETL pipelines</span>
+                <span class="chip">REST APIs</span>
+                <span class="chip">Git</span>
+                <span class="chip">Gemini API</span>
+            </div>
+
+            <h3 class="subsection-title">TIMELINE</h3>
+            <div class="tl mb-40">
+                <div class="tl-row">
+                    <div class="tl-when">2024 - 2026</div>
+                    <div class="tl-what"><strong>UMass Amherst Dining &middot; Student Supervisor.</strong>
+                        <span>Led student teams; built the ETL and demand forecasting for 37 locations.</span>
+                    </div>
+                </div>
+                <div class="tl-row">
+                    <div class="tl-when">2022</div>
+                    <div class="tl-what"><strong>Acmegrade &middot; Data Science Intern.</strong>
+                        <span>Random Forest and Gradient Boosting on 100,000 records; conversion-prediction accuracy up
+                            15%.</span>
+                    </div>
+                </div>
+                <div class="tl-row">
+                    <div class="tl-when">2022 - 2023</div>
+                    <div class="tl-what"><strong>Esports SIG, GITAM &middot; Operations and Finance Lead.</strong>
+                        <span>7 concurrent programs; turnout tripled to 1,800+; 100% sponsor-funded.</span>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="subsection-title">MORE</h3>
+            <div class="more-links">
+                <a href="/why-pranav" class="no-underline" data-cta="why">WHY PRANAV</a>
+                <a href="/projects" class="no-underline" data-cta="projects">ALL CASE STUDIES</a>
+                <a href="/blog" class="no-underline" data-cta="blog">BLOG</a>
+                <a href="/retro/" class="no-underline" data-cta="retro">RETRO MODE</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-inner">
+            <span class="footer-copy">&copy; <span id="year"></span> PRANAV KAJA</span>
+            <nav class="footer-links" aria-label="Contact and profiles">
+                <a href="mailto:balajipranavreddyk@gmail.com">EMAIL</a>
+                <a href="https://www.linkedin.com/in/pranavkaja" target="_blank" rel="noopener">LINKEDIN</a>
+                <a href="https://github.com/PranavKaja" target="_blank" rel="noopener">GITHUB</a>
+                <a href="/Resume_PranavKaja.pdf" target="_blank">RESUME</a>
+                <a href="/retro/">RETRO MODE</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="config.js" defer></script>
+    <script src="analytics.js" defer></script>
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+        // Which brief CTA gets the click? Guarded: analytics must never break the page.
+        document.addEventListener('click', function (e) {
+            var el = e.target.closest && e.target.closest('[data-cta]');
+            if (el && window.intel) window.intel.track('brief_cta', { target: el.dataset.cta });
+        });
+    </script>
+</body>
+
+</html>
