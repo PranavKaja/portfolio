@@ -8,7 +8,6 @@
     <meta name="description"
         content="Who Pranav Kaja is, what he has shipped, and the fastest way to reach him. The 60-second version of the full site.">
     <meta name="author" content="Pranav Kaja">
-    <!-- Resume-link landing page: kept out of search so it never competes with the homepage. -->
     <meta name="robots" content="noindex, follow">
     <link rel="canonical" href="https://pranavkaja.com/brief">
     <meta property="og:title" content="Pranav Kaja | The 60-Second Brief">
@@ -29,8 +28,7 @@
         href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <style>
-        /* Page-local styles. The footer rules mirror the planned global footer
-           (BUILD-PLAN.md 1.4) so this page is complete before that lands. */
+        /* Page-local styles */
         .nav-back {
             font-family: 'Share Tech Mono', monospace;
             font-size: 0.8rem;
@@ -46,11 +44,24 @@
             grid-template-columns: 250px 1fr;
             gap: 10px 40px;
             align-items: start;
-            padding: 30px 0;
-            border-top: 1px dashed var(--border);
+            padding: 24px 30px;
+            background-color: var(--bg);
+            border: 1.5px solid var(--text-main);
+            margin-bottom: 20px;
+            box-shadow: 4px 4px 0 var(--border);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            position: relative;
+            z-index: 1;
         }
 
-        .proof-row:last-of-type { border-bottom: 1px dashed var(--border); }
+        .proof-row:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--text-main);
+            background-color: var(--bg);
+            border-color: var(--text-main);
+        }
+
+        .proof-row:last-of-type { border-bottom: 1.5px solid var(--text-main); }
 
         .proof-num {
             font-family: 'Archivo', 'Inter', sans-serif;
@@ -84,32 +95,58 @@
 
         .proof-link:hover { color: var(--accent); }
 
+        .chips-container {
+            margin-top: 30px;
+            margin-bottom: 40px;
+        }
+
         .chips {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 40px;
+            gap: 10px;
         }
 
         .chip {
             font-family: 'Share Tech Mono', monospace;
             font-size: 0.75rem;
             letter-spacing: 1px;
-            padding: 6px 12px;
-            border: 1px solid var(--border);
-            background: var(--panel-bg);
+            padding: 8px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             white-space: nowrap;
+            border-radius: 4px;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+        
+        .chip:hover {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .tl-row {
             display: grid;
             grid-template-columns: 150px 1fr;
             gap: 20px;
-            padding: 16px 0;
-            border-top: 1px dashed var(--border);
+            padding: 24px 30px;
+            background-color: var(--bg);
+            border: 1.5px solid var(--text-main);
+            margin-bottom: 20px;
+            box-shadow: 4px 4px 0 var(--border);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            position: relative;
+            z-index: 1;
         }
 
-        .tl-row:last-of-type { border-bottom: 1px dashed var(--border); }
+        .tl-row:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--text-main);
+            background-color: var(--bg);
+            border-color: var(--text-main);
+        }
+
+        .tl-row:last-of-type { border-bottom: 1.5px solid var(--text-main); }
 
         .tl-when {
             font-family: 'Share Tech Mono', monospace;
@@ -120,7 +157,6 @@
         }
 
         .tl-what strong { font-weight: 600; }
-
         .tl-what span { color: var(--text-muted); }
 
         .more-links {
@@ -160,7 +196,6 @@
         }
 
         .footer-links a { color: var(--text-muted); }
-
         .footer-links a:hover { color: var(--accent); }
 
         a:focus-visible, button:focus-visible {
@@ -168,11 +203,129 @@
             outline-offset: 3px;
         }
 
+        /* Pulse Animation for Status Dot */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
+            70% { transform: scale(1.1); opacity: 0.8; box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+            100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+        }
+
+        .status-dot-animated {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #4ade80; /* Assuming a green accent for live status */
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        /* Sticky Action Bar */
+        .sticky-action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            z-index: 100;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .sticky-action-bar.visible {
+            transform: translateY(0);
+        }
+
         @media (max-width: 700px) {
             .proof-row, .tl-row { grid-template-columns: 1fr; gap: 8px; }
             .proof-num { font-size: 2.1rem; }
             .footer-inner { justify-content: center; text-align: center; }
+            .sticky-action-bar { padding: 12px 15px; }
+            .vitals { grid-template-columns: 1fr; border-right: 1.5px solid var(--text-main); border-bottom: none; }
+            .vital { border-right: none; border-bottom: 1.5px solid var(--text-main); }
         }
+        
+        /* 5-SEC RULE REFINEMENTS */
+        .vitals {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border: 1.5px solid var(--text-main);
+            background: var(--bg);
+            margin-bottom: 24px;
+        }
+        
+        .vital {
+            padding: 20px 16px;
+            border-right: 1.5px solid var(--text-main);
+        }
+        
+        .vital:last-child {
+            border-right: none;
+        }
+        
+        .vital .k {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        
+        .vital .v {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 0.95rem;
+            line-height: 1.3;
+            text-transform: uppercase;
+            color: var(--text-main);
+        }
+        
+        .vital .v.live {
+            color: var(--accent); /* Matches the orange/red status color */
+        }
+        
+        .chips-container h3 {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-main);
+            margin-bottom: 16px;
+        }
+        
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .chip {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            padding: 8px 16px;
+            background: var(--bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        
+        .chip:hover {
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            background: var(--bg);
+            border-color: var(--text-main);
+        }
+        
+        /* Removed redundant proof-row styles */
     </style>
 </head>
 
@@ -186,7 +339,7 @@
 
     <main class="container" id="main">
         <header class="hero">
-            <div class="hero-label mb-20"><span class="status-dot"></span>[ OPERATOR BRIEF ]</div>
+            <div class="hero-label mb-20"><span class="status-dot-animated"></span>[ OPERATOR BRIEF ]</div>
             <h1 class="hero-title">PRANAV<br>KAJA</h1>
             <p class="hero-subtitle">Data &amp; Analytics Engineer. I build pipelines, models, and dashboards that
                 survive contact with real data.</p>
@@ -219,50 +372,8 @@
             </div>
         </div>
 
-        <section class="section">
-            <div class="section-header">
-                <h2>Proof</h2>
-                <div class="line"></div>
-            </div>
-
-            <div class="proof-row">
-                <div class="proof-num">0.978 AUC</div>
-                <div>
-                    <div class="proof-kicker">Fraud Triage // XGBoost + Gemini</div>
-                    <p class="proof-copy">Fraud detection lifted from 0.60 to 0.978 AUC on 284,807 card transactions.
-                        A Gemini triage layer reviews each flag and writes a verdict an analyst can audit.</p>
-                    <a href="/projects/fraud-triage" class="proof-link no-underline" data-cta="fraud_case">READ THE CASE STUDY &rarr;</a>
-                </div>
-            </div>
-
-            <div class="proof-row">
-                <div class="proof-num">39 &rarr; 1</div>
-                <div>
-                    <div class="proof-kicker">CPK Production Planner // Live Tool</div>
-                    <p class="proof-copy">A 39-tab manual spreadsheet replaced with an in-browser planner: paste the
-                        day's order report, get every production sheet for 36 locations.</p>
-                    <a href="/projects/cpk-production" class="proof-link no-underline" data-cta="cpk_case">TRY THE LIVE TOOL &rarr;</a>
-                </div>
-            </div>
-
-            <div class="proof-row">
-                <div class="proof-num">-90%</div>
-                <div>
-                    <div class="proof-kicker">UMass Dining // ETL Automation</div>
-                    <p class="proof-copy">Automated daily transaction reporting across 37 retail locations serving
-                        15,000 patrons, cutting manual entry by 90% with VBA and Power Query.</p>
-                    <a href="/#experience" class="proof-link no-underline" data-cta="dining_more">THE FULL STORY &rarr;</a>
-                </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="section-header">
-                <h2>The 60-second version</h2>
-                <div class="line"></div>
-            </div>
-
-            <h3 class="subsection-title">SKILLS</h3>
+        <div class="chips-container">
+            <h3 class="subsection-title" style="margin-bottom: 12px; font-size: 0.8rem;">CORE STACK</h3>
             <div class="chips">
                 <span class="chip">Python</span>
                 <span class="chip">SQL (PostgreSQL)</span>
@@ -275,10 +386,42 @@
                 <span class="chip">ETL pipelines</span>
                 <span class="chip">REST APIs</span>
                 <span class="chip">Git</span>
-                <span class="chip">Gemini API</span>
+                <span class="chip">AI Integration</span>
+            </div>
+        </div>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>Proof</h2>
+                <div class="line"></div>
             </div>
 
-            <h3 class="subsection-title">TIMELINE</h3>
+            <div class="proof-row">
+                <div class="proof-num">0.978 AUC</div>
+                <div>
+                    <div class="proof-kicker">Fraud Triage // XGBoost + Gemini</div>
+                    <p class="proof-copy">Fraud detection lifted from 0.60 to 0.978 AUC on 284,807 card transactions.
+                        A <strong>Gemini</strong> triage layer reviews each flag and writes a verdict an analyst can audit.</p>
+                    <a href="/projects/fraud-triage" class="proof-link no-underline" data-cta="fraud_case">READ THE CASE STUDY &rarr;</a>
+                </div>
+            </div>
+
+            <div class="proof-row">
+                <div class="proof-num">39 &rarr; 1</div>
+                <div>
+                    <div class="proof-kicker">UMass Dining CPK Planner // ETL to Live Tool</div>
+                    <p class="proof-copy">Cut manual entry by 90% across 37 locations. What started as a <strong>VBA / Power Query</strong> script evolved into a live <strong>in-browser planner</strong> that replaces a 39-tab daily spreadsheet.</p>
+                    <a href="/projects/cpk-production" class="proof-link no-underline" data-cta="cpk_case">TRY THE LIVE TOOL &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>Timeline</h2>
+                <div class="line"></div>
+            </div>
+
             <div class="tl mb-40">
                 <div class="tl-row">
                     <div class="tl-when">2024 - 2026</div>
@@ -287,16 +430,16 @@
                     </div>
                 </div>
                 <div class="tl-row">
+                    <div class="tl-when">2022 - 2023</div>
+                    <div class="tl-what"><strong>Esports SIG, GITAM &middot; Operations and Finance Lead.</strong>
+                        <span>7 concurrent programs; turnout tripled to 1,800+; 100% sponsor-funded.</span>
+                    </div>
+                </div>
+                <div class="tl-row">
                     <div class="tl-when">2022</div>
                     <div class="tl-what"><strong>Acmegrade &middot; Data Science Intern.</strong>
                         <span>Random Forest and Gradient Boosting on 100,000 records; conversion-prediction accuracy up
                             15%.</span>
-                    </div>
-                </div>
-                <div class="tl-row">
-                    <div class="tl-when">2022 - 2023</div>
-                    <div class="tl-what"><strong>Esports SIG, GITAM &middot; Operations and Finance Lead.</strong>
-                        <span>7 concurrent programs; turnout tripled to 1,800+; 100% sponsor-funded.</span>
                     </div>
                 </div>
             </div>
@@ -309,6 +452,8 @@
                 <a href="/retro/" class="no-underline" data-cta="retro">RETRO MODE</a>
             </div>
         </section>
+        
+        <div style="height: 60px;"></div>
     </main>
 
     <footer class="main-footer">
@@ -323,13 +468,30 @@
             </nav>
         </div>
     </footer>
+    
+    <div class="sticky-action-bar" id="stickyBar">
+        <a href="mailto:balajipranavreddyk@gmail.com" class="btn btn-primary" style="padding: 6px 16px; font-size: 0.8rem;">EMAIL ME</a>
+        <a href="/Resume_PranavKaja.pdf" target="_blank" class="btn btn-secondary" style="padding: 6px 16px; font-size: 0.8rem;">RESUME</a>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="config.js" defer></script>
     <script src="analytics.js" defer></script>
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
-        // Which brief CTA gets the click? Guarded: analytics must never break the page.
+        
+        window.addEventListener('scroll', function() {
+            var scrollPosition = window.scrollY;
+            var heroHeight = document.querySelector('.hero').offsetHeight;
+            var stickyBar = document.getElementById('stickyBar');
+            
+            if (scrollPosition > heroHeight) {
+                stickyBar.classList.add('visible');
+            } else {
+                stickyBar.classList.remove('visible');
+            }
+        });
+        
         document.addEventListener('click', function (e) {
             var el = e.target.closest && e.target.closest('[data-cta]');
             if (el && window.intel) window.intel.track('brief_cta', { target: el.dataset.cta });
