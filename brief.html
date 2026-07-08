@@ -8,7 +8,6 @@
     <meta name="description"
         content="Who Pranav Kaja is, what he has shipped, and the fastest way to reach him. The 60-second version of the full site.">
     <meta name="author" content="Pranav Kaja">
-    <!-- Resume-link landing page: kept out of search so it never competes with the homepage. -->
     <meta name="robots" content="noindex, follow">
     <link rel="canonical" href="https://pranavkaja.com/brief">
     <meta property="og:title" content="Pranav Kaja | The 60-Second Brief">
@@ -29,8 +28,7 @@
         href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <style>
-        /* Page-local styles. The footer rules mirror the planned global footer
-           (BUILD-PLAN.md 1.4) so this page is complete before that lands. */
+        /* Page-local styles */
         .nav-back {
             font-family: 'Share Tech Mono', monospace;
             font-size: 0.8rem;
@@ -46,8 +44,15 @@
             grid-template-columns: 250px 1fr;
             gap: 10px 40px;
             align-items: start;
-            padding: 30px 0;
+            padding: 30px 15px;
             border-top: 1px dashed var(--border);
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            border-radius: 4px;
+        }
+
+        .proof-row:hover {
+            transform: translateX(5px);
+            background-color: rgba(255, 255, 255, 0.02);
         }
 
         .proof-row:last-of-type { border-bottom: 1px dashed var(--border); }
@@ -84,21 +89,34 @@
 
         .proof-link:hover { color: var(--accent); }
 
+        .chips-container {
+            margin-top: 30px;
+            margin-bottom: 40px;
+        }
+
         .chips {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 40px;
+            gap: 10px;
         }
 
         .chip {
             font-family: 'Share Tech Mono', monospace;
             font-size: 0.75rem;
             letter-spacing: 1px;
-            padding: 6px 12px;
-            border: 1px solid var(--border);
-            background: var(--panel-bg);
+            padding: 8px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             white-space: nowrap;
+            border-radius: 4px;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+        
+        .chip:hover {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .tl-row {
@@ -120,7 +138,6 @@
         }
 
         .tl-what strong { font-weight: 600; }
-
         .tl-what span { color: var(--text-muted); }
 
         .more-links {
@@ -160,7 +177,6 @@
         }
 
         .footer-links a { color: var(--text-muted); }
-
         .footer-links a:hover { color: var(--accent); }
 
         a:focus-visible, button:focus-visible {
@@ -168,10 +184,51 @@
             outline-offset: 3px;
         }
 
+        /* Pulse Animation for Status Dot */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
+            70% { transform: scale(1.1); opacity: 0.8; box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+            100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+        }
+
+        .status-dot-animated {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #4ade80; /* Assuming a green accent for live status */
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        /* Sticky Action Bar */
+        .sticky-action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            z-index: 100;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .sticky-action-bar.visible {
+            transform: translateY(0);
+        }
+
         @media (max-width: 700px) {
             .proof-row, .tl-row { grid-template-columns: 1fr; gap: 8px; }
             .proof-num { font-size: 2.1rem; }
             .footer-inner { justify-content: center; text-align: center; }
+            .sticky-action-bar { padding: 12px 15px; }
         }
     </style>
 </head>
@@ -186,7 +243,7 @@
 
     <main class="container" id="main">
         <header class="hero">
-            <div class="hero-label mb-20"><span class="status-dot"></span>[ OPERATOR BRIEF ]</div>
+            <div class="hero-label mb-20"><span class="status-dot-animated"></span>[ OPERATOR BRIEF ]</div>
             <h1 class="hero-title">PRANAV<br>KAJA</h1>
             <p class="hero-subtitle">Data &amp; Analytics Engineer. I build pipelines, models, and dashboards that
                 survive contact with real data.</p>
@@ -219,50 +276,8 @@
             </div>
         </div>
 
-        <section class="section">
-            <div class="section-header">
-                <h2>Proof</h2>
-                <div class="line"></div>
-            </div>
-
-            <div class="proof-row">
-                <div class="proof-num">0.978 AUC</div>
-                <div>
-                    <div class="proof-kicker">Fraud Triage // XGBoost + Gemini</div>
-                    <p class="proof-copy">Fraud detection lifted from 0.60 to 0.978 AUC on 284,807 card transactions.
-                        A Gemini triage layer reviews each flag and writes a verdict an analyst can audit.</p>
-                    <a href="/projects/fraud-triage" class="proof-link no-underline" data-cta="fraud_case">READ THE CASE STUDY &rarr;</a>
-                </div>
-            </div>
-
-            <div class="proof-row">
-                <div class="proof-num">39 &rarr; 1</div>
-                <div>
-                    <div class="proof-kicker">CPK Production Planner // Live Tool</div>
-                    <p class="proof-copy">A 39-tab manual spreadsheet replaced with an in-browser planner: paste the
-                        day's order report, get every production sheet for 36 locations.</p>
-                    <a href="/projects/cpk-production" class="proof-link no-underline" data-cta="cpk_case">TRY THE LIVE TOOL &rarr;</a>
-                </div>
-            </div>
-
-            <div class="proof-row">
-                <div class="proof-num">-90%</div>
-                <div>
-                    <div class="proof-kicker">UMass Dining // ETL Automation</div>
-                    <p class="proof-copy">Automated daily transaction reporting across 37 retail locations serving
-                        15,000 patrons, cutting manual entry by 90% with VBA and Power Query.</p>
-                    <a href="/#experience" class="proof-link no-underline" data-cta="dining_more">THE FULL STORY &rarr;</a>
-                </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="section-header">
-                <h2>The 60-second version</h2>
-                <div class="line"></div>
-            </div>
-
-            <h3 class="subsection-title">SKILLS</h3>
+        <div class="chips-container">
+            <h3 class="subsection-title" style="margin-bottom: 12px; font-size: 0.8rem;">CORE STACK</h3>
             <div class="chips">
                 <span class="chip">Python</span>
                 <span class="chip">SQL (PostgreSQL)</span>
@@ -277,8 +292,51 @@
                 <span class="chip">Git</span>
                 <span class="chip">Gemini API</span>
             </div>
+        </div>
 
-            <h3 class="subsection-title">TIMELINE</h3>
+        <section class="section">
+            <div class="section-header">
+                <h2>Proof</h2>
+                <div class="line"></div>
+            </div>
+
+            <div class="proof-row">
+                <div class="proof-num">0.978 AUC</div>
+                <div>
+                    <div class="proof-kicker">Fraud Triage // XGBoost + Gemini</div>
+                    <p class="proof-copy">Fraud detection lifted from 0.60 to 0.978 AUC on 284,807 card transactions.
+                        A <strong>Gemini</strong> triage layer reviews each flag and writes a verdict an analyst can audit.</p>
+                    <a href="/projects/fraud-triage" class="proof-link no-underline" data-cta="fraud_case">READ THE CASE STUDY &rarr;</a>
+                </div>
+            </div>
+
+            <div class="proof-row">
+                <div class="proof-num">39 &rarr; 1</div>
+                <div>
+                    <div class="proof-kicker">CPK Production Planner // Live Tool</div>
+                    <p class="proof-copy">A 39-tab manual spreadsheet replaced with an <strong>in-browser planner</strong>: paste the
+                        day's order report, get every production sheet for 36 locations.</p>
+                    <a href="/projects/cpk-production" class="proof-link no-underline" data-cta="cpk_case">TRY THE LIVE TOOL &rarr;</a>
+                </div>
+            </div>
+
+            <div class="proof-row">
+                <div class="proof-num">-90%</div>
+                <div>
+                    <div class="proof-kicker">UMass Dining // ETL Automation</div>
+                    <p class="proof-copy">Automated daily transaction reporting across 37 retail locations serving
+                        15,000 patrons, cutting manual entry by 90% with <strong>VBA</strong> and <strong>Power Query</strong>.</p>
+                    <a href="/#experience" class="proof-link no-underline" data-cta="dining_more">THE FULL STORY &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>Timeline</h2>
+                <div class="line"></div>
+            </div>
+
             <div class="tl mb-40">
                 <div class="tl-row">
                     <div class="tl-when">2024 - 2026</div>
@@ -309,6 +367,8 @@
                 <a href="/retro/" class="no-underline" data-cta="retro">RETRO MODE</a>
             </div>
         </section>
+        
+        <div style="height: 60px;"></div>
     </main>
 
     <footer class="main-footer">
@@ -323,13 +383,30 @@
             </nav>
         </div>
     </footer>
+    
+    <div class="sticky-action-bar" id="stickyBar">
+        <a href="mailto:balajipranavreddyk@gmail.com" class="btn btn-primary" style="padding: 6px 16px; font-size: 0.8rem;">EMAIL ME</a>
+        <a href="/Resume_PranavKaja.pdf" target="_blank" class="btn btn-secondary" style="padding: 6px 16px; font-size: 0.8rem;">RESUME</a>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="config.js" defer></script>
     <script src="analytics.js" defer></script>
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
-        // Which brief CTA gets the click? Guarded: analytics must never break the page.
+        
+        window.addEventListener('scroll', function() {
+            var scrollPosition = window.scrollY;
+            var heroHeight = document.querySelector('.hero').offsetHeight;
+            var stickyBar = document.getElementById('stickyBar');
+            
+            if (scrollPosition > heroHeight) {
+                stickyBar.classList.add('visible');
+            } else {
+                stickyBar.classList.remove('visible');
+            }
+        });
+        
         document.addEventListener('click', function (e) {
             var el = e.target.closest && e.target.closest('[data-cta]');
             if (el && window.intel) window.intel.track('brief_cta', { target: el.dataset.cta });
