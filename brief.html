@@ -44,18 +44,24 @@
             grid-template-columns: 250px 1fr;
             gap: 10px 40px;
             align-items: start;
-            padding: 30px 15px;
-            border-top: 1px dashed var(--border);
-            transition: transform 0.2s ease, background-color 0.2s ease;
-            border-radius: 4px;
+            padding: 24px 30px;
+            background-color: var(--bg);
+            border: 1.5px solid var(--text-main);
+            margin-bottom: 20px;
+            box-shadow: 4px 4px 0 var(--border);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            position: relative;
+            z-index: 1;
         }
 
         .proof-row:hover {
-            transform: translateX(5px);
-            background-color: rgba(255, 255, 255, 0.02);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--text-main);
+            background-color: var(--bg);
+            border-color: var(--text-main);
         }
 
-        .proof-row:last-of-type { border-bottom: 1px dashed var(--border); }
+        .proof-row:last-of-type { border-bottom: 1.5px solid var(--text-main); }
 
         .proof-num {
             font-family: 'Archivo', 'Inter', sans-serif;
@@ -123,11 +129,24 @@
             display: grid;
             grid-template-columns: 150px 1fr;
             gap: 20px;
-            padding: 16px 0;
-            border-top: 1px dashed var(--border);
+            padding: 24px 30px;
+            background-color: var(--bg);
+            border: 1.5px solid var(--text-main);
+            margin-bottom: 20px;
+            box-shadow: 4px 4px 0 var(--border);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            position: relative;
+            z-index: 1;
         }
 
-        .tl-row:last-of-type { border-bottom: 1px dashed var(--border); }
+        .tl-row:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--text-main);
+            background-color: var(--bg);
+            border-color: var(--text-main);
+        }
+
+        .tl-row:last-of-type { border-bottom: 1.5px solid var(--text-main); }
 
         .tl-when {
             font-family: 'Share Tech Mono', monospace;
@@ -306,16 +325,7 @@
             border-color: var(--text-main);
         }
         
-        .proof-row {
-            background: var(--bg);
-            border: 1.5px solid transparent;
-            margin-bottom: 12px;
-        }
-        .proof-row:hover {
-            border-color: var(--text-main);
-            background: var(--bg);
-            transform: none;
-        }
+        /* Removed redundant proof-row styles */
     </style>
 </head>
 
