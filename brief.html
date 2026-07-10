@@ -521,7 +521,8 @@
     <script src="config.js" defer></script>
     <script src="analytics.js" defer></script>
     <script>
-        document.getElementById('year').textContent = new Date().getFullYear();
+        var yearEl = document.getElementById('year');
+        if (yearEl) yearEl.textContent = new Date().getFullYear();
         
         window.addEventListener('scroll', function() {
             var scrollPosition = window.scrollY;
