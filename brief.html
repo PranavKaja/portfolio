@@ -508,8 +508,8 @@
                 <a href="/retro/" class="no-underline" data-cta="retro">RETRO MODE</a>
             </div>
         </section>
-        
     </main>
+    <div id="footer-trigger" style="height: 1px; width: 100%; position: absolute; bottom: 0;"></div>
     
     <div class="sticky-action-bar" id="stickyBar">
         <span style="font-family: 'Share Tech Mono', monospace; font-size: 0.95rem; font-weight: bold; margin-right: 15px; display: flex; align-items: center; color: var(--text-main);">TIME TO GIVE PRANAV A CHANCE</span>
@@ -524,16 +524,19 @@
         var yearEl = document.getElementById('year');
         if (yearEl) yearEl.textContent = new Date().getFullYear();
         
-        window.addEventListener('scroll', function() {
-            var scrollPosition = window.scrollY;
-            var heroHeight = document.querySelector('.hero').offsetHeight;
+        // Use IntersectionObserver to completely bypass all browser scroll math and zoom bugs
+        var observer = new IntersectionObserver(function(entries) {
             var stickyBar = document.getElementById('stickyBar');
-            
-            if (scrollPosition > heroHeight) {
+            if (entries[0].isIntersecting) {
                 stickyBar.classList.add('visible');
             } else {
                 stickyBar.classList.remove('visible');
             }
+        }, { rootMargin: '100px' }); // Triggers when within 100px of the absolute bottom
+        
+        // Wait for DOM to be ready before observing
+        document.addEventListener("DOMContentLoaded", function() {
+            observer.observe(document.getElementById('footer-trigger'));
         });
         
         document.addEventListener('click', function (e) {
