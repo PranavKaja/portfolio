@@ -268,10 +268,10 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            background: linear-gradient(to bottom, rgba(60, 60, 65, 0.7), rgba(40, 40, 45, 0.85));
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid var(--border);
             padding: 15px 20px;
             display: flex;
             justify-content: center;
@@ -279,18 +279,6 @@
             z-index: 100;
             transform: translateY(100%);
             transition: transform 0.3s ease;
-        }
-        
-        .sticky-action-bar .btn-secondary {
-            color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.25);
-            background: transparent;
-        }
-        
-        .sticky-action-bar .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.4);
-            color: #ffffff;
         }
         
         .sticky-action-bar.visible {
