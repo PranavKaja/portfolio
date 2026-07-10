@@ -37,7 +37,21 @@
 
         .nav-back:hover { color: var(--accent); }
 
-        .brief-hero-actions { flex-wrap: wrap; }
+        .brief-hero-actions { 
+            display: flex;
+            flex-wrap: wrap; 
+            gap: 12px;
+        }
+        
+        @media (min-width: 701px) {
+            .brief-hero-actions .btn {
+                width: 175px;
+                text-align: center;
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
 
         /* 5-SEC RULE: Compact Hero */
         .hero {
