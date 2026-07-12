@@ -642,6 +642,50 @@
   }
 
   // ============================================================
+  //  SETTINGS LOCK: usage is open, the MENU (settings) tab asks for
+  //  a basic login first. This is a soft gate against accidental
+  //  edits, not real security: the page is fully client-side, so
+  //  anyone with dev tools can get past it. Only the SHA-256 hash
+  //  of "ID:PASSWORD" (uppercased) is stored here.
+  // ============================================================
+  const SETTINGS_HASH = '6bf7dc74a82fc265df172560b69bbdaa1d3259dcc421b86f97138f6cac625a52';
+  const UNLOCK_KEY = 'cpk_settings_unlocked';
+  function isUnlocked() {
+    try { return sessionStorage.getItem(UNLOCK_KEY) === '1'; } catch (e) { return false; }
+  }
+  function setUnlocked(on) {
+    try { on ? sessionStorage.setItem(UNLOCK_KEY, '1') : sessionStorage.removeItem(UNLOCK_KEY); } catch (e) { }
+  }
+  async function checkLogin(id, pass) {
+    const msg = (String(id).trim() + ':' + String(pass).trim()).toUpperCase();
+    if (!(window.crypto && crypto.subtle)) return false; // non-secure context
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+    const hex = [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, '0')).join('');
+    return hex === SETTINGS_HASH;
+  }
+
+  function renderLogin() {
+    return head('Settings: sign in') +
+      '<p class="cpk-hint">Running the planner is open to everyone. Changing the menu (adding or dropping items) needs the settings login. Ask the kitchen manager.</p>' +
+      '<div class="cpk-menu-form">' +
+      '<input id="cpkl-id" placeholder="ID" size="12" autocomplete="off">' +
+      '<input id="cpkl-pass" placeholder="Password" size="14" type="password" autocomplete="off">' +
+      '<button class="cpk-mini" id="cpkl-go" style="font-weight:700;">UNLOCK</button>' +
+      '</div><p class="cpk-hint" id="cpkl-msg"></p>';
+  }
+  function bindLoginEvents() {
+    const go = $('cpkl-go');
+    if (!go) return;
+    const attempt = async () => {
+      const ok = await checkLogin($('cpkl-id').value, $('cpkl-pass').value);
+      if (ok) { setUnlocked(true); render(); }
+      else { $('cpkl-msg').textContent = (window.crypto && crypto.subtle) ? 'Wrong ID or password.' : 'This browser cannot unlock settings (needs a secure https connection).'; }
+    };
+    go.addEventListener('click', attempt);
+    ['cpkl-id', 'cpkl-pass'].forEach(id => $(id).addEventListener('keydown', e => { if (e.key === 'Enter') attempt(); }));
+  }
+
+  // ============================================================
   //  MENU TAB: add / drop items without touching code.
   // ============================================================
   function menuSection(title, sheet, rows, m) {
@@ -663,6 +707,7 @@
     const custom = sheet => m.added.filter(a => a.sheet === sheet)
       .map(a => ({ label: a.label, recipe: a.recipe || '', item: a.item, custom: true }));
     let h = head('Menu: add or drop items');
+    h += '<p class="cpk-hint">Settings are unlocked for this browser session. <button class="cpk-mini" id="cpkm-lock">Lock settings</button></p>';
     h += '<p class="cpk-hint">Changes save in THIS browser only (nothing uploads). Un-check "Make" to drop an item from every sheet ' +
       '(its row, packout column and sticker); re-check to bring it back. Items added here get a sheet row, a packout column and a sticker. ' +
       'Bread ratios, chicken factors and PREP ingredients are formulas in cpk.js; a new item that needs those still needs a code edit.</p>';
@@ -721,6 +766,8 @@
       m.hidden = m.hidden.filter(x => x !== item);
       saveMenu(m); render();
     });
+    const lock = $('cpkm-lock');
+    if (lock) lock.addEventListener('click', () => { setUnlocked(false); render(); });
     const reset = $('cpkm-reset');
     if (reset) reset.addEventListener('click', () => {
       if (confirm('Reset the menu to the built-in defaults? All added and dropped items on this browser are cleared.')) {
@@ -790,7 +837,10 @@
 
   function render() {
     const out = $('cpk-output');
-    if (tab === 'menu') { out.innerHTML = renderMenu(); bindMenuEvents(); return; }
+    if (tab === 'menu') {
+      if (!isUnlocked()) { out.innerHTML = renderLogin(); bindLoginEvents(); return; }
+      out.innerHTML = renderMenu(); bindMenuEvents(); return;
+    }
     if (!data.rows.length) { out.innerHTML = '<p class="cpk-empty">// Paste or upload an Orders Recap above, then hit GENERATE.</p>'; return; }
     const eff = effective();
     const ctx = makeCtx(indexOrders(data.rows));
