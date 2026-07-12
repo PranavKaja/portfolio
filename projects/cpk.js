@@ -134,7 +134,20 @@
   }
 
   // ============================================================
-  //  CONFIG — transcribed from "Worcester CPK test.xlsx"
+  //  CONFIG — mirrors "Worcester CPK Production 2026.xlsx"
+  //  Validated cell-by-cell against that workbook (2026-07-11).
+  //
+  //  TO ADD OR DROP A MENU ITEM, edit the lists below:
+  //   - DC item?      DC_ROWS (needed) + STK_DC (its FoodPro sticker)
+  //   - Retail item?  RT_ROWS (needed) + STK_RETAIL (its Harvest sticker)
+  //   - Triple stack? RT_TRIPLE (+ RT_TRIPLE_BREAD if it needs a loaf)
+  //   - Ships to cafes? add it to PK_COLS so it shows on Packout
+  //   - Needs bread/chicken? add a row to the matching *_BREAD / *_CHICKEN list
+  //   - Uses a prep ingredient (sliced meat, veg, aioli)? add its factor in PREP
+  //  Item numbers are canonical (no leading zeros): "0253" -> "253".
+  //
+  //  Known gaps vs the Excel are documented in
+  //  04-Project-Sources/cpk/VALIDATION-2026.md (read before "fixing" a mismatch).
   // ============================================================
   const LOC_NAMES = {
     '01': 'Worcester DC', '02': 'Franklin DC', '03': 'Hampshire', '04': 'Berkshire DC',
@@ -247,7 +260,7 @@
     { name: 'Sliced Roast Beef', unit: 'lbs', f: c => roundup(c.dc('2366') * 0.2) },
     { name: 'Sliced Provolone', unit: 'lbs', f: c => roundup(c.tot('4738') + c.rt('7523') * 0.1 + c.dc('1004') * 0.1 + c.dc('2352') * 0.1) },
     { name: 'Sliced Cheddar', unit: 'lbs', f: c => roundup(c.tot('4740') + c.dc('2420') * 0.1 + c.rt('8009') * 0.1 + c.rt('2226') * 0.1) },
-    { name: 'Sliced Swiss', unit: 'lbs', f: c => roundup(c.tsSand('279') * 0.1 + c.tsSand('283') * 0.1 + c.dc('2291') * 0.1) },
+    { name: 'Sliced Swiss', unit: 'lbs', f: c => roundup(c.tot('7173') + c.tsSand('279') * 0.1 + c.tsSand('283') * 0.1 + c.dc('2291') * 0.1) },
     { sec: 'COOKING' },
     { name: 'Boiled Eggs', unit: 'each', f: c => c.rt('9212') },
     { name: 'Grilled Chicken', unit: 'lbs', f: c => r2(c.dc('8371') * 0.2 + c.dc('9268') * 0.2 + c.dc('9241') * 0.2 + c.rt('9255') * 0.25 + c.rt('9257') * 0.25 + c.rt('9212') * 0.15 + c.rt('9221') * 0.25) },
@@ -261,9 +274,9 @@
     { sec: 'SALADS' },
     { name: 'Tuna Salad', unit: 'lbs', f: c => roundup((c.dc('2387') + c.rt('2387')) * 0.3) },
     { sec: 'AIOLIS & DRESSINGS' },
-    { name: 'Cranberry Aioli', unit: 'gal', f: c => r1(c.tsSand('279') / 128) },
-    { name: 'Sundried Tomato Aioli', unit: 'gal', f: c => r1(c.rt('8009') / 128) },
-    { name: 'Berry Vinaigrette', unit: 'gal', f: c => r1(c.rt('301') / 64) }
+    { name: 'Cranberry Aioli', unit: 'gal', f: c => roundup(c.tsSand('279') / 128, 1) },
+    { name: 'Sundried Tomato Aioli', unit: 'gal', f: c => roundup(c.rt('8009') / 128, 1) },
+    { name: 'Berry Vinaigrette', unit: 'gal', f: c => roundup(c.rt('301') / 64, 1) }
   ];
 
   // ---- Packout (location × item grid) ----
@@ -283,6 +296,8 @@
     { item: '6063', label: 'Veggie', g: 'salad' },
     { item: '9221', label: 'Chk Mozz', g: 'sand' },
     { item: '9230', label: 'Turk Pesto', g: 'sand' },
+    { item: '9111', label: 'Little Leaf', g: 'salad' },
+    { item: '9113', label: 'Italian NewO', g: 'sand' },
     { item: '9255', label: 'Buff W', g: 'wrap' },
     { item: '9257', label: 'Caesar W', g: 'wrap' },
     { item: '9266', label: 'Fruit', g: 'fruit' }
@@ -316,6 +331,7 @@
     { label: 'Gluten Free PB & J Sandwich', f: c => c.rt('2421') },
     { label: 'Ham + Swiss Triple Stack', f: c => c.tsPkg('283') },
     { label: 'Hummus Vegetable on Whole Wheat', f: c => c.rt('6063') },
+    { label: 'Italian Pesto Grinder on Semolina Focaccia', f: c => c.rt('7523') },
     { label: 'Mixed Fruit Cup', f: c => c.f12 },
     { label: 'Triple Stack PB + J', f: c => c.tsPkg('253') },
     { label: 'Tuna on White', f: c => c.rt('2387') },
