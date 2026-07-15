@@ -45,6 +45,8 @@ input,select,textarea{font:inherit;color:inherit}
 .btn.primary:hover{filter:brightness(1.08)}
 .btn svg{width:17px;height:17px;flex:none}
 .btn.iconbig{padding:9px 14px;font-size:.9rem}
+.btn.icononly{padding:8px 10px;gap:0}
+.btn.icononly svg{width:18px;height:18px}
 
 /* ---- input card ---- */
 .inputcard{background:var(--card);border:1.5px solid var(--rule);border-radius:12px;margin:18px 0;padding:18px}
@@ -199,10 +201,6 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);display
     <div class="brand">Worcester CPK<small>Production sheets</small></div>
     <div class="daychip" id="daychip"><span class="dot"></span><span id="dayword">No orders yet</span></div>
     <div class="spacer"></div>
-    <button class="btn primary iconbig" id="btn-print" title="Print the sheet on screen">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-      <span id="btn-print-label">Print this sheet</span>
-    </button>
     <button class="btn" id="btn-printall" title="Print all six production sheets">Print all</button>
   </div>
 
@@ -527,9 +525,9 @@ function head(title, printTab) {
   var d = prodDate();
   return '<div class="sheet-head"><h2 class="sheet-title">' + esc(title) + '</h2>' +
     '<div class="sheet-headr"><span class="sheet-date">Production ' + esc(DAY_NAMES[d.day]) + ' ' + esc(d.label) + '</span>' +
-    (printTab ? '<button class="btn sheetprint" data-printsheet="' + esc(printTab) + '" title="Print this sheet">' +
+    (printTab ? '<button class="btn sheetprint icononly" data-printsheet="' + esc(printTab) + '" title="Print this sheet" aria-label="Print this sheet">' +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>' +
-      'Print</button>' : '') +
+      '</button>' : '') +
     '</div></div>';
 }
 function calcTable(slot, ctx, header, valHeader) {
@@ -1182,8 +1180,6 @@ function render() {
   }
   var ctx = makeCtx(indexOrders(data.rows));
   out.innerHTML = (RENDER[tab] || renderDC)(ctx);
-  var tl = { dc: 'DC G&G', retail: 'Retail G&G', fruit: 'Fruit', prep: 'Prep', packout: 'Packout', stickers: 'Stickers' };
-  $('btn-print-label').textContent = 'Print ' + (tl[tab] || 'DC G&G');
   Array.prototype.forEach.call(out.querySelectorAll('[data-printsheet]'), function (b) {
     b.addEventListener('click', function () { doPrint([b.dataset.printsheet]); });
   });
@@ -1246,7 +1242,6 @@ function doPrint(tabs) {
   }).join('');
   window.print();
 }
-$('btn-print').addEventListener('click', function () { doPrint([PRINT_TABS.indexOf(tab) !== -1 ? tab : 'dc']); });
 $('btn-printall').addEventListener('click', function () { doPrint(PRINT_TABS); });
 window.addEventListener('afterprint', function () { $('printbox').innerHTML = ''; });
 
