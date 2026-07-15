@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>CPK Production Sheets</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='42' fill='%231C1D1F'/%3E%3Ccircle cx='50' cy='50' r='18' fill='%23FBFAF7'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   CPK Production Sheets: standalone kitchen tool.
+   Paper-first design: the screen is the sheet you print.
+   The production date wears its day-dot color (kitchen labels).
+   ============================================================ */
+:root{
+  --paper:#FBFAF7; --card:#FFFFFF; --ink:#1C1D1F; --muted:#6E6C66;
+  --rule:#D7D5CF; --rule-soft:#E8E6E0; --band:#F1EFE9;
+  --accent:#4B5563; /* replaced per production weekday */
+  --warn:#B45309; --warn-bg:#FEF3E2; --ok:#15803D;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif}
+button{font:inherit;cursor:pointer;color:inherit;background:none;border:none}
+input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 60px}
+
+/* ---- toolbar ---- */
+.bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 0 12px;border-bottom:2px solid var(--ink)}
+.brand{font-family:Oswald,sans-serif;font-weight:600;font-size:1.25rem;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.brand small{display:block;font-family:Inter,sans-serif;font-weight:500;font-size:.68rem;letter-spacing:.14em;color:var(--muted)}
+.daychip{display:inline-flex;align-items:center;gap:9px;border:1.5px solid var(--ink);border-radius:999px;padding:7px 16px 7px 10px;background:var(--card);font-family:Oswald,sans-serif;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.daychip .dot{width:18px;height:18px;border-radius:50%;background:var(--accent);flex:none}
+.spacer{flex:1}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--ink);border-radius:8px;padding:9px 16px;font-weight:600;font-size:.85rem;letter-spacing:.04em;background:var(--card)}
+.btn:hover{background:var(--band)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn svg{width:17px;height:17px;flex:none}
+.btn.iconbig{padding:9px 14px;font-size:.9rem}
+
+/* ---- input card ---- */
+.inputcard{background:var(--card);border:1.5px solid var(--rule);border-radius:12px;margin:18px 0;padding:18px}
+.inputcard h2{font-family:Oswald,sans-serif;font-weight:600;font-size:1.02rem;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
+.inputcard p.sub{color:var(--muted);font-size:.85rem;margin-bottom:12px}
+textarea#orders{width:100%;min-height:170px;border:1.5px solid var(--rule);border-radius:8px;background:var(--paper);padding:12px;font:12px/1.5 var(--mono);resize:vertical;white-space:pre;overflow:auto}
+textarea#orders.drag{border-color:var(--accent);background:#fff}
+.inputrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.quiet{background:none;border:none;color:var(--muted);font-size:.82rem;text-decoration:underline;text-underline-offset:3px;padding:6px 4px}
+.quiet:hover{color:var(--ink)}
+.statusline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 2px 0;font-size:.85rem;color:var(--muted)}
+.statusline .tag{font-size:.68rem;font-weight:700;letter-spacing:.1em;padding:2px 8px;border-radius:4px;background:var(--band);color:var(--ink)}
+.statusline .tag.warn{background:var(--warn-bg);color:var(--warn)}
+.collapsed-input{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--card);border:1.5px solid var(--rule);border-radius:12px;margin:18px 0;padding:12px 18px;font-size:.88rem}
+
+/* ---- tabs ---- */
+.tabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1.5px solid var(--rule);margin:6px 0 0;scrollbar-width:thin}
+.tab{font-family:Oswald,sans-serif;font-weight:500;font-size:.92rem;letter-spacing:.08em;text-transform:uppercase;padding:11px 16px 9px;border-bottom:3px solid transparent;color:var(--muted);white-space:nowrap}
+.tab:hover{color:var(--ink)}
+.tab.active{color:var(--ink);border-bottom-color:var(--accent)}
+.tab .badge{display:inline-block;min-width:10px;height:10px;border-radius:50%;margin-left:6px;vertical-align:2px}
+.tab .badge.ok{background:var(--ok)} .tab .badge.warn{background:var(--warn)}
+
+/* ---- sheet ---- */
+.sheet{padding:22px 2px}
+.sheet-head{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.sheet-title{font-family:Oswald,sans-serif;font-weight:600;font-size:1.5rem;letter-spacing:.09em;text-transform:uppercase}
+.sheet-date{font-family:Oswald,sans-serif;font-size:.95rem;letter-spacing:.07em;color:var(--muted);text-transform:uppercase}
+.grid2{display:grid;grid-template-columns:3fr 2fr;gap:22px;align-items:start}
+@media(max-width:840px){.grid2{grid-template-columns:1fr}}
+.blocklabel{font-family:Oswald,sans-serif;font-weight:600;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:2px 0 7px}
+.mt{margin-top:20px}
+
+table.t{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--rule);border-radius:10px;overflow:hidden;font-variant-numeric:tabular-nums}
+.t th,.t td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--rule-soft);vertical-align:top}
+.t thead th{font-size:.7rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);background:var(--band);border-bottom:1.5px solid var(--rule)}
+.t .num{text-align:right}
+.t .mono{font-family:var(--mono);font-size:.82rem;color:var(--muted)}
+.t .big{font-size:1.12rem;font-weight:700}
+.t tr.band td{background:var(--band);font-family:Oswald,sans-serif;font-weight:600;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px}
+.t tr.total td{border-top:2px solid var(--ink);font-weight:700;background:var(--card)}
+.t tr:last-child td{border-bottom:none}
+.t td.zero{color:#B9B7B0}
+.hint{font-size:.78rem;color:var(--muted);margin-top:8px}
+.scroll{overflow-x:auto;border-radius:10px}
+.scroll table.t{min-width:900px}
+.sheet-headr{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+
+/* ---- packout grid ---- */
+.pk tr.pkband th{font-family:Oswald,sans-serif;font-size:.7rem;letter-spacing:.1em;text-align:left;color:var(--ink)}
+.pk th.vlab{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;vertical-align:bottom;text-align:left;padding:10px 3px 8px;font-size:.76rem;font-weight:600;letter-spacing:.02em;text-transform:none;color:var(--ink);height:116px}
+.pk th.vlab .inum{font-family:var(--mono);font-size:.62rem;color:var(--muted);font-weight:400}
+.pk .gstart{border-left:2px solid var(--rule)}
+.pk td.loc,.pk th.loc{position:sticky;left:0;background:var(--card);white-space:nowrap;z-index:1;font-weight:600}
+.pk thead th.loc{background:var(--band);vertical-align:bottom}
+.pk tbody tr:nth-child(even) td{background:#F5F3EE}
+.pk td.q{font-weight:700;font-size:1.02rem}
+.pk .tray{border-left:2px solid var(--ink);background:var(--band);font-weight:700}
+.pk td.tray{font-size:1.1rem}
+.pk tr.pkempty td{opacity:.4}
+.pk tr.total td{background:var(--band)}
+.pk tr.total td.loc{background:var(--band)}
+.pk td.col-hl,.pk th.col-hl{background:#EAF1FA!important}
+.pk tr.row-hl td{background:#EAF1FA!important}
+.pk tbody td.cell-hl,.pk th.cell-hl{background:#D5E3F7!important}
+.pk td[data-c],.pk th.vlab,.pk th.tray{cursor:default}
+.warnbox{background:var(--warn-bg);border:1.5px solid var(--warn);border-radius:10px;padding:10px 14px;color:var(--warn);font-weight:600;font-size:.88rem;margin-bottom:14px}
+.okbox{background:#EDF7EF;border:1.5px solid var(--ok);border-radius:10px;padding:10px 14px;color:var(--ok);font-weight:600;font-size:.88rem;margin-bottom:14px}
+tr.flag td{background:var(--warn-bg)}
+
+@media(max-width:640px){
+  .wrap{padding:0 12px 40px}
+  .t th,.t td{padding:6px 8px}
+  #out{overflow-x:auto}
+  .sheet{padding:16px 0}
+  .btn.iconbig{padding:8px 12px;font-size:.8rem}
+}
+
+/* ---- footer / settings entry ---- */
+footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:.78rem}
+#gear{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:.78rem}
+#gear:hover{color:var(--ink)}
+
+/* ---- settings ---- */
+.set-nav{display:flex;gap:2px;flex-wrap:wrap;border-bottom:1.5px solid var(--rule);margin-bottom:18px}
+.set-nav .tab{font-size:.85rem}
+.card{background:var(--card);border:1.5px solid var(--rule);border-radius:12px;padding:16px 18px;margin-bottom:16px}
+.card h3{font-family:Oswald,sans-serif;font-weight:600;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.card p.help{color:var(--muted);font-size:.84rem;margin-bottom:10px;max-width:70ch}
+.formgrid{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin:8px 0}
+.field{display:flex;flex-direction:column;gap:4px;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.field input,.field select{border:1.5px solid var(--rule);border-radius:7px;padding:8px 10px;background:var(--paper);font-size:.88rem;color:var(--ink);text-transform:none;letter-spacing:0;font-weight:400}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.mini{border:1.5px solid var(--rule);border-radius:7px;padding:5px 11px;font-size:.78rem;font-weight:600;background:var(--card)}
+.mini:hover{border-color:var(--ink)}
+.mini.danger{color:#B91C1C;border-color:#E5B3B3}
+.mini.danger:hover{border-color:#B91C1C}
+.term{display:inline-flex;align-items:center;gap:7px;background:var(--band);border:1px solid var(--rule);border-radius:999px;padding:4px 6px 4px 12px;font-size:.82rem;margin:3px 4px 3px 0;font-variant-numeric:tabular-nums}
+.term button{font-weight:700;color:var(--muted);padding:0 6px}
+.term button:hover{color:#B91C1C}
+.rowoff{opacity:.45}
+.msg{font-size:.84rem;color:var(--warn);font-weight:600;margin-top:6px;min-height:1.2em}
+.msg.good{color:var(--ok)}
+.loginbox{max-width:420px;margin:60px auto;text-align:center}
+.loginbox .card{padding:26px}
+.loginbox input{width:100%;margin-bottom:10px;border:1.5px solid var(--rule);border-radius:8px;padding:11px 12px;background:var(--paper)}
+
+/* ---- print ---- */
+#printbox{display:none}
+@page{margin:10mm}
+@page cpkland{size:letter landscape;margin:8mm}
+@media print{
+  body>*:not(#printbox){display:none!important}
+  #printbox{display:block;color:#000;background:#fff;font-size:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #printbox .sheetprint,#printbox .noprint{display:none!important}
+  #printbox .psheet{page-break-after:always}
+  #printbox .psheet:last-child{page-break-after:auto}
+  #printbox .p-packout{page:cpkland}
+  #printbox .scroll{overflow:visible!important}
+  #printbox .scroll table.t{min-width:0}
+  #printbox table.t{width:100%;border:none;border-radius:0;font-size:11px}
+  #printbox .p-packout table.t{font-size:9.5px}
+  #printbox .pk th.vlab{height:auto;font-size:8.5px;padding:5px 2px 4px}
+  #printbox .pk th.vlab .inum{font-size:7px;color:#444}
+  #printbox .pk tr.pkband th{font-size:8px;background:#eee}
+  #printbox .pk td.loc,#printbox .pk th.loc{position:static;font-weight:700}
+  #printbox .pk .gstart{border-left:1.5px solid #000!important}
+  #printbox .pk .tray{border-left:1.5px solid #000!important;background:#eee;font-weight:700}
+  #printbox .pk tbody tr:nth-child(even) td{background:#f2f2f2}
+  #printbox .pk tr.pkempty td{color:#999}
+  #printbox .pk td.q{font-weight:700}
+  #printbox .t th,#printbox .t td{border:1px solid #999;padding:3px 5px;color:#000}
+  #printbox .t thead th{background:#eee;color:#000}
+  #printbox .t tr.band td{background:#eee;color:#000}
+  #printbox .t .big{font-size:12px}
+  #printbox .t td.zero{color:#bbb}
+  #printbox .sheet-head{margin-bottom:6px}
+  #printbox .sheet-title{font-size:16px}
+  #printbox .sheet-date{font-size:11px;color:#000}
+  #printbox .daychip{border-color:#000}
+  #printbox .grid2{display:grid;grid-template-columns:3fr 2fr;gap:14px}
+  #printbox .hint{color:#444;font-size:9px}
+  #printbox .blocklabel{color:#000}
+  #printbox .warnbox,#printbox .okbox{border-color:#000;color:#000;background:#fff}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="bar" id="topbar">
+    <div class="brand">Worcester CPK<small>Production sheets</small></div>
+    <div class="daychip" id="daychip"><span class="dot"></span><span id="dayword">No orders yet</span></div>
+    <div class="spacer"></div>
+    <button class="btn primary iconbig" id="btn-print" title="Print the sheet on screen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      <span id="btn-print-label">Print this sheet</span>
+    </button>
+    <button class="btn" id="btn-printall" title="Print all six production sheets">Print all</button>
+  </div>
+
+  <div id="inputzone"></div>
+
+  <div class="tabs" id="tabs" role="tablist"></div>
+  <div class="sheet" id="out"></div>
+
+  <footer>
+    <span>Worcester central kitchen production planner. Everything runs in this browser, nothing is uploaded.</span>
+    <button id="gear" title="Menu setup (manager sign-in)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Menu setup
+    </button>
+  </footer>
+</div>
+
+<div id="printbox"></div>
+
+<script>
+(function () {
+'use strict';
+var $ = function (id) { return document.getElementById(id); };
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+  });
+}
+function roundup(x, d) { var p = Math.pow(10, d || 0); return Math.ceil(((Number(x) || 0) * p).toFixed(6) * 1) / p; }
+function r1(x) { return Math.round((Number(x) || 0) * 10) / 10; }
+function r2(x) { return Math.round((Number(x) || 0) * 100) / 100; }
+function fmt(x) { var n = Number(x) || 0; return Number.isInteger(n) ? String(n) : String(Math.round(n * 100) / 100); }
+function normItem(s) { return String(s).replace(/^0+(?=\d)/, ''); }
+
+/* ============================================================
+   DEFAULT CONFIG: transcribed from the validated planner
+   (matches "Worcester CPK Production 2026.xlsx", validation notes
+   in the career hub: 04-Project-Sources/cpk/VALIDATION-2026.md).
+   Managers edit a copy of this in Menu setup; the copy lives in
+   this browser's localStorage. Reset brings this version back.
+   ============================================================ */
+var DEFAULT_CONFIG = {
+  v: 1,
+  locations: {
+    '01': 'Worcester DC', '02': 'Franklin DC', '03': 'Hampshire', '04': 'Berkshire DC',
+    '07': 'Chicken & Co', '08': 'Whitmore', '13': 'Worcester Cafe', '14': 'CC Grill',
+    '15': 'Furcolo', '18': 'U Club', '20': 'CC Deli', '21': 'Rec Center', '23': 'Harvest',
+    '30': 'ISB', '31': 'Herter', '34': 'Catering', '40': "CC People's", '41': 'CC Star Ginger',
+    '42': 'Library', '44': 'Morrill', '45': 'Roots', '46': 'Hamp Market', '51': 'CC Peets',
+    '52': 'Marcus', '53': 'CC Greenfield', '54': 'OIT', '66': 'Argo', '70': 'Snacks OF',
+    '72': 'Newman', '78': 'Terrace', '89': 'Mullins', '92': 'Post & Bean', '96': 'Special Events',
+    '97': 'ISOM'
+  },
+  dcLocs: ['01', '02', '03', '04'],
+  route: ['89','34','97','15','46','30','42','44','72','40','23','31','51','92','54','52','45','70','08','13','21','78','96'],
+  trays: { salad: 16, sand: 20, wrap: 24, fruit: 30 },
+  items: [
+    /* ---- DC Grab & Go ---- */
+    { id:'2420', name:'Gluten Free Turkey Sandwich', recipe:'76250', sheet:'dc', sec:'GLUTEN FREE', on:true, pack:'', pkLabel:'', pkOrd:0, stk:{list:'dc',label:'Gluten Free Turkey Sandwich',src:'dc'} },
+    { id:'2421', name:'Gluten Free PB & J', recipe:'146249', sheet:'dc', sec:'GLUTEN FREE', on:true, pack:'', pkLabel:'', pkOrd:0, stk:{list:'dc',label:'Gluten Free PB & J',src:'dc'} },
+    { id:'1004', name:'Turkey Kaiser', recipe:'155008', sheet:'dc', sec:'SANDWICHES', on:true, pack:'', pkLabel:'', pkOrd:0, stk:{list:'dc',label:'Turkey Kaiser',src:'dc'} },
+    { id:'2291', name:'Ham on Rye', recipe:'86250', sheet:'dc', sec:'SANDWICHES', on:true, pack:'', pkLabel:'', pkOrd:0, stk:{list:'dc',label:'Ham on Rye',src:'dc'} },
+    { id:'2299', name:'PB & J on WW', recipe:'146250', sheet:'dc', sec:'SANDWICHES', on:true, pack:'', pkLabel:'', pkOrd:0, stk:{list:'dc',label:'PB & J on WW',src:'dc'} },
+    { id:'2352', name:'Italian Cold Cut Grinder', recipe:'86251', sheet:'dc', sec:'SANDWICHES', on:true, pack:'', pkLabel:'', pkOrd:0, stk:null },
+    { id:'2366', name:'Roast Beef on Kaiser', recipe:'66250', sheet:'dc', sec:'SANDWICHES', on:true, pack:'', pkLabel:'', pkOrd:0, stk:{list:'dc',label:'Roast Beef on Kaiser',src:'dc'} },
+    { id:'2387', name:'Tuna Salad on White', recipe:'156250', sheet:'dc', sec:'SANDWICHES', on:true, pack:'', pkLabel:'', pkOrd:0, stk:{list:'dc',label:'Tuna on White',src:'dc'} },
+    { id:'6063', name:'Hummus & Vegetable Sandwich', recipe:'151652', sheet:'dc', sec:'SANDWICHES', on:true, pack:'', pkLabel:'', pkOrd:0, stk:{list:'dc',label:'Hummus & Vegetable Sandwich',src:'dc'} },
+    { id:'2404', name:'Hummus & Pita Chips', recipe:'155600', sheet:'dc', sec:'SALADS', on:true, pack:'', pkLabel:'', pkOrd:0, stk:{list:'dc',label:'Hummus & Pita Chips',src:'dc'} },
+    { id:'8371', name:'Grab & Go Salad Chicken Caesar', recipe:'76566', sheet:'dc', sec:'SALADS', on:true, pack:'', pkLabel:'', pkOrd:0, stk:{list:'dc',label:'Grab & Go Salad Chicken Caesar',src:'dc'} },
+    { id:'8372', name:'Grab & Go Salad Tossed', recipe:'186565', sheet:'dc', sec:'SALADS', on:true, pack:'', pkLabel:'', pkOrd:0, stk:{list:'dc',label:'Grab & Go Salad Tossed',src:'dc'} },
+    { id:'9268', name:'Chicken Caesar Wrap', recipe:'76214', sheet:'dc', sec:'WRAPS', on:true, pack:'', pkLabel:'', pkOrd:0, stk:{list:'dc',label:'Chicken Caesar Wrap',src:'dc'} },
+    { id:'9241', name:'Buffalo Chicken Wrap', recipe:'76213', sheet:'dc', sec:'WRAPS', on:true, pack:'', pkLabel:'', pkOrd:0, stk:{list:'dc',label:'Buffalo Chicken Wrap',src:'dc'} },
+    { id:'8285', name:'Hummus Veggie Wrap (vegan)', recipe:'', sheet:'dc', sec:'WRAPS', on:true, pack:'', pkLabel:'', pkOrd:0, stk:{list:'dc',label:'Hummus Veggie Wrap (vegan)',src:'dc'} },
+    /* ---- Retail Grab & Go ---- */
+    { id:'8009', name:'Turkey and Cheddar GF', recipe:'71418', sheet:'retail', sec:'SANDWICHES', on:true, pack:'sand', pkLabel:'GF Turk', pkOrd:110, stk:{list:'retail',label:'Turkey & Cheddar on GF Roll',src:'rt'} },
+    { id:'9230', name:'Peoples Croissant Turkey Pesto', recipe:'71504', sheet:'retail', sec:'SANDWICHES', on:true, pack:'sand', pkLabel:'Turk Pesto', pkOrd:140, stk:{list:'retail',label:'Turkey Pesto Croissant',src:'rt'} },
+    { id:'2226', name:'Turkey Croissant', recipe:'71419', sheet:'retail', sec:'SANDWICHES', on:true, pack:'sand', pkLabel:'Croissant', pkOrd:50, stk:{list:'retail',label:'Turkey on Multigrain Croissant',src:'rt'} },
+    { id:'2421', name:'Gluten Free PB & J', recipe:'146249', sheet:'retail', sec:'SANDWICHES', on:true, pack:'sand', pkLabel:'GF PBJ', pkOrd:70, stk:{list:'retail',label:'Gluten Free PB & J Sandwich',src:'rt'} },
+    { id:'2387', name:'Tuna Salad on White', recipe:'156250', sheet:'retail', sec:'SANDWICHES', on:true, pack:'sand', pkLabel:'Tuna', pkOrd:80, stk:{list:'retail',label:'Tuna on White',src:'rt'} },
+    { id:'7523', name:'Italian Focaccia', recipe:'76207', sheet:'retail', sec:'SANDWICHES', on:true, pack:'sand', pkLabel:'Italian', pkOrd:100, stk:{list:'retail',label:'Italian Pesto Grinder on Semolina Focaccia',src:'rt'} },
+    { id:'9221', name:'Chicken Mozzarella Multigrain', recipe:'71629', sheet:'retail', sec:'SANDWICHES', on:true, pack:'sand', pkLabel:'Chk Mozz', pkOrd:130, stk:{list:'retail',label:'Chicken, Pesto & Mozzarella Sandwich',src:'rt'} },
+    { id:'6063', name:'Hummus & Vegetable Sandwich', recipe:'151652', sheet:'retail', sec:'SANDWICHES', on:true, pack:'salad', pkLabel:'Veggie', pkOrd:120, stk:{list:'retail',label:'Hummus Vegetable on Whole Wheat',src:'rt'} },
+    { id:'9255', name:'Buffalo Chicken Wrap', recipe:'76211', sheet:'retail', sec:'WRAPS', on:true, pack:'wrap', pkLabel:'Buff W', pkOrd:170, stk:{list:'retail',label:'Buffalo Chicken Wrap',src:'rt'} },
+    { id:'9257', name:'Chicken Caesar Wrap', recipe:'76212', sheet:'retail', sec:'WRAPS', on:true, pack:'wrap', pkLabel:'Caesar W', pkOrd:180, stk:null },
+    { id:'9268', name:'Chicken Caesar Wrap (Grab 9268)', recipe:'76214', sheet:'retail', sec:'WRAPS', on:true, pack:'wrap', pkLabel:'Caesar GRB', pkOrd:190, stk:{list:'retail',label:'Chicken Caesar Wrap (Grab 9268)',src:'rt'} },
+    { id:'4837', name:'Peoples Salad Chicken Caesar', recipe:'71571', sheet:'retail', sec:'SALADS', on:true, pack:'salad', pkLabel:'Caesar Sld', pkOrd:90, stk:{list:'retail',label:'Chicken Caesar Salad',src:'rt'} },
+    { id:'9111', name:'Salad Little Leaf & Berry Pecan', recipe:'187600', sheet:'retail', sec:'SALADS', on:true, pack:'salad', pkLabel:'Little Leaf', pkOrd:150, stk:{list:'retail',label:'Salad Little Leaf & Berry Pecan',src:'rt'} },
+    { id:'9113', name:'Italian Sandwich New Orleans', recipe:'86002', sheet:'retail', sec:'SALADS', on:true, pack:'sand', pkLabel:'Italian NewO', pkOrd:160, stk:{list:'retail',label:'Italian Sandwich New Orleans',src:'rt'} },
+    { id:'301', name:'Driscol Berry Salad', recipe:'181106', sheet:'retail', sec:'SALADS', on:true, pack:'salad', pkLabel:'Berry Sld', pkOrd:40, stk:{list:'retail',label:'Driscol Berry Salad w/ Walnuts + Feta',src:'rt'} },
+    { id:'9212', name:'Cobb Salad', recipe:'186203', sheet:'retail', sec:'SALADS', on:true, pack:'', pkLabel:'', pkOrd:0, stk:null },
+    /* ---- Triple stacks (counted across all locations, x2 packages, x3 sandwiches) ---- */
+    { id:'253', name:'Triple Stack PB & J', recipe:'141300', sheet:'triple', sec:'', on:true, pack:'sand', pkLabel:'3 PBJ', pkOrd:10, stk:{list:'retail',label:'Triple Stack PB + J',src:'pkg'} },
+    { id:'279', name:'Triple Stack Turkey & Swiss', recipe:'71376', sheet:'triple', sec:'', on:true, pack:'sand', pkLabel:'3 Turk', pkOrd:20, stk:{list:'retail',label:'Turkey, Swiss + Cranberry Aioli Triple',src:'pkg'} },
+    { id:'283', name:'Triple Stack Ham & Swiss', recipe:'81181', sheet:'triple', sec:'', on:true, pack:'sand', pkLabel:'3 Ham', pkOrd:30, stk:{list:'retail',label:'Ham + Swiss Triple Stack',src:'pkg'} },
+    /* ---- Fruit cups (counted across all locations) ---- */
+    { id:'9266', name:'Mixed Fruit Cup (12oz)', recipe:'243004', sheet:'fruit', sec:'', on:true, pack:'fruit', pkLabel:'Fruit', pkOrd:1000, stk:{list:'retail',label:'Mixed Fruit Cup',src:'tot'} },
+    { id:'8637', name:'Grab & Go 8 oz Fruit Cup (DC)', recipe:'243008', sheet:'fruit', sec:'', on:true, pack:'', pkLabel:'', pkOrd:0, stk:{list:'dc',label:'Fruit Cup (8oz)',src:'tot'} }
+  ],
+  /* Linked amounts. Each row: value = round( sum(mult x count(item)) / per ).
+     count source: dc = Worcester DC (loc 01) · rt = cafes (everything except
+     the four dining commons) · tot = all locations · tsSand = orders x3
+     (triple sandwiches) · tsPkg = orders x2 (triple packages).
+     round: up = whole number up · up1 = 1 decimal up · r1/r2 = nearest
+     1/2 decimals · none = exact. */
+  calcs: [
+    { slot:'dcbread', label:'10" Tomato Wraps (PACKS)', unit:'', round:'up', per:12, note:'', terms:[{item:'9241',src:'dc',mult:1}] },
+    { slot:'dcbread', label:'10" White Wraps (PACKS)', unit:'', round:'up', per:12, note:'', terms:[{item:'9268',src:'dc',mult:1}] },
+    { slot:'dcbread', label:'GF Rolls (PACKS)', unit:'', round:'up', per:4, note:'', terms:[{item:'2420',src:'dc',mult:1}] },
+    { slot:'dcbread', label:'GF WW Bread', unit:'', round:'up', per:6, note:'', terms:[{item:'2421',src:'dc',mult:1}] },
+    { slot:'dcbread', label:'Kaiser Roll (PACKS)', unit:'', round:'up', per:6, note:'', terms:[{item:'1004',src:'dc',mult:1},{item:'2366',src:'dc',mult:1}] },
+    { slot:'dcbread', label:'White Bread (LOAF)', unit:'', round:'up', per:8, note:'', terms:[{item:'2387',src:'dc',mult:1}] },
+    { slot:'dcbread', label:'Rye Bread (LOAF)', unit:'', round:'up', per:15, note:'', terms:[{item:'2291',src:'dc',mult:1}] },
+    { slot:'dcbread', label:'Whole Wheat (LOAF)', unit:'', round:'up', per:8, note:'', terms:[{item:'2299',src:'dc',mult:1}] },
+    { slot:'dcbread', label:'Grinder Rolls (PACKS)', unit:'', round:'up', per:6, note:'', terms:[{item:'2352',src:'dc',mult:1}] },
+    { slot:'dcchicken', label:'Buffalo Chicken (DC Total)', unit:'LBS', round:'up', per:8, note:'', terms:[{item:'9241',src:'dc',mult:2}] },
+    { slot:'dcchicken', label:'Chicken Caesar (DC Total)', unit:'LBS', round:'up', per:16, note:'', terms:[{item:'9268',src:'dc',mult:2}] },
+    { slot:'rtbread', label:'Gluten Free Rolls (PACKS)', unit:'', round:'up', per:4, note:'', terms:[{item:'8009',src:'rt',mult:1}] },
+    { slot:'rtbread', label:'GF WW Bread', unit:'', round:'up', per:6, note:'', terms:[{item:'2421',src:'rt',mult:1}] },
+    { slot:'rtbread', label:'Multigrain Loaves (LOAF)', unit:'', round:'up', per:8, note:'', terms:[{item:'9221',src:'rt',mult:1}] },
+    { slot:'rtbread', label:'10" Wraps (PACKS)', unit:'', round:'up', per:12, note:'', terms:[{item:'9257',src:'rt',mult:1},{item:'9268',src:'rt',mult:1}] },
+    { slot:'rtbread', label:'Tomato Wraps (PACKS)', unit:'', round:'up', per:10, note:'', terms:[{item:'9255',src:'rt',mult:1}] },
+    { slot:'rtchicken', label:'Buffalo Chicken (Retail Total)', unit:'LBS', round:'up', per:12, note:'', terms:[{item:'9255',src:'rt',mult:3}] },
+    { slot:'rtchicken', label:'Chicken Caesar (Retail Total)', unit:'LBS', round:'up', per:12, note:'', terms:[{item:'9257',src:'rt',mult:3},{item:'9268',src:'rt',mult:3}] },
+    { slot:'tribread', label:'Wheat Bread (LOAF)', unit:'', round:'up', per:7, note:'', terms:[{item:'253',src:'tsSand',mult:1},{item:'279',src:'tsSand',mult:1}] },
+    { slot:'tribread', label:'Rye Bread (LOAF)', unit:'', round:'up', per:14, note:'', terms:[{item:'283',src:'tsSand',mult:1}] },
+    { slot:'fruitbulk', label:'Pineapple', unit:'lbs', round:'r1', per:1, note:'1 CS ≈ 9 lbs', terms:[{item:'9266',src:'tot',mult:0.19},{item:'8637',src:'tot',mult:0.12666}] },
+    { slot:'fruitbulk', label:'Honeydew', unit:'lbs', round:'r1', per:1, note:'1 CS ≈ 11 lbs', terms:[{item:'9266',src:'tot',mult:0.19},{item:'8637',src:'tot',mult:0.12666}] },
+    { slot:'fruitbulk', label:'Cantaloupe', unit:'lbs', round:'r1', per:1, note:'1 CS ≈ 17 lbs', terms:[{item:'9266',src:'tot',mult:0.19},{item:'8637',src:'tot',mult:0.12666}] },
+    { slot:'fruitbulk', label:'Grapes', unit:'lbs', round:'up', per:1, note:'', terms:[{item:'9266',src:'tot',mult:0.0625},{item:'8637',src:'tot',mult:0.04166}] },
+    { slot:'fruitbulk', label:'Strawberries', unit:'lbs', round:'up', per:1, note:'1 CS ≈ 6 lbs', terms:[{item:'9266',src:'tot',mult:0.125},{item:'8637',src:'tot',mult:0.0833}] },
+    { slot:'prep', sec:'SLICING', label:'Sliced Ham', unit:'lbs', round:'up', per:1, note:'', terms:[{item:'4735',src:'tot',mult:1},{item:'2291',src:'dc',mult:0.2},{item:'2352',src:'dc',mult:0.1},{item:'7523',src:'rt',mult:0.1},{item:'283',src:'tsSand',mult:0.2}] },
+    { slot:'prep', sec:'SLICING', label:'Sliced Turkey', unit:'lbs', round:'up', per:1, note:'', terms:[{item:'4926',src:'tot',mult:1},{item:'2420',src:'dc',mult:0.2},{item:'1004',src:'dc',mult:0.2},{item:'8009',src:'rt',mult:0.2},{item:'2226',src:'rt',mult:0.2},{item:'279',src:'tsSand',mult:0.2}] },
+    { slot:'prep', sec:'SLICING', label:'Sliced Roast Beef', unit:'lbs', round:'up', per:1, note:'', terms:[{item:'2366',src:'dc',mult:0.2}] },
+    { slot:'prep', sec:'SLICING', label:'Sliced Provolone', unit:'lbs', round:'up', per:1, note:'', terms:[{item:'4738',src:'tot',mult:1},{item:'7523',src:'rt',mult:0.1},{item:'1004',src:'dc',mult:0.1},{item:'2352',src:'dc',mult:0.1}] },
+    { slot:'prep', sec:'SLICING', label:'Sliced Cheddar', unit:'lbs', round:'up', per:1, note:'', terms:[{item:'4740',src:'tot',mult:1},{item:'2420',src:'dc',mult:0.1},{item:'8009',src:'rt',mult:0.1},{item:'2226',src:'rt',mult:0.1}] },
+    { slot:'prep', sec:'SLICING', label:'Sliced Swiss', unit:'lbs', round:'up', per:1, note:'', terms:[{item:'7173',src:'tot',mult:1},{item:'279',src:'tsSand',mult:0.1},{item:'283',src:'tsSand',mult:0.1},{item:'2291',src:'dc',mult:0.1}] },
+    { slot:'prep', sec:'COOKING', label:'Boiled Eggs', unit:'each', round:'none', per:1, note:'', terms:[{item:'9212',src:'rt',mult:1}] },
+    { slot:'prep', sec:'COOKING', label:'Grilled Chicken', unit:'lbs', round:'r2', per:1, note:'', terms:[{item:'8371',src:'dc',mult:0.2},{item:'9268',src:'dc',mult:0.2},{item:'9241',src:'dc',mult:0.2},{item:'9255',src:'rt',mult:0.25},{item:'9257',src:'rt',mult:0.25},{item:'9268',src:'rt',mult:0.25},{item:'9212',src:'rt',mult:0.15},{item:'9221',src:'rt',mult:0.25}] },
+    { slot:'prep', sec:'COOKING', label:'Spiced Walnuts', unit:'lbs', round:'up', per:1, note:'', terms:[{item:'301',src:'rt',mult:0.1}] },
+    { slot:'prep', sec:'VEGETABLES', label:'Carrot Sticks', unit:'lbs', round:'r2', per:1, note:'', terms:[{item:'2404',src:'dc',mult:0.3}] },
+    { slot:'prep', sec:'VEGETABLES', label:'Cucumbers', unit:'lbs', round:'r2', per:1, note:'', terms:[{item:'8372',src:'dc',mult:0.1}] },
+    { slot:'prep', sec:'VEGETABLES', label:'Red Onions', unit:'lbs', round:'r2', per:1, note:'', terms:[{item:'2352',src:'dc',mult:0.1},{item:'8372',src:'dc',mult:0.1},{item:'301',src:'rt',mult:0.1}] },
+    { slot:'prep', sec:'VEGETABLES', label:'Peppers', unit:'lbs', round:'r2', per:1, note:'', terms:[{item:'2352',src:'dc',mult:0.1}] },
+    { slot:'prep', sec:'VEGETABLES', label:'Sliced Tomatoes', unit:'lbs', round:'r2', per:1, note:'', terms:[{item:'8009',src:'rt',mult:0.15},{item:'7523',src:'rt',mult:0.15},{item:'9221',src:'rt',mult:0.15},{item:'2226',src:'rt',mult:0.15},{item:'9255',src:'rt',mult:0.15}] },
+    { slot:'prep', sec:'SALADS', label:'Tuna Salad', unit:'lbs', round:'up', per:1, note:'', terms:[{item:'2387',src:'dc',mult:0.3},{item:'2387',src:'rt',mult:0.3}] },
+    { slot:'prep', sec:'AIOLIS & DRESSINGS', label:'Cranberry Aioli', unit:'gal', round:'up1', per:128, note:'', terms:[{item:'279',src:'tsSand',mult:1}] },
+    { slot:'prep', sec:'AIOLIS & DRESSINGS', label:'Sundried Tomato Aioli', unit:'gal', round:'up1', per:128, note:'', terms:[{item:'8009',src:'rt',mult:1}] },
+    { slot:'prep', sec:'AIOLIS & DRESSINGS', label:'Berry Vinaigrette', unit:'gal', round:'up1', per:64, note:'', terms:[{item:'301',src:'rt',mult:1}] }
+  ]
+};
+
+/* ============================================================
+   CONFIG STORAGE
+   ============================================================ */
+var CFG_KEY = 'cpk_manager_config_v1';
+var config = loadConfig();
+function loadConfig() {
+  try {
+    var c = JSON.parse(localStorage.getItem(CFG_KEY));
+    if (c && c.v === 1 && Array.isArray(c.items) && Array.isArray(c.calcs)) return c;
+  } catch (e) {}
+  return JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+}
+function saveConfig() {
+  try { localStorage.setItem(CFG_KEY, JSON.stringify(config)); } catch (e) {}
+}
+function resetConfig() {
+  try { localStorage.removeItem(CFG_KEY); } catch (e) {}
+  config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+}
+
+/* ============================================================
+   PARSER (same grammar as the validated planner)
+   ============================================================ */
+var LINE = /^\s*(\d{1,2}\/\d{1,2}\/\d{2,4})\s+(\d[\d.]*)\s+(.+?)\s+(\d{1,3})\s*,\s*(.+?)\s{2,}(\d+)\s+(?:(\d+)\s+)?([A-Za-z]+)/;
+var DATE_LEAD = /^\s*\d{1,2}\/\d{1,2}\/\d{2,4}/;
+function parseRecap(text) {
+  var rows = [], skipped = [], multi = false;
+  var end = text.search(/^[ \t]*END OF LIST/im);
+  if (end !== -1) {
+    multi = /\d{1,2}\/\d{1,2}\/\d{2,4}/.test(text.slice(end + 11));
+    text = text.slice(0, end);
+  }
+  text.split(/\r?\n/).forEach(function (line) {
+    if (!line.trim()) return;
+    var m = line.match(LINE);
+    if (!m) { if (DATE_LEAD.test(line)) skipped.push(line.trim()); return; }
+    rows.push({
+      date: m[1],
+      item: normItem(m[2]),
+      name: m[3].trim(),
+      locCode: m[4].replace(/^0+(?=\d)/, '').padStart(2, '0'),
+      loc: m[5].trim(),
+      qty: parseInt(m[6], 10) || 0
+    });
+  });
+  return { rows: rows, skipped: skipped, multi: multi, excel: false };
+}
+/* Fallback for rows copied straight off the Excel workbook's Paste page:
+   tab-separated cells carrying an ITEM_LOCATION key like "253_23" with the
+   amount in the next filled cell. Works whether or not the date and item
+   columns came along in the copy. */
+function parseExcelPaste(text) {
+  var rows = [], seen = {}, stop = false;
+  text.split(/\r?\n/).forEach(function (line) {
+    if (stop || line.indexOf('\t') === -1) return;
+    if (/END OF LIST/i.test(line)) { stop = true; return; }
+    var cells = line.split('\t').map(function (c) { return c.trim(); });
+    var ki = -1;
+    for (var i = 0; i < cells.length; i++) {
+      if (/^\d[\d.]*_\d{1,3}$/.test(cells[i])) { ki = i; break; }
+    }
+    if (ki === -1) return;
+    var qty = null;
+    for (var j = ki + 1; j < cells.length; j++) {
+      if (cells[j] !== '') { if (/^\d+$/.test(cells[j])) qty = parseInt(cells[j], 10); break; }
+    }
+    if (qty === null) return;
+    var kp = cells[ki].split('_');
+    var item = normItem(kp[0]);
+    var loc = (kp[1].replace(/^0+(?=\d)/, '') || '0').padStart(2, '0');
+    if (seen[item + '_' + loc]) { stop = true; return; } /* stacked older recap below: first one only */
+    seen[item + '_' + loc] = 1;
+    var name = '';
+    for (var n = 0; n < ki; n++) {
+      if (/[A-Za-z]/.test(cells[n]) && cells[n].charAt(0) !== ',' && !/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(cells[n]) && !/^\d+\s+[A-Za-z]+$/.test(cells[n])) { name = cells[n]; break; }
+    }
+    rows.push({ date: '', item: item, name: name || ('Item ' + item), locCode: loc, loc: '', qty: qty });
+  });
+  return { rows: rows, skipped: [], multi: false, excel: true };
+}
+function parse(text) {
+  /* Tabs (an Excel copy) collapse to one whitespace char, which the recap
+     grammar reads as a single space; widen them so both formats parse. */
+  var out = parseRecap(text.replace(/\t/g, '   '));
+  if (!out.rows.length) {
+    var x = parseExcelPaste(text);
+    if (x.rows.length) return x;
+  }
+  return out;
+}
+
+/* ============================================================
+   ENGINE
+   ============================================================ */
+function indexOrders(rows) {
+  var idx = {};
+  rows.forEach(function (r) {
+    var e = idx[r.item] || (idx[r.item] = { name: r.name, total: 0, byLoc: {} });
+    e.byLoc[r.locCode] = (e.byLoc[r.locCode] || 0) + r.qty;
+    e.total += r.qty;
+  });
+  return idx;
+}
+function makeCtx(idx) {
+  function tot(it) { var e = idx[normItem(it)]; return e ? e.total : 0; }
+  function loc(it, l) { var e = idx[normItem(it)]; return e ? (e.byLoc[l] || 0) : 0; }
+  return {
+    idx: idx,
+    tot: tot,
+    loc: loc,
+    dc: function (it) { return loc(it, '01'); },
+    rt: function (it) { return tot(it) - config.dcLocs.reduce(function (s, l) { return s + loc(it, l); }, 0); },
+    tsSand: function (it) { return tot(it) * 3; },
+    tsPkg: function (it) { return tot(it) * 2; }
+  };
+}
+function srcVal(ctx, item, src) {
+  if (src === 'dc') return ctx.dc(item);
+  if (src === 'rt') return ctx.rt(item);
+  if (src === 'tsSand') return ctx.tsSand(item);
+  if (src === 'tsPkg') return ctx.tsPkg(item);
+  return ctx.tot(item);
+}
+function calcVal(ctx, row) {
+  var sum = row.terms.reduce(function (s, t) { return s + (Number(t.mult) || 0) * srcVal(ctx, t.item, t.src); }, 0);
+  var x = sum / (Number(row.per) || 1);
+  if (row.round === 'up') return roundup(x);
+  if (row.round === 'up1') return roundup(x, 1);
+  if (row.round === 'r1') return r1(x);
+  if (row.round === 'r2') return r2(x);
+  return x;
+}
+function itemsOn(sheet) { return config.items.filter(function (i) { return i.on && i.sheet === sheet; }); }
+function calcsIn(slot) { return config.calcs.filter(function (c) { return c.slot === slot; }); }
+function stickerVal(ctx, item) {
+  var s = item.stk;
+  if (!s) return 0;
+  if (s.src === 'dc') return ctx.dc(item.id);
+  if (s.src === 'rt') return ctx.rt(item.id);
+  if (s.src === 'pkg') return ctx.tsPkg(item.id);
+  return ctx.tot(item.id);
+}
+
+/* Production date = the due date on the orders themselves (most common
+   one), falling back to tomorrow when nothing is loaded. */
+var DAY_DOTS = ['#16161A', '#1D4ED8', '#CA8A04', '#DC2626', '#7C4A03', '#15803D', '#EA580C'];
+var DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+function prodDate() {
+  var counts = {};
+  data.rows.forEach(function (r) { if (r.date) counts[r.date] = (counts[r.date] || 0) + 1; });
+  var best = null;
+  Object.keys(counts).forEach(function (d) { if (!best || counts[d] > counts[best]) best = d; });
+  var dt;
+  if (best) {
+    var p = best.split('/');
+    dt = new Date((p[2].length === 2 ? 2000 + +p[2] : +p[2]), p[0] - 1, +p[1]);
+  } else {
+    dt = new Date(); dt.setDate(dt.getDate() + 1);
+  }
+  return { label: (dt.getMonth() + 1) + '/' + dt.getDate() + '/' + dt.getFullYear(), day: dt.getDay(), fromOrders: !!best };
+}
+
+/* ============================================================
+   SHEET RENDERERS
+   ============================================================ */
+function head(title, printTab) {
+  var d = prodDate();
+  return '<div class="sheet-head"><h2 class="sheet-title">' + esc(title) + '</h2>' +
+    '<div class="sheet-headr"><span class="sheet-date">Production ' + esc(DAY_NAMES[d.day]) + ' ' + esc(d.label) + '</span>' +
+    (printTab ? '<button class="btn sheetprint" data-printsheet="' + esc(printTab) + '" title="Print this sheet">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>' +
+      'Print</button>' : '') +
+    '</div></div>';
+}
+function calcTable(slot, ctx, header, valHeader) {
+  var h = '<table class="t"><thead><tr><th>' + esc(header) + '</th><th class="num">' + esc(valHeader || 'Pull') + '</th></tr></thead><tbody>';
+  calcsIn(slot).forEach(function (row) {
+    h += '<tr><td>' + esc(row.label) + '</td><td class="num big">' + fmt(calcVal(ctx, row)) + '</td></tr>';
+  });
+  return h + '</tbody></table>';
+}
+function chickenTable(slot, ctx) {
+  var h = '<table class="t"><thead><tr><th>Cook / weigh before cutting</th><th class="num">Qty</th><th>Unit</th></tr></thead><tbody>';
+  var tot = 0;
+  calcsIn(slot).forEach(function (row) {
+    var v = calcVal(ctx, row); tot += v;
+    h += '<tr><td>' + esc(row.label) + '</td><td class="num big">' + fmt(v) + '</td><td>' + esc(row.unit || 'LBS') + '</td></tr>';
+  });
+  return h + '<tr class="total"><td>Total</td><td class="num big">' + fmt(tot) + '</td><td>LBS</td></tr></tbody></table>';
+}
+function itemTable(sheet, ctx, needFn) {
+  var h = '<table class="t"><thead><tr><th>Item</th><th class="num">Recipe</th><th class="num">Item #</th><th class="num">Needed</th><th>Unit</th></tr></thead><tbody>';
+  var total = 0, lastSec = null;
+  itemsOn(sheet).forEach(function (it) {
+    if (it.sec && it.sec !== lastSec) { h += '<tr class="band"><td colspan="5">' + esc(it.sec) + '</td></tr>'; lastSec = it.sec; }
+    var need = needFn(it.id);
+    total += need;
+    h += '<tr><td>' + esc(it.name) + '</td><td class="num mono">' + esc(it.recipe) + '</td>' +
+      '<td class="num mono">' + esc(it.id) + '</td><td class="num big">' + fmt(need) + '</td><td>EACH</td></tr>';
+  });
+  h += '<tr class="total"><td colspan="3">TOTAL</td><td class="num big">' + fmt(total) + '</td><td>EACH</td></tr></tbody></table>';
+  return h;
+}
+function renderDC(ctx) {
+  var side = '<div class="blocklabel">Bread to defrost</div>' + calcTable('dcbread', ctx, 'Bread / base') +
+    '<div class="blocklabel mt">Chicken</div>' + chickenTable('dcchicken', ctx);
+  return head('DC Grab & Go', 'dc') +
+    '<div class="grid2"><div>' + itemTable('dc', ctx, ctx.dc) + '</div><div>' + side + '</div></div>';
+}
+function renderRetail(ctx) {
+  var side = '<div class="blocklabel">Bread to defrost</div>' + calcTable('rtbread', ctx, 'Bread / base') +
+    '<div class="blocklabel mt">Chicken</div>' + chickenTable('rtchicken', ctx);
+  var h = head('Retail Grab & Go', 'retail') +
+    '<div class="grid2"><div>' + itemTable('retail', ctx, ctx.rt) + '</div><div>' + side + '</div></div>';
+  var t = '<div class="blocklabel mt">Triple stacks</div>' +
+    '<table class="t"><thead><tr><th>Item</th><th class="num">Item #</th><th class="num">Ordered</th><th class="num">Packages</th><th class="num">Sandwiches</th></tr></thead><tbody>';
+  var oT = 0, pT = 0, sT = 0;
+  itemsOn('triple').forEach(function (it) {
+    var o = ctx.tot(it.id), p = o * 2, s = p * 1.5;
+    oT += o; pT += p; sT += s;
+    t += '<tr><td>' + esc(it.name) + '</td><td class="num mono">' + esc(it.id) + '</td>' +
+      '<td class="num">' + fmt(o) + '</td><td class="num big">' + fmt(p) + '</td><td class="num">' + fmt(s) + '</td></tr>';
+  });
+  t += '<tr class="total"><td colspan="2">TOTAL</td><td class="num">' + fmt(oT) + '</td><td class="num big">' + fmt(pT) + '</td><td class="num">' + fmt(sT) + '</td></tr></tbody></table>' +
+    '<p class="hint">1 ordered unit = 2 packages; 1 package = 1.5 sandwiches (3 halves).</p>' +
+    '<div class="grid2" style="margin-top:12px;"><div>' + calcTable('tribread', ctx, 'Triple-stack bread') + '</div><div></div></div>';
+  return h + t;
+}
+function renderFruit(ctx) {
+  var cups = '<table class="t"><thead><tr><th>Item</th><th class="num">Recipe</th><th class="num">Item #</th><th class="num">Needed</th></tr></thead><tbody>';
+  itemsOn('fruit').forEach(function (it) {
+    cups += '<tr><td>' + esc(it.name) + '</td><td class="num mono">' + esc(it.recipe) + '</td>' +
+      '<td class="num mono">' + esc(it.id) + '</td><td class="num big">' + fmt(ctx.tot(it.id)) + '</td></tr>';
+  });
+  cups += '</tbody></table>';
+  var bulk = '<table class="t"><thead><tr><th>Bulk fruit (cut weight)</th><th class="num">lbs</th><th></th></tr></thead><tbody>';
+  calcsIn('fruitbulk').forEach(function (row) {
+    bulk += '<tr><td>' + esc(row.label) + '</td><td class="num big">' + fmt(calcVal(ctx, row)) + '</td><td class="mono">' + esc(row.note || '') + '</td></tr>';
+  });
+  bulk += '</tbody></table>';
+  return head('Fruit Cups', 'fruit') +
+    '<div class="grid2"><div><div class="blocklabel">Mixed fruit cups</div>' + cups + '</div>' +
+    '<div><div class="blocklabel">Bulk required</div>' + bulk + '</div></div>' +
+    '<p class="hint">12oz cup: 3oz cantaloupe · 3oz honeydew · 3oz pineapple · 2oz strawberries · 3 to 4 red grapes.</p>';
+}
+function renderPrep(ctx) {
+  var h = '<table class="t"><thead><tr><th>Item</th><th class="num">Needed</th><th>Unit</th></tr></thead><tbody>';
+  var lastSec = null;
+  calcsIn('prep').forEach(function (row) {
+    if (row.sec && row.sec !== lastSec) { h += '<tr class="band"><td colspan="3">' + esc(row.sec) + '</td></tr>'; lastSec = row.sec; }
+    h += '<tr><td>' + esc(row.label) + '</td><td class="num big">' + fmt(calcVal(ctx, row)) + '</td><td>' + esc(row.unit) + '</td></tr>';
+  });
+  return head('Prep', 'prep') + h + '</tbody></table>' +
+    '<p class="hint">Amounts come from the per-item factors in Menu setup (Linked amounts).</p>';
+}
+function pkCols() {
+  return config.items.filter(function (i) { return i.on && i.pack; })
+    .sort(function (a, b) { return (a.pkOrd || 900) - (b.pkOrd || 900); });
+}
+function packoutLocs(ctx, cols) {
+  var seen = {};
+  cols.forEach(function (col) {
+    var e = ctx.idx[col.id];
+    if (e) Object.keys(e.byLoc).forEach(function (l) {
+      if (e.byLoc[l] > 0 && config.dcLocs.indexOf(l) === -1) seen[l] = true;
+    });
+  });
+  var extra = Object.keys(seen).filter(function (l) { return config.route.indexOf(l) === -1; }).sort(function (a, b) { return +a - +b; });
+  return config.route.concat(extra);
+}
+var pkShowEmpty = false;
+function renderPackout(ctx) {
+  /* Columns grouped by tray type, so the tray math is visible in the
+     layout itself. Cafes and items with nothing to pack are hidden by
+     default so the whole grid fits one printed page. */
+  var GROUPS = [
+    { g: 'sand', label: 'SANDWICHES · tray of ' + config.trays.sand },
+    { g: 'salad', label: 'SALADS · tray of ' + config.trays.salad },
+    { g: 'wrap', label: 'WRAPS · tray of ' + config.trays.wrap },
+    { g: 'fruit', label: 'FRUIT · tray of ' + config.trays.fruit }
+  ];
+  var all = pkCols();
+  var locsAll = packoutLocs(ctx, all);
+  var qty = {}, colAny = {}, locAny = {};
+  locsAll.forEach(function (loc) {
+    qty[loc] = {};
+    all.forEach(function (it) {
+      var v = ctx.loc(it.id, loc);
+      if (it.sheet === 'triple') v *= 2;
+      qty[loc][it.id] = v;
+      if (v) { colAny[it.id] = 1; locAny[loc] = 1; }
+    });
+  });
+  var useCols = all, useLocs = locsAll, hiddenCols = 0, hiddenLocs = 0;
+  if (!pkShowEmpty) {
+    useCols = all.filter(function (it) { return colAny[it.id]; });
+    useLocs = locsAll.filter(function (l) { return locAny[l]; });
+    hiddenCols = all.length - useCols.length;
+    hiddenLocs = locsAll.length - useLocs.length;
+  }
+  var groups = [], cols = [];
+  GROUPS.forEach(function (G) {
+    var mine = useCols.filter(function (c) { return c.pack === G.g; });
+    if (!mine.length) return;
+    groups.push({ label: G.label, n: mine.length });
+    mine.forEach(function (c, i) { cols.push({ it: c, gstart: i === 0 }); });
+  });
+  var toggle = '<p class="hint noprint"><label style="cursor:pointer;"><input type="checkbox" id="pk-showempty"' +
+    (pkShowEmpty ? ' checked' : '') + '> Show cafes and items with nothing today' +
+    (!pkShowEmpty && (hiddenLocs || hiddenCols) ? ' (' + hiddenLocs + ' stop' + (hiddenLocs === 1 ? '' : 's') + ' and ' + hiddenCols + ' item' + (hiddenCols === 1 ? '' : 's') + ' hidden)' : '') +
+    '</label></p>';
+  if (!cols.length || !useLocs.length) {
+    return head('Packout', 'packout') + '<p class="hint">Nothing to pack for the cafes today.</p>' + toggle;
+  }
+
+  var t = '<div class="scroll"><table class="t pk"><thead>';
+  t += '<tr class="pkband"><th rowspan="2" class="loc">Location</th>';
+  groups.forEach(function (G) { t += '<th colspan="' + G.n + '" class="gstart">' + esc(G.label) + '</th>'; });
+  t += '<th rowspan="2" class="num tray" data-c="T">Trays</th></tr><tr>';
+  cols.forEach(function (c, ci) {
+    t += '<th class="vlab' + (c.gstart ? ' gstart' : '') + '" data-c="' + ci + '"><span>' + esc(c.it.pkLabel || c.it.name.slice(0, 12)) + '</span> <span class="inum">' + esc(c.it.id) + '</span></th>';
+  });
+  t += '</tr></thead><tbody>';
+  var colTot = {}, grand = 0;
+  useLocs.forEach(function (loc) {
+    var name = config.locations[loc] || loc;
+    var acc = 0, cells = '', any = false;
+    cols.forEach(function (c, ci) {
+      var q = qty[loc][c.it.id];
+      if (q) { any = true; colTot[c.it.id] = (colTot[c.it.id] || 0) + q; acc += q / (config.trays[c.it.pack] || 20); }
+      cells += '<td class="num' + (q ? ' q' : ' zero') + (c.gstart ? ' gstart' : '') + '" data-c="' + ci + '">' + (q || '') + '</td>';
+    });
+    var trays = roundup(acc);
+    grand += trays;
+    t += '<tr' + (any ? '' : ' class="pkempty"') + '><td class="loc">' + esc(loc) + ' · ' + esc(name) + '</td>' + cells +
+      '<td class="num tray" data-c="T">' + (trays || '') + '</td></tr>';
+  });
+  t += '<tr class="total"><td class="loc">TOTAL LABELS</td>';
+  cols.forEach(function (c, ci) { t += '<td class="num' + (c.gstart ? ' gstart' : '') + '" data-c="' + ci + '">' + (colTot[c.it.id] || '') + '</td>'; });
+  t += '<td class="num tray" data-c="T">' + grand + '</td></tr></tbody></table></div>';
+  return head('Packout', 'packout') + t +
+    '<p class="hint">Each cell = units to pack for that cafe. Triple stacks count as packages (ordered x2). ' +
+    'Trays per cafe = sandwiches/' + config.trays.sand + ' + salads/' + config.trays.salad + ' + wraps/' + config.trays.wrap + ' + fruit/' + config.trays.fruit + ', rounded up.' +
+    (pkShowEmpty ? ' Grayed rows ship nothing today.' : '') + '</p>' + toggle;
+}
+/* Crosshair highlight on the packout grid: column header lights its column,
+   location cell lights its row, a matrix cell lights both. */
+function bindPackoutHover(pk) {
+  var clear = function () {
+    var hl = pk.querySelectorAll('.col-hl,.row-hl,.cell-hl');
+    for (var i = 0; i < hl.length; i++) hl[i].classList.remove('col-hl', 'row-hl', 'cell-hl');
+  };
+  var addCol = function (c) {
+    var els = pk.querySelectorAll('[data-c="' + c + '"]');
+    for (var i = 0; i < els.length; i++) els[i].classList.add('col-hl');
+  };
+  pk.addEventListener('mouseover', function (e) {
+    var cell = e.target.closest ? e.target.closest('td,th') : null;
+    if (!cell || !pk.contains(cell)) return;
+    clear();
+    var c = cell.getAttribute('data-c');
+    var inBody = cell.parentElement && cell.parentElement.parentElement && cell.parentElement.parentElement.tagName === 'TBODY';
+    if (cell.tagName === 'TH') {
+      if (c != null) { addCol(c); cell.classList.add('cell-hl'); }
+      return;
+    }
+    if (cell.classList.contains('loc')) {
+      if (inBody) { cell.parentElement.classList.add('row-hl'); cell.classList.add('cell-hl'); }
+      return;
+    }
+    if (c != null) {
+      addCol(c);
+      if (inBody) cell.parentElement.classList.add('row-hl');
+      cell.classList.add('cell-hl');
+    }
+  });
+  pk.addEventListener('mouseleave', clear);
+}
+
+function renderStickers(ctx) {
+  function colTable(caption, list) {
+    var tot = 0;
+    var t = '<table class="t"><thead><tr><th>' + esc(caption) + '</th><th class="num">Labels</th></tr></thead><tbody>';
+    list.forEach(function (it) {
+      var n = stickerVal(ctx, it); tot += n;
+      t += '<tr><td>' + esc(it.stk.label) + '</td><td class="num big">' + fmt(n) + '</td></tr>';
+    });
+    return t + '<tr class="total"><td>TOTAL</td><td class="num big">' + fmt(tot) + '</td></tr></tbody></table>';
+  }
+  var dcList = config.items.filter(function (i) { return i.on && i.stk && i.stk.list === 'dc'; });
+  var rtList = config.items.filter(function (i) { return i.on && i.stk && i.stk.list === 'retail'; });
+  return head('Stickers', 'stickers') + '<div class="grid2">' +
+    '<div>' + colTable('DC Grab & Go: FoodPro stickers', dcList) + '</div>' +
+    '<div>' + colTable('Retail Grab & Go: Harvest Fresh stickers', rtList) + '</div></div>';
+}
+
+/* ============================================================
+   CHECK (audit): every ordered unit must land on a sheet.
+   ============================================================ */
+function auditData(ctx) {
+  var dcItems = {}, rtItems = {}, whole = {}, pkItems = {};
+  config.items.forEach(function (i) {
+    if (!i.on) return;
+    if (i.sheet === 'dc') dcItems[i.id] = 1;
+    if (i.sheet === 'retail') rtItems[i.id] = 1;
+    if (i.sheet === 'triple' || i.sheet === 'fruit') whole[i.id] = 1;
+    if (i.pack) pkItems[i.id] = 1;
+  });
+  config.calcs.forEach(function (c) {
+    c.terms.forEach(function (t) { if (t.src === 'tot') whole[t.item] = whole[t.item] || 2; });
+  });
+  var rows = [], problems = 0, uncoveredTotal = 0;
+  Object.keys(ctx.idx).sort(function (a, b) { return +a - +b; }).forEach(function (it) {
+    var e = ctx.idx[it];
+    if (!e.total) return;
+    var dcQty = e.byLoc['01'] || 0;
+    var otherDC = config.dcLocs.slice(1).reduce(function (s, l) { return s + (e.byLoc[l] || 0); }, 0);
+    var rtQty = e.total - dcQty - otherDC;
+    var notes = [], uncovered = 0;
+    if (!dcItems[it] && !rtItems[it] && !whole[it]) {
+      notes.push('on NO sheet: ' + e.total + ' units not produced');
+      uncovered = e.total;
+    } else if (!whole[it]) {
+      if (dcQty > 0 && !dcItems[it]) { notes.push('DC qty not counted (no DC row)'); uncovered += dcQty; }
+      if (rtQty > 0 && !rtItems[it]) { notes.push('cafe qty not counted (no Retail row)'); uncovered += rtQty; }
+      if (otherDC > 0) notes.push(otherDC + ' at Franklin/Hampshire/Berkshire excluded (made by that DC, not Worcester)');
+    }
+    if (rtQty > 0 && !pkItems[it] && (rtItems[it] || whole[it])) notes.push('no Packout column: cafe units will not ship');
+    if (uncovered > 0 || notes.some(function (n) { return n.indexOf('Packout') !== -1; })) problems++;
+    uncoveredTotal += uncovered;
+    rows.push({
+      item: it, name: e.name, total: e.total,
+      dc: dcItems[it] ? dcQty : null, rt: rtItems[it] ? rtQty : null,
+      whole: whole[it] ? e.total : null, otherDC: otherDC,
+      pk: !!pkItems[it], notes: notes, uncovered: uncovered
+    });
+  });
+  return { rows: rows, problems: problems, uncovered: uncoveredTotal };
+}
+function renderCheck(ctx) {
+  var a = auditData(ctx);
+  var box = a.problems
+    ? '<div class="warnbox">' + a.problems + ' item(s) need attention, ' + a.uncovered + ' unit(s) are not counted on any sheet. Add the item in Menu setup or check the order.</div>'
+    : '<div class="okbox">Every ordered unit is counted on a sheet. Amounts at Franklin, Hampshire and Berkshire are made by that dining common, not Worcester.</div>';
+  var t = '<div class="scroll"><table class="t"><thead><tr><th class="num">Item #</th><th>Name (from order)</th><th class="num">Ordered</th>' +
+    '<th class="num">DC sheet</th><th class="num">Retail sheet</th><th class="num">Counted whole</th><th class="num">Other DC</th><th>Packout</th><th>Notes</th></tr></thead><tbody>';
+  a.rows.forEach(function (r) {
+    t += '<tr' + (r.notes.length ? ' class="flag"' : '') + '><td class="num mono">' + esc(r.item) + '</td><td>' + esc(r.name) + '</td>' +
+      '<td class="num big">' + fmt(r.total) + '</td>' +
+      '<td class="num">' + (r.dc == null ? '·' : fmt(r.dc)) + '</td>' +
+      '<td class="num">' + (r.rt == null ? '·' : fmt(r.rt)) + '</td>' +
+      '<td class="num">' + (r.whole == null ? '·' : fmt(r.whole)) + '</td>' +
+      '<td class="num">' + (r.otherDC || '·') + '</td>' +
+      '<td>' + (r.pk ? 'yes' : '·') + '</td>' +
+      '<td>' + esc(r.notes.join('; ')) + (r.uncovered > 0 ? ' <button class="mini" data-addmenu="' + esc(r.item) + '" data-addname="' + esc(r.name) + '">Add to menu</button>' : '') + '</td></tr>';
+  });
+  t += '</tbody></table></div>';
+  return head('Check: orders in, production out') + box + t +
+    '<p class="hint">Counted whole = triple stacks, fruit cups and raw slicing goods; those recipes use the total across all locations.</p>';
+}
+
+/* ============================================================
+   SETTINGS (hidden behind the manager sign-in)
+   ============================================================ */
+var SETTINGS_HASH = '6bf7dc74a82fc265df172560b69bbdaa1d3259dcc421b86f97138f6cac625a52';
+var UNLOCK_KEY = 'cpk_settings_unlocked';
+function isUnlocked() { try { return sessionStorage.getItem(UNLOCK_KEY) === '1'; } catch (e) { return false; } }
+function setUnlocked(on) { try { on ? sessionStorage.setItem(UNLOCK_KEY, '1') : sessionStorage.removeItem(UNLOCK_KEY); } catch (e) {} }
+function checkLogin(id, pass) {
+  var msg = (String(id).trim() + ':' + String(pass).trim()).toUpperCase();
+  if (!(window.crypto && crypto.subtle)) return Promise.resolve(false);
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg)).then(function (buf) {
+    var hex = Array.prototype.map.call(new Uint8Array(buf), function (x) { return x.toString(16).padStart(2, '0'); }).join('');
+    return hex === SETTINGS_HASH;
+  });
+}
+
+var SRC_LABEL = {
+  dc: 'Worcester DC orders (loc 01)',
+  rt: 'Cafe orders (all cafes, no dining commons)',
+  tot: 'All orders (every location)',
+  tsSand: 'Triple sandwiches (orders x3)',
+  tsPkg: 'Triple packages (orders x2)'
+};
+var SLOT_LABEL = {
+  dcbread: 'DC sheet: bread to defrost',
+  dcchicken: 'DC sheet: chicken to cook',
+  rtbread: 'Retail sheet: bread to defrost',
+  rtchicken: 'Retail sheet: chicken to cook',
+  tribread: 'Retail sheet: triple-stack bread',
+  fruitbulk: 'Fruit sheet: bulk fruit',
+  prep: 'Prep sheet'
+};
+var setTab = 'menu';
+var editingItem = null;   /* index into config.items, or -1 for new */
+var editingCalc = null;   /* index into config.calcs, or 'new:slot' */
+var pendingAdd = null;    /* {id, name} from the CHECK tab */
+
+function renderLogin() {
+  return '<div class="loginbox"><div class="card">' +
+    '<h3>Manager sign-in</h3>' +
+    '<p class="help">Making sheets and printing is open to everyone. Changing the menu needs the manager login.</p>' +
+    '<input id="li-id" placeholder="ID" autocomplete="off">' +
+    '<input id="li-pass" type="password" placeholder="Password" autocomplete="off">' +
+    '<button class="btn primary" id="li-go" style="width:100%;justify-content:center;">Sign in</button>' +
+    '<p class="msg" id="li-msg"></p>' +
+    '<button class="quiet" id="li-back">Back to the sheets</button>' +
+    '</div></div>';
+}
+
+function itemForm(it) {
+  it = it || { id: '', name: '', recipe: '', sheet: 'retail', sec: 'SANDWICHES', on: true, pack: 'sand', pkLabel: '', pkOrd: 900, stk: { list: 'retail', label: '', src: 'rt' } };
+  var stkList = it.stk ? it.stk.list : '';
+  var opt = function (v, l, cur) { return '<option value="' + v + '"' + (v === cur ? ' selected' : '') + '>' + l + '</option>'; };
+  return '<div class="card" id="itemform"><h3>' + (editingItem === -1 ? 'Add an item' : 'Edit item ' + esc(it.id)) + '</h3>' +
+    '<div class="formgrid">' +
+    '<label class="field">Item #<input id="if-id" value="' + esc(it.id) + '" size="8" inputmode="numeric"' + (editingItem !== -1 ? ' readonly' : '') + '></label>' +
+    '<label class="field">Name on the sheet<input id="if-name" value="' + esc(it.name) + '" size="34"></label>' +
+    '<label class="field">Recipe # (optional)<input id="if-recipe" value="' + esc(it.recipe) + '" size="10"></label>' +
+    '<label class="field">Which sheet<select id="if-sheet">' +
+    opt('dc', 'DC Grab & Go (counts Worcester DC orders)', it.sheet) +
+    opt('retail', 'Retail Grab & Go (counts cafe orders)', it.sheet) +
+    opt('triple', 'Triple stacks (counts every order, x2 packages)', it.sheet) +
+    opt('fruit', 'Fruit cups (counts every order)', it.sheet) + '</select></label>' +
+    '<label class="field">Section on the sheet<input id="if-sec" value="' + esc(it.sec) + '" size="16" placeholder="SANDWICHES"></label>' +
+    '</div><div class="formgrid">' +
+    '<label class="field">Packout column<select id="if-pack">' +
+    opt('', 'None (does not ship to cafes)', it.pack) +
+    opt('sand', 'Sandwich (tray of ' + config.trays.sand + ')', it.pack) +
+    opt('salad', 'Salad (tray of ' + config.trays.salad + ')', it.pack) +
+    opt('wrap', 'Wrap (tray of ' + config.trays.wrap + ')', it.pack) +
+    opt('fruit', 'Fruit (tray of ' + config.trays.fruit + ')', it.pack) + '</select></label>' +
+    '<label class="field">Packout column header<input id="if-pklabel" value="' + esc(it.pkLabel) + '" size="12"></label>' +
+    '<label class="field">Sticker<select id="if-stklist">' +
+    opt('', 'No sticker', stkList) +
+    opt('dc', 'DC sticker run (FoodPro)', stkList) +
+    opt('retail', 'Retail sticker run (Harvest Fresh)', stkList) + '</select></label>' +
+    '<label class="field">Sticker label<input id="if-stklabel" value="' + esc(it.stk ? it.stk.label : '') + '" size="30" placeholder="blank = item name"></label>' +
+    '</div>' +
+    '<p class="help">The sticker count follows the sheet: DC items print their DC amount, retail items their cafe amount, triples print packages, fruit prints the full total.</p>' +
+    '<div class="formgrid">' +
+    '<button class="btn primary" id="if-save">Save item</button>' +
+    '<button class="mini" id="if-cancel">Cancel</button>' +
+    (editingItem !== -1 ? '<button class="mini danger" id="if-delete">Delete this item</button>' : '') +
+    '</div><p class="msg" id="if-msg"></p></div>';
+}
+
+function renderMenuSettings() {
+  var h = '<div class="card"><h3>Menu</h3>' +
+    '<p class="help">Every item the kitchen makes. Un-check an item to take it off every sheet without deleting it (its packout column and sticker go too). ' +
+    'New items start counting from the pasted orders right away. If an ordered item is missing here, the CHECK tab flags it.</p>' +
+    '<div class="formgrid"><button class="btn" id="mi-add">+ Add an item</button></div></div>';
+  if (editingItem !== null) h += itemForm(editingItem === -1 ? (pendingAdd ? { id: pendingAdd.id, name: pendingAdd.name, recipe: '', sheet: 'retail', sec: 'SANDWICHES', on: true, pack: 'sand', pkLabel: '', pkOrd: 900, stk: { list: 'retail', label: '', src: 'rt' } } : null) : config.items[editingItem]);
+  var groups = [['dc', 'DC Grab & Go'], ['retail', 'Retail Grab & Go'], ['triple', 'Triple stacks'], ['fruit', 'Fruit cups']];
+  groups.forEach(function (g) {
+    h += '<div class="card"><h3>' + g[1] + '</h3><table class="t"><thead><tr><th>Make</th><th>Item</th><th class="num">Item #</th><th class="num">Recipe</th><th>Packout</th><th>Sticker</th><th></th></tr></thead><tbody>';
+    config.items.forEach(function (it, i) {
+      if (it.sheet !== g[0]) return;
+      h += '<tr' + (it.on ? '' : ' class="rowoff"') + '><td><input type="checkbox" data-toggle="' + i + '"' + (it.on ? ' checked' : '') + '></td>' +
+        '<td>' + esc(it.name) + '</td><td class="num mono">' + esc(it.id) + '</td><td class="num mono">' + esc(it.recipe) + '</td>' +
+        '<td>' + (it.pack ? esc(it.pack) + ' · ' + esc(it.pkLabel) : '·') + '</td>' +
+        '<td>' + (it.stk ? esc(it.stk.list) : '·') + '</td>' +
+        '<td><button class="mini" data-edit="' + i + '">Edit</button></td></tr>';
+    });
+    h += '</tbody></table></div>';
+  });
+  return h;
+}
+
+function termChips(row, ci) {
+  var h = '';
+  row.terms.forEach(function (t, ti) {
+    h += '<span class="term">' + esc(String(t.mult)) + ' × ' + esc(t.item) + ' · ' + esc(SRC_LABEL[t.src] || t.src) +
+      '<button data-delterm="' + ci + ':' + ti + '" title="Remove">✕</button></span>';
+  });
+  return h;
+}
+function calcEditor(ci) {
+  var isNew = typeof ci === 'string';
+  var row = isNew ? { slot: ci.split(':')[1], sec: '', label: '', unit: 'lbs', round: 'up', per: 1, note: '', terms: [] } : config.calcs[ci];
+  var opt = function (v, l, cur) { return '<option value="' + v + '"' + (v === cur ? ' selected' : '') + '>' + l + '</option>'; };
+  var h = '<div class="card" id="calcform"><h3>' + (isNew ? 'Add a line to ' + esc(SLOT_LABEL[row.slot]) : 'Edit: ' + esc(row.label)) + '</h3>' +
+    '<div class="formgrid">' +
+    '<label class="field">Line name<input id="cf-label" value="' + esc(row.label) + '" size="28"></label>' +
+    '<label class="field">Unit<input id="cf-unit" value="' + esc(row.unit || '') + '" size="6" placeholder="lbs"></label>' +
+    (row.slot === 'prep' ? '<label class="field">Section<input id="cf-sec" value="' + esc(row.sec || '') + '" size="14" placeholder="SLICING"></label>' : '') +
+    '<label class="field">Divide by (per pack / per gallon)<input id="cf-per" value="' + esc(String(row.per || 1)) + '" size="6" inputmode="decimal"></label>' +
+    '<label class="field">Rounding<select id="cf-round">' +
+    opt('up', 'Round up to a whole number', row.round) +
+    opt('up1', 'Round up to 1 decimal', row.round) +
+    opt('r1', 'Nearest 1 decimal', row.round) +
+    opt('r2', 'Nearest 2 decimals', row.round) +
+    opt('none', 'Exact, no rounding', row.round) + '</select></label>' +
+    '<label class="field">Note (shows on the sheet)<input id="cf-note" value="' + esc(row.note || '') + '" size="14"></label>' +
+    '</div>' +
+    '<p class="help">This line adds up the counts below (each times its factor), divides by "per", then rounds. Factors are per ordered unit: 0.2 means every unit needs 0.2 ' + esc(row.unit || 'lbs') + '.</p>' +
+    '<div id="cf-terms">' + termChips(row, isNew ? 'new' : ci) + '</div>' +
+    '<div class="formgrid">' +
+    '<label class="field">Factor<input id="cf-t-mult" size="6" value="1" inputmode="decimal"></label>' +
+    '<label class="field">× Item #<input id="cf-t-item" size="8" inputmode="numeric"></label>' +
+    '<label class="field">Counting<select id="cf-t-src">' +
+    Object.keys(SRC_LABEL).map(function (s) { return '<option value="' + s + '">' + SRC_LABEL[s] + '</option>'; }).join('') +
+    '</select></label>' +
+    '<button class="mini" id="cf-addterm">+ Add to the line</button>' +
+    '</div><div class="formgrid">' +
+    '<button class="btn primary" id="cf-save">Save line</button>' +
+    '<button class="mini" id="cf-cancel">Cancel</button>' +
+    (!isNew ? '<button class="mini danger" id="cf-delete">Delete this line</button>' : '') +
+    '</div><p class="msg" id="cf-msg"></p></div>';
+  return h;
+}
+var draftTerms = null; /* live term list while the calc editor is open */
+function renderWiring(ctx) {
+  var h = '<div class="card"><h3>Linked amounts</h3>' +
+    '<p class="help">Bread pulls, chicken weights, prep amounts and bulk fruit all follow the orders through these lines. ' +
+    'Live value shows what each line makes of the currently pasted orders, so you can check your change immediately. ' +
+    'Most kitchens touch this once a year, when a recipe or pack size changes.</p></div>';
+  if (editingCalc !== null) h += calcEditor(editingCalc);
+  Object.keys(SLOT_LABEL).forEach(function (slot) {
+    h += '<div class="card"><h3>' + esc(SLOT_LABEL[slot]) + '</h3><table class="t"><thead><tr><th>Line</th><th>Recipe (what it adds up)</th><th class="num">Live value</th><th></th></tr></thead><tbody>';
+    config.calcs.forEach(function (row, i) {
+      if (row.slot !== slot) return;
+      var formula = row.terms.map(function (t) { return (t.mult === 1 ? '' : t.mult + ' × ') + t.item + ' ' + t.src; }).join('  +  ') +
+        (Number(row.per) > 1 ? '  ÷ ' + row.per : '');
+      h += '<tr><td>' + (row.sec ? '<span class="mono">' + esc(row.sec) + '</span> ' : '') + esc(row.label) + (row.unit ? ' <span class="mono">(' + esc(row.unit) + ')</span>' : '') + '</td>' +
+        '<td class="mono">' + esc(formula) + '</td>' +
+        '<td class="num big">' + (ctx ? fmt(calcVal(ctx, row)) : '·') + '</td>' +
+        '<td><button class="mini" data-editcalc="' + i + '">Edit</button></td></tr>';
+    });
+    h += '</tbody></table><div class="formgrid"><button class="mini" data-newcalc="' + slot + '">+ Add a line here</button></div></div>';
+  });
+  return h;
+}
+
+function renderSetup() {
+  var locRows = Object.keys(config.locations).sort(function (a, b) { return +a - +b; }).map(function (code) {
+    return '<tr><td class="num mono">' + esc(code) + '</td><td><input data-locname="' + esc(code) + '" value="' + esc(config.locations[code]) + '" size="22" style="border:1px solid var(--rule);border-radius:6px;padding:4px 8px;background:var(--paper);"></td></tr>';
+  }).join('');
+  return '<div class="card"><h3>Trays</h3>' +
+    '<p class="help">How many pieces fit on one packout tray. Trays per cafe are rounded up from these.</p>' +
+    '<div class="formgrid">' +
+    ['salad', 'sand', 'wrap', 'fruit'].map(function (g) {
+      return '<label class="field">' + g + '<input data-tray="' + g + '" value="' + config.trays[g] + '" size="5" inputmode="numeric"></label>';
+    }).join('') +
+    '<button class="mini" id="su-trays">Save trays</button></div><p class="msg" id="su-traymsg"></p></div>' +
+    '<div class="card"><h3>Packout route order</h3>' +
+    '<p class="help">Cafes appear on the Packout sheet in this order (location codes, comma separated). A cafe that orders but is not listed still shows up, added at the end.</p>' +
+    '<div class="formgrid"><input id="su-route" value="' + esc(config.route.join(', ')) + '" style="flex:1;min-width:280px;border:1.5px solid var(--rule);border-radius:7px;padding:8px 10px;background:var(--paper);">' +
+    '<button class="mini" id="su-routesave">Save route</button></div><p class="msg" id="su-routemsg"></p></div>' +
+    '<div class="card"><h3>Location names</h3>' +
+    '<p class="help">Names shown on the Packout sheet. To add a new location, use the row at the bottom. The four dining commons (' + esc(config.dcLocs.join(', ')) + ') are treated as DCs: their orders never count as cafe orders.</p>' +
+    '<table class="t" style="max-width:460px;"><thead><tr><th class="num">Code</th><th>Name</th></tr></thead><tbody>' + locRows +
+    '<tr><td class="num"><input id="su-newcode" size="4" placeholder="99" style="border:1px solid var(--rule);border-radius:6px;padding:4px 8px;background:var(--paper);"></td>' +
+    '<td><input id="su-newname" size="22" placeholder="New cafe name" style="border:1px solid var(--rule);border-radius:6px;padding:4px 8px;background:var(--paper);"></td></tr>' +
+    '</tbody></table>' +
+    '<div class="formgrid"><button class="mini" id="su-locsave">Save locations</button></div><p class="msg" id="su-locmsg"></p></div>';
+}
+
+function renderBackup() {
+  return '<div class="card"><h3>Backup and restore</h3>' +
+    '<p class="help">Menu changes save in THIS browser only (nothing uploads). Export a settings file after big changes and keep it somewhere safe; ' +
+    'import it on a new computer to carry the menu over.</p>' +
+    '<div class="formgrid">' +
+    '<button class="btn" id="bk-export">Export settings file</button>' +
+    '<label class="btn" style="cursor:pointer;">Import settings file<input type="file" id="bk-import" accept=".json" style="display:none;"></label>' +
+    '</div><p class="msg" id="bk-msg"></p></div>' +
+    '<div class="card"><h3>Start over</h3>' +
+    '<p class="help">Puts the menu back to the built-in version this tool shipped with (the one checked against the 2026 workbook). Every change made on this computer is cleared.</p>' +
+    '<div class="formgrid"><button class="mini danger" id="bk-reset">Reset menu to factory version</button></div></div>' +
+    '<div class="card"><h3>Lock</h3>' +
+    '<div class="formgrid"><button class="mini" id="bk-lock">Lock Menu setup (sign out)</button></div></div>';
+}
+
+function renderSettings() {
+  var ctx = data.rows.length ? makeCtx(indexOrders(data.rows)) : null;
+  var nav = [['menu', 'Menu'], ['wiring', 'Linked amounts'], ['setup', 'Locations & trays'], ['backup', 'Backup']];
+  var h = '<div class="sheet-head"><h2 class="sheet-title">Menu setup</h2>' +
+    '<button class="quiet" id="set-close">Close, back to the sheets</button></div>' +
+    '<div class="set-nav">' + nav.map(function (n) {
+      return '<button class="tab' + (setTab === n[0] ? ' active' : '') + '" data-setnav="' + n[0] + '">' + n[1] + '</button>';
+    }).join('') + '</div>';
+  if (setTab === 'menu') h += renderMenuSettings();
+  else if (setTab === 'wiring') h += renderWiring(ctx);
+  else if (setTab === 'setup') h += renderSetup();
+  else h += renderBackup();
+  return h;
+}
+
+/* ============================================================
+   APP STATE + RENDER
+   ============================================================ */
+var data = { rows: [], skipped: [], multi: false };
+var tab = 'dc';
+var view = 'sheets';           /* sheets | login | settings */
+var inputOpen = true;
+var usingSample = false;
+var RENDER = { dc: renderDC, retail: renderRetail, fruit: renderFruit, prep: renderPrep, packout: renderPackout, stickers: renderStickers, check: renderCheck };
+var TABS = [['dc', 'DC G&G'], ['retail', 'Retail G&G'], ['fruit', 'Fruit'], ['prep', 'Prep'], ['packout', 'Packout'], ['stickers', 'Stickers'], ['check', 'Check']];
+var PRINT_TABS = ['dc', 'retail', 'fruit', 'prep', 'packout', 'stickers'];
+
+var SAMPLE = [
+  ['10/15/25', '1004', 'CPK TURKEY ON KAISER', '01', 'Worcester DC', 60, 'EACH'],
+  ['10/15/25', '2291', 'CPK HAM ON RYE', '01', 'Worcester DC', 50, 'EACH'],
+  ['10/15/25', '2299', 'CPK PEANUT BUTTER & JELLY', '01', 'Worcester DC', 40, 'EACH'],
+  ['10/15/25', '2366', 'CPK ROAST BEEF ON KAISER', '01', 'Worcester DC', 30, 'EACH'],
+  ['10/15/25', '2387', 'CPK TUNA SALAD ON WHITE', '01', 'Worcester DC', 30, 'EACH'],
+  ['10/15/25', '2387', 'CPK TUNA SALAD ON WHITE', '23', 'Harvest', 8, 'EACH'],
+  ['10/15/25', '2387', 'CPK TUNA SALAD ON WHITE', '42', 'LIBRARY CAFE', 4, 'EACH'],
+  ['10/15/25', '2404', 'CPK HUMMUS PITA CHIPS CARROTS', '01', 'Worcester DC', 50, 'EACH'],
+  ['10/15/25', '2421', 'CPK PEANUT BUTTER AND JELLY GF', '01', 'Worcester DC', 30, 'EACH'],
+  ['10/15/25', '2421', 'CPK PEANUT BUTTER AND JELLY GF', '23', 'Harvest', 2, 'EACH'],
+  ['10/15/25', '6063', 'CPK SAND HUMMUS VEG VEGAN', '01', 'Worcester DC', 30, 'EACH'],
+  ['10/15/25', '6063', 'CPK SAND HUMMUS VEG VEGAN', '23', 'Harvest', 4, 'EACH'],
+  ['10/15/25', '8285', 'CPK WRAP HUMMUS VEGGIE VEGAN', '01', 'Worcester DC', 40, 'EACH'],
+  ['10/15/25', '8371', 'CPK SALAD CHICKEN CAESAR DC', '01', 'Worcester DC', 120, 'EACH'],
+  ['10/15/25', '8372', 'CPK SALAD GREEN TOSSED DC', '01', 'Worcester DC', 100, 'EACH'],
+  ['10/15/25', '8637', 'FRUIT CUP MIXED CPK', '01', 'Worcester DC', 160, 'EACH'],
+  ['10/15/25', '9241', 'CPK WRAP CHICKEN BUFFALO  DC', '01', 'Worcester DC', 140, 'EACH'],
+  ['10/15/25', '9268', 'CPK CHICKEN WRAP CAESAR GRAB', '01', 'Worcester DC', 120, 'EACH'],
+  ['10/15/25', '9268', 'CPK CHICKEN WRAP CAESAR GRAB', '23', 'Harvest', 15, 'EACH'],
+  ['10/15/25', '8009', 'CPK SANDWICH GF TURKEY & CHEDD', '23', 'Harvest', 6, 'EACH'],
+  ['10/15/25', '8009', 'CPK SANDWICH GF TURKEY & CHEDD', '42', 'LIBRARY CAFE', 2, 'EACH'],
+  ['10/15/25', '9230', 'CPK PEOPLES TURKEY PESTO CROIS', '42', 'LIBRARY CAFE', 3, 'EACH'],
+  ['10/15/25', '2226', 'CPK CROISSANT TURKEY', '13', 'Worcester Cafe', 2, 'EACH'],
+  ['10/15/25', '9221', 'CPK SANDWICH CHICKEN & MOZZARE', '23', 'Harvest', 15, 'EACH'],
+  ['10/15/25', '9255', 'CPK WRAP CHICKEN BUFFALO', '23', 'Harvest', 15, 'EACH'],
+  ['10/15/25', '9255', 'CPK WRAP CHICKEN BUFFALO', '42', 'LIBRARY CAFE', 5, 'EACH'],
+  ['10/15/25', '4837', 'CPK PEOPLES CHICKEN CAESAR', '23', 'Harvest', 18, 'EACH'],
+  ['10/15/25', '4837', 'CPK PEOPLES CHICKEN CAESAR', '42', 'LIBRARY CAFE', 5, 'EACH'],
+  ['10/15/25', '9111', 'SALAD LITTLE LEAF & BERRY PECA', '13', 'Worcester Cafe', 2, 'EACH'],
+  ['10/15/25', '9113', 'ITALIAN SANDWICH NEW ORLEANS C', '08', 'Whitmore Snack Bar (41400-3)', 4, 'EACH'],
+  ['10/15/25', '0301', 'SALAD LITTLE LEAF & DRISCOLL B', '23', 'Harvest', 2, 'EACH'],
+  ['10/15/25', '9266', 'CPK FRUIT CUP MIXED CUT 12oz', '23', 'Harvest', 24, 'each'],
+  ['10/15/25', '9266', 'CPK FRUIT CUP MIXED CUT 12oz', '42', 'LIBRARY CAFE', 16, 'each'],
+  ['10/15/25', '0253', 'CPK TRIPLE STACK PB&J', '23', 'Harvest', 4, '2 eac'],
+  ['10/15/25', '0253', 'CPK TRIPLE STACK PB&J', '42', 'LIBRARY CAFE', 1, '2 eac'],
+  ['10/15/25', '0279', 'CPK TRIPLE STACK TURKEY DC', '23', 'Harvest', 8, '2 eac'],
+  ['10/15/25', '0279', 'CPK TRIPLE STACK TURKEY DC', '42', 'LIBRARY CAFE', 2, '2 eac'],
+  ['10/15/25', '0283', 'CPK TRIPLE STACK HAM', '23', 'Harvest', 4, '2 eac'],
+  ['10/15/25', '0283', 'CPK TRIPLE STACK HAM', '42', 'LIBRARY CAFE', 2, '2 eac']
+].map(function (r) { return r[0] + '     ' + r[1] + '     ' + r[2] + '     ' + r[3] + ', ' + r[4] + '        ' + r[5] + '      ' + r[6]; }).join('\n') + '\nEND OF LIST';
+
+function updateDayChip() {
+  var d = prodDate();
+  document.documentElement.style.setProperty('--accent', DAY_DOTS[d.day]);
+  $('dayword').textContent = data.rows.length
+    ? 'Production ' + DAY_NAMES[d.day].slice(0, 3) + ' ' + d.label
+    : 'No orders yet';
+}
+
+function renderInputZone() {
+  var zone = $('inputzone');
+  if (view !== 'sheets') { zone.innerHTML = ''; return; }
+  if (inputOpen) {
+    zone.innerHTML =
+      '<div class="inputcard">' +
+      '<h2>Paste the day\'s Orders Recap</h2>' +
+      '<p class="sub">Copy the whole FoodPro Orders Recap (or drop the .txt file on the box). The sheets build themselves.</p>' +
+      '<textarea id="orders" spellcheck="false" aria-label="Orders Recap"></textarea>' +
+      '<div class="inputrow">' +
+      '<button class="btn primary" id="btn-gen">Make the sheets</button>' +
+      '<label class="btn" style="cursor:pointer;">Upload .txt file<input type="file" id="file" accept=".txt,text/plain" style="display:none;"></label>' +
+      '<button class="quiet" id="btn-sample">Load sample orders</button>' +
+      '<button class="quiet" id="btn-clear">Clear</button>' +
+      '</div><div class="statusline" id="status"></div></div>';
+    bindInputEvents();
+    if (lastText) $('orders').value = lastText;
+  } else {
+    zone.innerHTML =
+      '<div class="collapsed-input"><div class="statusline" style="margin:0;" id="status"></div>' +
+      '<div class="spacer"></div><button class="btn" id="btn-reopen">Change orders</button></div>';
+    $('btn-reopen').addEventListener('click', function () { inputOpen = true; renderInputZone(); var ta = $('orders'); if (ta) { ta.value = lastText; } updateStatus(); });
+  }
+  updateStatus();
+}
+var lastText = '';
+function updateStatus() {
+  var el = $('status');
+  if (!el) return;
+  if (!data.rows.length) {
+    el.innerHTML = lastText
+      ? '<span class="tag warn">No order lines found</span><span>That paste has no orders the tool can read. Paste the whole FoodPro Orders Recap, or copy the rows straight off the Excel Paste page. Your text is still in the box above.</span>'
+      : '<span>Nothing loaded yet.</span>';
+    return;
+  }
+  var a = auditData(makeCtx(indexOrders(data.rows)));
+  var h = '<span class="tag">' + data.rows.length + ' order lines</span>';
+  if (data.excel) h += '<span class="tag">pasted from Excel</span>';
+  if (usingSample) h += '<span class="tag warn">SAMPLE DATA</span>';
+  if (data.skipped.length) h += '<span>' + data.skipped.length + ' non-order lines ignored</span>';
+  if (data.multi) h += '<span>file held several reports, first one used</span>';
+  h += a.problems
+    ? '<span class="tag warn">' + a.problems + ' item(s) to check, see CHECK tab</span>'
+    : '<span class="tag" style="background:#EDF7EF;color:var(--ok);">all orders counted</span>';
+  el.innerHTML = h;
+}
+
+function renderTabs() {
+  var bar = $('tabs');
+  if (view !== 'sheets') { bar.innerHTML = ''; return; }
+  var aud = data.rows.length ? auditData(makeCtx(indexOrders(data.rows))) : null;
+  bar.innerHTML = TABS.map(function (t) {
+    var badge = '';
+    if (t[0] === 'check' && aud) badge = '<span class="badge ' + (aud.problems ? 'warn' : 'ok') + '"></span>';
+    return '<button class="tab' + (tab === t[0] ? ' active' : '') + '" role="tab" data-tab="' + t[0] + '">' + t[1] + badge + '</button>';
+  }).join('');
+  Array.prototype.forEach.call(bar.querySelectorAll('[data-tab]'), function (b) {
+    b.addEventListener('click', function () { tab = b.dataset.tab; render(); });
+  });
+}
+
+function render() {
+  updateDayChip();
+  renderInputZone();
+  renderTabs();
+  var out = $('out');
+  if (view === 'login') { out.innerHTML = renderLogin(); bindLoginEvents(); return; }
+  if (view === 'settings') { out.innerHTML = renderSettings(); bindSettingsEvents(); return; }
+  if (!data.rows.length) {
+    out.innerHTML = '<p class="hint" style="font-size:.95rem;">Paste an Orders Recap above (or load the sample) and the production sheets appear here.</p>';
+    return;
+  }
+  var ctx = makeCtx(indexOrders(data.rows));
+  out.innerHTML = (RENDER[tab] || renderDC)(ctx);
+  var tl = { dc: 'DC G&G', retail: 'Retail G&G', fruit: 'Fruit', prep: 'Prep', packout: 'Packout', stickers: 'Stickers' };
+  $('btn-print-label').textContent = 'Print ' + (tl[tab] || 'DC G&G');
+  Array.prototype.forEach.call(out.querySelectorAll('[data-printsheet]'), function (b) {
+    b.addEventListener('click', function () { doPrint([b.dataset.printsheet]); });
+  });
+  var pe = out.querySelector('#pk-showempty');
+  if (pe) pe.addEventListener('change', function () { pkShowEmpty = pe.checked; render(); });
+  var pkt = out.querySelector('table.pk');
+  if (pkt) bindPackoutHover(pkt);
+  Array.prototype.forEach.call(out.querySelectorAll('[data-addmenu]'), function (b) {
+    b.addEventListener('click', function () {
+      pendingAdd = { id: b.dataset.addmenu, name: titleCase(b.dataset.addname) };
+      editingItem = -1; setTab = 'menu';
+      view = isUnlocked() ? 'settings' : 'login';
+      render();
+      window.scrollTo(0, 0);
+    });
+  });
+}
+function titleCase(s) {
+  return String(s || '').toLowerCase().replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+}
+
+function generate(text, fromSample) {
+  lastText = text;
+  usingSample = !!fromSample;
+  data = parse(text);
+  if (data.rows.length) inputOpen = false;
+  render();
+}
+
+function bindInputEvents() {
+  var ta = $('orders');
+  $('btn-gen').addEventListener('click', function () { generate(ta.value, false); });
+  $('btn-sample').addEventListener('click', function () { generate(SAMPLE, true); });
+  $('btn-clear').addEventListener('click', function () { ta.value = ''; data = { rows: [], skipped: [], multi: false }; usingSample = false; lastText = ''; render(); });
+  ta.addEventListener('paste', function () { setTimeout(function () { if (ta.value.trim()) generate(ta.value, false); }, 60); });
+  var file = $('file');
+  file.addEventListener('change', function (e) { loadFile(e.target.files && e.target.files[0]); e.target.value = ''; });
+  ta.addEventListener('dragover', function (e) { e.preventDefault(); ta.classList.add('drag'); });
+  ta.addEventListener('dragleave', function () { ta.classList.remove('drag'); });
+  ta.addEventListener('drop', function (e) {
+    if (!e.dataTransfer || !e.dataTransfer.files.length) return;
+    e.preventDefault(); ta.classList.remove('drag');
+    loadFile(e.dataTransfer.files[0]);
+  });
+}
+function loadFile(f) {
+  if (!f) return;
+  var reader = new FileReader();
+  reader.onload = function () { generate(String(reader.result || ''), false); };
+  reader.readAsText(f);
+}
+
+/* ---- print ---- */
+function doPrint(tabs) {
+  if (!data.rows.length) { window.alert('Paste an Orders Recap first, then print.'); return; }
+  var ctx = makeCtx(indexOrders(data.rows));
+  var box = $('printbox');
+  box.innerHTML = tabs.map(function (t) {
+    return '<section class="psheet p-' + t + '">' + RENDER[t](ctx) + '</section>';
+  }).join('');
+  window.print();
+}
+$('btn-print').addEventListener('click', function () { doPrint([PRINT_TABS.indexOf(tab) !== -1 ? tab : 'dc']); });
+$('btn-printall').addEventListener('click', function () { doPrint(PRINT_TABS); });
+window.addEventListener('afterprint', function () { $('printbox').innerHTML = ''; });
+
+/* ---- login + settings events ---- */
+$('gear').addEventListener('click', function () {
+  view = isUnlocked() ? 'settings' : 'login';
+  render(); window.scrollTo(0, 0);
+});
+function bindLoginEvents() {
+  var attempt = function () {
+    checkLogin($('li-id').value, $('li-pass').value).then(function (ok) {
+      if (ok) { setUnlocked(true); view = 'settings'; render(); }
+      else $('li-msg').textContent = (window.crypto && crypto.subtle) ? 'Wrong ID or password.' : 'This browser needs a secure (https) connection to sign in.';
+    });
+  };
+  $('li-go').addEventListener('click', attempt);
+  ['li-id', 'li-pass'].forEach(function (id) {
+    $(id).addEventListener('keydown', function (e) { if (e.key === 'Enter') attempt(); });
+  });
+  $('li-back').addEventListener('click', function () { view = 'sheets'; render(); });
+}
+
+function bindSettingsEvents() {
+  var out = $('out');
+  $('set-close').addEventListener('click', function () { view = 'sheets'; editingItem = null; editingCalc = null; pendingAdd = null; render(); });
+  Array.prototype.forEach.call(out.querySelectorAll('[data-setnav]'), function (b) {
+    b.addEventListener('click', function () { setTab = b.dataset.setnav; editingItem = null; editingCalc = null; render(); });
+  });
+
+  /* menu */
+  var add = $('mi-add');
+  if (add) add.addEventListener('click', function () { editingItem = -1; render(); });
+  Array.prototype.forEach.call(out.querySelectorAll('[data-toggle]'), function (cb) {
+    cb.addEventListener('change', function () {
+      config.items[+cb.dataset.toggle].on = cb.checked;
+      saveConfig(); render();
+    });
+  });
+  Array.prototype.forEach.call(out.querySelectorAll('[data-edit]'), function (b) {
+    b.addEventListener('click', function () { editingItem = +b.dataset.edit; pendingAdd = null; render(); });
+  });
+  if ($('if-save')) {
+    $('if-save').addEventListener('click', function () {
+      var id = normItem(($('if-id').value || '').trim());
+      var name = ($('if-name').value || '').trim();
+      var sheet = $('if-sheet').value;
+      var msg = $('if-msg');
+      if (!/^\d{2,6}$/.test(id)) { msg.textContent = 'Item # must be 2 to 6 digits.'; return; }
+      if (!name) { msg.textContent = 'Give the item a name.'; return; }
+      if (editingItem === -1 && config.items.some(function (i) { return i.id === id && i.sheet === sheet; })) {
+        msg.textContent = 'Item ' + id + ' is already on that sheet.'; return;
+      }
+      var stkList = $('if-stklist').value;
+      var stkSrcBySheet = { dc: 'dc', retail: 'rt', triple: 'pkg', fruit: 'tot' };
+      var rec = {
+        id: id, name: name, recipe: ($('if-recipe').value || '').trim(), sheet: sheet,
+        sec: ($('if-sec').value || '').trim().toUpperCase(), on: true,
+        pack: $('if-pack').value,
+        pkLabel: ($('if-pklabel').value || '').trim() || name.slice(0, 12),
+        pkOrd: editingItem === -1 ? 900 : (config.items[editingItem].pkOrd || 900),
+        stk: stkList ? { list: stkList, label: (($('if-stklabel').value || '').trim()) || name, src: stkSrcBySheet[sheet] } : null
+      };
+      if (editingItem === -1) config.items.push(rec);
+      else { rec.on = config.items[editingItem].on; config.items[editingItem] = rec; }
+      saveConfig();
+      editingItem = null; pendingAdd = null;
+      render();
+    });
+    $('if-cancel').addEventListener('click', function () { editingItem = null; pendingAdd = null; render(); });
+    var del = $('if-delete');
+    if (del) del.addEventListener('click', function () {
+      if (window.confirm('Delete this item from the menu? If it is still ordered, the CHECK tab will flag it.')) {
+        config.items.splice(editingItem, 1);
+        saveConfig(); editingItem = null; render();
+      }
+    });
+  }
+
+  /* wiring */
+  Array.prototype.forEach.call(out.querySelectorAll('[data-editcalc]'), function (b) {
+    b.addEventListener('click', function () {
+      editingCalc = +b.dataset.editcalc;
+      draftTerms = JSON.parse(JSON.stringify(config.calcs[editingCalc].terms));
+      render(); window.scrollTo(0, 0);
+    });
+  });
+  Array.prototype.forEach.call(out.querySelectorAll('[data-newcalc]'), function (b) {
+    b.addEventListener('click', function () {
+      editingCalc = 'new:' + b.dataset.newcalc;
+      draftTerms = [];
+      render(); window.scrollTo(0, 0);
+    });
+  });
+  if ($('cf-save')) {
+    var refreshChips = function () {
+      $('cf-terms').innerHTML = draftTerms.map(function (t, ti) {
+        return '<span class="term">' + esc(String(t.mult)) + ' × ' + esc(t.item) + ' · ' + esc(SRC_LABEL[t.src] || t.src) +
+          '<button data-dt="' + ti + '" title="Remove">✕</button></span>';
+      }).join('');
+      Array.prototype.forEach.call($('cf-terms').querySelectorAll('[data-dt]'), function (x) {
+        x.addEventListener('click', function () { draftTerms.splice(+x.dataset.dt, 1); refreshChips(); });
+      });
+    };
+    refreshChips();
+    $('cf-addterm').addEventListener('click', function () {
+      var item = normItem(($('cf-t-item').value || '').trim());
+      var mult = parseFloat($('cf-t-mult').value);
+      if (!/^\d{2,6}$/.test(item)) { $('cf-msg').textContent = 'Item # must be 2 to 6 digits.'; return; }
+      if (!(mult > 0)) { $('cf-msg').textContent = 'Factor must be a number above 0.'; return; }
+      draftTerms.push({ item: item, src: $('cf-t-src').value, mult: mult });
+      $('cf-msg').textContent = '';
+      $('cf-t-item').value = '';
+      refreshChips();
+    });
+    $('cf-save').addEventListener('click', function () {
+      var label = ($('cf-label').value || '').trim();
+      var per = parseFloat($('cf-per').value) || 1;
+      if (!label) { $('cf-msg').textContent = 'Give the line a name.'; return; }
+      if (!draftTerms.length) { $('cf-msg').textContent = 'Add at least one item to the line.'; return; }
+      var isNew = typeof editingCalc === 'string';
+      var row = {
+        slot: isNew ? editingCalc.split(':')[1] : config.calcs[editingCalc].slot,
+        sec: $('cf-sec') ? ($('cf-sec').value || '').trim().toUpperCase() : (isNew ? '' : config.calcs[editingCalc].sec || ''),
+        label: label,
+        unit: ($('cf-unit').value || '').trim(),
+        round: $('cf-round').value,
+        per: per,
+        note: ($('cf-note').value || '').trim(),
+        terms: draftTerms
+      };
+      if (isNew) config.calcs.push(row); else config.calcs[editingCalc] = row;
+      saveConfig(); editingCalc = null; draftTerms = null; render();
+    });
+    $('cf-cancel').addEventListener('click', function () { editingCalc = null; draftTerms = null; render(); });
+    var cdel = $('cf-delete');
+    if (cdel) cdel.addEventListener('click', function () {
+      if (window.confirm('Delete this line? The sheet loses it immediately.')) {
+        config.calcs.splice(editingCalc, 1);
+        saveConfig(); editingCalc = null; draftTerms = null; render();
+      }
+    });
+  }
+
+  /* setup */
+  var trays = $('su-trays');
+  if (trays) trays.addEventListener('click', function () {
+    var ok = true;
+    Array.prototype.forEach.call(out.querySelectorAll('[data-tray]'), function (inp) {
+      var v = parseInt(inp.value, 10);
+      if (v > 0) config.trays[inp.dataset.tray] = v; else ok = false;
+    });
+    saveConfig();
+    $('su-traymsg').textContent = ok ? 'Saved.' : 'Tray sizes must be whole numbers above 0; bad ones were skipped.';
+    $('su-traymsg').className = ok ? 'msg good' : 'msg';
+  });
+  var route = $('su-routesave');
+  if (route) route.addEventListener('click', function () {
+    var codes = ($('su-route').value || '').split(',').map(function (s) { return s.trim(); }).filter(function (s) { return /^\d{1,3}$/.test(s); })
+      .map(function (s) { return s.replace(/^0+(?=\d)/, '').padStart(2, '0'); });
+    if (!codes.length) { $('su-routemsg').textContent = 'No valid codes found.'; return; }
+    config.route = codes;
+    saveConfig();
+    $('su-routemsg').textContent = 'Saved: ' + codes.length + ' stops.';
+    $('su-routemsg').className = 'msg good';
+  });
+  var locsave = $('su-locsave');
+  if (locsave) locsave.addEventListener('click', function () {
+    Array.prototype.forEach.call(out.querySelectorAll('[data-locname]'), function (inp) {
+      var v = inp.value.trim();
+      if (v) config.locations[inp.dataset.locname] = v;
+    });
+    var nc = ($('su-newcode').value || '').trim(), nn = ($('su-newname').value || '').trim();
+    if (nc && nn && /^\d{1,3}$/.test(nc)) config.locations[nc.replace(/^0+(?=\d)/, '').padStart(2, '0')] = nn;
+    saveConfig();
+    $('su-locmsg').textContent = 'Saved.';
+    $('su-locmsg').className = 'msg good';
+    render();
+  });
+
+  /* backup */
+  var exp = $('bk-export');
+  if (exp) exp.addEventListener('click', function () {
+    var blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'cpk-menu-settings.json';
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
+  });
+  var imp = $('bk-import');
+  if (imp) imp.addEventListener('change', function (e) {
+    var f = e.target.files && e.target.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      try {
+        var c = JSON.parse(String(reader.result));
+        if (!(c && c.v === 1 && Array.isArray(c.items) && Array.isArray(c.calcs))) throw new Error('shape');
+        config = c;
+        saveConfig();
+        $('bk-msg').textContent = 'Imported: ' + c.items.length + ' items, ' + c.calcs.length + ' linked lines.';
+        $('bk-msg').className = 'msg good';
+        render();
+      } catch (err) {
+        $('bk-msg').textContent = 'That file is not a CPK settings file.';
+        $('bk-msg').className = 'msg';
+      }
+    };
+    reader.readAsText(f);
+    e.target.value = '';
+  });
+  var rst = $('bk-reset');
+  if (rst) rst.addEventListener('click', function () {
+    if (window.confirm('Reset the whole menu to the factory version? Every change made on this computer is cleared.')) {
+      resetConfig(); render();
+    }
+  });
+  var lock = $('bk-lock');
+  if (lock) lock.addEventListener('click', function () { setUnlocked(false); view = 'sheets'; render(); });
+}
+
+/* ---- boot ---- */
+render();
+})();
+</script>
+</body>
+</html>
