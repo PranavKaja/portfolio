@@ -1,29 +1,399 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Instantly redirect to the home page -->
-    <meta http-equiv="refresh" content="0; url=/">
-    <title>Redirecting...</title>
-    <style>
-        body {
-            background-color: #050505;
-            color: #00ea3d;
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Page Not Found | Pranav Kaja</title>
+  <meta name="description" content="Error 404. That page performed an illegal operation, or more likely never existed. Here's where to go instead.">
+  <meta name="robots" content="noindex, follow">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <style>
+    /* ===========================================================
+       404 - PranavOS error dialog. Self-contained on purpose:
+       this file is Vercel's fallback for ANY bad path, so it can
+       carry no external CSS/font/asset dependencies, and every
+       link is absolute so it resolves from any URL depth.
+       Palette mirrors the /retro Windows 95 build.
+       =========================================================== */
+    :root {
+      --teal: #008080;
+      --silver: #c0c0c0;
+      --silver-light: #dfdfdf;
+      --white: #ffffff;
+      --gray: #808080;
+      --black: #000000;
+      --navy: #000080;
+      --navy-bright: #1084d0;
+      --link: #0000ee;
+      --font: "MS Sans Serif", Tahoma, "Segoe UI", system-ui, sans-serif;
+      --mono: "Lucida Console", Consolas, "Courier New", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--black);
+      background: var(--teal);
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px 64px;
+      /* faint retro desktop texture */
+      background-image:
+        radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 3px 3px;
+    }
+
+    .bevel-out {
+      border: 2px solid;
+      border-color: var(--white) var(--black) var(--black) var(--white);
+      box-shadow: inset 1px 1px 0 var(--silver-light), inset -1px -1px 0 var(--gray);
+    }
+    .bevel-in {
+      border: 2px solid;
+      border-color: var(--gray) var(--white) var(--white) var(--gray);
+    }
+
+    /* ---- the window ---- */
+    .win {
+      width: 100%;
+      max-width: 560px;
+      background: var(--silver);
+      border: 2px solid;
+      border-color: var(--silver-light) var(--black) var(--black) var(--silver-light);
+      box-shadow: inset 1px 1px 0 var(--white), inset -1px -1px 0 var(--gray), 3px 3px 10px rgba(0,0,0,.4);
+      padding: 3px;
+      animation: pop .16s ease-out;
+    }
+    @keyframes pop {
+      from { transform: scale(.96); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    .titlebar {
+      height: 24px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 3px 0 5px;
+      background: linear-gradient(90deg, var(--navy), var(--navy-bright));
+      color: #fff;
+      user-select: none;
+    }
+    .titlebar .t-ico { font-size: 14px; }
+    .titlebar .t-name {
+      flex: 1;
+      font-weight: 700;
+      font-size: 12.5px;
+      letter-spacing: .2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .t-btns { display: flex; gap: 2px; }
+    .t-btn {
+      width: 18px; height: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font);
+      font-size: 11px; font-weight: 700; line-height: 1;
+      color: #000;
+      background: var(--silver);
+      border: 2px solid;
+      border-color: var(--white) var(--black) var(--black) var(--white);
+      box-shadow: inset 1px 1px 0 var(--silver-light), inset -1px -1px 0 var(--gray);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .t-btn:active { border-color: var(--black) var(--white) var(--white) var(--black); box-shadow: inset 1px 1px 0 var(--gray); }
+
+    .menubar {
+      display: flex;
+      gap: 2px;
+      padding: 3px 4px 4px;
+      font-size: 12px;
+      user-select: none;
+    }
+    .menubar span { padding: 1px 7px; cursor: default; }
+    .menubar span u { text-decoration: underline; }
+    .menubar span:hover { background: var(--navy); color: #fff; }
+
+    .body {
+      background: var(--white);
+      margin: 0 1px;
+      padding: 20px 22px;
+      border: 2px solid;
+      border-color: var(--gray) var(--white) var(--white) var(--gray);
+    }
+
+    /* ---- error message row ---- */
+    .err {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .err-ico { flex-shrink: 0; margin-top: 2px; }
+    .err h1 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      line-height: 1.35;
+    }
+    .err p {
+      margin: 0 0 8px;
+      line-height: 1.5;
+      color: #1a1a1a;
+    }
+    .err p:last-child { margin-bottom: 0; }
+    .code { font-family: var(--mono); }
+
+    /* ---- BSOD-style details drawer ---- */
+    .details { margin-top: 14px; }
+    .details summary {
+      display: inline-block;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--link);
+      list-style: none;
+    }
+    .details summary::-webkit-details-marker { display: none; }
+    .details summary::before { content: "\25B8  "; }
+    .details[open] summary::before { content: "\25BE  "; }
+    .bsod {
+      margin-top: 10px;
+      background: #0000aa;
+      color: #d8d8d8;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.55;
+      padding: 14px 16px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .bsod b { color: #fff; }
+
+    /* ---- separator ---- */
+    .sep {
+      height: 0;
+      border-top: 1px solid var(--gray);
+      border-bottom: 1px solid var(--white);
+      margin: 18px 0 14px;
+    }
+
+    .body h2 {
+      font-size: 12.5px;
+      margin: 0 0 12px;
+      font-weight: 700;
+    }
+
+    /* ---- destination icon grid (mini Explorer) ---- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+      gap: 6px 4px;
+    }
+    .tile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 4px 7px;
+      text-align: center;
+      text-decoration: none;
+      color: #000;
+      border: 1px dotted transparent;
+    }
+    .tile:hover { border-color: var(--navy); background: #e8f0ff; }
+    .tile:focus-visible { outline: 1px dotted var(--navy); outline-offset: -3px; }
+    .tile .glyph { font-size: 30px; line-height: 1; filter: drop-shadow(1px 1px 0 rgba(0,0,0,.25)); }
+    .tile .label { font-size: 12px; line-height: 1.25; }
+    .tile .sub { font-size: 10px; color: #666; }
+
+    /* ---- OK button row ---- */
+    .actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 18px;
+    }
+    .btn95 {
+      font-family: var(--font);
+      font-size: 12.5px;
+      padding: 5px 16px;
+      min-width: 88px;
+      background: var(--silver);
+      color: #000;
+      text-decoration: none;
+      text-align: center;
+      cursor: pointer;
+      border: 2px solid;
+      border-color: var(--white) var(--black) var(--black) var(--white);
+      box-shadow: inset 1px 1px 0 var(--silver-light), inset -1px -1px 0 var(--gray);
+    }
+    .btn95:active { border-color: var(--black) var(--white) var(--white) var(--black); box-shadow: inset 1px 1px 0 var(--gray); }
+    .btn95:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
+    .btn95.primary { font-weight: 700; }
+
+    /* ---- status bar ---- */
+    .statusbar {
+      display: flex;
+      gap: 4px;
+      padding: 4px 2px 1px;
+      font-size: 11px;
+      color: #333;
+    }
+    .statusbar .cell {
+      height: 20px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      border: 1px solid;
+      border-color: var(--gray) var(--white) var(--white) var(--gray);
+    }
+    .statusbar .cell.grow { flex: 1; }
+
+    @media (max-width: 480px) {
+      .err { flex-direction: column; gap: 10px; }
+      .body { padding: 16px; }
+      .grid { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); }
+    }
+  </style>
 </head>
 <body>
-    <script>
-        // Fallback JavaScript redirect
-        window.location.replace("/");
-    </script>
+  <div class="win" role="dialog" aria-labelledby="err-title" aria-describedby="err-body">
+    <div class="titlebar">
+      <span class="t-ico" aria-hidden="true">&#128463;</span>
+      <span class="t-name">PranavOS - System Error</span>
+      <span class="t-btns" aria-hidden="true">
+        <span class="t-btn">_</span>
+        <span class="t-btn">&#9633;</span>
+        <a class="t-btn" href="/" title="Close (back to home)">&#10005;</a>
+      </span>
+    </div>
+
+    <div class="menubar" aria-hidden="true">
+      <span><u>F</u>ile</span>
+      <span><u>E</u>dit</span>
+      <span><u>V</u>iew</span>
+      <span><u>H</u>elp</span>
+    </div>
+
+    <div class="body">
+      <div class="err">
+        <div class="err-ico" aria-hidden="true">
+          <svg width="40" height="40" viewBox="0 0 40 40" role="img" aria-label="Error">
+            <circle cx="20" cy="20" r="18" fill="#d40000" stroke="#7a0000" stroke-width="1.5"/>
+            <path d="M13 13 L27 27 M27 13 L13 27" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <h1 id="err-title">This page has performed an illegal operation.</h1>
+          <div id="err-body">
+            <p>Error <b>404</b>: the page you asked for could not be found. It may have been moved, renamed, or it was never here to begin with.</p>
+            <p>No files were harmed. Pick a destination below and you're back in business.</p>
+          </div>
+
+          <details class="details">
+            <summary>Details</summary>
+            <div class="bsod" role="note">A fatal exception <b>0E</b> has occurred at <b>0404:PRANAVKAJA</b>.
+The current page cannot continue.
+
+  Requested route : <span id="bad-path" class="code">/unknown</span>
+  Status          : 404 NOT_FOUND
+  Handler         : static-fallback
+  Coffee          : still warm
+
+* Press <b>OK</b> to return to the home page.
+* Press CTRL+ALT+DEL to reboot. Or, you know, just press OK.</div>
+          </details>
+        </div>
+      </div>
+
+      <div class="sep" role="separator"></div>
+
+      <h2>Where would you like to go?</h2>
+      <nav class="grid" aria-label="Site destinations">
+        <a class="tile" href="/">
+          <span class="glyph" aria-hidden="true">&#127968;</span>
+          <span class="label">Home</span>
+        </a>
+        <a class="tile" href="/projects">
+          <span class="glyph" aria-hidden="true">&#128193;</span>
+          <span class="label">All Projects</span>
+        </a>
+        <a class="tile" href="/projects/overheard">
+          <span class="glyph" aria-hidden="true">&#128064;</span>
+          <span class="label">Overheard</span>
+          <span class="sub">social intel</span>
+        </a>
+        <a class="tile" href="/projects/invitovate">
+          <span class="glyph" aria-hidden="true">&#9993;&#65039;</span>
+          <span class="label">Invitovate</span>
+          <span class="sub">outreach</span>
+        </a>
+        <a class="tile" href="/cpk">
+          <span class="glyph" aria-hidden="true">&#127981;</span>
+          <span class="label">CPK Planner</span>
+          <span class="sub">live tool</span>
+        </a>
+        <a class="tile" href="/Resume_PranavKaja.pdf" target="_blank" rel="noopener">
+          <span class="glyph" aria-hidden="true">&#128196;</span>
+          <span class="label">R&eacute;sum&eacute;</span>
+        </a>
+        <a class="tile" href="/retro/">
+          <span class="glyph" aria-hidden="true">&#128421;&#65039;</span>
+          <span class="label">PranavOS 95</span>
+          <span class="sub">retro mode</span>
+        </a>
+      </nav>
+
+      <div class="actions">
+        <a class="btn95 primary" href="/" id="ok-btn">OK</a>
+        <a class="btn95" href="/projects">Projects</a>
+      </div>
+    </div>
+
+    <div class="statusbar">
+      <span class="cell grow">404 object(s) not found</span>
+      <span class="cell" id="clock">12:00 PM</span>
+    </div>
+  </div>
+
+  <script>
+    // Show the route the visitor actually tried. textContent = no injection.
+    (function () {
+      var p = (location.pathname || "/") + (location.search || "");
+      var el = document.getElementById("bad-path");
+      if (el) el.textContent = p;
+    })();
+
+    // Taskbar-style clock.
+    (function () {
+      var clock = document.getElementById("clock");
+      function tick() {
+        if (!clock) return;
+        var d = new Date();
+        var h = d.getHours(), m = d.getMinutes();
+        var ap = h < 12 ? "AM" : "PM";
+        h = h % 12; if (h === 0) h = 12;
+        clock.textContent = h + ":" + (m < 10 ? "0" + m : m) + " " + ap;
+      }
+      tick();
+      setInterval(tick, 15000);
+    })();
+
+    // Enter or Escape closes the "dialog" back to home, like a real one.
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === "Escape") {
+        window.location.href = "/";
+      }
+    });
+  </script>
 </body>
 </html>
