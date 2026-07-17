@@ -87,6 +87,9 @@
   .stamp{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:9.5px;
     font-weight:700;letter-spacing:.08em;color:var(--missed);border:1.5px solid var(--missed);
     padding:2px 5px;border-radius:4px;transform:rotate(4deg);opacity:.72}
+  .prio{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--missed);
+    border:1px solid var(--line);padding:1px 6px;border-radius:10px;margin-right:2px}
+  .prio.lo{color:var(--ink-soft)}
   .empty{color:var(--ink-soft);font-size:14px;padding:26px 4px}
   footer{border-top:1px solid var(--line);padding:16px 0 40px;font-family:var(--mono);
     font-size:11px;color:var(--ink-soft)}
@@ -101,6 +104,19 @@
     <div class="context" id="context"></div>
   </header>
 
+  <section>
+    <h2 class="sect">Instagram — Response Rate to Directed Intent (the primary signal)</h2>
+    <div class="stats" id="igstats"></div>
+    <div class="grid">
+      <section><table id="igleague"><thead></thead><tbody></tbody></table></section>
+      <section>
+        <h2 class="sect" id="igfeedtitle">What they ignored (all brands)</h2>
+        <div id="igfeed"></div>
+      </section>
+    </div>
+  </section>
+
+  <h2 class="sect" style="margin-top:36px;border-top:1px solid var(--line);padding-top:24px">YouTube — secondary context layer</h2>
   <div class="stats" id="stats"></div>
 
   <div class="filter" id="filter"><span class="lab">Category</span></div>
@@ -218,7 +234,36 @@ function feed(){
 }
 function esc(s){return s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
 
-function render(){stats();filterBar();league();feed();
+let igSel=null;
+function igStats(){
+  const rows=D.ig_scorecard||[];
+  const directed=rows.reduce((s,r)=>s+(r.directed||0),0);
+  const answered=rows.reduce((s,r)=>s+(r.answered||0),0);
+  const complaints=rows.reduce((s,r)=>s+(r.complaints||0),0);
+  const rrdi=directed?Math.round(answered/directed*100):0;
+  $("#igstats").innerHTML=[
+    [`${rows.length}`,"brands tracked"],
+    [`${directed}`,"customers who addressed the brand"],
+    [`${rrdi}%`,"got a public reply",true],
+    [`${complaints}`,"complaints, all unanswered"],
+  ].map(([n,l,w])=>`<div class="stat"><div class="n ${w?'warn':''}">${n}</div><div class="l">${l}</div></div>`).join("");
+}
+function igLeague(){
+  const rows=(D.ig_scorecard||[]).slice().sort((a,b)=>(b.directed||0)-(a.directed||0));
+  $("#igleague thead").innerHTML="<tr><th>Brand</th><th class='num'>Comments</th><th class='num'>Directed</th><th class='num'>Complaints</th><th class='num'>RRDI</th></tr>";
+  $("#igleague tbody").innerHTML=rows.map(r=>`<tr class="brow" data-igb="${r.name}" aria-selected="${igSel===r.name}"><td><div class="bname">${r.name}</div><div class="cat">${(r.category||'').replace(/-/g,' ')}</div></td><td class="num">${r.comments}</td><td class="num">${r.directed}</td><td class="num"><span class="missed-n">${r.complaints}</span></td><td class="num"><span class="rpct" style="color:var(--missed)">${r.rrdi_pct}%</span></td></tr>`).join("");
+  $("#igleague tbody").querySelectorAll(".brow").forEach(tr=>tr.onclick=()=>{igSel=(igSel===tr.dataset.igb?null:tr.dataset.igb);igLeague();igFeed();});
+}
+function igFeed(){
+  let items=(D.ig_missed||[]);
+  if(igSel) items=items.filter(i=>i.brand===igSel);
+  $("#igfeedtitle").textContent= igSel? `Ignored — ${igSel} (answer these first)` : "What they ignored, ranked: answer these first";
+  $("#igfeed").innerHTML=items.slice(0,40).map(i=>{
+    const p=Math.round(i.priority_score||0);
+    return `<div class="card"><span class="stamp" title="no brand reply visible in the scraped comments (thread replies need a paid scrape tier, see docs/PIPELINE-SHAKEOUT.md)">no visible reply</span><div class="top"><span class="prio ${p<40?'lo':''}" title="response priority 0-100">${p}</span><span class="badge b-${i.type}">${i.type.replace(/_/g,' ')}</span><span class="urg ${i.urgency}"></span><span class="topic">${i.theme_label||i.topic||''} · ${i.brand}</span></div><div class="ctext">${esc(i.text||'').slice(0,300)}</div><div class="meta">${i.url?`<a href="${i.url}" target="_blank" rel="noopener">view on instagram →</a>`:''}</div></div>`;
+  }).join("") || '<div class="empty">No items.</div>';
+}
+function render(){igStats();igLeague();igFeed();stats();filterBar();league();feed();
   $("#context").innerHTML=`<span>Surface <b>YouTube (owned comments)</b></span><span>Window <b>365 days</b></span><span>Cohort <b>${withData.length} active / ${D.scorecard.length} tracked</b></span>`;
   $("#foot").textContent=`Data generated ${D.generated||"—"} · classification: gemini-2.5-flash · owned-comment response gap · a portfolio build`;
 }

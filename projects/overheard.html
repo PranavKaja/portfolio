@@ -73,7 +73,7 @@
                 social-response-gap engine built on Google Cloud.</p>
             <div class="pp-chips" style="margin-top: 8px;">
                 <span>17 Brands</span>
-                <span>2,200+ Comments</span>
+                <span>3,000+ Comments</span>
                 <span>BigQuery + Vertex AI</span>
                 <span>Gemini Classified</span>
                 <span>$0 on Credit</span>
@@ -140,13 +140,15 @@
                 <div class="panel">
                     <h3>STAGE 2 — CLASSIFY &amp; RANK</h3>
                     <p>Gemini reads every comment and tags it — question, complaint, purchase intent, or noise — with
-                        strict JSON output. SQL marts then rank each brand by response rate, reply time, and the count
-                        of questions left unanswered past a 7-day window.</p>
+                        strict JSON output. A classical-ML layer then clusters the missed comments into themes and
+                        scores each one 0–100 for answer-first priority, and SQL marts rank each brand by what it
+                        leaves unanswered.</p>
                 </div>
             </div>
             <p style="font-size: 1rem; line-height: 1.7; max-width: 760px; margin-top: 22px;">
-                The result is two views: a league table of who answers and who ignores, and a per-brand feed of the
-                actual missed conversations — each one a real customer the brand left on read.
+                The result is three views: an Instagram league table of who gets addressed and who stays silent, a
+                priority-ranked feed of the actual missed conversations — each one a real customer the brand left on
+                read — and a YouTube context layer behind it.
             </p>
         </section>
 
@@ -183,8 +185,11 @@
                     the cloud project, after the consumer API hit a separate billing wall.</li>
                 <li><strong>Measured, not asserted</strong> — every prompt change is scored against a hand-labeled
                     golden set before its output is trusted.</li>
+                <li><strong>Tested the fancier model, kept the winner</strong> — a social-media sentiment transformer
+                    was benchmarked against the LLM on the golden set and lost, so the LLM kept tone and classical ML
+                    went where it wins: theme clustering and answer-first priority ranking.</li>
                 <li><strong>Shipped the tool</strong> — a self-contained console reads the marts and renders the league
-                    table plus a filterable feed of missed conversations.</li>
+                    table plus a priority-ranked feed of missed conversations.</li>
             </ul>
         </section>
 
@@ -195,9 +200,9 @@
             </div>
             <div class="vitals">
                 <div class="vital"><div class="k">Brands tracked</div><div class="v">17</div></div>
-                <div class="vital"><div class="k">Comments analyzed</div><div class="v">2,200+</div></div>
-                <div class="vital"><div class="k">Questions &amp; complaints</div><div class="v live">484</div></div>
-                <div class="vital"><div class="k">Left unanswered</div><div class="v">64%</div></div>
+                <div class="vital"><div class="k">Comments analyzed</div><div class="v">3,000+</div></div>
+                <div class="vital"><div class="k">Questions &amp; complaints</div><div class="v live">760+</div></div>
+                <div class="vital"><div class="k">Unanswered on YouTube</div><div class="v">64%</div></div>
                 <div class="vital"><div class="k">Run cost</div><div class="v">$0 (cloud credit)</div></div>
             </div>
             <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 16px; font-family: 'Share Tech Mono', monospace;">
