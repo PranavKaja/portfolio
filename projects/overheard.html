@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overheard — The Social Response-Gap Engine (BigQuery + Gemini) | Pranav Kaja</title>
+    <meta name="description"
+        content="A GCP-native pipeline by Pranav Kaja that finds the customer questions brands ignore on their own social posts, classifies them with Gemini on Vertex AI, and ranks brands by how much they miss. Live in-browser tool.">
+    <meta name="author" content="Pranav Kaja">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta property="og:title" content="Overheard — The Social Response-Gap Engine | Pranav Kaja">
+    <meta property="og:description" content="BigQuery + Vertex AI (Gemini): finds and ranks the customer questions brands leave unanswered on their own social posts. Live tool.">
+    <meta property="og:image" content="https://pranavkaja.com/images/og-card.png?v=2">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://pranavkaja.com/projects/overheard">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Overheard — The Social Response-Gap Engine | Pranav Kaja">
+    <meta name="twitter:description" content="A live BigQuery + Gemini pipeline that counts the customer questions brands ignore.">
+    <meta name="twitter:image" content="https://pranavkaja.com/images/og-card.png?v=2">
+    <link rel="canonical" href="https://pranavkaja.com/projects/overheard">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "TechArticle",
+          "headline": "Overheard — The Social Response-Gap Engine",
+          "description": "A GCP-native pipeline that ingests brands' owned social comments into BigQuery, classifies them with Gemini on Vertex AI, and ranks brands by the customer questions they leave unanswered.",
+          "author": { "@type": "Person", "name": "Pranav Kaja", "url": "https://pranavkaja.com/" },
+          "url": "https://pranavkaja.com/projects/overheard",
+          "image": "https://pranavkaja.com/images/og-card.png?v=2",
+          "keywords": "social listening, BigQuery, Vertex AI, Gemini, data engineering, ELT, marketing analytics, Pranav Kaja",
+          "about": ["Social Listening", "Data Engineering", "Large Language Models"],
+          "inLanguage": "en"
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://pranavkaja.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Projects", "item": "https://pranavkaja.com/projects" },
+            { "@type": "ListItem", "position": 3, "name": "Overheard", "item": "https://pranavkaja.com/projects/overheard" }
+          ]
+        }
+      ]
+    }
+    </script>
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <nav class="top-nav">
+        <a href="/" class="nav-logo interactive-element no-underline text-inherit">SUBJECT // PRANAV KAJA</a>
+        <div class="nav-links">
+            <a href="/projects"><span class="nav-num">&larr; </span>ALL MISSIONS</a>
+        </div>
+    </nav>
+
+    <main class="container" id="main">
+        <header class="hero">
+            <div class="hero-label mb-20"><span class="status-dot"></span>[ LIVE TOOL ] // OPERATIONAL</div>
+            <h1 class="hero-title" style="font-size: 3.2rem; line-height: 1.05;">OVERHEARD</h1>
+            <p class="hero-subtitle">The questions brands don't answer — found, classified, and counted. A
+                social-response-gap engine built on Google Cloud.</p>
+            <div class="pp-chips" style="margin-top: 8px;">
+                <span>17 Brands</span>
+                <span>3,000+ Comments</span>
+                <span>BigQuery + Vertex AI</span>
+                <span>Gemini Classified</span>
+                <span>$0 on Credit</span>
+            </div>
+            <div style="margin-top: 22px;">
+                <a href="/overheard" class="btn interactive-element no-underline">LAUNCH LIVE TOOL &rarr;</a>
+            </div>
+        </header>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>BRIEFING</h2>
+                <div class="line"></div>
+            </div>
+            <p style="font-size: 1.05rem; line-height: 1.7; max-width: 760px;">
+                Every day, customers ask brands questions in public — under the brand's own YouTube videos and Instagram
+                posts. Brands miss a huge share of them. Each ignored question is a lost sale, or a public complaint that
+                everyone with the same question sees go unanswered. Social teams know it hurts, but they can't see the
+                whole surface, and they can't put a number on it.
+            </p>
+            <p style="font-size: 1.05rem; line-height: 1.7; max-width: 760px; margin-top: 14px;">
+                Overheard measures it. For a set of competing brands, it collects the public conversation on their own
+                posts, uses <strong>Gemini</strong> to tell a real question or complaint from noise, checks whether the
+                brand ever replied, and ranks the field by who answers and who goes silent — the benchmark a social team
+                would actually act on.
+            </p>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>ROLE / METHOD / OUTCOME</h2>
+                <div class="line"></div>
+            </div>
+            <div class="msn-rmo">
+                <div class="rmo-cell">
+                    <div class="k">Role</div>
+                    <div class="v">Solo build, end to end — pipeline, AI layer, marts, and the front-end tool.</div>
+                </div>
+                <div class="rmo-cell">
+                    <div class="k">Method</div>
+                    <div class="v">An ELT pipeline on BigQuery with a Gemini classification layer, validated against a
+                        hand-labeled set.</div>
+                </div>
+                <div class="rmo-cell">
+                    <div class="k">Outcome</div>
+                    <div class="v">A live index of which brands ignore their customers, and the exact comments they
+                        missed.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>HOW IT WORKS</h2>
+                <div class="line"></div>
+            </div>
+            <div class="grid-2">
+                <div class="panel">
+                    <h3>STAGE 1 — INGEST &amp; WAREHOUSE</h3>
+                    <p>Scheduled jobs pull each brand's public comments into BigQuery, normalized to one schema. An
+                        official-account registry flags which comments are the brand replying — so "answered" vs
+                        "ignored" is ground truth, not a guess. Idempotent loads mean a rerun never double-counts.</p>
+                </div>
+                <div class="panel">
+                    <h3>STAGE 2 — CLASSIFY &amp; RANK</h3>
+                    <p>Gemini reads every comment and tags it — question, complaint, purchase intent, or noise — with
+                        strict JSON output. A classical-ML layer then clusters the missed comments into themes and
+                        scores each one 0–100 for answer-first priority, and SQL marts rank each brand by what it
+                        leaves unanswered.</p>
+                </div>
+            </div>
+            <p style="font-size: 1rem; line-height: 1.7; max-width: 760px; margin-top: 22px;">
+                The result is three views: an Instagram league table of who gets addressed and who stays silent, a
+                priority-ranked feed of the actual missed conversations — each one a real customer the brand left on
+                read — and a YouTube context layer behind it.
+            </p>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>THE FINDING WORTH TELLING</h2>
+                <div class="line"></div>
+            </div>
+            <div class="panel" style="border-left: 4px solid var(--accent);">
+                <p style="font-size: 1.02rem; line-height: 1.7;">
+                    The first data pull looked fantastic: one brand had thousands of comments and answered none of them.
+                    It was wrong. Resolving channels by name search had grabbed <strong>Ninja the gaming streamer</strong>
+                    instead of Ninja the appliance brand — thousands of comments of gaming chat, a beautiful and
+                    meaningless number. A manual spot-check against the live comment URLs caught it. The fix was to pin
+                    every brand's official channel by verified handle. That's the whole case for a manual verification
+                    gate: the numbers that look cleanest are the ones most worth checking.
+                </p>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>THE ENGINEERING ARC</h2>
+                <div class="line"></div>
+            </div>
+            <ul class="ops-points" style="max-width: 780px;">
+                <li><strong>Schema first</strong> — a partitioned, clustered BigQuery model with raw, staging, and mart
+                    layers before a single row was loaded.</li>
+                <li><strong>Ground truth over guessing</strong> — response gaps are measured only on owned surfaces,
+                    where a brand's own reply is verifiable, not inferred.</li>
+                <li><strong>Caught the channel bug</strong> — switched from name search to handle-verified channel IDs
+                    after the verification gate flagged the wrong "Ninja."</li>
+                <li><strong>Vertex over the consumer API</strong> — routed Gemini through Vertex AI so it bills against
+                    the cloud project, after the consumer API hit a separate billing wall.</li>
+                <li><strong>Measured, not asserted</strong> — every prompt change is scored against a hand-labeled
+                    golden set before its output is trusted.</li>
+                <li><strong>Tested the fancier model, kept the winner</strong> — a social-media sentiment transformer
+                    was benchmarked against the LLM on the golden set and lost, so the LLM kept tone and classical ML
+                    went where it wins: theme clustering and answer-first priority ranking.</li>
+                <li><strong>Calibrated the headline metric</strong> — the scrape tier can't see in-thread replies, so
+                    34 flagged comments were hand-checked against the live threads. About 28% had a brand reply the
+                    scrape missed; every published number now carries that correction instead of the flattering raw
+                    figure. Brands turned out to answer the sales questions and skip the service complaints.</li>
+                <li><strong>Shipped the tool</strong> — a self-contained console reads the marts and renders the league
+                    table plus a priority-ranked feed of missed conversations.</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>RESULTS</h2>
+                <div class="line"></div>
+            </div>
+            <div class="vitals">
+                <div class="vital"><div class="k">Brands tracked</div><div class="v">17</div></div>
+                <div class="vital"><div class="k">Comments analyzed</div><div class="v">3,800+</div></div>
+                <div class="vital"><div class="k">Questions &amp; complaints</div><div class="v live">790+</div></div>
+                <div class="vital"><div class="k">Unanswered on YouTube</div><div class="v">64%</div></div>
+                <div class="vital"><div class="k">Unanswered on Instagram</div><div class="v">~7 in 10</div></div>
+                <div class="vital"><div class="k">Run cost</div><div class="v">$0 (cloud credit)</div></div>
+            </div>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 16px; font-family: 'Share Tech Mono', monospace;">
+                STACK: BigQuery &middot; Vertex AI (Gemini) &middot; Cloud Run &middot; Cloud Scheduler &middot; Python
+            </p>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 8px;">
+                Figures are live from the tool and reflect the latest data pull.
+            </p>
+            <div style="margin-top: 22px;">
+                <a href="/overheard" class="btn interactive-element no-underline">OPEN THE LIVE TOOL &rarr;</a>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="interests-simple-box">
+                <h3 class="beyond-title">MORE MISSIONS</h3>
+                <p class="beyond-subtitle">Case files across ML, BI, and supply-chain strategy.</p>
+                <a href="/projects" class="btn btn-secondary interactive-element no-underline">VIEW ALL MISSIONS</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        &copy; <span id="year"></span> Pranav Kaja. All rights reserved.
+    </footer>
+
+    <div class="custom-cursor" id="custom-cursor"></div>
+    <div class="crosshair-h"></div>
+    <div class="crosshair-v"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="/config.js" defer></script>
+    <script src="/analytics.js" defer></script>
+    <script src="/main.js" defer></script>
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>
