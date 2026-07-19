@@ -1,5 +1,5 @@
 /* ============================================================================
-   assistant.js  —  "Pip", a friendly 90s desktop helper.
+   assistant.js ,  "Pip", a friendly 90s desktop helper.
    Pops up with tips and nudges toward Resume / Contact. Summon by typing
    "help" anywhere on the desktop. Auto-introduces itself once after a while.
    ========================================================================== */
@@ -9,7 +9,7 @@
   var TIPS = [
     "Hi, I'm Pip! New here? Double-click <b>About Pranav</b> for the 30-second version of who he is.",
     "There are <b>10 projects</b> in <b>My Projects</b>. Double-click any file to dig in.",
-    "Recruiter in a hurry? Grab the <b>Resume</b> right here — one click, downloadable.",
+    "Recruiter in a hurry? Grab the <b>Resume</b> right here, one click, downloadable.",
     "Like what you see? Don't be shy. Pranav's <b>open to full-time roles</b>.",
     "Psst… <b>Minesweeper</b> actually works. You're welcome.",
     "Drag windows by the title bar, resize from the bottom-right corner.",

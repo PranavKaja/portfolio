@@ -1,5 +1,5 @@
 /* ============================================================
- * Ops Console logic — Supabase Auth + project CRUD.
+ * Ops Console logic, Supabase Auth + project CRUD.
  * ============================================================ */
 (function () {
   const $ = id => document.getElementById(id);
@@ -28,7 +28,7 @@
     show('unconfigured');
     views.login.classList.remove('hidden');     // still show the (inert) login shell
     $('login-btn').disabled = true;
-    msg($('login-msg'), 'Backend offline — configure Supabase in config.js.', 'err');
+    msg($('login-msg'), 'Backend offline, configure Supabase in config.js.', 'err');
     return;
   }
 
@@ -1140,10 +1140,10 @@
     const tEl = $('home-daily-views-title');
     if (tEl) {
         if (intelRange === 'custom' && intelCustomRange) {
-            tEl.textContent = 'PAGE VIEWS — CUSTOM';
+            tEl.textContent = 'PAGE VIEWS, CUSTOM';
         } else {
             const rangeLabel = intelRange === 0 ? 'ALL TIME' : (intelRange === 1 ? 'TODAY' : `LAST ${intelRange} DAYS`);
-            tEl.textContent = `Page Views — ${rangeLabel.toLowerCase()}`;
+            tEl.textContent = `Page Views, ${rangeLabel.toLowerCase()}`;
         }
     }
     
@@ -1235,7 +1235,7 @@
 
 
 
-  // best score per distinct (anonymous) player — repeat plays collapse to one row
+  // best score per distinct (anonymous) player, repeat plays collapse to one row
   function leaderboardTable(rows) {
     return '<table class="lb"><thead><tr><th>#</th><th>Player</th><th>Best</th><th>Plays</th></tr></thead><tbody>' +
       rows.map((r, i) => `<tr>
@@ -1512,16 +1512,16 @@
       const total = rows.reduce((s, r) => s + r[1], 0);
       body = rows.length ? detailTable(['Project', 'Opens'], rows, ['Total', total]) : '';
     } else if (kind === 'pages') {
-      title = 'Pages — views & avg time';
+      title = 'Pages, views & avg time';
       const rows = (d.top_pages || []).map(p => [p.path === '/' ? '/ (home)' : p.path, p.n, fmtTime(p.avg_sec)]);
       const totalViews = rows.reduce((s, r) => s + r[1], 0);
       const overallAvgTime = d.kpis ? fmtTimeHM(d.kpis.avg_time) : '';
       body = rows.length ? detailTable(['Page', 'Views', 'Avg time'], rows, ['Total', totalViews, overallAvgTime]) : '';
     } else if (kind === 'leaderboard') {
-      title = 'Game Leaderboard — all players';
+      title = 'Game Leaderboard, all players';
       body = (d.leaderboard || []).length ? leaderboardTable(d.leaderboard) : '';
     } else if (kind === 'daily') {
-      title = 'Page Views — Analytics';
+      title = 'Page Views, Analytics';
       window._renderDailyTable = (daysCount) => {
         const byDay = {};
         (d.daily || []).forEach(r => { byDay[r.day] = r; });

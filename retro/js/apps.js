@@ -1,5 +1,5 @@
 /* ============================================================================
-   apps.js  —  Builds the content for each desktop application/window.
+   apps.js ,  Builds the content for each desktop application/window.
    Each builder returns an options object consumed by WM.open().
    ========================================================================== */
 (function () {
@@ -114,7 +114,7 @@
     const certs = D.certifications.map((c) => `
       <div style="margin-bottom:9px">
         <div class="row" style="justify-content:space-between; margin-bottom:3px">
-          <span><b>${esc(c.name)}</b> <span class="muted">— ${esc(c.issuer)}</span></span>
+          <span><b>${esc(c.name)}</b> <span class="muted">, ${esc(c.issuer)}</span></span>
           <span class="muted" style="font-family:var(--mono)">${c.progress}%${c.progress < 100 ? " ⏳" : " ✓"}</span>
         </div>
         <div class="prog"><span style="width:${c.progress}%"></span></div>
@@ -125,7 +125,7 @@
         ${cats}
         <div class="group" style="margin-bottom:4px"><span class="legend">Certifications</span>${certs}</div>
       </div>`;
-    return { id: "skills", title: "Skills — Control Panel", icon: "🛠️", width: 540, height: 470,
+    return { id: "skills", title: "Skills - Control Panel", icon: "🛠️", width: 540, height: 470,
       menubar: `<span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>H</u>elp</span>`,
       body, bodyClass: "pad silver",
       status: `<div class="cell grow">${D.skills.length} categories · ${D.certifications.length} certs</div>` };
@@ -147,9 +147,9 @@
           </div>
         </div>
       </div>`;
-    return { id: "resume", title: "Resume — Document Viewer", icon: "📃", width: 620, height: 540,
+    return { id: "resume", title: "Resume - Document Viewer", icon: "📃", width: 620, height: 540,
       body, bodyClass: "",
-      status: `<div class="cell grow">Pranav Kaja — Resume</div><div class="cell">PDF</div>`,
+      status: `<div class="cell grow">Pranav Kaja, Resume</div><div class="cell">PDF</div>`,
       onMount: (el) => {
         const container = el.querySelector("#resume-frame-container");
         fetch(resumeUrl, { method: 'HEAD' })
@@ -186,7 +186,7 @@
         <figcaption>${esc(i.name)}</figcaption>
         <p>${esc(i.desc)}</p>
       </figure>`).join("");
-    return { id: "interests", title: "My Pictures — Interests", icon: "🖼️", width: 600, height: 460,
+    return { id: "interests", title: "My Pictures - Interests", icon: "🖼️", width: 600, height: 460,
       menubar: `<span><u>F</u>ile</span><span><u>V</u>iew</span><span>S<u>l</u>ide Show</span><span><u>H</u>elp</span>`,
       body: `<div class="gallery">${cards}</div>`, bodyClass: "",
       status: `<div class="cell grow">${D.interests.length} image(s)</div><div class="cell">Beyond the screen</div>` };
@@ -221,7 +221,7 @@
           </div>
         </div>
       </div>`;
-    const opts = { id: "contact", title: "Contact — Outlook Express", icon: "✉️", width: 470, height: 440,
+    const opts = { id: "contact", title: "Contact - Outlook Express", icon: "✉️", width: 470, height: 440,
       body, bodyClass: "pad silver",
       status: `<div class="cell grow">Connected</div><div class="cell">📡 56k</div>` };
     opts.onMount = (el) => {
@@ -229,8 +229,8 @@
       send.addEventListener("click", () => {
         const from = el.querySelector("#c-from").value.trim();
         const msg = el.querySelector("#c-msg").value.trim();
-        const subject = encodeURIComponent("Hello from your retro portfolio" + (from ? " — " + from : ""));
-        const bodyt = encodeURIComponent(msg + (from ? "\n\n— " + from : ""));
+        const subject = encodeURIComponent("Hello from your retro portfolio" + (from ? ", " + from : ""));
+        const bodyt = encodeURIComponent(msg + (from ? "\n\n- " + from : ""));
         window.location.href = `mailto:${D.identity.email}?subject=${subject}&body=${bodyt}`;
         el.querySelector("#c-note").textContent = "Opening your mail client…";
       });
@@ -245,7 +245,7 @@
         <span class="ico" style="font-size:22px">📝</span>
         <a href="${esc(b.url)}" target="_blank" rel="noopener" style="font-size:13px">${esc(b.title)} ↗</a>
       </div>`).join("");
-    return { id: "blog", title: "Blog — Notepad", icon: "📝", width: 440, height: 320,
+    return { id: "blog", title: "Blog - Notepad", icon: "📝", width: 440, height: 320,
       menubar: `<span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>H</u>elp</span>`,
       body: `<div style="padding:8px">${items}</div>`, bodyClass: "",
       status: `<div class="cell grow">${D.blog.length} posts · opens live site</div>` };
@@ -312,9 +312,9 @@ WHERE TO LOOK FIRST
 In a hurry? Start ▸ Standard Site loads the
 normal portfolio.
 
-— Built ${new Date().getFullYear()} · type \`help\` anytime</pre>
+- Built ${new Date().getFullYear()} · type \`help\` anytime</pre>
       </div>`;
-    return { id: "readme", title: "readme.txt — Notepad", icon: "📄", width: 600, height: 450,
+    return { id: "readme", title: "readme.txt - Notepad", icon: "📄", width: 600, height: 450,
       menubar: `<span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>S</u>earch</span><span><u>H</u>elp</span>`,
       body, bodyClass: "", status: `<div class="cell grow">Ln 1, Col 1</div>` };
   }

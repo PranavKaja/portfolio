@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (!isTouchDevice) {
         // Hide the OS pointer only now that JS is running and the custom
-        // crosshair exists — if this script never runs, the system cursor stays.
+        // crosshair exists, if this script never runs, the system cursor stays.
         if (cursor) document.body.classList.add('custom-cursor-active');
         let mouseX = 0;
         let mouseY = 0;
@@ -629,7 +629,7 @@ window.addEventListener('load', () => {
         `;
 
         trophyContainer.innerHTML = `
-            <span class="trophy-icon" role="button" tabindex="0" aria-expanded="false" aria-label="Trophy unlocked — open message">🏆</span>
+            <span class="trophy-icon" role="button" tabindex="0" aria-expanded="false" aria-label="Trophy unlocked, open message">🏆</span>
             <div class="trophy-popup desktop-popup">${popupHTML}</div>
         `;
 
@@ -686,7 +686,7 @@ window.addEventListener('load', () => {
 
     // Confetti that has come to rest. We keep a registry of settled particles
     // so they can be re-pinned to the TRUE bottom of the page whenever the
-    // layout height changes — e.g. the mobile Loadout section expanding, fonts
+    // layout height changes, e.g. the mobile Loadout section expanding, fonts
     // or images loading, or a window resize. Each particle settles at an
     // absolute document Y; without re-pinning, growing the page (expanding
     // Loadout) leaves them frozen at the old bottom, i.e. floating mid-page.
@@ -777,7 +777,7 @@ window.addEventListener('load', () => {
 });
 
 // ============================================================
-// OPS LOG — experience timeline items open a detail overlay,
+// OPS LOG, experience timeline items open a detail overlay,
 // mirroring the mission cards. Content lives in a small data map
 // (easy to expand later); for now it echoes the card copy.
 // ============================================================

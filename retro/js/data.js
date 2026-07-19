@@ -1,5 +1,5 @@
 /* ============================================================================
-   data.js  —  All portfolio content, compiled into one global object.
+   data.js ,  All portfolio content, compiled into one global object.
    Inlined (not fetched) so the site runs from file:// with no server.
    Source of record: 02-Website/portfolio/data/*.json + index.html copy.
    ========================================================================== */

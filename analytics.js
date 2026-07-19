@@ -1,5 +1,5 @@
 /* ============================================================
- * Visitor Intel — lightweight, privacy-preserving tracker.
+ * Visitor Intel, lightweight, privacy-preserving tracker.
  * No cookies, no PII. A random session id in localStorage and a
  * normalized referrer are all it sends. Honors Do Not Track.
  * Other scripts can call window.intel.track(type, meta).
@@ -54,7 +54,7 @@
         source: SOURCE,
         session_id: SESSION,
         meta: meta || {}
-      }).then(function () {}, function () {}); // swallow errors — analytics must never break the page
+      }).then(function () {}, function () {}); // swallow errors, analytics must never break the page
     } catch (e) { /* no-op */ }
   }
 

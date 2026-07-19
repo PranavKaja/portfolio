@@ -1,5 +1,5 @@
 /* ============================================================
- * CPK Production Planner — client-side, in-browser.
+ * CPK Production Planner, client-side, in-browser.
  * Paste / upload the daily Orders Recap; the tool reproduces the
  * Worcester central-kitchen workbook's production sheets:
  *   DC G&G · Retail G&G · Fruit · PREP · Packout · Stickers
@@ -8,7 +8,7 @@
  *   - Retail needed  = total ordered (all locations) − DC
  *   - Triple stacks  = ordered ×2 packages, ×1.5 sandwiches/package
  * Quantities (bread ratios, prep factors, fruit weights, tray sizes)
- * are transcribed from the workbook — edit the CONFIG block to tune.
+ * are transcribed from the workbook, edit the CONFIG block to tune.
  * 100% in-browser: nothing is uploaded anywhere.
  * ============================================================ */
 (function () {
@@ -55,7 +55,7 @@
   ].map(r => `${r[0]}     ${r[1]}     ${r[2]}     ${r[3]}, ${r[4]}        ${r[5]}      ${r[6]}`).join('\n') + '\nEND OF LIST';
 
   // ============================================================
-  //  PARSER — reads the Orders Recap into {item, locCode, qty}
+  //  PARSER, reads the Orders Recap into {item, locCode, qty}
   // ============================================================
   // date  item#  name(multi-word)  loc#, loc name  DUE-AMOUNT  [pack] UNIT  [total]
   const LINE = /^\s*(\d{1,2}\/\d{1,2}\/\d{2,4})\s+(\d[\d.]*)\s+(.+?)\s+(\d{1,3})\s*,\s*(.+?)\s{2,}(\d+)\s+(?:(\d+)\s+)?([A-Za-z]+)/;
@@ -116,7 +116,7 @@
 
   // The four dining commons ("DC"): Worcester 01, Franklin 02, Hampshire 03,
   // Berkshire 04. This Worcester workbook produces DC G&G for Worcester (01)
-  // only and Retail G&G for the cafés — so retail excludes ALL dining commons.
+  // only and Retail G&G for the cafés, so retail excludes ALL dining commons.
   const DC_LOCS = ['01', '02', '03', '04'];
 
   // Build the calc context referenced by every formula below.
@@ -134,7 +134,7 @@
   }
 
   // ============================================================
-  //  CONFIG — transcribed from "Worcester CPK test.xlsx"
+  //  CONFIG, transcribed from "Worcester CPK test.xlsx"
   // ============================================================
   const LOC_NAMES = {
     '01': 'Worcester DC', '02': 'Franklin DC', '03': 'Hampshire', '04': 'Berkshire DC',
@@ -267,7 +267,7 @@
   ];
 
   // ---- Packout (location × item grid) ----
-  // g: tray group — salad 1/16, sand 1/20, wrap 1/24, fruit 1/30
+  // g: tray group, salad 1/16, sand 1/20, wrap 1/24, fruit 1/30
   const PK_COLS = [
     { item: '253', label: '3 PBJ', g: 'sand', tri: true },
     { item: '279', label: '3 Turk', g: 'sand', tri: true },
@@ -463,8 +463,8 @@
       rows.forEach(r => t += `<tr><td>${esc(r.label)}</td><td class="num strong">${fmt(r.n)}</td></tr>`);
       return t + `<tr class="totals"><td>TOTAL</td><td class="num strong">${fmt(tot)}</td></tr></tbody></table>`;
     };
-    return h + '<div class="cpk-grid2"><div>' + colTable('DC Grab & Go — FoodPro stickers', dcRows, dcTot) +
-      '</div><div>' + colTable('Retail Grab & Go — Harvest Fresh stickers', rtRows, rtTot) + '</div></div>';
+    return h + '<div class="cpk-grid2"><div>' + colTable('DC Grab & Go, FoodPro stickers', dcRows, dcTot) +
+      '</div><div>' + colTable('Retail Grab & Go, Harvest Fresh stickers', rtRows, rtTot) + '</div></div>';
   }
 
   // ============================================================
