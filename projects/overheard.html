@@ -188,6 +188,10 @@
                 <li><strong>Tested the fancier model, kept the winner</strong> — a social-media sentiment transformer
                     was benchmarked against the LLM on the golden set and lost, so the LLM kept tone and classical ML
                     went where it wins: theme clustering and answer-first priority ranking.</li>
+                <li><strong>Calibrated the headline metric</strong> — the scrape tier can't see in-thread replies, so
+                    34 flagged comments were hand-checked against the live threads. About 28% had a brand reply the
+                    scrape missed; every published number now carries that correction instead of the flattering raw
+                    figure. Brands turned out to answer the sales questions and skip the service complaints.</li>
                 <li><strong>Shipped the tool</strong> — a self-contained console reads the marts and renders the league
                     table plus a priority-ranked feed of missed conversations.</li>
             </ul>
@@ -200,9 +204,10 @@
             </div>
             <div class="vitals">
                 <div class="vital"><div class="k">Brands tracked</div><div class="v">17</div></div>
-                <div class="vital"><div class="k">Comments analyzed</div><div class="v">3,000+</div></div>
-                <div class="vital"><div class="k">Questions &amp; complaints</div><div class="v live">760+</div></div>
+                <div class="vital"><div class="k">Comments analyzed</div><div class="v">3,800+</div></div>
+                <div class="vital"><div class="k">Questions &amp; complaints</div><div class="v live">790+</div></div>
                 <div class="vital"><div class="k">Unanswered on YouTube</div><div class="v">64%</div></div>
+                <div class="vital"><div class="k">Unanswered on Instagram</div><div class="v">~7 in 10</div></div>
                 <div class="vital"><div class="k">Run cost</div><div class="v">$0 (cloud credit)</div></div>
             </div>
             <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 16px; font-family: 'Share Tech Mono', monospace;">

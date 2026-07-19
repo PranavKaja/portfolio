@@ -105,8 +105,9 @@
   </header>
 
   <section>
-    <h2 class="sect">Instagram — Response Rate to Directed Intent (the primary signal)</h2>
+    <h2 class="sect">Instagram — the response gap (hand-calibrated)</h2>
     <div class="stats" id="igstats"></div>
+    <p class="context" id="calnote" style="margin-top:6px"></p>
     <div class="grid">
       <section><table id="igleague"><thead></thead><tbody></tbody></table></section>
       <section>
@@ -238,20 +239,22 @@ let igSel=null;
 function igStats(){
   const rows=D.ig_scorecard||[];
   const directed=rows.reduce((s,r)=>s+(r.directed||0),0);
-  const answered=rows.reduce((s,r)=>s+(r.answered||0),0);
   const complaints=rows.reduce((s,r)=>s+(r.complaints||0),0);
-  const rrdi=directed?Math.round(answered/directed*100):0;
+  const cal=D.calibration||{};
+  const noReply=cal.no_reply_pct!=null?`~${cal.no_reply_pct}%`:"—";
   $("#igstats").innerHTML=[
     [`${rows.length}`,"brands tracked"],
     [`${directed}`,"customers who addressed the brand"],
-    [`${rrdi}%`,"got a public reply",true],
-    [`${complaints}`,"complaints, all unanswered"],
+    [noReply,"get no public reply (calibrated)",true],
+    [`${complaints}`,"complaints found"],
   ].map(([n,l,w])=>`<div class="stat"><div class="n ${w?'warn':''}">${n}</div><div class="l">${l}</div></div>`).join("");
+  if(cal.checked)$("#calnote").innerHTML=`<span>Calibration: ${cal.checked} flagged comments hand-checked in-thread on ${cal.date}; ${cal.answered} had a brand reply the scrape can't see. Headline uses the corrected rate. Per-brand reply rates aren't shown: the sample is cohort-level.</span>`;
 }
 function igLeague(){
   const rows=(D.ig_scorecard||[]).slice().sort((a,b)=>(b.directed||0)-(a.directed||0));
-  $("#igleague thead").innerHTML="<tr><th>Brand</th><th class='num'>Comments</th><th class='num'>Directed</th><th class='num'>Complaints</th><th class='num'>RRDI</th></tr>";
-  $("#igleague tbody").innerHTML=rows.map(r=>`<tr class="brow" data-igb="${r.name}" aria-selected="${igSel===r.name}"><td><div class="bname">${r.name}</div><div class="cat">${(r.category||'').replace(/-/g,' ')}</div></td><td class="num">${r.comments}</td><td class="num">${r.directed}</td><td class="num"><span class="missed-n">${r.complaints}</span></td><td class="num"><span class="rpct" style="color:var(--missed)">${r.rrdi_pct}%</span></td></tr>`).join("");
+  const hiPrio=n=>(D.ig_missed||[]).filter(i=>i.brand===n&&(i.priority_score||0)>=40).length;
+  $("#igleague thead").innerHTML="<tr><th>Brand</th><th class='num'>Comments</th><th class='num'>Directed</th><th class='num'>Complaints</th><th class='num' title='flagged items with response-priority 40+, no reply visible in scraped data'>High-prio missed</th></tr>";
+  $("#igleague tbody").innerHTML=rows.map(r=>`<tr class="brow" data-igb="${r.name}" aria-selected="${igSel===r.name}"><td><div class="bname">${r.name}</div><div class="cat">${(r.category||'').replace(/-/g,' ')}</div></td><td class="num">${r.comments}</td><td class="num">${r.directed}</td><td class="num"><span class="missed-n">${r.complaints}</span></td><td class="num"><span class="rpct" style="color:var(--missed)">${hiPrio(r.name)}</span></td></tr>`).join("");
   $("#igleague tbody").querySelectorAll(".brow").forEach(tr=>tr.onclick=()=>{igSel=(igSel===tr.dataset.igb?null:tr.dataset.igb);igLeague();igFeed();});
 }
 function igFeed(){
