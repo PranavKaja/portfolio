@@ -1,5 +1,5 @@
 /* ============================================================
- * Mission History — now data-driven.
+ * Mission History, now data-driven.
  * Loads projects from Supabase (or data/projects.json offline),
  * renders the cards, and wires the detail overlay via delegation
  * so dynamically injected cards behave exactly like the old static ones.

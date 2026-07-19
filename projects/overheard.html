@@ -4,18 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Overheard — The Social Response-Gap Engine (BigQuery + Gemini) | Pranav Kaja</title>
+    <title>Overheard: The Social Response-Gap Engine (BigQuery + Gemini) | Pranav Kaja</title>
     <meta name="description"
         content="A GCP-native pipeline by Pranav Kaja that finds the customer questions brands ignore on their own social posts, classifies them with Gemini on Vertex AI, and ranks brands by how much they miss. Live in-browser tool.">
     <meta name="author" content="Pranav Kaja">
     <meta name="robots" content="index, follow, max-image-preview:large">
-    <meta property="og:title" content="Overheard — The Social Response-Gap Engine | Pranav Kaja">
+    <meta property="og:title" content="Overheard: The Social Response-Gap Engine | Pranav Kaja">
     <meta property="og:description" content="BigQuery + Vertex AI (Gemini): finds and ranks the customer questions brands leave unanswered on their own social posts. Live tool.">
     <meta property="og:image" content="https://pranavkaja.com/images/og-card.png?v=2">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://pranavkaja.com/projects/overheard">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Overheard — The Social Response-Gap Engine | Pranav Kaja">
+    <meta name="twitter:title" content="Overheard: The Social Response-Gap Engine | Pranav Kaja">
     <meta name="twitter:description" content="A live BigQuery + Gemini pipeline that counts the customer questions brands ignore.">
     <meta name="twitter:image" content="https://pranavkaja.com/images/og-card.png?v=2">
     <link rel="canonical" href="https://pranavkaja.com/projects/overheard">
@@ -33,7 +33,7 @@
       "@graph": [
         {
           "@type": "TechArticle",
-          "headline": "Overheard — The Social Response-Gap Engine",
+          "headline": "Overheard: The Social Response-Gap Engine",
           "description": "A GCP-native pipeline that ingests brands' owned social comments into BigQuery, classifies them with Gemini on Vertex AI, and ranks brands by the customer questions they leave unanswered.",
           "author": { "@type": "Person", "name": "Pranav Kaja", "url": "https://pranavkaja.com/" },
           "url": "https://pranavkaja.com/projects/overheard",
@@ -69,7 +69,7 @@
         <header class="hero">
             <div class="hero-label mb-20"><span class="status-dot"></span>[ LIVE TOOL ] // OPERATIONAL</div>
             <h1 class="hero-title" style="font-size: 3.2rem; line-height: 1.05;">OVERHEARD</h1>
-            <p class="hero-subtitle">The questions brands don't answer — found, classified, and counted. A
+            <p class="hero-subtitle">The questions brands don't answer, found, classified, and counted. A
                 social-response-gap engine built on Google Cloud.</p>
             <div class="pp-chips" style="margin-top: 8px;">
                 <span>17 Brands</span>
@@ -89,7 +89,7 @@
                 <div class="line"></div>
             </div>
             <p style="font-size: 1.05rem; line-height: 1.7; max-width: 760px;">
-                Every day, customers ask brands questions in public — under the brand's own YouTube videos and Instagram
+                Every day, customers ask brands questions in public, under the brand's own YouTube videos and Instagram
                 posts. Brands miss a huge share of them. Each ignored question is a lost sale, or a public complaint that
                 everyone with the same question sees go unanswered. Social teams know it hurts, but they can't see the
                 whole surface, and they can't put a number on it.
@@ -97,7 +97,7 @@
             <p style="font-size: 1.05rem; line-height: 1.7; max-width: 760px; margin-top: 14px;">
                 Overheard measures it. For a set of competing brands, it collects the public conversation on their own
                 posts, uses <strong>Gemini</strong> to tell a real question or complaint from noise, checks whether the
-                brand ever replied, and ranks the field by who answers and who goes silent — the benchmark a social team
+                brand ever replied, and ranks the field by who answers and who goes silent, the benchmark a social team
                 would actually act on.
             </p>
         </section>
@@ -110,7 +110,7 @@
             <div class="msn-rmo">
                 <div class="rmo-cell">
                     <div class="k">Role</div>
-                    <div class="v">Solo build, end to end — pipeline, AI layer, marts, and the front-end tool.</div>
+                    <div class="v">Solo build, end to end: pipeline, AI layer, marts, and the front-end tool.</div>
                 </div>
                 <div class="rmo-cell">
                     <div class="k">Method</div>
@@ -132,14 +132,14 @@
             </div>
             <div class="grid-2">
                 <div class="panel">
-                    <h3>STAGE 1 — INGEST &amp; WAREHOUSE</h3>
+                    <h3>STAGE 1: INGEST &amp; WAREHOUSE</h3>
                     <p>Scheduled jobs pull each brand's public comments into BigQuery, normalized to one schema. An
-                        official-account registry flags which comments are the brand replying — so "answered" vs
+                        official-account registry flags which comments are the brand replying, so "answered" vs
                         "ignored" is ground truth, not a guess. Idempotent loads mean a rerun never double-counts.</p>
                 </div>
                 <div class="panel">
-                    <h3>STAGE 2 — CLASSIFY &amp; RANK</h3>
-                    <p>Gemini reads every comment and tags it — question, complaint, purchase intent, or noise — with
+                    <h3>STAGE 2: CLASSIFY &amp; RANK</h3>
+                    <p>Gemini reads every comment and tags it, question, complaint, purchase intent, or noise, with
                         strict JSON output. A classical-ML layer then clusters the missed comments into themes and
                         scores each one 0–100 for answer-first priority, and SQL marts rank each brand by what it
                         leaves unanswered.</p>
@@ -147,8 +147,8 @@
             </div>
             <p style="font-size: 1rem; line-height: 1.7; max-width: 760px; margin-top: 22px;">
                 The result is three views: an Instagram league table of who gets addressed and who stays silent, a
-                priority-ranked feed of the actual missed conversations — each one a real customer the brand left on
-                read — and a YouTube context layer behind it.
+                priority-ranked feed of the actual missed conversations, each one a real customer the brand left on
+                read, and a YouTube context layer behind it.
             </p>
         </section>
 
@@ -161,7 +161,7 @@
                 <p style="font-size: 1.02rem; line-height: 1.7;">
                     The first data pull looked fantastic: one brand had thousands of comments and answered none of them.
                     It was wrong. Resolving channels by name search had grabbed <strong>Ninja the gaming streamer</strong>
-                    instead of Ninja the appliance brand — thousands of comments of gaming chat, a beautiful and
+                    instead of Ninja the appliance brand, thousands of comments of gaming chat, a beautiful and
                     meaningless number. A manual spot-check against the live comment URLs caught it. The fix was to pin
                     every brand's official channel by verified handle. That's the whole case for a manual verification
                     gate: the numbers that look cleanest are the ones most worth checking.
@@ -175,24 +175,24 @@
                 <div class="line"></div>
             </div>
             <ul class="ops-points" style="max-width: 780px;">
-                <li><strong>Schema first</strong> — a partitioned, clustered BigQuery model with raw, staging, and mart
+                <li><strong>Schema first</strong>: a partitioned, clustered BigQuery model with raw, staging, and mart
                     layers before a single row was loaded.</li>
-                <li><strong>Ground truth over guessing</strong> — response gaps are measured only on owned surfaces,
+                <li><strong>Ground truth over guessing</strong>: response gaps are measured only on owned surfaces,
                     where a brand's own reply is verifiable, not inferred.</li>
-                <li><strong>Caught the channel bug</strong> — switched from name search to handle-verified channel IDs
+                <li><strong>Caught the channel bug</strong>: switched from name search to handle-verified channel IDs
                     after the verification gate flagged the wrong "Ninja."</li>
-                <li><strong>Vertex over the consumer API</strong> — routed Gemini through Vertex AI so it bills against
+                <li><strong>Vertex over the consumer API</strong>: routed Gemini through Vertex AI so it bills against
                     the cloud project, after the consumer API hit a separate billing wall.</li>
-                <li><strong>Measured, not asserted</strong> — every prompt change is scored against a hand-labeled
+                <li><strong>Measured, not asserted</strong>: every prompt change is scored against a hand-labeled
                     golden set before its output is trusted.</li>
-                <li><strong>Tested the fancier model, kept the winner</strong> — a social-media sentiment transformer
+                <li><strong>Tested the fancier model, kept the winner</strong>: a social-media sentiment transformer
                     was benchmarked against the LLM on the golden set and lost, so the LLM kept tone and classical ML
                     went where it wins: theme clustering and answer-first priority ranking.</li>
-                <li><strong>Calibrated the headline metric</strong> — the scrape tier can't see in-thread replies, so
+                <li><strong>Calibrated the headline metric</strong>: the scrape tier can't see in-thread replies, so
                     34 flagged comments were hand-checked against the live threads. About 28% had a brand reply the
                     scrape missed; every published number now carries that correction instead of the flattering raw
                     figure. Brands turned out to answer the sales questions and skip the service complaints.</li>
-                <li><strong>Shipped the tool</strong> — a self-contained console reads the marts and renders the league
+                <li><strong>Shipped the tool</strong>: a self-contained console reads the marts and renders the league
                     table plus a priority-ranked feed of missed conversations.</li>
             </ul>
         </section>

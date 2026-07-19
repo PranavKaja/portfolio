@@ -1,5 +1,5 @@
 /* ============================================================================
-   desktop.js  —  Boot sequence, desktop icons, Start menu, taskbar, sound.
+   desktop.js ,  Boot sequence, desktop icons, Start menu, taskbar, sound.
    ========================================================================== */
 (function () {
   const $ = (s) => document.querySelector(s);

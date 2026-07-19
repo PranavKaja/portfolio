@@ -1,5 +1,5 @@
 /* ============================================================
- * Transmission Log — public contact form.
+ * Transmission Log, public contact form.
  * Submits to Supabase `messages`. If the backend isn't configured
  * (or insert fails), falls back to a prefilled mailto: so the form
  * is never a dead end.
@@ -20,9 +20,9 @@
   function mailtoFallback(name, email, phone, body) {
     // reuse the runtime-assembled address so we don't hardcode it for scrapers
     const addr = ($('email-desc') && $('email-desc').textContent.trim()) || '';
-    if (!addr) { setMsg('Channel offline — email me directly.', 'err'); return; }
+    if (!addr) { setMsg('Channel offline, email me directly.', 'err'); return; }
     const subject = 'Transmission from ' + (name || 'a visitor');
-    const lines = [body, '', '— ' + (name || ''), email || '', phone || ''].join('\n');
+    const lines = [body, '', '- ' + (name || ''), email || '', phone || ''].join('\n');
     window.location.href = 'mailto:' + addr +
       '?subject=' + encodeURIComponent(subject) +
       '&body=' + encodeURIComponent(lines);
@@ -34,7 +34,7 @@
   // but they catch the two things that actually lose you a reply: obvious
   // typos and throwaway inboxes.
 
-  // Disposable / throwaway inboxes — a message here can never get a reply.
+  // Disposable / throwaway inboxes, a message here can never get a reply.
   // Covers the popular providers; not meant to be exhaustive.
   const DISPOSABLE = new Set([
     'mailinator.com', '10minutemail.com', 'guerrillamail.com', 'guerrillamail.info',
@@ -127,7 +127,7 @@
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // honeypot: a bot filled the hidden field — pretend success, do nothing
+    // honeypot: a bot filled the hidden field, pretend success, do nothing
     if ($('tx-website').value) { setMsg('// Transmission received.', 'ok'); form.classList.add('sent'); return; }
 
     const name = $('tx-name').value.trim();
@@ -136,12 +136,12 @@
     const body = $('tx-body').value.trim();
 
     if (!name || !email || !body) { setMsg('Name, email, and a message are required.', 'err'); return; }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setMsg('That email looks off — check it?', 'err'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setMsg('That email looks off, check it?', 'err'); return; }
 
     const host = email.split('@')[1].toLowerCase();
-    // hard block: temporary/disposable inboxes — you'd never get a reply through
+    // hard block: temporary/disposable inboxes, you'd never get a reply through
     if (DISPOSABLE.has(host)) {
-      setMsg('That looks like a temporary inbox — please use an email you actually check so I can reply.', 'err');
+      setMsg('That looks like a temporary inbox, please use an email you actually check so I can reply.', 'err');
       $('tx-email').focus();
       return;
     }

@@ -4,18 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invitovate — A Calm Outreach Pipeline (Multi-Tenant SaaS) | Pranav Kaja</title>
+    <title>Invitovate: A Calm Outreach Pipeline (Multi-Tenant SaaS) | Pranav Kaja</title>
     <meta name="description"
         content="Invitovate is a live multi-tenant SaaS by Pranav Kaja: a calm outreach pipeline on Postgres with per-user row-level security, an event-sourced status log, per-variant analytics, and an eval gate on every drafted message. Draft in your voice, send only what you approve.">
     <meta name="author" content="Pranav Kaja">
     <meta name="robots" content="index, follow, max-image-preview:large">
-    <meta property="og:title" content="Invitovate — A Calm Outreach Pipeline | Pranav Kaja">
+    <meta property="og:title" content="Invitovate: A Calm Outreach Pipeline | Pranav Kaja">
     <meta property="og:description" content="A live multi-tenant SaaS: Postgres + row-level security, an event-sourced pipeline, per-variant analytics, and an eval gate on every message. Draft in your voice, send only what you approve.">
     <meta property="og:image" content="https://pranavkaja.com/images/og-card.png?v=2">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://pranavkaja.com/projects/invitovate">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Invitovate — A Calm Outreach Pipeline | Pranav Kaja">
+    <meta name="twitter:title" content="Invitovate: A Calm Outreach Pipeline | Pranav Kaja">
     <meta name="twitter:description" content="A live multi-tenant SaaS I built solo: Postgres + RLS, event-sourced pipeline, per-variant analytics, and an eval gate on every drafted message.">
     <meta name="twitter:image" content="https://pranavkaja.com/images/og-card.png?v=2">
     <link rel="canonical" href="https://pranavkaja.com/projects/invitovate">
@@ -33,7 +33,7 @@
       "@graph": [
         {
           "@type": "TechArticle",
-          "headline": "Invitovate — A Calm Outreach Pipeline",
+          "headline": "Invitovate: A Calm Outreach Pipeline",
           "description": "A live multi-tenant SaaS product: a calm outreach pipeline on Postgres with per-user row-level security, an event-sourced status log, per-variant analytics, and an eval gate on every drafted message.",
           "author": { "@type": "Person", "name": "Pranav Kaja", "url": "https://pranavkaja.com/" },
           "url": "https://pranavkaja.com/projects/invitovate",
@@ -112,7 +112,7 @@
             <div class="msn-rmo">
                 <div class="rmo-cell">
                     <div class="k">Role</div>
-                    <div class="v">Solo build, end to end — product design, marketing site, multi-tenant backend, the
+                    <div class="v">Solo build, end to end, product design, marketing site, multi-tenant backend, the
                         console, and a background runner.</div>
                 </div>
                 <div class="rmo-cell">
@@ -122,8 +122,7 @@
                 </div>
                 <div class="rmo-cell">
                     <div class="k">Outcome</div>
-                    <div class="v">A live product that turns scattered outreach into one calm, trackable pipeline —
-                        draft in your voice, send only what you approve.</div>
+                    <div class="v">A live product that turns scattered outreach into one calm, trackable pipeline, draft in your voice, send only what you approve.</div>
                 </div>
             </div>
         </section>
@@ -137,7 +136,7 @@
                 <div class="panel">
                     <h3>FIND &amp; DRAFT</h3>
                     <p>Your own AI finds the right people and writes each message in your voice, grounded in real
-                        details about who you're reaching. Nothing sends on its own — every draft waits for your
+                        details about who you're reaching. Nothing sends on its own, every draft waits for your
                         approval, so the human always holds the send button.</p>
                 </div>
                 <div class="panel">
@@ -164,20 +163,20 @@
                 data wrong. That's where the real work went.
             </p>
             <ul class="ops-points" style="max-width: 780px;">
-                <li><strong>Multi-tenant from day one</strong> — per-user row-level security in Postgres, verified with
+                <li><strong>Multi-tenant from day one</strong>: per-user row-level security in Postgres, verified with
                     a real second account, so no one ever sees another user's pipeline. Signup is invite-gated.</li>
-                <li><strong>A pipeline that can't lie</strong> — status lives in an append-only event log, and a
+                <li><strong>A pipeline that can't lie</strong>: status lives in an append-only event log, and a
                     database trigger blocks a contact from ever moving backwards in the funnel. The history is the
                     truth, not a mutable cell.</li>
-                <li><strong>A quality gate on the words</strong> — every drafted message runs an executable lint pass
+                <li><strong>A quality gate on the words</strong>: every drafted message runs an executable lint pass
                     (banned-phrase scan, per-batch quotas and budgets) before a human ever reads it. It's an eval gate
                     for content, not a vibe check.</li>
-                <li><strong>Decisions from evidence</strong> — the tool measures per channel and per variant, so I
+                <li><strong>Decisions from evidence</strong>: the tool measures per channel and per variant, so I
                     retired the email channel on the data (it produced zero replies across 88 sends) instead of on a
                     hunch.</li>
-                <li><strong>Tool-agnostic by design</strong> — every action is a REST call, so the whole pipeline is
+                <li><strong>Tool-agnostic by design</strong>: every action is a REST call, so the whole pipeline is
                     drivable by any agent, IDE, or a packaged background app. No lock-in to one client.</li>
-                <li><strong>The human holds the send button</strong> — the AI finds and drafts; a person approves
+                <li><strong>The human holds the send button</strong>: the AI finds and drafts; a person approves
                     everything that goes out. That guardrail is the product, not an afterthought.</li>
             </ul>
         </section>

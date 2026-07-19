@@ -4,18 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fraud Triage — LLM-Augmented Fraud Detection (XGBoost + Gemini) | Pranav Kaja</title>
+    <title>Fraud Triage: LLM-Augmented Fraud Detection (XGBoost + Gemini) | Pranav Kaja</title>
     <meta name="description"
         content="A two-stage fraud pipeline by Pranav Kaja: XGBoost scores 284,807 card transactions at 0.978 AUC, then Google Gemini writes analyst-ready verdicts for the high-risk flags.">
     <meta name="author" content="Pranav Kaja">
     <meta name="robots" content="index, follow, max-image-preview:large">
-    <meta property="og:title" content="Fraud Triage — LLM-Augmented Fraud Detection | Pranav Kaja">
+    <meta property="og:title" content="Fraud Triage: LLM-Augmented Fraud Detection | Pranav Kaja">
     <meta property="og:description" content="XGBoost scores 284K transactions at 0.978 AUC; Google Gemini triages the high-risk flags into structured, analyst-ready verdicts.">
     <meta property="og:image" content="https://pranavkaja.com/images/og-card.png?v=2">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://pranavkaja.com/projects/fraud-triage">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Fraud Triage — LLM-Augmented Fraud Detection | Pranav Kaja">
+    <meta name="twitter:title" content="Fraud Triage: LLM-Augmented Fraud Detection | Pranav Kaja">
     <meta name="twitter:description" content="XGBoost + Google Gemini: speed of classical ML, explainability of generative AI.">
     <meta name="twitter:image" content="https://pranavkaja.com/images/og-card.png?v=2">
     <link rel="canonical" href="https://pranavkaja.com/projects/fraud-triage">
@@ -33,7 +33,7 @@
       "@graph": [
         {
           "@type": "TechArticle",
-          "headline": "Fraud Triage — LLM-Augmented Transaction Fraud Detection",
+          "headline": "Fraud Triage: LLM-Augmented Transaction Fraud Detection",
           "description": "A two-stage fraud pipeline: XGBoost scores 284,807 card transactions at 0.978 AUC, then Google Gemini writes structured, analyst-ready verdicts for the high-risk flags.",
           "author": { "@type": "Person", "name": "Pranav Kaja", "url": "https://pranavkaja.com/" },
           "url": "https://pranavkaja.com/projects/fraud-triage",
@@ -69,7 +69,7 @@
         <header class="hero">
             <div class="hero-label mb-20"><span class="status-dot"></span>MSN-02 // DEPLOYED</div>
             <h1 class="hero-title" style="font-size: 3.2rem; line-height: 1.05;">FRAUD TRIAGE</h1>
-            <p class="hero-subtitle">A two-stage pipeline that catches what the model misses — XGBoost for speed,
+            <p class="hero-subtitle">A two-stage pipeline that catches what the model misses, XGBoost for speed,
                 Google Gemini for the reasoning.</p>
             <div class="pp-chips" style="margin-top: 8px;">
                 <span>0.978 AUC</span>
@@ -90,12 +90,12 @@
                 Card networks process millions of transactions a day. Under 1% are fraudulent, but each one is real
                 money lost. The job is two-sided: catch fraud without drowning analysts in false flags, and give them
                 enough context to make a fast, defensible call on the ones that do get flagged. Most systems stop at a
-                score — a 0.87 doesn't tell an analyst <em>why</em> a transaction looks wrong or what to do about it.
+                score, a 0.87 doesn't tell an analyst <em>why</em> a transaction looks wrong or what to do about it.
             </p>
             <p style="font-size: 1.05rem; line-height: 1.7; max-width: 760px; margin-top: 14px;">
                 This project pairs two complementary AI systems so each does what it's best at: <strong>XGBoost</strong>
                 rapidly scores every transaction, then <strong>Google Gemini</strong> takes the small fraction flagged
-                as suspicious and produces a structured, analyst-actionable verdict with reasoning — the speed of
+                as suspicious and produces a structured, analyst-actionable verdict with reasoning, the speed of
                 classical ML with the explainability of generative AI.
             </p>
         </section>
@@ -108,7 +108,7 @@
             <div class="msn-rmo">
                 <div class="rmo-cell">
                     <div class="k">Role</div>
-                    <div class="v">Solo build, end to end — modeling, LLM layer, and batch pipeline.</div>
+                    <div class="v">Solo build, end to end, modeling, LLM layer, and batch pipeline.</div>
                 </div>
                 <div class="rmo-cell">
                     <div class="k">Method</div>
@@ -128,21 +128,21 @@
             </div>
             <div class="grid-2">
                 <div class="panel">
-                    <h3>STAGE 1 — XGBOOST</h3>
+                    <h3>STAGE 1: XGBOOST</h3>
                     <p>Trained on 284,807 historical card transactions, it scores every transaction with a fraud
                         probability. Fast and cheap, it scales to millions of transactions a day and flags only the
                         highest-risk ones for review.</p>
                 </div>
                 <div class="panel">
-                    <h3>STAGE 2 — GOOGLE GEMINI</h3>
+                    <h3>STAGE 2: GOOGLE GEMINI</h3>
                     <p>A reasoning layer that examines each flagged transaction's raw features and writes a structured
-                        verdict — what's suspicious, why, and the recommended action — only paying the LLM cost on the
+                        verdict, what's suspicious, why, and the recommended action, only paying the LLM cost on the
                         few cases that need deep analysis.</p>
                 </div>
             </div>
             <p style="font-size: 1rem; line-height: 1.7; max-width: 760px; margin-top: 22px;">
                 In practice: overnight the model scores a million transactions and flags the top 100. Each flag is sent
-                through the Gemini triage agent, which returns a standardized JSON case file — verdict, confidence,
+                through the Gemini triage agent, which returns a standardized JSON case file, verdict, confidence,
                 primary signals, reasoning, and a recommended action. The analyst reviews a decision instead of a bare
                 number. What used to take ~5 minutes of investigation per case becomes ~30 seconds of verification.
             </p>
@@ -155,7 +155,7 @@
             </div>
             <div class="panel" style="border-left: 4px solid var(--accent);">
                 <p style="font-size: 1.02rem; line-height: 1.7;">
-                    During testing, a transaction scored <strong>0.000000</strong> — the ML model was certain it was
+                    During testing, a transaction scored <strong>0.000000</strong>: the ML model was certain it was
                     legitimate. It was actually fraud. The model would have let it through. Reading the <em>raw feature
                     values</em> rather than the model's confidence, the LLM noticed multiple anomalous signals and
                     flagged it anyway. That's the whole case for two layers: the model is excellent on the bulk of
@@ -171,16 +171,16 @@
                 <div class="line"></div>
             </div>
             <ul class="ops-points" style="max-width: 780px;">
-                <li><strong>Started with vanilla Gradient Boosting</strong> — the textbook baseline. It hit a wall at
+                <li><strong>Started with vanilla Gradient Boosting</strong>: the textbook baseline. It hit a wall at
                     0.60 AUC, barely better than random.</li>
                 <li><strong>Diagnosed the failure:</strong> a 577:1 class imbalance was overwhelming the loss function,
                     and 1,081 duplicate rows produced bimodal predictions that broke the metric.</li>
-                <li><strong>Switched to XGBoost with weighted loss</strong> — <code>scale_pos_weight=577</code> weights
+                <li><strong>Switched to XGBoost with weighted loss</strong>: <code>scale_pos_weight=577</code> weights
                     fraud examples 577&times; during training; L2 regularization smoothed the duplicate-row impact.
                     AUC jumped from 0.60 to <strong>0.978</strong>, at 84% recall and 84% precision on the rare class.</li>
-                <li><strong>Added the Gemini triage layer</strong> — a function that formats the XGBoost score plus the
+                <li><strong>Added the Gemini triage layer</strong>: a function that formats the XGBoost score plus the
                     top features into a structured prompt and returns a strict-JSON verdict.</li>
-                <li><strong>Scaled to batch</strong> — a rate-limited processor that runs 100 transactions through the
+                <li><strong>Scaled to batch</strong>: a rate-limited processor that runs 100 transactions through the
                     LLM in ~10 minutes with timing, token tracking, error handling, and caching.</li>
             </ul>
         </section>
@@ -191,13 +191,13 @@
                 <div class="line"></div>
             </div>
             <ul class="ops-points" style="max-width: 780px;">
-                <li><strong>Structured output enforcement</strong> — Gemini set to <code>response_mime_type="application/json"</code>,
+                <li><strong>Structured output enforcement</strong>: Gemini set to <code>response_mime_type="application/json"</code>,
                     guaranteeing valid JSON: no regex parsing, no markdown fences, no malformed responses.</li>
-                <li><strong>Signal compression</strong> — only the top 5 most anomalous features (not all 30) go to the
+                <li><strong>Signal compression</strong>: only the top 5 most anomalous features (not all 30) go to the
                     LLM, keeping prompts focused and token cost low.</li>
-                <li><strong>Rate limiting &amp; caching</strong> — 5s between calls to stay under the free-tier limit, with
+                <li><strong>Rate limiting &amp; caching</strong>: 5s between calls to stay under the free-tier limit, with
                     results saved to disk after every batch so a dropped session loses no work.</li>
-                <li><strong>Cost projections</strong> — tokens-per-call tracked and projected across 1K&ndash;1M daily
+                <li><strong>Cost projections</strong>: tokens-per-call tracked and projected across 1K&ndash;1M daily
                     volumes (~$30/month at 100K/day): the analysis that actually decides whether to deploy.</li>
             </ul>
         </section>
@@ -222,7 +222,7 @@
         <section class="section">
             <div class="interests-simple-box">
                 <h3 class="beyond-title">MORE MISSIONS</h3>
-                <p class="beyond-subtitle">Eight more case files — ML, BI, and supply-chain strategy.</p>
+                <p class="beyond-subtitle">Eight more case files, ML, BI, and supply-chain strategy.</p>
                 <a href="/projects" class="btn btn-secondary interactive-element no-underline">VIEW ALL MISSIONS</a>
             </div>
         </section>

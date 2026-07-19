@@ -6,8 +6,8 @@
 > Boston, MA, and is open to full-time roles.
 
 ## About
-Pranav builds for the whole data lifecycle — clean inputs, edge cases, monitoring,
-and an audit trail — favoring models that ship and get monitored over ones that
+Pranav builds for the whole data lifecycle, clean inputs, edge cases, monitoring,
+and an audit trail, favoring models that ship and get monitored over ones that
 only look good on a slide.
 
 ## Pages

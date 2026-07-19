@@ -1,5 +1,5 @@
 // ============================================================
-// Supabase connection — fill these in after creating your project.
+// Supabase connection, fill these in after creating your project.
 //   Supabase Dashboard → Project Settings → API
 //   • Project URL          -> SUPABASE_URL
 //   • Project API keys: anon/public -> SUPABASE_ANON_KEY
@@ -7,7 +7,7 @@
 // The anon key is SAFE to ship in the browser: Row Level Security
 // (see supabase/schema.sql) is what actually protects writes.
 //
-// Leave these blank to run the site fully offline — it falls back to
+// Leave these blank to run the site fully offline, it falls back to
 // data/projects.json so everything still renders without a backend.
 // ============================================================
 window.PORTFOLIO_CONFIG = {
