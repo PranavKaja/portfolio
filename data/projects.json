@@ -10,7 +10,7 @@
     "outcome": "Industry-grade AUC with a reasoning trail analysts can audit",
     "chips": ["0.978 AUC", "84% Recall", "84% Precision", "284K Records", "~2s Latency"],
     "skills": ["XGBoost", "Google Gemini", "Python"],
-    "status": "in_progress", "sort_order": 10, "published": true,
+    "status": "deployed", "sort_order": 10, "published": true,
     "github_url": "https://github.com/PranavKaja/fraud-triage", "show_status": true, "show_github": true
   },
   {
@@ -109,15 +109,15 @@
     "github_url": "https://www.isenberg.umass.edu/news/2026-strategy-summit", "show_status": false, "show_github": true
   },
   {
-    "code": "MSN-10", "title": "Analysis on Heart Disease Predictors", "tech": "Python / Scikit-learn",
-    "summary": "~82% accuracy (Random Forest); ensemble + Flask app.",
+    "code": "MSN-10", "title": "Heart Disease Prediction", "tech": "Python / Scikit-learn",
+    "summary": "~82% accuracy; best of 5 models; live Flask app.",
     "stack": "Python / Scikit-learn / Flask",
     "hook": "~82% accuracy, deployed as a Flask app.",
     "brief": "End-to-end capstone comparing five classifiers on the 13-feature clinical heart dataset. Random Forest was the strongest at ~82% accuracy; a top-3 majority-vote ensemble landed just behind, served through a Flask web app that scores risk from a 13-field form.",
     "role": "Capstone lead",
-    "method": "Five-model comparison with a top-3 majority-vote ensemble, served via Flask",
-    "outcome": "~82% Random Forest accuracy; ensemble just behind, in a live app",
-    "chips": ["~82% Accuracy", "5 Models", "Top-3 Ensemble", "Flask App"],
+    "method": "Five-model comparison on a 13-feature clinical set, served via Flask",
+    "outcome": "~82% Random Forest accuracy, best of five models, in a live app",
+    "chips": ["~82% Accuracy", "5 Models Compared", "13 Features", "Flask App"],
     "skills": ["Python", "Scikit-learn", "Flask"],
     "status": "archived", "sort_order": 90, "published": true,
     "github_url": "https://github.com/PranavKaja/heart-disease", "show_status": false, "show_github": true

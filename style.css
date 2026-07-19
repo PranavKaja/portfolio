@@ -824,7 +824,14 @@ h2.hover-swap {
     flex-direction: column;
     align-items: center;
     gap: 5px;
-    transition: transform 0.3s, border-color 0.3s;
+    transition: transform 0.3s, border-color 0.3s, opacity 0.4s, visibility 0.4s;
+}
+
+/* Earns its screen space: invisible until the visitor has settled in
+   (20s timer in cargame.js) or presses WASD themselves */
+.wasd-keyboard-hint.hint-gated {
+    opacity: 0;
+    visibility: hidden;
 }
 
 .wasd-keyboard-hint.first-trigger {

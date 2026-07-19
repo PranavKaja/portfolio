@@ -1,9 +1,10 @@
 # Pranav Kaja
 
-> Pranav Kaja is a Data & Analytics Engineer translating complex data into clear
-> action since 2020. He holds an MS in Business Analytics from the University of
-> Massachusetts Amherst (GPA 4.00) and a BTech in Computer Science, is based in
-> Boston, MA, and is open to full-time roles.
+> Pranav Kaja is a Data & Analytics Engineer. He builds pipelines, models, and
+> dashboards that survive contact with real data. He holds an MS in Business
+> Analytics from the University of Massachusetts Amherst (GPA 4.00) and a BTech
+> in Computer Science, is based in Massachusetts, and is open to full-time roles
+> anywhere in the US.
 
 ## About
 Pranav builds for the whole data lifecycle, clean inputs, edge cases, monitoring,
@@ -20,8 +21,9 @@ only look good on a slide.
 - Student Supervisor, UMass Amherst Dining (Sep 2024 - May 2026): automated a
   37-location ETL pipeline, cutting manual reporting from 2 hrs/day to 12 min/day;
   led a team of student employees; built data-driven inventory forecasting.
-- Data Science Intern, Acmegrade (May 2022 - Jul 2022): built a Random Forest
-  churn predictor on 100K records, improving accuracy 15% over baseline.
+- Data Science Intern, Acmegrade (May 2022 - Jul 2022): trained Random Forest
+  and Gradient Boosting on a 100,000-record client portfolio, lifting
+  conversion-prediction accuracy 15% over baseline.
 
 ## Skills
 - Data Engineering: SQL, ETL/ELT, Python, Spark & Hadoop, Data Warehousing
