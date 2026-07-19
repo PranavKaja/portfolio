@@ -1,5 +1,5 @@
 /* ============================================================================
-   wm.js  —  Tiny window manager: open/focus/drag/resize/min/max/close windows
+   wm.js ,  Tiny window manager: open/focus/drag/resize/min/max/close windows
    and keep the taskbar in sync. No dependencies.
    ========================================================================== */
 (function () {

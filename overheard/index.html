@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Overheard — Kitchen Social Response Index</title>
+<title>Overheard: Kitchen Social Response Index</title>
 <style>
   :root{
     --paper:#faf8f5; --ink:#191a1d; --ink-soft:#5b5a57; --line:#e6e2da;
@@ -105,7 +105,7 @@
   </header>
 
   <section>
-    <h2 class="sect">Instagram — the response gap (hand-calibrated)</h2>
+    <h2 class="sect">Instagram: the response gap (hand-calibrated)</h2>
     <div class="stats" id="igstats"></div>
     <p class="context" id="calnote" style="margin-top:6px"></p>
     <div class="grid">
@@ -117,14 +117,14 @@
     </div>
   </section>
 
-  <h2 class="sect" style="margin-top:36px;border-top:1px solid var(--line);padding-top:24px">YouTube — secondary context layer</h2>
+  <h2 class="sect" style="margin-top:36px;border-top:1px solid var(--line);padding-top:24px">YouTube: secondary context layer</h2>
   <div class="stats" id="stats"></div>
 
   <div class="filter" id="filter"><span class="lab">Category</span></div>
 
   <div class="grid">
     <section>
-      <h2 class="sect">The index — who answers, who ignores</h2>
+      <h2 class="sect">The index: who answers, who ignores</h2>
       <table id="league"><thead></thead><tbody></tbody></table>
     </section>
     <section>
@@ -144,7 +144,7 @@
 <script>
 const D = window.DATA || {scorecard:[],feed:[],generated:""};
 const $ = s => document.querySelector(s);
-const fmt = n => n==null?"—":(typeof n==="number"?n.toLocaleString():n);
+const fmt = n => n==null?"–":(typeof n==="number"?n.toLocaleString():n);
 let catFilter="all", selBrand=null, typeFilter="all";
 
 const cats = [...new Set(D.scorecard.map(r=>r.category))].sort();
@@ -161,7 +161,7 @@ function stats(){
     [`${rows.length}`,"brands with YouTube volume"],
     [`${fmt(act)}`,"questions & complaints found"],
     [`${pct}%`,"left unanswered", true],
-    [worst? worst.name:"—","lowest response rate"],
+    [worst? worst.name:"–","lowest response rate"],
   ].map(([n,l,w])=>`<div class="stat"><div class="n ${w?'warn':''}">${n}</div><div class="l">${l}</div></div>`).join("");
 }
 
@@ -197,9 +197,9 @@ function league(){
       <td><div class="bname">${r.name}</div><div class="cat">${r.category.replace(/-/g,' ')}</div></td>
       <td><div class="bar" title="${ans} answered / ${mis} missed"><span class="a" style="width:${aw}%"></span><span class="m" style="width:${mw}%"></span></div></td>
       <td class="num"><span class="missed-n">${mis}</span></td>
-      <td class="num"><span class="rpct" style="color:${rc}">${rp==null?"—":rp+"%"}</span></td>
-      <td class="num">${r.median_reply_hours==null?"—":r.median_reply_hours}</td>
-      <td class="num">${r.share_of_voice_pct==null?"—":r.share_of_voice_pct}</td></tr>`;
+      <td class="num"><span class="rpct" style="color:${rc}">${rp==null?"–":rp+"%"}</span></td>
+      <td class="num">${r.median_reply_hours==null?"–":r.median_reply_hours}</td>
+      <td class="num">${r.share_of_voice_pct==null?"–":r.share_of_voice_pct}</td></tr>`;
   }).join("");
   $("#league thead").querySelectorAll("th").forEach(th=>th.onclick=()=>{
     const k=th.dataset.k; if(k==="silence")return;
@@ -216,7 +216,7 @@ function feed(){
   const brand=D.scorecard.find(r=>r.brand_id===selBrand);
   let items=D.feed.filter(f=>f.brand_id===selBrand).sort((a,b)=>(b.like_count||0)-(a.like_count||0));
   const types=[...new Set(items.map(i=>i.type))];
-  $("#feedtitle").textContent=`Missed — ${brand?brand.name:selBrand}`;
+  $("#feedtitle").textContent=`Missed, ${brand?brand.name:selBrand}`;
   const shown=items.filter(i=>typeFilter==="all"||i.type===typeFilter);
   $("#feedcount").textContent=`${shown.length} unanswered`;
   const mk=(id,l)=>`<button class="ftype" data-t="${id}" aria-pressed="${typeFilter===id}">${l}</button>`;
@@ -241,7 +241,7 @@ function igStats(){
   const directed=rows.reduce((s,r)=>s+(r.directed||0),0);
   const complaints=rows.reduce((s,r)=>s+(r.complaints||0),0);
   const cal=D.calibration||{};
-  const noReply=cal.no_reply_pct!=null?`~${cal.no_reply_pct}%`:"—";
+  const noReply=cal.no_reply_pct!=null?`~${cal.no_reply_pct}%`:"–";
   $("#igstats").innerHTML=[
     [`${rows.length}`,"brands tracked"],
     [`${directed}`,"customers who addressed the brand"],
@@ -260,7 +260,7 @@ function igLeague(){
 function igFeed(){
   let items=(D.ig_missed||[]);
   if(igSel) items=items.filter(i=>i.brand===igSel);
-  $("#igfeedtitle").textContent= igSel? `Ignored — ${igSel} (answer these first)` : "What they ignored, ranked: answer these first";
+  $("#igfeedtitle").textContent= igSel? `Ignored, ${igSel} (answer these first)` : "What they ignored, ranked: answer these first";
   $("#igfeed").innerHTML=items.slice(0,40).map(i=>{
     const p=Math.round(i.priority_score||0);
     return `<div class="card"><span class="stamp" title="no brand reply visible in the scraped comments (thread replies need a paid scrape tier, see docs/PIPELINE-SHAKEOUT.md)">no visible reply</span><div class="top"><span class="prio ${p<40?'lo':''}" title="response priority 0-100">${p}</span><span class="badge b-${i.type}">${i.type.replace(/_/g,' ')}</span><span class="urg ${i.urgency}"></span><span class="topic">${i.theme_label||i.topic||''} · ${i.brand}</span></div><div class="ctext">${esc(i.text||'').slice(0,300)}</div><div class="meta">${i.url?`<a href="${i.url}" target="_blank" rel="noopener">view on instagram →</a>`:''}</div></div>`;
@@ -268,7 +268,7 @@ function igFeed(){
 }
 function render(){igStats();igLeague();igFeed();stats();filterBar();league();feed();
   $("#context").innerHTML=`<span>Surface <b>YouTube (owned comments)</b></span><span>Window <b>365 days</b></span><span>Cohort <b>${withData.length} active / ${D.scorecard.length} tracked</b></span>`;
-  $("#foot").textContent=`Data generated ${D.generated||"—"} · classification: gemini-2.5-flash · owned-comment response gap · a portfolio build`;
+  $("#foot").textContent=`Data generated ${D.generated||"–"} · classification: gemini-2.5-flash · owned-comment response gap · a portfolio build`;
 }
 render();
 </script>

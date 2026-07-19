@@ -1,7 +1,7 @@
-# Backend Setup — Projects DB + Ops Console
+# Backend Setup, Projects DB + Ops Console
 
 This copy of the portfolio is wired to a **Supabase** (Postgres) backend so projects
-live in a database and you manage them from a hidden admin panel — no more editing
+live in a database and you manage them from a hidden admin panel, no more editing
 HTML per project. It runs **fully offline** until you add credentials (it falls back
 to `data/projects.json`), so nothing breaks before setup.
 
@@ -15,14 +15,14 @@ to `data/projects.json`), so nothing breaks before setup.
 |---|---|
 | Projects table + status badges + security rules | `supabase/schema.sql` |
 | Seed data (your 9 missions) | `supabase/seed.sql` |
-| Live dossier sync — site reads projects from the DB | `missions.js`, `index.html` |
+| Live dossier sync, site reads projects from the DB | `missions.js`, `index.html` |
 | Offline fallback / seed source | `data/projects.json` |
-| Ops Console — login + add/edit/delete projects | `admin.html`, `admin.js`, `admin.css` |
+| Ops Console, login + add/edit/delete projects | `admin.html`, `admin.js`, `admin.css` |
 | Connection config | `config.js` |
-| **Transmission Log** — public contact form | `contact.html`, `contact.js` |
+| **Transmission Log**: public contact form | `contact.html`, `contact.js` |
 | Inbound messages table + security | `supabase/transmissions.sql` |
 | Ops Console **Transmissions** inbox tab | `admin.html`, `admin.js` |
-| **Visitor Intel** — anonymous analytics tracker | `analytics.js` |
+| **Visitor Intel**: anonymous analytics tracker | `analytics.js` |
 | Events table + admin-only dashboard function | `supabase/analytics.sql` |
 | Ops Console **Intel** dashboard tab | `admin.html`, `admin.js`, `admin.css` |
 
@@ -48,7 +48,7 @@ Tracked events: **pageview**, **project_click**, **resume_download**, **contact_
 4. New query → paste [`supabase/transmissions.sql`](supabase/transmissions.sql) → **Run**. (Contact inbox.)
 5. New query → paste [`supabase/analytics.sql`](supabase/analytics.sql) → **Run**. (Visitor Intel.)
 
-> Or skip the four files and run [`supabase/setup_all.sql`](supabase/setup_all.sql) once — it bundles all of them.
+> Or skip the four files and run [`supabase/setup_all.sql`](supabase/setup_all.sql) once, it bundles all of them.
 
 ### 3. Connect the front-end
 1. **Project Settings → API**.
@@ -60,7 +60,7 @@ Tracked events: **pageview**, **project_click**, **resume_download**, **contact_
      SUPABASE_ANON_KEY: "eyJhbGci...."
    };
    ```
-   > The `anon` key is **safe to ship in the browser** — Row Level Security (in `schema.sql`)
+   > The `anon` key is **safe to ship in the browser**, Row Level Security (in `schema.sql`)
    > is what protects writes. Do **not** use the `service_role` key here.
 
 ### 4. Create your admin login
@@ -68,10 +68,10 @@ Tracked events: **pageview**, **project_click**, **resume_download**, **contact_
    (Or **Add user** → "Auto Confirm" so you can log in immediately.)
 2. That email/password is what you'll use at `/admin.html`.
 
-### 5. ⚠️ REQUIRED — disable public signups
+### 5. ⚠️ REQUIRED: disable public signups
 The admin policies grant access to **any authenticated user**, and the publishable key is
 public (it's in the browser). If self-signup is left on, **anyone can register and gain admin
-access** — reading your contact inbox and editing your projects. Close it:
+access**, reading your contact inbox and editing your projects. Close it:
 
 - **Authentication → Sign In / Up** → turn **off** "Allow new users to sign up" → **Save changes**.
 - Confirm "Allow anonymous sign-ins" is also off.
@@ -110,7 +110,7 @@ card badge / visibility updates live. Set **published = off** to hide a project 
   (**received → decoded → replied**), a **★ flag** for priority, and **delete**.
 - The tab shows an unread count (messages still `received`).
 - **Security:** anyone can *submit* (anon insert, size-limited) but only the signed-in admin
-  can *read* the inbox — visitors can never see each other's messages.
+  can *read* the inbox, visitors can never see each other's messages.
 - If Supabase isn't configured, the form falls back to opening a prefilled email, so it's
   never a dead end. A hidden honeypot field drops naive spam bots; for heavier spam
   protection add a Vercel function with rate limiting later.
@@ -121,11 +121,11 @@ card badge / visibility updates live. Set **published = off** to hide a project 
   submits, and WASD-game scores.
 - Open the **Intel** tab in the Ops Console for the dashboard: KPI cards, traffic sources,
   top projects, top pages, game stats, and a 30-day page-view chart.
-- **Privacy:** no cookies, no IP, no names — just a random `localStorage` session id and a
+- **Privacy:** no cookies, no IP, no names, just a random `localStorage` session id and a
   normalized referrer. It **honors Do Not Track** (tracking is skipped entirely if the
   browser sends DNT).
 - **Security:** the public can *write* events (anon insert, size-limited) but the dashboard
-  function (`intel_dashboard()`) is `EXECUTE`-granted to **authenticated only** — visitors
+  function (`intel_dashboard()`) is `EXECUTE`-granted to **authenticated only**, visitors
   can never read the analytics back.
 
 ---
@@ -150,7 +150,7 @@ It stays a static site on Vercel:
 - Commit `config.js` with your real URL + anon key (the anon key is public-safe).
 - **Protect the admin page.** `admin.html` has `noindex`, but for real privacy add Vercel
   password protection or move it behind a non-obvious path. (Auth still gates all writes
-  regardless — RLS means an anon visitor can only read published rows.)
+  regardless, RLS means an anon visitor can only read published rows.)
 
 ---
 

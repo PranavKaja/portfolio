@@ -3,7 +3,7 @@ function wrapText() {
     // The per-character scatter is a desktop-pointer-only easter egg. On touch
     // devices the car game can't run at all, so exploding every heading and
     // paragraph into single-character spans would only bloat the DOM and break
-    // screen-reader reading order for zero benefit — skip wrapping entirely.
+    // screen-reader reading order for zero benefit, skip wrapping entirely.
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
     // skip text inside the hover popovers: they're invisible while the
@@ -52,7 +52,7 @@ function wrapText() {
             if (newChild !== child && newChild.nodeType) el.replaceChild(newChild, child);
         });
         // Hide the decorative char spans from assistive tech and expose the real
-        // text once, so screen readers announce words — not "P R A G M A T I C".
+        // text once, so screen readers announce words, not "P R A G M A T I C".
         Array.from(el.children).forEach(c => c.setAttribute('aria-hidden', 'true'));
         const srText = document.createElement('span');
         srText.className = 'sr-only';
@@ -61,8 +61,7 @@ function wrapText() {
     });
 }
 // NOTE: wrapText() is intentionally NOT called at load. It shreds every heading
-// and paragraph into per-character spans that each carry will-change:transform —
-// thousands of layer-promoted nodes that drag the whole page even when nobody
+// and paragraph into per-character spans that each carry will-change:transform, // thousands of layer-promoted nodes that drag the whole page even when nobody
 // plays the game. It's now deferred to ensureWrapped(), called the first time the
 // car actually spawns (see startGame). Everyday visitors pay nothing.
 
@@ -208,7 +207,7 @@ function updateBoostUI() {
 
 let charElements = [];
 let textWrapped = false;
-// Build the char spans lazily — only when the game first runs — and capture
+// Build the char spans lazily, only when the game first runs, and capture
 // each char's starting position once at that point.
 function ensureWrapped() {
     if (textWrapped) return;
@@ -372,7 +371,7 @@ function startGame() {
     countdownOverlay.classList.remove('hidden');
 
     // Build the char spans the scatter effect needs WHILE the countdown is on
-    // screen — deferred two frames so the "3" paints first and the heavy wrap
+    // screen, deferred two frames so the "3" paints first and the heavy wrap
     // (thousands of spans + their layout reads) is hidden behind it instead of
     // freezing the keypress. It finishes long before "GO!", so play starts smooth.
     requestAnimationFrame(() => requestAnimationFrame(ensureWrapped));
