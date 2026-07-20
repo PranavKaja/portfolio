@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Invitovate: From a Spreadsheet Habit to a Multi-Tenant Product | Pranav Kaja</title>
+    <meta name="description"
+        content="How I turned my own messy outreach into Invitovate, a live multi-tenant SaaS. The parts that broke, the boring engineering that made it trustworthy, and why the tool saves time by making me stop forgetting.">
+    <meta name="author" content="Pranav Kaja">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta property="og:title" content="Building Invitovate: From a Spreadsheet Habit to a Multi-Tenant Product">
+    <meta property="og:description" content="The messy version, the parts that broke, and the boring engineering that made outreach trustworthy enough to run every day.">
+    <meta property="og:image" content="https://pranavkaja.com/images/og-card.png?v=2">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://pranavkaja.com/blog/building-invitovate">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Building Invitovate: From a Spreadsheet Habit to a Product">
+    <meta name="twitter:description" content="The parts that broke, and the boring engineering that made outreach trustworthy enough to run every day.">
+    <meta name="twitter:image" content="https://pranavkaja.com/images/og-card.png?v=2">
+    <link rel="canonical" href="https://pranavkaja.com/blog/building-invitovate">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        { "@type": "BlogPosting",
+          "headline": "Building Invitovate: From a Spreadsheet Habit to a Multi-Tenant Product",
+          "description": "How I turned my own messy outreach into Invitovate, a live multi-tenant SaaS: the parts that broke, the boring engineering that made it trustworthy, and why it saves time by making me stop forgetting.",
+          "author": { "@type": "Person", "name": "Pranav Kaja", "url": "https://pranavkaja.com/" },
+          "publisher": { "@type": "Person", "name": "Pranav Kaja" },
+          "datePublished": "2026-07-14", "dateModified": "2026-07-14",
+          "url": "https://pranavkaja.com/blog/building-invitovate",
+          "image": "https://pranavkaja.com/images/og-card.png?v=2",
+          "keywords": "SaaS, multi-tenant, Postgres, row-level security, event sourcing, product engineering, Supabase, outreach, Pranav Kaja",
+          "mainEntityOfPage": "https://pranavkaja.com/blog/building-invitovate", "inLanguage": "en" },
+        { "@type": "BreadcrumbList", "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://pranavkaja.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://pranavkaja.com/blog" },
+          { "@type": "ListItem", "position": 3, "name": "Building Invitovate", "item": "https://pranavkaja.com/blog/building-invitovate" } ] }
+      ]
+    }
+    </script>
+
+    <style>
+    /* ============================================================
+       Scoped styles for this post only (prefix: ht-, root #story).
+       Calm teal interactive accent, the site's orange kept for highlights.
+       ============================================================ */
+    #story{
+      --ht-ink:#18181b; --ht-muted:#6d6d75; --ht-line:#e4e4e7;
+      --ht-panel:#f7f7f8; --ht-card:#ffffff;
+      --ht-accent:#0d9488;      /* teal, primary interactive colour */
+      --ht-accent-soft:#f0fdfa; /* teal tint */
+      --ht-warn:#b45309;        /* muted amber */
+      --ht-orange:#c43c00;      /* the site accent, used sparingly */
+      max-width:840px;
+    }
+    #story.post-body p{ font-size:1.05rem; line-height:1.75; }
+    #story a{ color:var(--ht-accent); text-underline-offset:3px; }
+
+    /* thin reading-progress bar pinned to the very top */
+    .ht-progress{ position:fixed; top:0; left:0; height:3px; width:0;
+      background:var(--ht-accent); z-index:200; transition:width .08s linear; }
+
+    /* fixed dot rail (desktop only), click a dot to jump, current section lights up */
+    .ht-rail{ position:fixed; right:18px; top:50%; transform:translateY(-50%);
+      z-index:90; display:flex; flex-direction:column; gap:13px; }
+    .ht-rail a{ position:relative; width:11px; height:11px; border-radius:50%;
+      border:1.6px solid var(--ht-muted); background:transparent; transition:.18s; }
+    .ht-rail a:hover, .ht-rail a.active{ background:var(--ht-accent);
+      border-color:var(--ht-accent); transform:scale(1.3); }
+    .ht-rail a span{ position:absolute; right:22px; top:50%; transform:translateY(-50%);
+      white-space:nowrap; background:var(--ht-ink); color:#fff;
+      font:600 11px/1 'Inter',sans-serif; padding:6px 9px; border-radius:6px;
+      opacity:0; pointer-events:none; transition:.18s; }
+    .ht-rail a:hover span{ opacity:1; }
+    @media(max-width:1180px){ .ht-rail{ display:none; } }
+
+    /* contents card */
+    .ht-toc{ border:1px solid var(--ht-line); background:var(--ht-panel);
+      border-radius:12px; padding:18px 20px 8px; margin:8px 0 30px; }
+    .ht-toc .ht-toc-h{ font-family:'Share Tech Mono',monospace; font-size:.78rem;
+      letter-spacing:.14em; text-transform:uppercase; color:var(--ht-muted); margin-bottom:6px; }
+    .ht-toc ol{ list-style:none; margin:0; padding:0;
+      display:grid; grid-template-columns:1fr 1fr; gap:2px 22px; }
+    @media(max-width:620px){ .ht-toc ol{ grid-template-columns:1fr; } }
+    .ht-toc li a{ display:flex; gap:10px; align-items:baseline; padding:8px 4px;
+      border-bottom:1px solid transparent; text-decoration:none; color:var(--ht-ink);
+      font-size:.95rem; transition:.15s; }
+    .ht-toc li a:hover{ color:var(--ht-accent); }
+    .ht-toc li a .num{ font-family:'Share Tech Mono',monospace; font-size:.8rem;
+      color:var(--ht-accent); min-width:22px; }
+
+    /* section anchors clear the fixed top-nav */
+    .ht-sec{ scroll-margin-top:84px; }
+    #story h2 .num{ font-family:'Share Tech Mono',monospace; color:var(--ht-accent);
+      font-size:.85rem; margin-right:10px; vertical-align:1px; }
+
+    /* big-idea callout */
+    .ht-big{ border:1px solid var(--ht-line); border-left:4px solid var(--ht-accent);
+      background:linear-gradient(180deg,var(--ht-accent-soft),#fff);
+      border-radius:0 12px 12px 0; padding:20px 24px; margin:6px 0 4px; }
+    .ht-big .k{ font-family:'Share Tech Mono',monospace; font-size:.72rem;
+      letter-spacing:.16em; text-transform:uppercase; color:var(--ht-accent); }
+    .ht-big p{ margin:6px 0 0 !important; font-size:1.12rem !important; }
+
+    /* teal note */
+    .ht-note{ border-left:3px solid var(--ht-accent); background:var(--ht-accent-soft);
+      padding:13px 17px; border-radius:0 9px 9px 0; margin:18px 0; font-size:.96rem;
+      line-height:1.6; color:#1f3a37; }
+    .ht-note b{ color:var(--ht-accent); }
+
+    /* stat band */
+    .ht-stat{ display:flex; flex-wrap:wrap; align-items:center; gap:6px 18px; margin:18px 0;
+      border:1px solid var(--ht-line); border-radius:12px; padding:16px 20px; background:var(--ht-panel); }
+    .ht-stat .big{ font:800 1.7rem 'Inter',sans-serif; color:var(--ht-ink); }
+    .ht-stat .arrow{ color:var(--ht-accent); font:700 1.2rem 'Share Tech Mono',monospace; }
+    .ht-stat .lab{ font-family:'Share Tech Mono',monospace; font-size:.74rem;
+      letter-spacing:.08em; text-transform:uppercase; color:var(--ht-muted); }
+
+    /* stepper */
+    .ht-steps{ margin:18px 0; padding:0; list-style:none; counter-reset:s; }
+    .ht-steps li{ position:relative; padding:0 0 20px 46px; border-left:2px solid var(--ht-line);
+      margin-left:14px; }
+    .ht-steps li:last-child{ border-left-color:transparent; padding-bottom:0; }
+    .ht-steps li::before{ counter-increment:s; content:counter(s);
+      position:absolute; left:-15px; top:-2px; width:28px; height:28px; border-radius:50%;
+      background:var(--ht-accent); color:#fff; font:700 .82rem 'Share Tech Mono',monospace;
+      display:flex; align-items:center; justify-content:center; }
+    .ht-steps li b{ font:700 .98rem 'Inter',sans-serif; }
+    .ht-steps li p{ margin:3px 0 0 !important; font-size:.95rem !important; color:var(--ht-muted); line-height:1.55; }
+
+    /* live-tool call to action */
+    .ht-cta{ border:1px solid var(--ht-accent); border-radius:14px; overflow:hidden;
+      background:linear-gradient(180deg,var(--ht-accent-soft),#fff); margin:22px 0; }
+    .ht-cta .body{ padding:20px 24px; }
+    .ht-cta .k{ font-family:'Share Tech Mono',monospace; font-size:.72rem;
+      letter-spacing:.16em; text-transform:uppercase; color:var(--ht-accent); }
+    .ht-cta h3{ margin:6px 0 6px; font:800 1.2rem 'Inter',sans-serif; color:var(--ht-ink); }
+    .ht-cta p{ margin:0 0 14px !important; font-size:.98rem !important; color:#334; line-height:1.6; }
+    #story .ht-cta .go{ display:inline-block; background:var(--ht-accent); color:#fff;
+      font:700 .82rem 'Share Tech Mono',monospace; letter-spacing:.04em; text-transform:uppercase;
+      padding:11px 20px; border-radius:8px; text-decoration:none; }
+    #story .ht-cta .go:hover{ background:#0b7c72; color:#fff; }
+
+    .ht-pills{ display:flex; flex-wrap:wrap; gap:8px; margin:16px 0; }
+    .ht-pills span{ font:600 .76rem 'Share Tech Mono',monospace; letter-spacing:.03em;
+      padding:6px 11px; border:1px solid var(--ht-line); border-radius:20px;
+      color:var(--ht-ink); background:var(--ht-card); }
+    .ht-backtop{ display:inline-block; margin-top:6px; font-family:'Share Tech Mono',monospace;
+      font-size:.8rem; color:var(--ht-muted); }
+    </style>
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="ht-progress" id="ht-progress" aria-hidden="true"></div>
+
+    <nav class="top-nav">
+        <a href="/" class="nav-logo interactive-element no-underline text-inherit">SUBJECT // PRANAV KAJA</a>
+        <div class="nav-links"><a href="/blog"><span class="nav-num">&larr; </span>ALL POSTS</a></div>
+    </nav>
+
+    <!-- dot rail: jump between sections, current one lights up -->
+    <nav class="ht-rail" id="ht-rail" aria-label="Section navigation">
+        <a href="#start"><span>Where it started</span></a>
+        <a href="#pile"><span>A pile of files</span></a>
+        <a href="#tenant"><span>Going multi-tenant</span></a>
+        <a href="#log"><span>A log that can't lie</span></a>
+        <a href="#email"><span>Killing email</span></a>
+        <a href="#agnostic"><span>Any tool can drive it</span></a>
+        <a href="#why"><span>Why I use it</span></a>
+    </nav>
+
+    <main class="container" id="main">
+        <header class="hero">
+            <div class="post-meta mb-20">Jul 2026 &middot; Product Engineering &middot; ~6 min read</div>
+            <h1 class="hero-title" style="font-size: 2.5rem; line-height: 1.1;">Building Invitovate: From a Spreadsheet
+                Habit to a Multi-Tenant Product</h1>
+            <p class="hero-subtitle">The messy version, the parts that broke, and the boring engineering that made
+                outreach trustworthy enough to run every day.</p>
+        </header>
+
+        <article class="section post-body" id="story">
+
+            <p>Invitovate started as a chore I kept doing badly. I was reaching out to people every day, and I was
+                running the whole thing out of a spreadsheet and a wall of browser tabs. The messages were fine. The
+                bookkeeping was the problem. I'd lose track of who I'd already contacted, forget who had replied, and
+                have no idea which version of a message was actually working. So I built the thing I wanted, and it
+                turned into a real product: <a href="https://invitovate.com" target="_blank" rel="noopener">Invitovate</a>,
+                a multi-tenant SaaS that other people now use too.</p>
+
+            <nav class="ht-toc" aria-label="Table of contents">
+                <div class="ht-toc-h">// Contents, jump anywhere</div>
+                <ol>
+                    <li><a href="#start"><span class="num">01</span> Where it started</a></li>
+                    <li><a href="#pile"><span class="num">02</span> The first version was a pile of files</a></li>
+                    <li><a href="#tenant"><span class="num">03</span> Going multi-tenant</a></li>
+                    <li><a href="#log"><span class="num">04</span> A status log that can't lie</a></li>
+                    <li><a href="#email"><span class="num">05</span> Killing the channel that didn't work</a></li>
+                    <li><a href="#agnostic"><span class="num">06</span> Any tool can drive it</a></li>
+                    <li><a href="#why"><span class="num">07</span> Why I use it, and why you might</a></li>
+                </ol>
+            </nav>
+
+            <div class="ht-big">
+                <div class="k">// The whole point in one sentence</div>
+                <p>The hard part of outreach isn't sending. It's remembering where every conversation stands. So I built
+                    a pipeline that can't quietly get that wrong.</p>
+            </div>
+
+            <!-- ============ 01 START ============ -->
+            <section class="ht-sec" id="start">
+                <h2><span class="num">01</span> Where it started</h2>
+                <p>Every day I'd open the spreadsheet, scroll to find where I left off, and try to reconstruct the state
+                    of a few hundred conversations from memory and a color code. It worked until it didn't. The
+                    expensive mistakes were never the messages, they were the double-sends, the dropped follow-ups, and
+                    the total blindness to what was landing. None of that is a writing problem. It's a
+                    <strong>tracking</strong> problem, and tracking by hand is exactly the kind of work software should
+                    take off your plate.</p>
+            </section>
+
+            <!-- ============ 02 PILE OF FILES ============ -->
+            <section class="ht-sec" id="pile">
+                <h2><span class="num">02</span> The first version was a pile of files</h2>
+                <p>The first build was a personal kit: a folder of scripts and JSON files that drafted messages and kept
+                    notes. It was great for exactly one user, me. The moment I imagined anyone else touching it, the
+                    whole thing fell over. There was no real notion of accounts, no isolation, and no source of truth
+                    that two people could trust at once. A pile of files is a prototype, not a product.</p>
+                <div class="ht-note"><b>The lesson:</b> "works on my machine, for me" is a fine place to start and a
+                    terrible place to stop. The jump from a script to a product is almost entirely about the boring
+                    guarantees: identity, isolation, and a state you can trust.</div>
+            </section>
+
+            <!-- ============ 03 MULTI-TENANT ============ -->
+            <section class="ht-sec" id="tenant">
+                <h2><span class="num">03</span> Going multi-tenant</h2>
+                <p>So I rebuilt it on Postgres as a proper multi-tenant app. The core decision was to enforce isolation
+                    in the database itself with <strong>row-level security</strong>, not in application code where one
+                    forgotten <code>WHERE</code> clause leaks everyone's data. Each user only ever sees their own rows,
+                    the database refuses anything else, and signup is invite-gated so it's a controlled preview, not an
+                    open door.</p>
+                <p>The test I actually cared about wasn't a unit test. I made a second real account, logged in as that
+                    user, and tried to see the first account's pipeline. I couldn't. That was the moment it stopped
+                    being my script and started being something I'd let someone else put their work into.</p>
+            </section>
+
+            <!-- ============ 04 THE LOG ============ -->
+            <section class="ht-sec" id="log">
+                <h2><span class="num">04</span> A status log that can't lie</h2>
+                <p>Here's the bug that changed how I built the rest of it. Early on, a contact's status could be
+                    overwritten to any value, and one day I watched a contact jump <em>backwards</em> in the funnel,
+                    from replied back to not-yet-contacted, because of an out-of-order update. In a spreadsheet you
+                    shrug and fix the cell. In a pipeline you're supposed to trust, a status that can silently move the
+                    wrong way is poison.</p>
+                <p>The fix wasn't to patch the bad row. It was to make the database refuse to do it. Status now lives in
+                    an <strong>append-only event log</strong>: you don't edit state, you add an event, and the current
+                    status is derived from the history. Then I added a trigger that <strong>blocks a contact from ever
+                    moving backwards</strong> in the funnel. The history became the truth, and the truth became
+                    impossible to quietly corrupt.</p>
+                <div class="ht-note"><b>Why it matters:</b> the whole promise of the tool is "you can trust where every
+                    conversation stands." A mutable status cell can't make that promise. An append-only log with a
+                    guardrail can.</div>
+            </section>
+
+            <!-- ============ 05 KILLING EMAIL ============ -->
+            <section class="ht-sec" id="email">
+                <h2><span class="num">05</span> Killing the channel that didn't work</h2>
+                <p>Because every message is tagged and every outcome is logged, I could finally ask the tool a blunt
+                    question: is email actually doing anything? The answer was no. Across 88 email sends I had zero
+                    replies, while every real reply had come through a different channel. So I retired email. Not
+                    because I disliked it, but because the data said it was dead weight.</p>
+                <div class="ht-stat">
+                    <span class="big">88 sends</span>
+                    <span class="arrow">&rarr;</span>
+                    <span class="big">0 replies</span>
+                    <span class="lab">so the channel got cut, on evidence</span>
+                </div>
+                <p>I also threw out a vanity metric in the same spirit. I used to quote a tidy "response rate"
+                    percentage, then realized it was flattering and unstable on small numbers. Now the tool shows raw
+                    counts: contacts, accepts, replies. Uglier, honest, and much harder to fool yourself with.</p>
+            </section>
+
+            <!-- ============ 06 TOOL-AGNOSTIC ============ -->
+            <section class="ht-sec" id="agnostic">
+                <h2><span class="num">06</span> Any tool can drive it</h2>
+                <p>I didn't want the pipeline welded to one interface. So every operation is a plain
+                    <strong>REST call</strong>. That one decision meant the same pipeline could be run three ways: by
+                    hand in the dashboard, by an agent or agentic IDE calling the endpoints, or by a small packaged app
+                    that runs the machine-side work in the background so I don't babysit a terminal.</p>
+                <ol class="ht-steps">
+                    <li><b>Manual first</b>
+                        <p>Everything works from the dashboard with a human clicking approve. That's the floor, and it
+                            never goes away.</p></li>
+                    <li><b>Agent-drivable</b>
+                        <p>Because it's all REST, any agent can find people and draft messages against the same
+                            contract. No special client required.</p></li>
+                    <li><b>Runs on its own</b>
+                        <p>A packaged background app supervises the machine work, so the boring parts happen without me
+                            sitting there.</p></li>
+                </ol>
+                <p>The one line I never crossed: <strong>the AI drafts, a human approves the send.</strong> Finding and
+                    writing can be automated all day. Deciding to hit send on a message with my name on it stays a human
+                    call, on purpose.</p>
+            </section>
+
+            <!-- ============ 07 WHY ============ -->
+            <section class="ht-sec" id="why">
+                <h2><span class="num">07</span> Why I use it, and why you might</h2>
+                <p>Invitovate doesn't make me type faster. It makes me stop forgetting. That sounds small until you've
+                    lost a week of momentum because you couldn't remember who you already talked to. The time it saves
+                    isn't in the writing, it's in never reconstructing state from scratch, never double-messaging
+                    someone, and never guessing which approach is working when the tool already knows.</p>
+                <p>If you run any kind of founder-led or personal outreach and you're doing it out of a spreadsheet, the
+                    pitch is simple: one calm pipeline, drafts in your own voice, and you approve every send. The parts
+                    that used to eat your attention just stop.</p>
+                <blockquote>The best thing I built into it is the part nobody notices: a pipeline that can't quietly get
+                    your data wrong. Boring, and the whole point.</blockquote>
+                <div class="ht-pills">
+                    <span>Postgres + RLS</span>
+                    <span>Event sourcing</span>
+                    <span>DB guardrails</span>
+                    <span>Per-variant analytics</span>
+                    <span>Human-approved sends</span>
+                </div>
+                <div class="ht-cta">
+                    <div class="body">
+                        <div class="k">// See the product</div>
+                        <h3>Invitovate</h3>
+                        <p>A calm pipeline for outreach. Your own AI finds people and drafts in your voice; you send
+                            only what you approve. Live now.</p>
+                        <a class="go" href="https://invitovate.com" target="_blank" rel="noopener">Visit Invitovate &rarr;</a>
+                    </div>
+                </div>
+                <p style="margin-top:6px"><a class="ht-backtop" href="#main">&uarr; back to top</a></p>
+            </section>
+
+        </article>
+
+        <section class="section">
+            <div class="interests-simple-box">
+                <h3 class="beyond-title">MORE NOTES</h3>
+                <p class="beyond-subtitle">More on how things actually got built.</p>
+                <a href="/blog" class="btn btn-secondary interactive-element no-underline">ALL POSTS</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">&copy; <span id="year"></span> Pranav Kaja. All rights reserved.</footer>
+    <div class="custom-cursor" id="custom-cursor"></div>
+    <div class="crosshair-h"></div>
+    <div class="crosshair-v"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="/config.js" defer></script>
+    <script src="/analytics.js" defer></script>
+    <script src="/main.js" defer></script>
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+    <!-- post-specific interactions, scoped so they can't collide with site JS -->
+    <script>
+    (function () {
+        var root = document.getElementById('story');
+        if (!root) return;
+
+        /* reading-progress bar */
+        var bar = document.getElementById('ht-progress');
+        function onScroll() {
+            var d = document.documentElement;
+            var max = d.scrollHeight - d.clientHeight;
+            bar.style.width = (max > 0 ? (d.scrollTop / max) * 100 : 0).toFixed(1) + '%';
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+
+        /* dot rail, highlight the section currently in view */
+        var dots = [].slice.call(document.querySelectorAll('.ht-rail a'));
+        var secs = [].slice.call(document.querySelectorAll('.ht-sec'));
+        if (window.IntersectionObserver && secs.length) {
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (e.isIntersecting) {
+                        var id = '#' + e.target.id;
+                        dots.forEach(function (d) {
+                            d.classList.toggle('active', d.getAttribute('href') === id);
+                        });
+                    }
+                });
+            }, { rootMargin: '-45% 0px -50% 0px' });
+            secs.forEach(function (s) { io.observe(s); });
+        }
+    })();
+    </script>
+</body>
+
+</html>

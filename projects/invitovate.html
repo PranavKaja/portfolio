@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitovate: A Calm Outreach Pipeline (Multi-Tenant SaaS) | Pranav Kaja</title>
+    <meta name="description"
+        content="Invitovate is a live multi-tenant SaaS by Pranav Kaja: a calm outreach pipeline on Postgres with per-user row-level security, an event-sourced status log, per-variant analytics, and an eval gate on every drafted message. Draft in your voice, send only what you approve.">
+    <meta name="author" content="Pranav Kaja">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta property="og:title" content="Invitovate: A Calm Outreach Pipeline | Pranav Kaja">
+    <meta property="og:description" content="A live multi-tenant SaaS: Postgres + row-level security, an event-sourced pipeline, per-variant analytics, and an eval gate on every message. Draft in your voice, send only what you approve.">
+    <meta property="og:image" content="https://pranavkaja.com/images/og-card.png?v=2">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://pranavkaja.com/projects/invitovate">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Invitovate: A Calm Outreach Pipeline | Pranav Kaja">
+    <meta name="twitter:description" content="A live multi-tenant SaaS I built solo: Postgres + RLS, event-sourced pipeline, per-variant analytics, and an eval gate on every drafted message.">
+    <meta name="twitter:image" content="https://pranavkaja.com/images/og-card.png?v=2">
+    <link rel="canonical" href="https://pranavkaja.com/projects/invitovate">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "TechArticle",
+          "headline": "Invitovate: A Calm Outreach Pipeline",
+          "description": "A live multi-tenant SaaS product: a calm outreach pipeline on Postgres with per-user row-level security, an event-sourced status log, per-variant analytics, and an eval gate on every drafted message.",
+          "author": { "@type": "Person", "name": "Pranav Kaja", "url": "https://pranavkaja.com/" },
+          "url": "https://pranavkaja.com/projects/invitovate",
+          "image": "https://pranavkaja.com/images/og-card.png?v=2",
+          "keywords": "SaaS, multi-tenant, Postgres, row-level security, event sourcing, product engineering, outreach CRM, Supabase, Pranav Kaja",
+          "about": ["Product Engineering", "SaaS", "Data Engineering"],
+          "inLanguage": "en"
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://pranavkaja.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Projects", "item": "https://pranavkaja.com/projects" },
+            { "@type": "ListItem", "position": 3, "name": "Invitovate", "item": "https://pranavkaja.com/projects/invitovate" }
+          ]
+        }
+      ]
+    }
+    </script>
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <nav class="top-nav">
+        <a href="/" class="nav-logo interactive-element no-underline text-inherit">SUBJECT // PRANAV KAJA</a>
+        <div class="nav-links">
+            <a href="/projects"><span class="nav-num">&larr; </span>ALL MISSIONS</a>
+        </div>
+    </nav>
+
+    <main class="container" id="main">
+        <header class="hero">
+            <div class="hero-label mb-20"><span class="status-dot"></span>[ LIVE PRODUCT ] // SHIPPED</div>
+            <h1 class="hero-title" style="font-size: 3.2rem; line-height: 1.05;">INVITOVATE</h1>
+            <p class="hero-subtitle">A calm pipeline for outreach. Your own AI finds the right people and drafts in
+                your voice; you send only what you approve. Built solo, end to end, and live.</p>
+            <div class="pp-chips" style="margin-top: 8px;">
+                <span>Multi-Tenant SaaS</span>
+                <span>Postgres + RLS</span>
+                <span>Event-Sourced Pipeline</span>
+                <span>Vanilla JS</span>
+                <span>Live at invitovate.com</span>
+            </div>
+            <div style="margin-top: 22px;">
+                <a href="https://invitovate.com" target="_blank" rel="noopener" class="btn interactive-element no-underline">VISIT INVITOVATE &rarr;</a>
+                <a href="/blog/building-invitovate" class="btn btn-secondary interactive-element no-underline" style="margin-left: 8px;">READ THE BUILD STORY</a>
+            </div>
+        </header>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>BRIEFING</h2>
+                <div class="line"></div>
+            </div>
+            <p style="font-size: 1.05rem; line-height: 1.7; max-width: 760px;">
+                Outreach breaks down long before you run out of people to contact. It breaks down when you lose the
+                thread: who you already messaged, who replied, what you said, and which version of a message actually
+                worked. Most people run it out of a spreadsheet and a dozen browser tabs, and the tracking, not the
+                typing, is what quietly eats the day.
+            </p>
+            <p style="font-size: 1.05rem; line-height: 1.7; max-width: 760px; margin-top: 14px;">
+                Invitovate is the fix I built for myself and turned into a product. It's one pipeline for the whole
+                thing: your own AI finds the right people and drafts each message in your voice, you approve every send,
+                and the tool remembers everything and tells you which approach is landing. It's a real
+                <strong>multi-tenant SaaS</strong> on Postgres, live at <strong>invitovate.com</strong>, and I designed
+                and shipped the whole stack solo.
+            </p>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>ROLE / METHOD / OUTCOME</h2>
+                <div class="line"></div>
+            </div>
+            <div class="msn-rmo">
+                <div class="rmo-cell">
+                    <div class="k">Role</div>
+                    <div class="v">Solo build, end to end, product design, marketing site, multi-tenant backend, the
+                        console, and a background runner.</div>
+                </div>
+                <div class="rmo-cell">
+                    <div class="k">Method</div>
+                    <div class="v">A Postgres-backed SaaS with per-user row-level security, an event-sourced status
+                        pipeline, and an eval gate on every drafted message.</div>
+                </div>
+                <div class="rmo-cell">
+                    <div class="k">Outcome</div>
+                    <div class="v">A live product that turns scattered outreach into one calm, trackable pipeline, draft in your voice, send only what you approve.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>HOW IT WORKS</h2>
+                <div class="line"></div>
+            </div>
+            <div class="grid-2">
+                <div class="panel">
+                    <h3>FIND &amp; DRAFT</h3>
+                    <p>Your own AI finds the right people and writes each message in your voice, grounded in real
+                        details about who you're reaching. Nothing sends on its own, every draft waits for your
+                        approval, so the human always holds the send button.</p>
+                </div>
+                <div class="panel">
+                    <h3>TRACK &amp; LEARN</h3>
+                    <p>Every contact moves through one pipeline backed by an append-only status log. Each message is
+                        tagged by variant, and accept rates are measured per variant, so you can see what's actually
+                        landing and do more of it instead of guessing.</p>
+                </div>
+            </div>
+            <p style="font-size: 1rem; line-height: 1.7; max-width: 760px; margin-top: 22px;">
+                Start fully manual, or hand the machine work to a background runner. Because every operation is a plain
+                REST call, the same pipeline can be driven by the dashboard, by any agent or agentic IDE, or by a
+                packaged app that just runs in the background. One dashboard, three ways to run it.
+            </p>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>BUILT TO BE BORING</h2>
+                <div class="line"></div>
+            </div>
+            <p style="font-size: 1.02rem; line-height: 1.7; max-width: 760px;">
+                The interesting engineering here is the part you never notice: a pipeline that can't quietly get your
+                data wrong. That's where the real work went.
+            </p>
+            <ul class="ops-points" style="max-width: 780px;">
+                <li><strong>Multi-tenant from day one</strong>: per-user row-level security in Postgres, verified with
+                    a real second account, so no one ever sees another user's pipeline. Signup is invite-gated.</li>
+                <li><strong>A pipeline that can't lie</strong>: status lives in an append-only event log, and a
+                    database trigger blocks a contact from ever moving backwards in the funnel. The history is the
+                    truth, not a mutable cell.</li>
+                <li><strong>A quality gate on the words</strong>: every drafted message runs an executable lint pass
+                    (banned-phrase scan, per-batch quotas and budgets) before a human ever reads it. It's an eval gate
+                    for content, not a vibe check.</li>
+                <li><strong>Decisions from evidence</strong>: the tool measures per channel and per variant, so I
+                    retired the email channel on the data (it produced zero replies across 88 sends) instead of on a
+                    hunch.</li>
+                <li><strong>Tool-agnostic by design</strong>: every action is a REST call, so the whole pipeline is
+                    drivable by any agent, IDE, or a packaged background app. No lock-in to one client.</li>
+                <li><strong>The human holds the send button</strong>: the AI finds and drafts; a person approves
+                    everything that goes out. That guardrail is the product, not an afterthought.</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>THE STACK</h2>
+                <div class="line"></div>
+            </div>
+            <div class="vitals">
+                <div class="vital"><div class="k">Status</div><div class="v live">Live</div></div>
+                <div class="vital"><div class="k">Tenancy</div><div class="v">Multi-user, RLS</div></div>
+                <div class="vital"><div class="k">Contacts tracked</div><div class="v">375+</div></div>
+                <div class="vital"><div class="k">Message variants</div><div class="v">Scored</div></div>
+                <div class="vital"><div class="k">Home</div><div class="v">invitovate.com</div></div>
+            </div>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 16px; font-family: 'Share Tech Mono', monospace;">
+                STACK: Supabase (Postgres + RLS) &middot; Vanilla JS &middot; Vercel &middot; Node runner &middot; REST
+            </p>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 8px;">
+                Figures reflect the latest verified snapshot; the product is in active daily use.
+            </p>
+            <div style="margin-top: 22px;">
+                <a href="https://invitovate.com" target="_blank" rel="noopener" class="btn interactive-element no-underline">VISIT INVITOVATE &rarr;</a>
+                <a href="/blog/building-invitovate" class="btn btn-secondary interactive-element no-underline" style="margin-left: 8px;">READ THE BUILD STORY</a>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="interests-simple-box">
+                <h3 class="beyond-title">MORE MISSIONS</h3>
+                <p class="beyond-subtitle">Case files across ML, BI, and supply-chain strategy.</p>
+                <a href="/projects" class="btn btn-secondary interactive-element no-underline">VIEW ALL MISSIONS</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        &copy; <span id="year"></span> Pranav Kaja. All rights reserved.
+    </footer>
+
+    <div class="custom-cursor" id="custom-cursor"></div>
+    <div class="crosshair-h"></div>
+    <div class="crosshair-v"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="/config.js" defer></script>
+    <script src="/analytics.js" defer></script>
+    <script src="/main.js" defer></script>
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>
