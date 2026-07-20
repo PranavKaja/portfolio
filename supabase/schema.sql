@@ -1,5 +1,5 @@
 -- ============================================================
--- Ops Console — Projects schema
+-- Ops Console: Projects schema
 -- Run this once in the Supabase SQL editor (Dashboard → SQL Editor → New query).
 -- Safe to re-run: drops/recreates policies, leaves data intact.
 -- ============================================================
