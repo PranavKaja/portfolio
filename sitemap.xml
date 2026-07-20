@@ -1,57 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- lastmod values track each page's real last commit date. Do not bulk-stamp them
+     with today's date: a sitemap that claims everything changed daily is a signal
+     search engines learn to ignore. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://pranavkaja.com/</loc>
-    <lastmod>2026-06-15</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://pranavkaja.com/why-pranav</loc>
-    <lastmod>2026-06-15</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://pranavkaja.com/contact</loc>
-    <lastmod>2026-06-15</lastmod>
+    <lastmod>2026-07-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://pranavkaja.com/interests</loc>
-    <lastmod>2026-06-15</lastmod>
+    <lastmod>2026-07-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://pranavkaja.com/projects</loc>
-    <lastmod>2026-06-15</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
-  <url><loc>https://pranavkaja.com/projects/invitovate</loc><lastmod>2026-07-14</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://pranavkaja.com/projects/overheard</loc><lastmod>2026-07-18</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://pranavkaja.com/overheard</loc><lastmod>2026-07-18</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://pranavkaja.com/overheard/kitchen-index</loc><lastmod>2026-07-19</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://pranavkaja.com/projects/fraud-triage</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://pranavkaja.com/projects/corporate-analytics</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://pranavkaja.com/projects/heart-disease-prediction</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://pranavkaja.com/projects/hospital-readmission</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://pranavkaja.com/projects/auto-insurance-churn</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://pranavkaja.com/projects/supply-chain-optimization</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://pranavkaja.com/projects/bullwhip-mitigation</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://pranavkaja.com/projects/prime-air-drone-logistics</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://pranavkaja.com/projects/strategy-summit</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://pranavkaja.com/projects/cpk-production</loc><lastmod>2026-06-21</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://pranavkaja.com/projects/invitovate</loc><lastmod>2026-07-20</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://pranavkaja.com/projects/overheard</loc><lastmod>2026-07-19</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://pranavkaja.com/overheard</loc><lastmod>2026-07-20</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://pranavkaja.com/overheard/kitchen-index</loc><lastmod>2026-07-20</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://pranavkaja.com/projects/fraud-triage</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://pranavkaja.com/projects/corporate-analytics</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pranavkaja.com/projects/heart-disease-prediction</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pranavkaja.com/projects/hospital-readmission</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pranavkaja.com/projects/auto-insurance-churn</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pranavkaja.com/projects/supply-chain-optimization</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pranavkaja.com/projects/bullwhip-mitigation</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pranavkaja.com/projects/prime-air-drone-logistics</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pranavkaja.com/projects/strategy-summit</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pranavkaja.com/projects/cpk-production</loc><lastmod>2026-07-20</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url>
     <loc>https://pranavkaja.com/blog</loc>
-    <lastmod>2026-06-15</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  <url><loc>https://pranavkaja.com/blog/building-invitovate</loc><lastmod>2026-07-14</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://pranavkaja.com/blog/how-this-site-works</loc><lastmod>2026-06-20</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://pranavkaja.com/blog/two-stage-fraud-detection</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://pranavkaja.com/blog/automating-etl-pipeline</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pranavkaja.com/blog/building-invitovate</loc><lastmod>2026-07-20</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pranavkaja.com/blog/how-this-site-works</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pranavkaja.com/blog/two-stage-fraud-detection</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pranavkaja.com/blog/automating-etl-pipeline</loc><lastmod>2026-07-06</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>

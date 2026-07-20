@@ -114,7 +114,10 @@
     <main class="container" id="main">
         <header class="hero">
             <div class="hero-label mb-20"><span class="status-dot"></span>[ SYSTEM ONLINE ]</div>
-            <h1 class="hero-title">PRAGMATIC<br>OPERATOR</h1>
+            <!-- The h1 is the page's topic signal for search and screen readers, so it carries the
+                 real name and role. The stylized wordmark stays the only thing on screen. -->
+            <h1 class="hero-title"><span class="sr-only">Pranav Kaja, Data &amp; Analytics Engineer</span><span
+                    aria-hidden="true">PRAGMATIC<br>OPERATOR</span></h1>
             <p class="hero-subtitle">Data &amp; Analytics Engineer. I build pipelines, models, and dashboards that survive contact with real data.</p>
             <div class="hero-actions">
                 <a href="/contact" class="btn btn-primary hover-swap" onclick="if(window.intel) window.intel.track('contact_click');"><span class="default-text">INITIATE
