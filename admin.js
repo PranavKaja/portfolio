@@ -1284,7 +1284,14 @@
     } else if (intelRange > 0 && intelRange !== 1) {
         daysCount = intelRange;
     } else if (intelRange === 0) {
+        // all time: start at the first day that has data, not a fixed year back
         daysCount = 365;
+        const firstDay = rows.map(r => r.day).sort()[0];
+        if (firstDay) {
+            const startDt = new Date(firstDay + 'T00:00:00');
+            const endMid = new Date(endDt); endMid.setHours(0, 0, 0, 0);
+            daysCount = Math.min(365, Math.max(1, Math.round((endMid - startDt) / 86400000) + 1));
+        }
     }
 
     for (let i = daysCount - 1; i >= 0; i--) {
