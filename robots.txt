@@ -3,16 +3,28 @@ Allow: /
 Disallow: /admin
 Disallow: /admin.html
 
-# AI / answer-engine crawlers are welcome
+# AI / answer-engine crawlers are welcome, admin still isn't.
+# Each group repeats the disallows on purpose: a named user-agent group
+# REPLACES the * group for that bot, it does not inherit from it. With a
+# bare "Allow: /" these five were being handed /admin.
 User-agent: GPTBot
-Allow: /
+Disallow: /admin
+Disallow: /admin.html
+
 User-agent: OAI-SearchBot
-Allow: /
+Disallow: /admin
+Disallow: /admin.html
+
 User-agent: ChatGPT-User
-Allow: /
+Disallow: /admin
+Disallow: /admin.html
+
 User-agent: PerplexityBot
-Allow: /
+Disallow: /admin
+Disallow: /admin.html
+
 User-agent: Google-Extended
-Allow: /
+Disallow: /admin
+Disallow: /admin.html
 
 Sitemap: https://pranavkaja.com/sitemap.xml
