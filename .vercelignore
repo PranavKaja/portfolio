@@ -1,0 +1,14 @@
+# Files that live in the repo but must never be served from pranavkaja.com.
+# Vercel deploys the repo root as static files, so anything here would
+# otherwise be fetchable (the supabase/*.sql files were returning HTTP 200).
+
+# Database setup scripts: schema, seeds, RLS policies. Run these from a
+# local psql/Supabase session, never over the web.
+supabase/
+
+# Local scratch pages that are not part of the site.
+test.html
+test2.html
+test-event.html
+projects/cpktest.txt
+_local/

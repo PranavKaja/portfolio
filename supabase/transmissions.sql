@@ -1,5 +1,5 @@
 -- ============================================================
--- Transmission Log — inbound contact messages
+-- Transmission Log: inbound contact messages
 -- Run once in the Supabase SQL editor (after schema.sql).
 -- ============================================================
 
