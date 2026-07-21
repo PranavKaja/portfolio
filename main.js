@@ -803,10 +803,10 @@ document.addEventListener('DOMContentLoaded', () => {
             dates: 'MAY 2022 - JUL 2022',
             role: 'Data Science Intern',
             company: 'ACMEGRADE',
-            brief: 'Built a Random Forest churn predictor on 100K records, improving model accuracy 15% over baseline.',
+            brief: 'Trained Random Forest and Gradient Boosting on a 100,000-record client portfolio, lifting conversion-prediction accuracy 15% over baseline.',
             points: [
-                'Built a Random Forest churn predictor on 100K records',
-                'Improved model accuracy 15% over baseline'
+                'Trained Random Forest and Gradient Boosting on a 100,000-record client portfolio',
+                'Lifted conversion-prediction accuracy 15% over baseline'
             ]
         }
     };

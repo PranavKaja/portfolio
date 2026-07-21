@@ -43,7 +43,7 @@ a, button {
     color: inherit;
 }
 
-/* The custom crosshair replaces the OS pointer — but only once JS has
+/* The custom crosshair replaces the OS pointer, but only once JS has
    confirmed it is live (main.js / interests.js add .custom-cursor-active).
    If the script ever fails to load, the system cursor stays visible instead
    of leaving the user with no pointer at all. */
@@ -233,8 +233,8 @@ body.custom-cursor-active button {
 .btn {
     padding: 15px 30px;
     /* 1.2rem (19.2px) bold clears the WCAG "large text" threshold (18.66px
-       bold), so white-on-accent at 3.44:1 meets the 3:1 large-text bar —
-       keeps the signature orange + white text instead of dulling either. */
+       bold), so white-on-accent at 3.44:1 meets the 3:1 large-text bar.
+       Keeps the signature orange + white text instead of dulling either. */
     font-size: 1.2rem;
     font-weight: bold;
     font-family: 'Share Tech Mono', monospace;
@@ -556,7 +556,7 @@ h2.hover-swap {
     }
 }
 
-/* "TAP" on touch, "CLICK" on a mouse — default to TAP, swap on fine pointer */
+/* "TAP" on touch, "CLICK" on a mouse: default to TAP, swap on fine pointer */
 .verb-click { display: none; }
 @media (hover: hover) and (pointer: fine) {
     .verb-touch { display: none; }
@@ -745,7 +745,7 @@ h2.hover-swap {
     cursor: none;
     /* No will-change: transform here. It cached each node as a fixed-resolution
        GPU texture, and the per-frame scale() (depth zoom) then upsampled that
-       small bitmap — making the text/icons blurry at rest and only snapping
+       small bitmap, making the text/icons blurry at rest and only snapping
        sharp when :hover forced a repaint. Re-rasterizing per frame keeps the 8
        nodes crisp; the intentional depth softness is the JS blur() filter. */
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -824,7 +824,14 @@ h2.hover-swap {
     flex-direction: column;
     align-items: center;
     gap: 5px;
-    transition: transform 0.3s, border-color 0.3s;
+    transition: transform 0.3s, border-color 0.3s, opacity 0.4s, visibility 0.4s;
+}
+
+/* Earns its screen space: invisible until the visitor has settled in
+   (20s timer in cargame.js) or presses WASD themselves */
+.wasd-keyboard-hint.hint-gated {
+    opacity: 0;
+    visibility: hidden;
 }
 
 .wasd-keyboard-hint.first-trigger {
@@ -1834,7 +1841,7 @@ body.msn-open {
     overflow-y: auto;
 }
 
-/* desktop: render the whole sheet at 75% — the approved density.
+/* desktop: render the whole sheet at 75%, the approved density.
    zoom scales layout too, so the sheet also fits short laptop
    viewports without an internal scrollbar */
 @media (min-width: 769px) {
@@ -2794,7 +2801,7 @@ body.game-active .trophy-container {
 
 
 /* ============================================================
-   OPS LOG — experience timeline items are clickable like the
+   OPS LOG: experience timeline items are clickable like the
    project/dossier cards: hover shows an arrow + an expand cue,
    click/tap opens the detail overlay (#ops-overlay).
    ============================================================ */
@@ -2882,7 +2889,7 @@ body.game-active .trophy-container {
 
 
 /* ============================================================
-   BLOG — reading layout (index list + article body)
+   BLOG: reading layout (index list + article body)
    ============================================================ */
 .post-meta {
     font-family: 'Share Tech Mono', monospace;

@@ -13,6 +13,11 @@
     <meta property="og:description" content="Real complaints and questions on kitchen brands' own Instagram posts, hand-verified unanswered in the live threads. Every item links to its source.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://pranavkaja.com/overheard/kitchen-index">
+    <meta property="og:image" content="https://pranavkaja.com/images/og-overheard.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://pranavkaja.com/images/og-overheard.png">
     <link rel="canonical" href="https://pranavkaja.com/overheard/kitchen-index">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/style.css">
@@ -20,6 +25,42 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
         rel="stylesheet">
+    <style>
+        /* Scrollable list panel, same pattern as the /overheard console's .feedbox */
+        .feedbox {
+            max-height: min(76vh, 780px);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            padding-right: 10px;
+            scrollbar-gutter: stable;
+            scrollbar-width: thin;
+            scrollbar-color: color-mix(in srgb, var(--text-muted) 45%, transparent) transparent;
+        }
+        .feedbox::after {
+            content: "";
+            display: block;
+            position: sticky;
+            bottom: 0;
+            height: 34px;
+            background: linear-gradient(to bottom, transparent, var(--bg));
+            pointer-events: none;
+        }
+        /* the site-wide hover pop would clip and jitter inside a scroll container */
+        .feedbox .panel:hover {
+            transform: none;
+            box-shadow: none;
+            border-left-color: var(--accent);
+        }
+        .feedcount {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        @media (max-width: 600px) {
+            .feedcount { display: none; }
+        }
+    </style>
 </head>
 
 <body>
@@ -75,7 +116,9 @@
             <div class="section-header">
                 <h2>THE LIST, HARDEST FIRST</h2>
                 <div class="line"></div>
+                <span class="feedcount">20 items</span>
             </div>
+            <div class="feedbox" tabindex="0" aria-label="The list: 20 verified items, scrollable">
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">FELLOW</span>
@@ -335,6 +378,7 @@
                 <p style="margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:0.85rem;">
                     <a href="https://www.instagram.com/p/DaS27NtJUfu/c/17857201860679963" target="_blank" rel="noopener">view the live thread &rarr;</a>
                 </p>
+            </div>
             </div>
         </section>
 

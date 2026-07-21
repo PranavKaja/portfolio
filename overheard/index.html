@@ -4,6 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Overheard: Kitchen Social Response Index</title>
+<meta name="description" content="A response-gap engine measuring which customer comments kitchen brands answer on social, and which they skip. Brands answer the comments that sell and skip the comments that churn.">
+<meta name="author" content="Pranav Kaja">
+<meta property="og:title" content="Overheard: The questions kitchen brands don't answer">
+<meta property="og:description" content="A response-gap engine measuring which customer comments kitchen brands answer on social, and which they skip. Brands answer the comments that sell and skip the comments that churn.">
+<meta property="og:image" content="https://pranavkaja.com/images/og-overheard.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://pranavkaja.com/overheard">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pranav Kaja">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Overheard: The questions kitchen brands don't answer">
+<meta name="twitter:description" content="A response-gap engine measuring which customer comments kitchen brands answer on social, and which they skip.">
+<meta name="twitter:image" content="https://pranavkaja.com/images/og-overheard.png">
+<link rel="canonical" href="https://pranavkaja.com/overheard">
 <style>
   :root{
     --paper:#faf8f5; --ink:#191a1d; --ink-soft:#5b5a57; --line:#e6e2da;
@@ -69,6 +84,11 @@
   .ftype{font-size:11px;border:1px solid var(--line);background:var(--card);color:var(--ink-soft);
     padding:4px 9px;border-radius:999px;cursor:pointer}
   .ftype[aria-pressed=true]{background:var(--chip);color:var(--ink);border-color:var(--ink-soft)}
+  .feedbox{max-height:min(76vh,780px);overflow-y:auto;overscroll-behavior:contain;
+    padding-right:8px;scrollbar-gutter:stable;scrollbar-width:thin;
+    scrollbar-color:color-mix(in srgb,var(--ink-soft) 45%,transparent) transparent}
+  .feedbox::after{content:"";display:block;position:sticky;bottom:0;height:34px;
+    background:linear-gradient(to bottom,transparent,var(--paper));pointer-events:none}
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 15px;
     margin-bottom:10px;position:relative}
   .card .top{display:flex;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap}
@@ -84,9 +104,9 @@
   .meta{font-family:var(--mono);font-size:11px;color:var(--ink-soft);display:flex;gap:12px;
     align-items:center;flex-wrap:wrap}
   .meta a{color:var(--ink-soft)}
-  .stamp{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:9.5px;
+  .stamp{margin-left:auto;flex-shrink:0;white-space:nowrap;font-family:var(--mono);font-size:9.5px;
     font-weight:700;letter-spacing:.08em;color:var(--missed);border:1.5px solid var(--missed);
-    padding:2px 5px;border-radius:4px;transform:rotate(4deg);opacity:.72}
+    padding:2px 5px;border-radius:4px;transform:rotate(-2deg);opacity:.72}
   .prio{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--missed);
     border:1px solid var(--line);padding:1px 6px;border-radius:10px;margin-right:2px}
   .prio.lo{color:var(--ink-soft)}
@@ -111,8 +131,11 @@
     <div class="grid">
       <section><table id="igleague"><thead></thead><tbody></tbody></table></section>
       <section>
-        <h2 class="sect" id="igfeedtitle">What they ignored (all brands)</h2>
-        <div id="igfeed"></div>
+        <div class="feedhead">
+          <h2 class="sect" id="igfeedtitle">What they ignored (all brands)</h2>
+          <span class="feedcount" id="igfeedcount"></span>
+        </div>
+        <div id="igfeed" class="feedbox"></div>
       </section>
     </div>
   </section>
@@ -133,7 +156,7 @@
         <span class="feedcount" id="feedcount"></span>
       </div>
       <div class="ftypes" id="ftypes"></div>
-      <div id="feed"><div class="empty">Pick a brand to see what it's ignoring.</div></div>
+      <div id="feed" class="feedbox"><div class="empty">Pick a brand to see what it's ignoring.</div></div>
     </section>
   </div>
 
@@ -224,14 +247,15 @@ function feed(){
   ftypes.querySelectorAll(".ftype").forEach(b=>b.onclick=()=>{typeFilter=b.dataset.t;feed();});
   feedEl.innerHTML = shown.length? shown.map(i=>{
     const d=i.published_at?String(i.published_at).slice(0,10):"";
-    return `<div class="card"><span class="stamp">no reply</span>
+    return `<div class="card">
       <div class="top"><span class="badge b-${i.type}">${i.type.replace(/_/g,' ')}</span>
         <span class="urg ${i.urgency}" title="${i.urgency} urgency"></span>
-        <span class="topic">${i.topic||""}</span></div>
+        <span class="topic">${i.topic||""}</span><span class="stamp">no reply</span></div>
       <div class="ctext">${esc(i.text||"").slice(0,320)}</div>
       <div class="meta"><span>♥ ${fmt(i.like_count||0)}</span><span>${d}</span>
         ${i.url?`<a href="${i.url}" target="_blank" rel="noopener">view on youtube →</a>`:""}</div></div>`;
   }).join("") : '<div class="empty">No comments of this type.</div>';
+  feedEl.scrollTop=0;
 }
 function esc(s){return s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
 
@@ -261,9 +285,11 @@ function igFeed(){
   let items=(D.ig_missed||[]);
   if(igSel) items=items.filter(i=>i.brand===igSel);
   $("#igfeedtitle").textContent= igSel? `Ignored, ${igSel} (answer these first)` : "What they ignored, ranked: answer these first";
+  $("#igfeedcount").textContent= items.length>40? `top 40 of ${items.length}` : `${items.length} flagged`;
+  $("#igfeed").scrollTop=0;
   $("#igfeed").innerHTML=items.slice(0,40).map(i=>{
     const p=Math.round(i.priority_score||0);
-    return `<div class="card"><span class="stamp" title="no brand reply visible in the scraped comments (thread replies need a paid scrape tier, see docs/PIPELINE-SHAKEOUT.md)">no visible reply</span><div class="top"><span class="prio ${p<40?'lo':''}" title="response priority 0-100">${p}</span><span class="badge b-${i.type}">${i.type.replace(/_/g,' ')}</span><span class="urg ${i.urgency}"></span><span class="topic">${i.theme_label||i.topic||''} · ${i.brand}</span></div><div class="ctext">${esc(i.text||'').slice(0,300)}</div><div class="meta">${i.url?`<a href="${i.url}" target="_blank" rel="noopener">view on instagram →</a>`:''}</div></div>`;
+    return `<div class="card"><div class="top"><span class="prio ${p<40?'lo':''}" title="response priority 0-100">${p}</span><span class="badge b-${i.type}">${i.type.replace(/_/g,' ')}</span><span class="urg ${i.urgency}"></span><span class="topic">${i.theme_label||i.topic||''} · ${i.brand}</span><span class="stamp" title="no brand reply visible in the scraped comments (thread replies need a paid scrape tier, see docs/PIPELINE-SHAKEOUT.md)">no visible reply</span></div><div class="ctext">${esc(i.text||'').slice(0,300)}</div><div class="meta">${i.url?`<a href="${i.url}" target="_blank" rel="noopener">view on instagram →</a>`:''}</div></div>`;
   }).join("") || '<div class="empty">No items.</div>';
 }
 function render(){igStats();igLeague();igFeed();stats();filterBar();league();feed();

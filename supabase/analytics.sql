@@ -1,5 +1,5 @@
 -- ============================================================
--- Visitor Intel — privacy-preserving analytics
+-- Visitor Intel: privacy-preserving analytics
 -- Run in the Supabase SQL editor after schema.sql.
 -- No PII: anonymous client-generated session ids + normalized traffic
 -- sources only. No IP, no name, no cookies (a localStorage id only).

@@ -46,8 +46,8 @@ window.PRANAV = {
       org: "Acmegrade",
       role: "Data Science Intern",
       points: [
-        "Built a Random Forest churn predictor on 100K records.",
-        "Improved model accuracy 15% over baseline.",
+        "Trained Random Forest and Gradient Boosting on a 100K-record client portfolio.",
+        "Improved conversion-prediction accuracy 15% over baseline.",
       ],
     },
   ],

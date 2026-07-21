@@ -239,6 +239,8 @@ window.addEventListener('keydown', (e) => {
         const keyEl = document.querySelector(`.keycap[data-text="${key.toUpperCase()}"]`);
         if (keyEl) keyEl.classList.add('pressed');
         const hintEl = document.getElementById('wasd-hint');
+        // Player already knows the keys: lift the gate so keycap feedback shows
+        if (hintEl) hintEl.classList.remove('hint-gated');
         if (!gameActive) {
             // tic-tac-toe has its own stage: don't boot the car under it
             if (document.body.classList.contains('ttt-active')) return;
@@ -735,3 +737,10 @@ function resetScatteredText() {
         }
     });
 }
+
+// The keycap hint starts hidden (.hint-gated in the markup) and appears once
+// the visitor has been on the page 20 seconds; pressing WASD reveals it early.
+setTimeout(() => {
+    const gatedHint = document.getElementById('wasd-hint');
+    if (gatedHint) gatedHint.classList.remove('hint-gated');
+}, 20000);
