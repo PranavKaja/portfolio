@@ -13,6 +13,10 @@
     none: 'NONE'
   };
 
+  // The homepage shows a short reel, not the whole archive. Everything else
+  // lives on /projects, which the "VIEW ALL MISSION FILES" button points to.
+  const HOME_CARD_LIMIT = 6;
+
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
       ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -51,13 +55,16 @@
     const num = codeNum(p.code);
     const status = p.status || 'deployed';
     const showStatus = p.show_status !== false;
+    // status_label lets a card say what it is to a visitor ("LIVE TOOL") instead
+    // of its lifecycle enum. Falls back to the enum label when unset.
+    const statusText = p.status_label || STATUS_LABELS[status] || status;
     const chips = (p.chips || []).map(c => `<span>${esc(c)}</span>`).join('');
     // hover card shows skills used/learnt; falls back to the metric chips until skills are set
     const hasSkills = p.skills && p.skills.length > 0;
     const hoverList = hasSkills ? p.skills : (p.chips || []);
     const hoverTags = hoverList.map(c => `<span>${esc(c)}</span>`).join('');
     const chipClass = hasSkills ? 'skill-chips' : 'pp-chips';
-    const statusHtml = (status === 'none' || !showStatus) ? '' : `<span class="proj-status proj-status--${esc(status)}">${esc(STATUS_LABELS[status] || status)}</span>`;
+    const statusHtml = (status === 'none' || !showStatus) ? '' : `<span class="proj-status proj-status--${esc(status)}">${esc(statusText)}</span>`;
     return `
     <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="${esc(num)}"
         aria-label="Open mission ${esc(p.code)}: ${esc(p.title)}">
@@ -217,10 +224,13 @@
       return;
     }
 
-    const byCode = {};
-    projects.forEach(p => { byCode[codeNum(p.code)] = p; });
+    // sort_order is the running order; the homepage takes the first slice of it
+    const featured = projects.slice(0, HOME_CARD_LIMIT);
 
-    grid.innerHTML = projects.map(cardHTML).join('');
+    const byCode = {};
+    featured.forEach(p => { byCode[codeNum(p.code)] = p; });
+
+    grid.innerHTML = featured.map(cardHTML).join('');
     grid.setAttribute('aria-busy', 'false');
     wireOverlay(byCode, grid);
 

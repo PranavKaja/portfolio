@@ -6,14 +6,14 @@
 
 -- Status badge values shown on the live dossier grid.
 do $$ begin
-  create type project_status as enum ('deployed', 'in_progress', 'archived', 'classified');
+  create type project_status as enum ('deployed', 'in_progress', 'archived', 'classified', 'none');
 exception
   when duplicate_object then null;
 end $$;
 
 create table if not exists public.projects (
   id          uuid primary key default gen_random_uuid(),
-  code        text not null unique,                 -- e.g. 'MSN-02'
+  code        text not null unique,                 -- e.g. 'MSN-04'
   title       text not null,
   tech        text not null default '',             -- short stack line on the card
   summary     text not null default '',             -- one-liner on the card ("desc")
@@ -24,12 +24,26 @@ create table if not exists public.projects (
   method      text not null default '',
   outcome     text not null default '',
   chips       text[] not null default '{}',         -- metric chips
+  skills      text[] not null default '{}',         -- skills shown on the card hover panel
   status      project_status not null default 'deployed',
+  status_label text,                                -- overrides the status pill text, e.g. 'LIVE TOOL'
+  show_status boolean not null default true,        -- false = no status pill on the card
+  github_url  text,                                 -- repo, or the live page for link_type 'site'
+  show_github boolean not null default true,
+  link_type   text not null default 'github',       -- 'github' or 'site' (picks the icon and label)
   sort_order  int not null default 0,               -- grid order (low first)
   published   boolean not null default true,        -- false = hidden from the public site
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );
+
+-- columns added after the first build; kept here so re-running stays idempotent
+alter table public.projects add column if not exists skills       text[] not null default '{}';
+alter table public.projects add column if not exists status_label text;
+alter table public.projects add column if not exists show_status  boolean not null default true;
+alter table public.projects add column if not exists github_url   text;
+alter table public.projects add column if not exists show_github  boolean not null default true;
+alter table public.projects add column if not exists link_type    text not null default 'github';
 
 create index if not exists projects_sort_idx on public.projects (sort_order);
 

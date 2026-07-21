@@ -215,58 +215,41 @@
                 <div class="line"></div>
             </div>
             <div class="grid-3" id="projects-grid" aria-busy="false">
-                <!-- Static fallback for SEO, social scrapers, and no-JS. missions.js replaces these with live data on load. -->
-                <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="01" aria-label="Open mission MSN-01: CPK Production Planner">
-                    <span class="proj-status proj-status--deployed">DEPLOYED</span>
-                    <div class="proj-id">MSN-01</div><h3>CPK Production Planner</h3>
+                <!-- Static fallback for SEO, social scrapers, and no-JS. missions.js replaces these with live
+                     data on load. Keep this list to the first six by sort_order so it matches what renders;
+                     the rest of the archive lives on /projects. -->
+                <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="01" aria-label="Open mission MSN-01: Invitovate">
+                    <span class="proj-status proj-status--deployed">LIVE PRODUCT</span>
+                    <div class="proj-id">MSN-01</div><h3>Invitovate</h3>
+                    <p class="tech">Postgres + RLS / Vanilla JS</p>
+                    <p class="desc">A calm, multi-tenant outreach pipeline. Draft in your voice, send only what you approve.</p>
+                </div>
+                <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="02" aria-label="Open mission MSN-02: Overheard">
+                    <span class="proj-status proj-status--deployed">LIVE TOOL</span>
+                    <div class="proj-id">MSN-02</div><h3>Overheard</h3>
+                    <p class="tech">BigQuery / Vertex AI (Gemini)</p>
+                    <p class="desc">Finds and ranks the customer questions brands ignore on their own social posts. 17 brands, live.</p>
+                </div>
+                <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="03" aria-label="Open mission MSN-03: CPK Production Planner">
+                    <span class="proj-status proj-status--deployed">LIVE TOOL</span>
+                    <div class="proj-id">MSN-03</div><h3>CPK Production Planner</h3>
                     <p class="tech">In-Browser Tool / JS</p>
                     <p class="desc">Order report in, make lists and pick sheets out, across 36 locations.</p>
                 </div>
-                <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="02" aria-label="Open mission MSN-02: Fraud Triage">
-                    <span class="proj-status proj-status--deployed">DEPLOYED</span>
-                    <div class="proj-id">MSN-02</div><h3>Fraud Triage</h3>
+                <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="04" aria-label="Open mission MSN-04: Fraud Triage">
+                    <div class="proj-id">MSN-04</div><h3>Fraud Triage</h3>
                     <p class="tech">XGBoost / Gemini</p>
                     <p class="desc">0.978 AUC; caught fraud the base model missed.</p>
                 </div>
-                <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="03" aria-label="Open mission MSN-03: Corporate Analytics">
-                    <div class="proj-id">MSN-03</div><h3>Corporate Analytics</h3>
+                <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="05" aria-label="Open mission MSN-05: Corporate Analytics">
+                    <div class="proj-id">MSN-05</div><h3>Corporate Analytics</h3>
                     <p class="tech">Power BI / SQL</p>
                     <p class="desc">30% faster executive reviews via custom dashboards.</p>
                 </div>
-                <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="04" aria-label="Open mission MSN-04: Hospital Readmission">
-                    <div class="proj-id">MSN-04</div><h3>Hospital Readmission</h3>
+                <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="06" aria-label="Open mission MSN-06: Hospital Readmission">
+                    <div class="proj-id">MSN-06</div><h3>Hospital Readmission</h3>
                     <p class="tech">Python / Gradient Boosting</p>
                     <p class="desc">90% recall on readmissions via threshold tuning.</p>
-                </div>
-                <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="05" aria-label="Open mission MSN-05: Auto Insurance Churn">
-                    <div class="proj-id">MSN-05</div><h3>Auto Insurance Churn</h3>
-                    <p class="tech">Gradient Boosting / SMOTE</p>
-                    <p class="desc">ROC-AUC 0.70 on 92,849 policyholders.</p>
-                </div>
-                <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="06" aria-label="Open mission MSN-06: Supply Chain Opt.">
-                    <div class="proj-id">MSN-06</div><h3>Supply Chain Opt.</h3>
-                    <p class="tech">HBP Simulation / Python</p>
-                    <p class="desc">34% cumulative margin across 4-year horizon.</p>
-                </div>
-                <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="07" aria-label="Open mission MSN-07: Bullwhip Mitigation">
-                    <div class="proj-id">MSN-07</div><h3>Bullwhip Mitigation</h3>
-                    <p class="tech">HBP Simulation / Sourcing</p>
-                    <p class="desc">54% gross margin under demand volatility.</p>
-                </div>
-                <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="08" aria-label="Open mission MSN-08: Prime Air Drone Logistics">
-                    <div class="proj-id">MSN-08</div><h3>Prime Air Drone Logistics</h3>
-                    <p class="tech">Geospatial / Network Design</p>
-                    <p class="desc">3-hub network covering 7.9% of Massachusetts.</p>
-                </div>
-                <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="09" aria-label="Open mission MSN-09: Strategy Summit">
-                    <div class="proj-id">MSN-09</div><h3>Strategy Summit</h3>
-                    <p class="tech">CAPSIM Simulation / Strategy</p>
-                    <p class="desc">483% stock recovery; top-3 of 8 teams.</p>
-                </div>
-                <div class="project-panel interactive-element" tabindex="0" role="button" data-msn="10" aria-label="Open mission MSN-10: Heart Disease Prediction">
-                    <div class="proj-id">MSN-10</div><h3>Heart Disease Prediction</h3>
-                    <p class="tech">Python / Scikit-learn</p>
-                    <p class="desc">~82% accuracy; best of 5 models; live Flask app.</p>
                 </div>
             </div>
             <div class="proj-viewall" style="text-align:center; margin-top: 35px;">
