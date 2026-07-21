@@ -41,13 +41,13 @@
         { "@type": "WebApplication", "name": "CPK Production Planner", "url": "https://pranavkaja.com/projects/cpk-production" },
         { "@type": "TechArticle", "name": "Fraud Triage", "url": "https://pranavkaja.com/projects/fraud-triage" },
         { "@type": "TechArticle", "name": "Corporate Analytics", "url": "https://pranavkaja.com/projects/corporate-analytics" },
-        { "@type": "TechArticle", "name": "Heart Disease Prediction", "url": "https://pranavkaja.com/projects/heart-disease-prediction" },
         { "@type": "TechArticle", "name": "Hospital Readmission", "url": "https://pranavkaja.com/projects/hospital-readmission" },
         { "@type": "TechArticle", "name": "Auto Insurance Churn", "url": "https://pranavkaja.com/projects/auto-insurance-churn" },
         { "@type": "TechArticle", "name": "Supply Chain Optimization", "url": "https://pranavkaja.com/projects/supply-chain-optimization" },
         { "@type": "TechArticle", "name": "Bullwhip Mitigation", "url": "https://pranavkaja.com/projects/bullwhip-mitigation" },
         { "@type": "TechArticle", "name": "Prime Air Drone Logistics", "url": "https://pranavkaja.com/projects/prime-air-drone-logistics" },
-        { "@type": "TechArticle", "name": "Strategy Summit", "url": "https://pranavkaja.com/projects/strategy-summit" }
+        { "@type": "TechArticle", "name": "Strategy Summit", "url": "https://pranavkaja.com/projects/strategy-summit" },
+        { "@type": "TechArticle", "name": "Heart Disease Prediction", "url": "https://pranavkaja.com/projects/heart-disease-prediction" }
       ]
     }
     </script>
@@ -64,73 +64,77 @@
         <header class="hero">
             <div class="hero-label mb-20"><span class="status-dot"></span>[ MISSION ARCHIVE ]</div>
             <h1 class="hero-title" style="font-size: 3.4rem;">CASE FILES</h1>
-            <p class="hero-subtitle">Ten case files across machine learning, business intelligence, and supply-chain
-                strategy, plus two live in-browser tools and Invitovate, a shipped SaaS product. Each one has the
-                problem, the method, and the result.</p>
+            <p class="hero-subtitle">Twelve case files across machine learning, business intelligence, and
+                supply-chain strategy. Three of them are live and you can open them right now: a shipped SaaS
+                product and two working tools. Each one has the problem, the method, and the result.</p>
         </header>
 
         <section class="section">
             <div class="grid-3">
+                <!-- Order and codes mirror projects.sort_order in Supabase. If you renumber there,
+                     renumber here and on each case-file page's hero label in the same pass. -->
                 <a href="/projects/invitovate" class="project-panel no-underline text-inherit interactive-element" style="display:block;">
-                    <div class="proj-id">LIVE PRODUCT</div><h3>Invitovate</h3>
+                    <span class="proj-status proj-status--deployed">LIVE PRODUCT</span>
+                    <div class="proj-id">MSN-01</div><h3>Invitovate</h3>
                     <p class="tech">Postgres + RLS / Vanilla JS</p>
                     <p class="desc">A calm, multi-tenant outreach pipeline. Draft in your voice, send only what you approve. Live at invitovate.com.</p>
                 </a>
                 <a href="/projects/overheard" class="project-panel no-underline text-inherit interactive-element" style="display:block;">
-                    <div class="proj-id">LIVE TOOL</div><h3>Overheard</h3>
+                    <span class="proj-status proj-status--deployed">LIVE TOOL</span>
+                    <div class="proj-id">MSN-02</div><h3>Overheard</h3>
                     <p class="tech">BigQuery / Vertex AI (Gemini)</p>
                     <p class="desc">Finds and ranks the customer questions brands ignore on their own social posts. 17 brands, live.</p>
                 </a>
                 <a href="/projects/cpk-production" class="project-panel no-underline text-inherit interactive-element" style="display:block;">
                     <span class="proj-status proj-status--deployed">LIVE TOOL</span>
-                    <div class="proj-id">MSN-01</div><h3>CPK Production Planner</h3>
+                    <div class="proj-id">MSN-03</div><h3>CPK Production Planner</h3>
                     <p class="tech">In-Browser Tool / JS</p>
                     <p class="desc">Paste a kitchen's order report; get make lists and per-station pick sheets across 36 locations. Replaces a 39-tab spreadsheet.</p>
                 </a>
                 <a href="/projects/fraud-triage" class="project-panel no-underline text-inherit interactive-element" style="display:block;">
-                    <div class="proj-id">MSN-02</div><h3>Fraud Triage</h3>
+                    <div class="proj-id">MSN-04</div><h3>Fraud Triage</h3>
                     <p class="tech">XGBoost / Gemini</p>
                     <p class="desc">0.978 AUC; a two-stage pipeline that catches what the model misses.</p>
                 </a>
                 <a href="/projects/corporate-analytics" class="project-panel no-underline text-inherit interactive-element" style="display:block;">
-                    <div class="proj-id">MSN-03</div><h3>Corporate Analytics</h3>
+                    <div class="proj-id">MSN-05</div><h3>Corporate Analytics</h3>
                     <p class="tech">Power BI / SQL</p>
                     <p class="desc">30% faster executive reviews via custom dashboards.</p>
                 </a>
-                <a href="/projects/heart-disease-prediction" class="project-panel no-underline text-inherit interactive-element" style="display:block;">
-                    <div class="proj-id">MSN-10</div><h3>Heart Disease Prediction</h3>
-                    <p class="tech">Python / Scikit-learn</p>
-                    <p class="desc">~82% accuracy; best of 5 models; live Flask app.</p>
-                </a>
                 <a href="/projects/hospital-readmission" class="project-panel no-underline text-inherit interactive-element" style="display:block;">
-                    <div class="proj-id">MSN-04</div><h3>Hospital Readmission</h3>
-                    <p class="tech">Python / Logistic Regression</p>
+                    <div class="proj-id">MSN-06</div><h3>Hospital Readmission</h3>
+                    <p class="tech">Python / Gradient Boosting</p>
                     <p class="desc">90% recall on readmissions via threshold tuning.</p>
                 </a>
                 <a href="/projects/auto-insurance-churn" class="project-panel no-underline text-inherit interactive-element" style="display:block;">
-                    <div class="proj-id">MSN-05</div><h3>Auto Insurance Churn</h3>
+                    <div class="proj-id">MSN-07</div><h3>Auto Insurance Churn</h3>
                     <p class="tech">Gradient Boosting / SMOTE</p>
-                    <p class="desc">ROC-AUC 0.70 on 92,849 policyholders; SMOTE + Gradient Boosting.</p>
+                    <p class="desc">ROC-AUC 0.70 on 92,849 policyholders, after removing a leakage column.</p>
                 </a>
                 <a href="/projects/supply-chain-optimization" class="project-panel no-underline text-inherit interactive-element" style="display:block;">
-                    <div class="proj-id">MSN-06</div><h3>Supply Chain Optimization</h3>
+                    <div class="proj-id">MSN-08</div><h3>Supply Chain Optimization</h3>
                     <p class="tech">HBP Simulation / Python</p>
                     <p class="desc">34% cumulative margin at a 98% service level.</p>
                 </a>
                 <a href="/projects/bullwhip-mitigation" class="project-panel no-underline text-inherit interactive-element" style="display:block;">
-                    <div class="proj-id">MSN-07</div><h3>Bullwhip Mitigation</h3>
+                    <div class="proj-id">MSN-09</div><h3>Bullwhip Mitigation</h3>
                     <p class="tech">HBP Simulation / Sourcing</p>
                     <p class="desc">54% gross margin under demand volatility.</p>
                 </a>
                 <a href="/projects/prime-air-drone-logistics" class="project-panel no-underline text-inherit interactive-element" style="display:block;">
-                    <div class="proj-id">MSN-08</div><h3>Prime Air Drone Logistics</h3>
+                    <div class="proj-id">MSN-10</div><h3>Prime Air Drone Logistics</h3>
                     <p class="tech">Geospatial / Network Design</p>
                     <p class="desc">3-hub drone network covering 7.9% of Massachusetts.</p>
                 </a>
                 <a href="/projects/strategy-summit" class="project-panel no-underline text-inherit interactive-element" style="display:block;">
-                    <div class="proj-id">MSN-09</div><h3>Strategy Summit</h3>
+                    <div class="proj-id">MSN-11</div><h3>Strategy Summit</h3>
                     <p class="tech">CAPSIM Simulation / Strategy</p>
                     <p class="desc">483% stock recovery; top-3 of 8 teams.</p>
+                </a>
+                <a href="/projects/heart-disease-prediction" class="project-panel no-underline text-inherit interactive-element" style="display:block;">
+                    <div class="proj-id">MSN-12</div><h3>Heart Disease Prediction</h3>
+                    <p class="tech">Python / Scikit-learn</p>
+                    <p class="desc">~82% accuracy; best of 5 models; live Flask app.</p>
                 </a>
             </div>
         </section>

@@ -484,6 +484,13 @@ body.custom-cursor-active button {
     margin-bottom: 15px;
 }
 
+/* The status pill is absolutely positioned in the top-right corner and the code
+   sits on the same line, so reserve room for the widest pill ("LIVE PRODUCT",
+   116px in from the card edge) and the code can never run underneath it. */
+.proj-status + .proj-id {
+    padding-right: 95px;
+}
+
 .project-panel h3, .skill-panel h3 {
     font-size: 1.2rem;
     margin-bottom: 5px;
