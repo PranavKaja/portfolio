@@ -825,7 +825,7 @@ function renderCheck(ctx) {
 /* ============================================================
    SETTINGS (hidden behind the manager sign-in)
    ============================================================ */
-var SETTINGS_HASH = '6bf7dc74a82fc265df172560b69bbdaa1d3259dcc421b86f97138f6cac625a52';
+var SETTINGS_HASH = 'c8f0c463c9b66c3d8999211ebc32599a7843299fedd95641b76fd80b589ffb9a';
 var UNLOCK_KEY = 'cpk_settings_unlocked';
 function isUnlocked() { try { return sessionStorage.getItem(UNLOCK_KEY) === '1'; } catch (e) { return false; } }
 function setUnlocked(on) { try { on ? sessionStorage.setItem(UNLOCK_KEY, '1') : sessionStorage.removeItem(UNLOCK_KEY); } catch (e) {} }
