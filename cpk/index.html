@@ -199,7 +199,7 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);display
 
   <div class="bar" id="topbar">
     <div class="brand">Worcester CPK<small>Production sheets</small></div>
-    <div class="daychip" id="daychip"><span class="dot"></span><span id="dayword">No orders yet</span></div>
+    <div class="daychip" id="daychip"><span class="dot" id="daydot" style="display:none"></span><span id="dayword">No orders yet</span></div>
     <div class="spacer"></div>
     <button class="btn" id="btn-printall" title="Print all six production sheets">Print all</button>
   </div>
@@ -1107,6 +1107,10 @@ var SAMPLE = [
 function updateDayChip() {
   var d = prodDate();
   document.documentElement.style.setProperty('--accent', DAY_DOTS[d.day]);
+  // Before any orders are loaded there is no real production date yet, so the
+  // day-colored dot (normally the recap's due date) would just show today+1
+  // with no meaning. Hide it until there is an actual date to color.
+  $('daydot').style.display = data.rows.length ? '' : 'none';
   $('dayword').textContent = data.rows.length
     ? 'Production ' + DAY_NAMES[d.day].slice(0, 3) + ' ' + d.label
     : 'No orders yet';
