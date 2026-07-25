@@ -105,6 +105,9 @@
   const roundup = (x, d) => { const p = Math.pow(10, d || 0); return Math.ceil((Number(x) || 0) * p) / p; };
   const r1 = x => Math.round((Number(x) || 0) * 10) / 10;
   const r2 = x => Math.round((Number(x) || 0) * 100) / 100;
+  // Round UP to the nearest half pound (bulk melons). toFixed guards float noise
+  // so an exact 36 does not creep to 36.5.
+  const up5 = x => Math.ceil(((Number(x) || 0) * 2).toFixed(6) * 1) / 2;
   const fmt = x => { const n = Number(x) || 0; return Number.isInteger(n) ? String(n) : String(Math.round(n * 100) / 100); };
 
   // ---- order index: item -> { name, total, byLoc{code:qty} } ----
@@ -158,7 +161,9 @@
   //  the "count every order" decision (the Excel drops orders its
   //  Consolidated/Menu tables don't pre-list):
   //   - 8285 Hummus Veggie Wrap: ordered at Worcester DC, absent from
-  //     the entire workbook. Added as a DC row + sticker.
+  //     the entire workbook. Added as a DC row + sticker, plus a 10"
+  //     wrap bread line and lettuce/peppers prep (Pranav's spec
+  //     2026-07-24; own bread line, 0.1 lb/wrap prep placeholder).
   //   - 9268 Chicken Caesar Wrap ordered BY CAFES: the Excel only has
   //     9268 at loc 01 and tracks retail caesar wraps as 9257 only.
   //     Added a retail row for 9268 and included it in the retail
@@ -202,6 +207,9 @@
   const DC_BREAD = [
     { label: '10" Tomato Wraps (PACKS)', f: c => roundup(c.dc('9241') / 12) },
     { label: '10" White Wraps (PACKS)', f: c => roundup(c.dc('9268') / 12) },
+    // 8285 uses the same 10" wrap as the chicken wraps; own line so it does not
+    // shift the validated tomato/white counts. Merge into one if it shares that stock.
+    { label: '10" Wraps Hummus Veggie (PACKS)', f: c => roundup(c.dc('8285') / 12) },
     { label: 'GF Rolls (PACKS)', f: c => roundup(c.dc('2420') / 4) },
     { label: 'GF WW Bread', f: c => roundup(c.dc('2421') / 6) },
     { label: 'Kaiser Roll (PACKS)', f: c => roundup((c.dc('1004') + c.dc('2366')) / 6) },
@@ -265,9 +273,11 @@
     { label: 'Grab & Go 8 oz Fruit Cup (DC)', recipe: 243008, item: '8637' }
   ];
   const FRUIT_BULK = [
-    { label: 'Pineapple', note: '1 CS ≈ 9 lbs', f: c => r1(0.19 * c.f12 + 0.12666 * c.f8) },
-    { label: 'Honeydew', note: '1 CS ≈ 11 lbs', f: c => r1(0.19 * c.f12 + 0.12666 * c.f8) },
-    { label: 'Cantaloupe', note: '1 CS ≈ 17 lbs', f: c => r1(0.19 * c.f12 + 0.12666 * c.f8) },
+    // Melons round UP to the nearest 0.5 lb (Pranav's call 2026-07-24). The Excel
+    // left these raw; grapes and strawberries already round up to the whole pound.
+    { label: 'Pineapple', note: '1 CS ≈ 9 lbs', f: c => up5(0.19 * c.f12 + 0.12666 * c.f8) },
+    { label: 'Honeydew', note: '1 CS ≈ 11 lbs', f: c => up5(0.19 * c.f12 + 0.12666 * c.f8) },
+    { label: 'Cantaloupe', note: '1 CS ≈ 17 lbs', f: c => up5(0.19 * c.f12 + 0.12666 * c.f8) },
     { label: 'Grapes', note: '', f: c => roundup(0.0625 * c.f12 + 0.04166 * c.f8) },
     { label: 'Strawberries', note: '1 CS ≈ 6 lbs', f: c => roundup(0.125 * c.f12 + 0.0833 * c.f8) }
   ];
@@ -291,7 +301,9 @@
     { name: 'Carrot Sticks', unit: 'lbs', f: c => r2(c.dc('2404') * 0.3) },
     { name: 'Cucumbers', unit: 'lbs', f: c => r2(c.dc('8372') * 0.1) },
     { name: 'Red Onions', unit: 'lbs', f: c => r2(c.dc('2352') * 0.1 + c.dc('8372') * 0.1 + c.rt('301') * 0.1) },
-    { name: 'Peppers', unit: 'lbs', f: c => r2(c.dc('2352') * 0.1) },
+    // 8285 Hummus Veggie Wrap fillings; 0.1 lb/wrap is a placeholder pending the real recipe.
+    { name: 'Peppers', unit: 'lbs', f: c => r2(c.dc('2352') * 0.1 + c.dc('8285') * 0.1) },
+    { name: 'Lettuce', unit: 'lbs', f: c => r2(c.dc('8285') * 0.1) },
     { name: 'Sliced Tomatoes', unit: 'lbs', f: c => r2((c.rt('8009') + c.rt('7523') + c.rt('9221') + c.rt('2226') + c.rt('9255')) * 0.15) },
     { sec: 'SALADS' },
     { name: 'Tuna Salad', unit: 'lbs', f: c => roundup((c.dc('2387') + c.rt('2387')) * 0.3) },

@@ -199,7 +199,7 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);display
 
   <div class="bar" id="topbar">
     <div class="brand">Worcester CPK<small>Production sheets</small></div>
-    <div class="daychip" id="daychip"><span class="dot"></span><span id="dayword">No orders yet</span></div>
+    <div class="daychip" id="daychip"><span class="dot" id="daydot" style="display:none"></span><span id="dayword">No orders yet</span></div>
     <div class="spacer"></div>
     <button class="btn" id="btn-printall" title="Print all six production sheets">Print all</button>
   </div>
@@ -236,6 +236,8 @@ function esc(s) {
 function roundup(x, d) { var p = Math.pow(10, d || 0); return Math.ceil(((Number(x) || 0) * p).toFixed(6) * 1) / p; }
 function r1(x) { return Math.round((Number(x) || 0) * 10) / 10; }
 function r2(x) { return Math.round((Number(x) || 0) * 100) / 100; }
+/* Round UP to the nearest half pound (bulk melons). toFixed guards float noise. */
+function up5(x) { return Math.ceil((((Number(x) || 0) * 2).toFixed(6)) * 1) / 2; }
 function fmt(x) { var n = Number(x) || 0; return Number.isInteger(n) ? String(n) : String(Math.round(n * 100) / 100); }
 function normItem(s) { return String(s).replace(/^0+(?=\d)/, ''); }
 
@@ -307,11 +309,12 @@ var DEFAULT_CONFIG = {
      count source: dc = Worcester DC (loc 01) · rt = cafes (everything except
      the four dining commons) · tot = all locations · tsSand = orders x3
      (triple sandwiches) · tsPkg = orders x2 (triple packages).
-     round: up = whole number up · up1 = 1 decimal up · r1/r2 = nearest
-     1/2 decimals · none = exact. */
+     round: up = whole number up · up1 = 1 decimal up · up5 = nearest 0.5 up
+     · r1/r2 = nearest 1/2 decimals · none = exact. */
   calcs: [
     { slot:'dcbread', label:'10" Tomato Wraps (PACKS)', unit:'', round:'up', per:12, note:'', terms:[{item:'9241',src:'dc',mult:1}] },
     { slot:'dcbread', label:'10" White Wraps (PACKS)', unit:'', round:'up', per:12, note:'', terms:[{item:'9268',src:'dc',mult:1}] },
+    { slot:'dcbread', label:'10" Wraps Hummus Veggie (PACKS)', unit:'', round:'up', per:12, note:'own line; same 10" wrap as the chicken wraps', terms:[{item:'8285',src:'dc',mult:1}] },
     { slot:'dcbread', label:'GF Rolls (PACKS)', unit:'', round:'up', per:4, note:'', terms:[{item:'2420',src:'dc',mult:1}] },
     { slot:'dcbread', label:'GF WW Bread', unit:'', round:'up', per:6, note:'', terms:[{item:'2421',src:'dc',mult:1}] },
     { slot:'dcbread', label:'Kaiser Roll (PACKS)', unit:'', round:'up', per:6, note:'', terms:[{item:'1004',src:'dc',mult:1},{item:'2366',src:'dc',mult:1}] },
@@ -330,9 +333,9 @@ var DEFAULT_CONFIG = {
     { slot:'rtchicken', label:'Chicken Caesar (Retail Total)', unit:'LBS', round:'up', per:12, note:'', terms:[{item:'9257',src:'rt',mult:3},{item:'9268',src:'rt',mult:3}] },
     { slot:'tribread', label:'Wheat Bread (LOAF)', unit:'', round:'up', per:7, note:'', terms:[{item:'253',src:'tsSand',mult:1},{item:'279',src:'tsSand',mult:1}] },
     { slot:'tribread', label:'Rye Bread (LOAF)', unit:'', round:'up', per:14, note:'', terms:[{item:'283',src:'tsSand',mult:1}] },
-    { slot:'fruitbulk', label:'Pineapple', unit:'lbs', round:'r1', per:1, note:'1 CS ≈ 9 lbs', terms:[{item:'9266',src:'tot',mult:0.19},{item:'8637',src:'tot',mult:0.12666}] },
-    { slot:'fruitbulk', label:'Honeydew', unit:'lbs', round:'r1', per:1, note:'1 CS ≈ 11 lbs', terms:[{item:'9266',src:'tot',mult:0.19},{item:'8637',src:'tot',mult:0.12666}] },
-    { slot:'fruitbulk', label:'Cantaloupe', unit:'lbs', round:'r1', per:1, note:'1 CS ≈ 17 lbs', terms:[{item:'9266',src:'tot',mult:0.19},{item:'8637',src:'tot',mult:0.12666}] },
+    { slot:'fruitbulk', label:'Pineapple', unit:'lbs', round:'up5', per:1, note:'1 CS ≈ 9 lbs', terms:[{item:'9266',src:'tot',mult:0.19},{item:'8637',src:'tot',mult:0.12666}] },
+    { slot:'fruitbulk', label:'Honeydew', unit:'lbs', round:'up5', per:1, note:'1 CS ≈ 11 lbs', terms:[{item:'9266',src:'tot',mult:0.19},{item:'8637',src:'tot',mult:0.12666}] },
+    { slot:'fruitbulk', label:'Cantaloupe', unit:'lbs', round:'up5', per:1, note:'1 CS ≈ 17 lbs', terms:[{item:'9266',src:'tot',mult:0.19},{item:'8637',src:'tot',mult:0.12666}] },
     { slot:'fruitbulk', label:'Grapes', unit:'lbs', round:'up', per:1, note:'', terms:[{item:'9266',src:'tot',mult:0.0625},{item:'8637',src:'tot',mult:0.04166}] },
     { slot:'fruitbulk', label:'Strawberries', unit:'lbs', round:'up', per:1, note:'1 CS ≈ 6 lbs', terms:[{item:'9266',src:'tot',mult:0.125},{item:'8637',src:'tot',mult:0.0833}] },
     { slot:'prep', sec:'SLICING', label:'Sliced Ham', unit:'lbs', round:'up', per:1, note:'', terms:[{item:'4735',src:'tot',mult:1},{item:'2291',src:'dc',mult:0.2},{item:'2352',src:'dc',mult:0.1},{item:'7523',src:'rt',mult:0.1},{item:'283',src:'tsSand',mult:0.2}] },
@@ -347,7 +350,8 @@ var DEFAULT_CONFIG = {
     { slot:'prep', sec:'VEGETABLES', label:'Carrot Sticks', unit:'lbs', round:'r2', per:1, note:'', terms:[{item:'2404',src:'dc',mult:0.3}] },
     { slot:'prep', sec:'VEGETABLES', label:'Cucumbers', unit:'lbs', round:'r2', per:1, note:'', terms:[{item:'8372',src:'dc',mult:0.1}] },
     { slot:'prep', sec:'VEGETABLES', label:'Red Onions', unit:'lbs', round:'r2', per:1, note:'', terms:[{item:'2352',src:'dc',mult:0.1},{item:'8372',src:'dc',mult:0.1},{item:'301',src:'rt',mult:0.1}] },
-    { slot:'prep', sec:'VEGETABLES', label:'Peppers', unit:'lbs', round:'r2', per:1, note:'', terms:[{item:'2352',src:'dc',mult:0.1}] },
+    { slot:'prep', sec:'VEGETABLES', label:'Peppers', unit:'lbs', round:'r2', per:1, note:'incl. 8285 (0.1 lb/wrap placeholder)', terms:[{item:'2352',src:'dc',mult:0.1},{item:'8285',src:'dc',mult:0.1}] },
+    { slot:'prep', sec:'VEGETABLES', label:'Lettuce', unit:'lbs', round:'r2', per:1, note:'8285 filling; 0.1 lb/wrap placeholder', terms:[{item:'8285',src:'dc',mult:0.1}] },
     { slot:'prep', sec:'VEGETABLES', label:'Sliced Tomatoes', unit:'lbs', round:'r2', per:1, note:'', terms:[{item:'8009',src:'rt',mult:0.15},{item:'7523',src:'rt',mult:0.15},{item:'9221',src:'rt',mult:0.15},{item:'2226',src:'rt',mult:0.15},{item:'9255',src:'rt',mult:0.15}] },
     { slot:'prep', sec:'SALADS', label:'Tuna Salad', unit:'lbs', round:'up', per:1, note:'', terms:[{item:'2387',src:'dc',mult:0.3},{item:'2387',src:'rt',mult:0.3}] },
     { slot:'prep', sec:'AIOLIS & DRESSINGS', label:'Cranberry Aioli', unit:'gal', round:'up1', per:128, note:'', terms:[{item:'279',src:'tsSand',mult:1}] },
@@ -484,6 +488,7 @@ function calcVal(ctx, row) {
   var x = sum / (Number(row.per) || 1);
   if (row.round === 'up') return roundup(x);
   if (row.round === 'up1') return roundup(x, 1);
+  if (row.round === 'up5') return up5(x);
   if (row.round === 'r1') return r1(x);
   if (row.round === 'r2') return r2(x);
   return x;
@@ -946,6 +951,7 @@ function calcEditor(ci) {
     '<label class="field">Rounding<select id="cf-round">' +
     opt('up', 'Round up to a whole number', row.round) +
     opt('up1', 'Round up to 1 decimal', row.round) +
+    opt('up5', 'Round up to the nearest half (0.5)', row.round) +
     opt('r1', 'Nearest 1 decimal', row.round) +
     opt('r2', 'Nearest 2 decimals', row.round) +
     opt('none', 'Exact, no rounding', row.round) + '</select></label>' +
@@ -1101,6 +1107,10 @@ var SAMPLE = [
 function updateDayChip() {
   var d = prodDate();
   document.documentElement.style.setProperty('--accent', DAY_DOTS[d.day]);
+  // Before any orders are loaded there is no real production date yet, so the
+  // day-colored dot (normally the recap's due date) would just show today+1
+  // with no meaning. Hide it until there is an actual date to color.
+  $('daydot').style.display = data.rows.length ? '' : 'none';
   $('dayword').textContent = data.rows.length
     ? 'Production ' + DAY_NAMES[d.day].slice(0, 3) + ' ' + d.label
     : 'No orders yet';
