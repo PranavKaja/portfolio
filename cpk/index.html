@@ -483,8 +483,15 @@ function cloudPush() {
         cloudState = 'error';
         flashSaved((res.body && res.body.message) || 'Not synced', true);
       }
+      /* Only the footer line, not a full render: a render mid-edit would
+         rebuild the form under the manager's cursor. */
+      renderCloudLine();
     })
-    .catch(function () { cloudState = 'offline'; flashSaved('Saved here only, no connection', true); });
+    .catch(function () {
+      cloudState = 'offline';
+      flashSaved('Saved here only, no connection', true);
+      renderCloudLine();
+    });
 }
 /* True when this browser is running a menu saved before the version the
    tool now ships. The saved menu still wins, but we say so out loud. */
