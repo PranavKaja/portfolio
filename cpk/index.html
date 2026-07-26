@@ -158,11 +158,31 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);display
 .notice{background:var(--warn-bg);border:1.5px solid var(--warn);border-radius:10px;padding:12px 16px;margin:16px 0;display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:.86rem}
 .notice .grow{flex:1;min-width:280px}
 .notice strong{display:block;margin-bottom:2px}
-.explain{background:var(--band);border:1.5px solid var(--rule);border-radius:12px;padding:14px 18px;margin-bottom:16px;font-size:.87rem;line-height:1.6;max-width:80ch}
-.explain h3{font-family:Oswald,sans-serif;font-weight:600;font-size:.88rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
-.explain ul{margin:6px 0 0 18px}
-.explain li{margin-bottom:4px}
-.explain .k{font-weight:700}
+/* "How this page works" lives behind an i button next to each tab now, so it
+   is one click away on every tab without costing a card of vertical space. */
+.set-navwrap{position:relative}
+.navitem{display:inline-flex;align-items:center}
+.infobtn{position:relative;width:17px;height:17px;margin:0 8px 6px 3px;border:1.5px solid var(--rule);border-radius:50%;
+  color:var(--muted);font-size:.66rem;font-weight:700;line-height:1;font-family:Georgia,serif;
+  display:inline-flex;align-items:center;justify-content:center;flex:none}
+/* The dot stays small so the tabs stay compact, but the thing a thumb has to
+   hit on a kitchen tablet is 34px square. */
+.infobtn::after{content:"";position:absolute;top:50%;left:50%;width:34px;height:34px;transform:translate(-50%,-50%)}
+.infobtn:hover{border-color:var(--ink);color:var(--ink)}
+.infobtn[aria-expanded="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.infopop{position:absolute;top:100%;left:0;z-index:30;margin-top:6px;max-width:64ch;
+  background:var(--card);border:1.5px solid var(--ink);border-radius:12px;
+  padding:14px 18px 12px;font-size:.85rem;line-height:1.55;
+  box-shadow:0 10px 28px rgba(0,0,0,.13)}
+.infopop h3{font-family:Oswald,sans-serif;font-weight:600;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.infopop ul{margin:0 0 0 18px;padding:0}
+.infopop li{margin-bottom:5px}
+.infopop li.here{background:var(--band);border-radius:5px;padding:2px 6px;margin-left:-6px}
+.infopop .k{font-weight:700}
+.infopop .shared{margin-top:10px;padding-top:9px;border-top:1px solid var(--rule-soft)}
+.infopop .close{position:absolute;top:8px;right:10px;color:var(--muted);font-size:1rem;line-height:1;padding:2px 4px}
+.infopop .close:hover{color:var(--ink)}
+@media(max-width:640px){.infopop{left:0;right:0;max-width:none}}
 .fx{font-size:.82rem;line-height:1.6}
 .fx div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fx b{font-variant-numeric:tabular-nums}
@@ -1129,22 +1149,27 @@ function sectionDatalist() {
 }
 
 /* The page never used to say what its two halves were, which is the thing
-   that made it hard to read. It says it now, on every tab. */
-function explainer() {
-  return '<div class="explain"><h3>How this page works</h3>' +
+   that made it hard to read. It says it now behind the i button next to each
+   tab, rather than as a card repeated on every tab. The line for the tab you
+   are on is marked, so the relevant answer is the one your eye lands on. */
+function infoPopup(tab) {
+  var li = function (key, html) {
+    return '<li' + (key === tab ? ' class="here"' : '') + '>' + html + '</li>';
+  };
+  return '<button class="close" id="info-close" aria-label="Close">&times;</button>' +
+    '<h3>How this page works</h3>' +
     '<ul>' +
-    '<li><span class="k">Menu items</span> are the finished things the kitchen makes and counts, one row per item per sheet. ' +
-    'An item made for both the DC and the cafes is listed twice on purpose, once on each sheet, because the two count different orders.</li>' +
-    '<li><span class="k">Recipe amounts</span> turn those counts into raw goods: bread to defrost, meat to slice, chicken to cook, fruit to cut. ' +
-    'Each line reads "this much per one ordered".</li>' +
-    '<li><span class="k">Locations &amp; trays</span> control the Packout sheet: who ships, in what order, and how many fit a tray.</li>' +
-    '<li><span class="k">Backup</span> is the only way to move a menu to another computer.</li>' +
+    li('menu', '<span class="k">Menu items</span> are the finished things the kitchen makes and counts, one row per item per sheet. ' +
+      'An item made for both the DC and the cafes is listed twice on purpose, once on each sheet, because the two count different orders.') +
+    li('wiring', '<span class="k">Recipe amounts</span> turn those counts into raw goods: bread to defrost, meat to slice, chicken to cook, fruit to cut. ' +
+      'Each line reads "this much per one ordered".') +
+    li('setup', '<span class="k">Locations &amp; trays</span> control the Packout sheet: who ships, in what order, and how many fit a tray.') +
+    li('backup', '<span class="k">Backup &amp; version</span> keeps every save as a numbered version you can put back, and exports a copy you hold yourself.') +
     '</ul>' +
-    '<p style="margin-top:8px;"><b>Nothing here has a Save button.</b> Changing something that already exists saves it right then, and SAVED flashes at the top of the page. Adding something new has one Add button, because there is nothing to save until the record exists. There is no undo, so export a backup before a big change.</p>' +
+    '<p class="shared"><b>Nothing here has a Save button.</b> Changing something that already exists saves it right then, and SAVED flashes at the top of the page. ' +
+    'Adding something new has one Add button, because there is nothing to save until the record exists. There is no undo, so export a backup before a big change.</p>' +
     '<p style="margin-top:8px;"><b>Changes here apply everywhere.</b> The menu is shared, so what you save becomes the menu every computer and phone sees the next time it opens this tool. ' +
-    'Every save is kept as a numbered version and any of them can be put back, under Backup &amp; version. ' +
-    'The orders you paste on the sheets page are not shared, those stay in this browser.</p>' +
-    '</div>';
+    'The orders you paste on the sheets page are not shared, those stay in this browser.</p>';
 }
 
 function itemForm(it) {
@@ -1192,8 +1217,7 @@ function itemForm(it) {
 }
 
 function renderMenuSettings() {
-  var h = explainer() +
-    '<div class="card"><h3>Menu items</h3>' +
+  var h = '<div class="card"><h3>Menu items</h3>' +
     '<p class="help">Every item the kitchen makes. Un-check an item to take it off every sheet without deleting it (its packout column and sticker go too). ' +
     'New items start counting from the pasted orders right away. If an ordered item is missing here, the CHECK tab flags it.</p>' +
     '<div class="formgrid"><button class="btn" id="mi-add">+ Add an item</button></div></div>';
@@ -1319,8 +1343,7 @@ function calcEditor(ci, ctx) {
 }
 var draftTerms = null; /* live term list while the calc editor is open */
 function renderWiring(ctx) {
-  var h = explainer() +
-    '<div class="card"><h3>Recipe amounts</h3>' +
+  var h = '<div class="card"><h3>Recipe amounts</h3>' +
     '<p class="help">Bread pulls, chicken weights, prep amounts and bulk fruit all follow the orders through these lines. ' +
     'Every line reads the same way: <b>this much per one ordered</b>, added up across the items that use it, divided by pack size, rounded. ' +
     'Live value shows what each line makes of the orders loaded right now, so you can check a change immediately. ' +
@@ -1353,7 +1376,7 @@ function renderSetup() {
   var locRows = Object.keys(config.locations).sort(function (a, b) { return +a - +b; }).map(function (code) {
     return '<tr><td class="num mono">' + esc(code) + '</td><td><input data-locname="' + esc(code) + '" value="' + esc(config.locations[code]) + '" size="22" style="border:1px solid var(--rule);border-radius:6px;padding:4px 8px;background:var(--paper);"></td></tr>';
   }).join('');
-  return explainer() + '<div class="card"><h3>Trays</h3>' +
+  return '<div class="card"><h3>Trays</h3>' +
     '<p class="help">How many pieces fit on one packout tray. Trays per cafe are rounded up from these.</p>' +
     '<div class="formgrid">' +
     ['salad', 'sand', 'wrap', 'fruit'].map(function (g) {
@@ -1403,8 +1426,7 @@ function renderHistory() {
 }
 function renderBackup() {
   var stale = updateWaiting();
-  return explainer() +
-    '<div class="card"><h3>Backup and restore</h3>' +
+  return '<div class="card"><h3>Backup and restore</h3>' +
     '<p class="help">The menu is stored on the server and shared by every device, and every save is kept as a version you can put back. ' +
     'An exported file is a second copy you hold yourself, worth taking before a big change. Last export from this browser: <b>' + esc(lastExportWords()) + '</b>.</p>' +
     '<div class="formgrid">' +
@@ -1436,9 +1458,13 @@ function renderSettings() {
   var h = '<div class="sheet-head"><h2 class="sheet-title">Menu setup</h2>' +
     '<div class="sheet-headr"><span class="savebar" id="savebar"></span>' +
     '<button class="quiet" id="set-close">Close, back to the sheets</button></div></div>' +
-    '<div class="set-nav">' + nav.map(function (n) {
-      return '<button class="tab' + (setTab === n[0] ? ' active' : '') + '" data-setnav="' + n[0] + '">' + n[1] + '</button>';
-    }).join('') + '</div>';
+    '<div class="set-navwrap"><div class="set-nav">' + nav.map(function (n) {
+      return '<span class="navitem">' +
+        '<button class="tab' + (setTab === n[0] ? ' active' : '') + '" data-setnav="' + n[0] + '">' + n[1] + '</button>' +
+        '<button class="infobtn" data-info="' + n[0] + '" aria-expanded="false" title="How this page works" aria-label="How this page works: ' + n[1] + '">i</button>' +
+        '</span>';
+    }).join('') + '</div>' +
+    '<div class="infopop" id="infopop" hidden></div></div>';
   if (setTab === 'menu') h += renderMenuSettings();
   else if (setTab === 'wiring') h += renderWiring(ctx);
   else if (setTab === 'setup') h += renderSetup();
@@ -1710,12 +1736,46 @@ function bindLoginEvents() {
   $('li-back').addEventListener('click', function () { view = 'sheets'; render(); });
 }
 
+/* Looks the popup up by id each time rather than closing over a node, so a
+   handler bound at boot still works against whatever render() last drew. */
+function closeInfo() {
+  var p = $('infopop');
+  if (p) p.hidden = true;
+  Array.prototype.forEach.call(document.querySelectorAll('[data-info]'), function (b) {
+    b.setAttribute('aria-expanded', 'false');
+  });
+}
+document.addEventListener('click', closeInfo);
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeInfo(); });
+
 function bindSettingsEvents() {
   var out = $('out');
   $('set-close').addEventListener('click', function () { view = 'sheets'; editingItem = null; editingCalc = null; pendingAdd = null; render(); });
   Array.prototype.forEach.call(out.querySelectorAll('[data-setnav]'), function (b) {
     b.addEventListener('click', function () { setTab = b.dataset.setnav; editingItem = null; editingCalc = null; render(); });
   });
+
+  /* "How this page works", one click from any tab. Kept out of the render
+     cycle so opening it never disturbs a form someone is part-way through.
+     The dismiss handlers are bound once at boot, not here: this function
+     runs on every render and would otherwise stack a listener each time. */
+  var pop = $('infopop');
+  if (pop) {
+    Array.prototype.forEach.call(out.querySelectorAll('[data-info]'), function (b) {
+      b.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (b.getAttribute('aria-expanded') === 'true') { closeInfo(); return; }
+        pop.innerHTML = infoPopup(b.dataset.info);
+        pop.hidden = false;
+        Array.prototype.forEach.call(document.querySelectorAll('[data-info]'), function (o) {
+          o.setAttribute('aria-expanded', String(o === b));
+        });
+        var x = $('info-close');
+        if (x) x.addEventListener('click', function (ev) { ev.stopPropagation(); closeInfo(); });
+      });
+    });
+    pop.addEventListener('click', function (e) { e.stopPropagation(); });
+  }
 
   /* menu */
   var add = $('mi-add');
