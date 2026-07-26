@@ -154,6 +154,28 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);display
 .loginbox .card{padding:26px}
 .loginbox input{width:100%;margin-bottom:10px;border:1.5px solid var(--rule);border-radius:8px;padding:11px 12px;background:var(--paper)}
 
+/* ---- update notice + plain-English recipe lines ---- */
+.notice{background:var(--warn-bg);border:1.5px solid var(--warn);border-radius:10px;padding:12px 16px;margin:16px 0;display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:.86rem}
+.notice .grow{flex:1;min-width:280px}
+.notice strong{display:block;margin-bottom:2px}
+.explain{background:var(--band);border:1.5px solid var(--rule);border-radius:12px;padding:14px 18px;margin-bottom:16px;font-size:.87rem;line-height:1.6;max-width:80ch}
+.explain h3{font-family:Oswald,sans-serif;font-weight:600;font-size:.88rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.explain ul{margin:6px 0 0 18px}
+.explain li{margin-bottom:4px}
+.explain .k{font-weight:700}
+.fx{font-size:.82rem;line-height:1.6}
+.fx div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fx b{font-variant-numeric:tabular-nums}
+.fx .sep{color:var(--muted)}
+.fx .unk{color:var(--warn)}
+.pv{margin:10px 0 4px}
+.pv table{margin-top:6px}
+.warnline{color:var(--warn);font-size:.82rem;font-weight:600;margin-top:8px}
+.savebar{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ok);opacity:0;transition:opacity .18s;white-space:nowrap}
+.savebar.on{opacity:1}
+.savebar.bad{color:var(--warn)}
+.autonote{font-size:.78rem;color:var(--muted);margin-top:8px}
+
 /* ---- print ---- */
 #printbox{display:none}
 @page{margin:10mm}
@@ -204,13 +226,14 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);display
     <button class="btn" id="btn-printall" title="Print all six production sheets">Print all</button>
   </div>
 
+  <div id="notice"></div>
   <div id="inputzone"></div>
 
   <div class="tabs" id="tabs" role="tablist"></div>
   <div class="sheet" id="out"></div>
 
   <footer>
-    <span>Worcester central kitchen production planner. Everything runs in this browser, nothing is uploaded.</span>
+    <span id="cloudline">Worcester central kitchen production planner.</span>
     <button id="gear" title="Menu setup (manager sign-in)">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       Menu setup
@@ -247,9 +270,17 @@ function normItem(s) { return String(s).replace(/^0+(?=\d)/, ''); }
    in the career hub: 04-Project-Sources/cpk/VALIDATION-2026.md).
    Managers edit a copy of this in Menu setup; the copy lives in
    this browser's localStorage. Reset brings this version back.
+
+   BUMP `build` whenever the shipped menu or a formula changes here.
+   A browser holding an older build keeps its own saved menu (nobody
+   loses their work on a deploy) but gets told an update exists, so a
+   correction shipped from the repo can no longer be shadowed in
+   silence. `v` is the file SHAPE version and only changes if the
+   structure below changes.
    ============================================================ */
 var DEFAULT_CONFIG = {
   v: 1,
+  build: 1,
   locations: {
     '01': 'Worcester DC', '02': 'Franklin DC', '03': 'Hampshire', '04': 'Berkshire DC',
     '07': 'Chicken & Co', '08': 'Whitmore', '13': 'Worcester Cafe', '14': 'CC Grill',
@@ -363,21 +394,140 @@ var DEFAULT_CONFIG = {
 /* ============================================================
    CONFIG STORAGE
    ============================================================ */
-var CFG_KEY = 'cpk_manager_config_v1';
+var CFG_KEY = 'cpk_manager_config_v1';     /* legacy per-browser menu, pre-sharing */
+var CLOUD_CACHE = 'cpk_cloud_cache_v1';    /* last shared menu this PC saw */
+var EXPORT_KEY = 'cpk_last_export';
+var savedBuild = null;   /* build the saved menu descends from, null = none saved */
+
+/* ---- the shared menu ----
+   One manager edits, every device gets it. Reads are a plain REST select
+   with the publishable key (the table is read-only to it). Writes go
+   through the cpk-config edge function, which checks the manager
+   passphrase server-side; nothing in this page can write on its own.
+   The last menu seen is cached so a kitchen PC that loses its connection
+   still builds sheets. */
+var CLOUD = {
+  url: 'https://jjwndqrgejtueeyllqiw.supabase.co',
+  key: 'sb_publishable_f2DN0Pz4rzVQPPSZjcbOyw_l8DyycYK'
+};
+var cloudState = 'checking';   /* checking | synced | offline | local */
+var cloudVersion = null;       /* id of the shared version now loaded */
+var cloudSavedAt = '';
+var managerPassword = null;    /* held in memory for the session only, never stored */
+
+function readJSON(key) { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } }
+function writeJSON(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+function validConfig(c) {
+  return !!(c && c.v === 1 && Array.isArray(c.items) && c.items.length &&
+    Array.isArray(c.calcs) && c.calcs.length && c.locations && c.trays);
+}
 var config = loadConfig();
 function loadConfig() {
-  try {
-    var c = JSON.parse(localStorage.getItem(CFG_KEY));
-    if (c && c.v === 1 && Array.isArray(c.items) && Array.isArray(c.calcs)) return c;
-  } catch (e) {}
+  /* Paint from whatever is on hand, instantly, then let the network
+     correct it. The kitchen never waits on a request to see its sheets. */
+  var c = readJSON(CLOUD_CACHE);
+  if (validConfig(c)) { savedBuild = Number(c.build) || 0; return c; }
+  c = readJSON(CFG_KEY);
+  if (validConfig(c)) { savedBuild = Number(c.build) || 0; return c; }
   return JSON.parse(JSON.stringify(DEFAULT_CONFIG));
 }
+function cloudUrl(path) { return CLOUD.url + path; }
+function cloudLoad() {
+  fetch(cloudUrl('/rest/v1/cpk_config?select=id,config,created_at&order=id.desc&limit=1'), {
+    headers: { apikey: CLOUD.key, Authorization: 'Bearer ' + CLOUD.key }
+  }).then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+    .then(function (rows) {
+      if (rows && rows.length && validConfig(rows[0].config)) {
+        config = rows[0].config;
+        cloudVersion = rows[0].id;
+        cloudSavedAt = rows[0].created_at;
+        savedBuild = Number(config.build) || 0;
+        writeJSON(CLOUD_CACHE, config);
+        cloudState = 'synced';
+      } else {
+        /* Table is empty: nobody has published a menu yet, so this PC
+           keeps whatever it has until a manager saves one. */
+        cloudState = 'local';
+      }
+      render();
+    })
+    .catch(function () { cloudState = 'offline'; render(); });
+}
+function cloudFn(payload) {
+  return fetch(cloudUrl('/functions/v1/cpk-config'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', apikey: CLOUD.key },
+    body: JSON.stringify(payload)
+  }).then(function (r) {
+    return r.json().catch(function () { return {}; }).then(function (j) { return { status: r.status, body: j }; });
+  });
+}
+var pushTimer = null;
+/* Local write is instant; the shared write is debounced so keystroke-level
+   autosave does not fire a request per character. */
+function queuePush() {
+  if (pushTimer) clearTimeout(pushTimer);
+  pushTimer = setTimeout(cloudPush, 900);
+}
+function cloudPush() {
+  if (!managerPassword) { flashSaved('Saved here only', true); return; }
+  cloudFn({ action: 'save', password: managerPassword, config: config })
+    .then(function (res) {
+      if (res.body && res.body.ok) {
+        cloudVersion = res.body.id;
+        cloudSavedAt = res.body.created_at;
+        cloudState = 'synced';
+        writeJSON(CLOUD_CACHE, config);
+        flashSaved('Synced to every device');
+      } else {
+        cloudState = 'error';
+        flashSaved((res.body && res.body.message) || 'Not synced', true);
+      }
+    })
+    .catch(function () { cloudState = 'offline'; flashSaved('Saved here only, no connection', true); });
+}
+/* True when this browser is running a menu saved before the version the
+   tool now ships. The saved menu still wins, but we say so out loud. */
+function updateWaiting() { return savedBuild !== null && savedBuild < DEFAULT_CONFIG.build; }
 function saveConfig() {
-  try { localStorage.setItem(CFG_KEY, JSON.stringify(config)); } catch (e) {}
+  writeJSON(CLOUD_CACHE, config);
+  savedBuild = Number(config.build) || 0;
 }
 function resetConfig() {
-  try { localStorage.removeItem(CFG_KEY); } catch (e) {}
+  try { localStorage.removeItem(CFG_KEY); localStorage.removeItem(CLOUD_CACHE); } catch (e) {}
   config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+  savedBuild = null;
+}
+/* Everything in Menu setup saves the moment it is touched. One shared
+   indicator says so, so "did that save?" has the same answer everywhere. */
+var saveTimer = null;
+function flashSaved(msg, bad) {
+  var el = $('savebar');
+  if (!el) return;
+  el.textContent = msg || 'Saved';
+  el.className = 'savebar on' + (bad ? ' bad' : '');
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(function () { var e = $('savebar'); if (e) e.className = 'savebar'; }, 1800);
+}
+function autosave(msg) { saveConfig(); flashSaved(msg || 'Saved'); queuePush(); }
+/* render() rebuilds the indicator, so flash after it, not before. */
+function saveRenderFlash(msg) { saveConfig(); render(); flashSaved(msg || 'Saved'); queuePush(); }
+function lastExport() { try { return localStorage.getItem(EXPORT_KEY) || ''; } catch (e) { return ''; } }
+function stampExport() { try { localStorage.setItem(EXPORT_KEY, new Date().toISOString()); } catch (e) {} }
+function lastExportWords() {
+  var s = lastExport();
+  if (!s) return 'never';
+  var d = new Date(s);
+  return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+}
+function downloadConfig(name) {
+  var blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name || 'cpk-menu-settings.json';
+  a.click();
+  stampExport();
+  setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
 }
 
 /* ============================================================
@@ -614,7 +764,7 @@ function renderPrep(ctx) {
     h += '<tr><td>' + esc(row.label) + '</td><td class="num big">' + fmt(calcVal(ctx, row)) + '</td><td>' + esc(row.unit) + '</td></tr>';
   });
   return head('Prep', 'prep') + h + '</tbody></table>' +
-    '<p class="hint">Amounts come from the per-item factors in Menu setup (Linked amounts).</p>';
+    '<p class="hint">Amounts come from the per-item factors in Menu setup (Recipe amounts).</p>';
 }
 function pkCols() {
   return config.items.filter(function (i) { return i.on && i.pack; })
@@ -825,17 +975,25 @@ function renderCheck(ctx) {
 /* ============================================================
    SETTINGS (hidden behind the manager sign-in)
    ============================================================ */
-var SETTINGS_HASH = 'c8f0c463c9b66c3d8999211ebc32599a7843299fedd95641b76fd80b589ffb9a';
-var UNLOCK_KEY = 'cpk_settings_unlocked';
-function isUnlocked() { try { return sessionStorage.getItem(UNLOCK_KEY) === '1'; } catch (e) { return false; } }
-function setUnlocked(on) { try { on ? sessionStorage.setItem(UNLOCK_KEY, '1') : sessionStorage.removeItem(UNLOCK_KEY); } catch (e) {} }
-function checkLogin(id, pass) {
-  var msg = (String(id).trim() + ':' + String(pass).trim()).toUpperCase();
-  if (!(window.crypto && crypto.subtle)) return Promise.resolve(false);
-  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg)).then(function (buf) {
-    var hex = Array.prototype.map.call(new Uint8Array(buf), function (x) { return x.toString(16).padStart(2, '0'); }).join('');
-    return hex === SETTINGS_HASH;
-  });
+/* The password is checked on the server now, not in this file. A hash in
+   the page could only ever gate the UI, and once one manager's edit
+   reaches every device that is not good enough. The trade is that
+   changing the menu needs a connection; building and printing sheets
+   still works completely offline. */
+function isUnlocked() { return !!managerPassword; }
+function setUnlocked(on) { if (!on) managerPassword = null; }
+function checkLogin(pass) {
+  var password = String(pass).trim();
+  if (!password) return Promise.resolve({ ok: false, msg: 'Enter the manager password.' });
+  return cloudFn({ action: 'login', password: password })
+    .then(function (res) {
+      if (res.body && res.body.ok) { managerPassword = password; return { ok: true }; }
+      if (res.status === 503) return { ok: false, msg: 'The shared menu is not set up yet. CPK_MANAGER_SECRET is missing on the server.' };
+      return { ok: false, msg: 'Wrong password.' };
+    })
+    .catch(function () {
+      return { ok: false, msg: 'No connection. Changing the menu needs internet; printing sheets does not.' };
+    });
 }
 
 var SRC_LABEL = {
@@ -844,6 +1002,14 @@ var SRC_LABEL = {
   tot: 'All orders (every location)',
   tsSand: 'Triple sandwiches (orders x3)',
   tsPkg: 'Triple packages (orders x2)'
+};
+/* Same five sources phrased to read inside a sentence. */
+var SRC_SHORT = {
+  dc: 'ordered at Worcester DC',
+  rt: 'ordered by the cafes',
+  tot: 'ordered anywhere',
+  tsSand: 'triple sandwiches (orders x3)',
+  tsPkg: 'triple packages (orders x2)'
 };
 var SLOT_LABEL = {
   dcbread: 'DC sheet: bread to defrost',
@@ -854,6 +1020,46 @@ var SLOT_LABEL = {
   fruitbulk: 'Fruit sheet: bulk fruit',
   prep: 'Prep sheet'
 };
+
+/* ---- what an item number means, in words ----
+   Nothing here is invented. A menu item answers for itself. A code that
+   is NOT on the menu (raw goods ordered on their own line, like the
+   sliced meats) is described by the recipe lines that use it, and by the
+   name the day's own Orders Recap gives it. */
+var orderIdx = {};   /* item # -> {name,total,byLoc} for the orders now loaded */
+function menuName(id) {
+  for (var i = 0; i < config.items.length; i++) if (config.items[i].id === id) return config.items[i].name;
+  return null;
+}
+function calcsUsing(id) {
+  return config.calcs.filter(function (c) {
+    return c.terms.some(function (t) { return t.item === id; });
+  }).map(function (c) { return c.label; });
+}
+function itemLabel(id) {
+  var n = menuName(id);
+  if (n) return n;
+  if (orderIdx[id]) return titleCase(orderIdx[id].name);
+  var used = calcsUsing(id);
+  if (used.length) return 'not a menu item, feeds ' + used.join(' + ');
+  return 'unknown item number';
+}
+/* An id nobody can explain is worth flagging in orange rather than
+   printing a confident-looking name for. */
+function itemKnown(id) { return !!(menuName(id) || orderIdx[id] || calcsUsing(id).length); }
+function itemChoices() {
+  var seen = {}, out = [];
+  var push = function (id, label) { if (id && !seen[id]) { seen[id] = 1; out.push([id, label]); } };
+  config.items.forEach(function (i) { push(i.id, i.name); });
+  Object.keys(orderIdx).forEach(function (id) { push(id, titleCase(orderIdx[id].name) + ' (from today\'s orders)'); });
+  config.calcs.forEach(function (c) { c.terms.forEach(function (t) { push(t.item, itemLabel(t.item)); }); });
+  return out.sort(function (a, b) { return (+a[0]) - (+b[0]); });
+}
+function itemDatalist(id) {
+  return '<datalist id="' + id + '">' + itemChoices().map(function (c) {
+    return '<option value="' + esc(c[0]) + '">' + esc(c[1]) + '</option>';
+  }).join('') + '</datalist>';
+}
 var setTab = 'menu';
 var editingItem = null;   /* index into config.items, or -1 for new */
 var editingCalc = null;   /* index into config.calcs, or 'new:slot' */
@@ -862,13 +1068,40 @@ var pendingAdd = null;    /* {id, name} from the CHECK tab */
 function renderLogin() {
   return '<div class="loginbox"><div class="card">' +
     '<h3>Manager sign-in</h3>' +
-    '<p class="help">Making sheets and printing is open to everyone. Changing the menu needs the manager login.</p>' +
-    '<input id="li-id" placeholder="ID" autocomplete="off">' +
-    '<input id="li-pass" type="password" placeholder="Password" autocomplete="off">' +
+    '<p class="help">Making sheets and printing is open to everyone. Changing the menu needs the manager password, ' +
+    'and a change here applies on every device that opens this tool.</p>' +
+    '<input id="li-pass" type="password" placeholder="Manager password" autocomplete="off">' +
     '<button class="btn primary" id="li-go" style="width:100%;justify-content:center;">Sign in</button>' +
     '<p class="msg" id="li-msg"></p>' +
     '<button class="quiet" id="li-back">Back to the sheets</button>' +
     '</div></div>';
+}
+
+function sectionDatalist() {
+  var seen = {};
+  config.items.forEach(function (i) { if (i.sec) seen[i.sec] = 1; });
+  return '<datalist id="seclist">' + Object.keys(seen).sort().map(function (s) {
+    return '<option value="' + esc(s) + '"></option>';
+  }).join('') + '</datalist>';
+}
+
+/* The page never used to say what its two halves were, which is the thing
+   that made it hard to read. It says it now, on every tab. */
+function explainer() {
+  return '<div class="explain"><h3>How this page works</h3>' +
+    '<ul>' +
+    '<li><span class="k">Menu items</span> are the finished things the kitchen makes and counts, one row per item per sheet. ' +
+    'An item made for both the DC and the cafes is listed twice on purpose, once on each sheet, because the two count different orders.</li>' +
+    '<li><span class="k">Recipe amounts</span> turn those counts into raw goods: bread to defrost, meat to slice, chicken to cook, fruit to cut. ' +
+    'Each line reads "this much per one ordered".</li>' +
+    '<li><span class="k">Locations &amp; trays</span> control the Packout sheet: who ships, in what order, and how many fit a tray.</li>' +
+    '<li><span class="k">Backup</span> is the only way to move a menu to another computer.</li>' +
+    '</ul>' +
+    '<p style="margin-top:8px;"><b>Nothing here has a Save button.</b> Changing something that already exists saves it right then, and SAVED flashes at the top of the page. Adding something new has one Add button, because there is nothing to save until the record exists. There is no undo, so export a backup before a big change.</p>' +
+    '<p style="margin-top:8px;"><b>Changes here apply everywhere.</b> The menu is shared, so what you save becomes the menu every computer and phone sees the next time it opens this tool. ' +
+    'Every save is kept as a numbered version and any of them can be put back, under Backup &amp; version. ' +
+    'The orders you paste on the sheets page are not shared, those stay in this browser.</p>' +
+    '</div>';
 }
 
 function itemForm(it) {
@@ -885,7 +1118,8 @@ function itemForm(it) {
     opt('retail', 'Retail Grab & Go (counts cafe orders)', it.sheet) +
     opt('triple', 'Triple stacks (counts every order, x2 packages)', it.sheet) +
     opt('fruit', 'Fruit cups (counts every order)', it.sheet) + '</select></label>' +
-    '<label class="field">Section on the sheet<input id="if-sec" value="' + esc(it.sec) + '" size="16" placeholder="SANDWICHES"></label>' +
+    '<label class="field">Section on the sheet<input id="if-sec" list="seclist" value="' + esc(it.sec) + '" size="16" placeholder="SANDWICHES"></label>' +
+    sectionDatalist() +
     '</div><div class="formgrid">' +
     '<label class="field">Packout column<select id="if-pack">' +
     opt('', 'None (does not ship to cafes)', it.pack) +
@@ -894,22 +1128,27 @@ function itemForm(it) {
     opt('wrap', 'Wrap (tray of ' + config.trays.wrap + ')', it.pack) +
     opt('fruit', 'Fruit (tray of ' + config.trays.fruit + ')', it.pack) + '</select></label>' +
     '<label class="field">Packout column header<input id="if-pklabel" value="' + esc(it.pkLabel) + '" size="12"></label>' +
+    '<label class="field">Packout column position<input id="if-pkord" value="' + esc(String(it.pkOrd || 900)) + '" size="6" inputmode="numeric"></label>' +
     '<label class="field">Sticker<select id="if-stklist">' +
     opt('', 'No sticker', stkList) +
     opt('dc', 'DC sticker run (FoodPro)', stkList) +
     opt('retail', 'Retail sticker run (Harvest Fresh)', stkList) + '</select></label>' +
     '<label class="field">Sticker label<input id="if-stklabel" value="' + esc(it.stk ? it.stk.label : '') + '" size="30" placeholder="blank = item name"></label>' +
     '</div>' +
-    '<p class="help">The sticker count follows the sheet: DC items print their DC amount, retail items their cafe amount, triples print packages, fruit prints the full total.</p>' +
+    '<p class="help">The sticker count follows the sheet: DC items print their DC amount, retail items their cafe amount, triples print packages, fruit prints the full total. ' +
+    'Packout column position orders the columns left to right inside each tray group, lowest number first. Leave it at 900 to land at the end.</p>' +
     '<div class="formgrid">' +
-    '<button class="btn primary" id="if-save">Save item</button>' +
-    '<button class="mini" id="if-cancel">Cancel</button>' +
+    '<button class="btn primary" id="if-save">' + (editingItem === -1 ? 'Add this item' : 'Done') + '</button>' +
+    (editingItem === -1 ? '<button class="mini" id="if-cancel">Cancel</button>' : '') +
     (editingItem !== -1 ? '<button class="mini danger" id="if-delete">Delete this item</button>' : '') +
-    '</div><p class="msg" id="if-msg"></p></div>';
+    '</div>' +
+    (editingItem !== -1 ? '<p class="autonote">Changes save as you make them, so there is nothing to click to keep them. Done just closes the form.</p>' : '') +
+    '<p class="msg" id="if-msg"></p></div>';
 }
 
 function renderMenuSettings() {
-  var h = '<div class="card"><h3>Menu</h3>' +
+  var h = explainer() +
+    '<div class="card"><h3>Menu items</h3>' +
     '<p class="help">Every item the kitchen makes. Un-check an item to take it off every sheet without deleting it (its packout column and sticker go too). ' +
     'New items start counting from the pasted orders right away. If an ordered item is missing here, the CHECK tab flags it.</p>' +
     '<div class="formgrid"><button class="btn" id="mi-add">+ Add an item</button></div></div>';
@@ -921,7 +1160,7 @@ function renderMenuSettings() {
       if (it.sheet !== g[0]) return;
       h += '<tr' + (it.on ? '' : ' class="rowoff"') + '><td><input type="checkbox" data-toggle="' + i + '"' + (it.on ? ' checked' : '') + '></td>' +
         '<td>' + esc(it.name) + '</td><td class="num mono">' + esc(it.id) + '</td><td class="num mono">' + esc(it.recipe) + '</td>' +
-        '<td>' + (it.pack ? esc(it.pack) + ' · ' + esc(it.pkLabel) : '·') + '</td>' +
+        '<td>' + (it.pack ? esc(it.pack) + ' · ' + esc(it.pkLabel) + ' <span class="mono">#' + esc(String(it.pkOrd || 900)) + '</span>' : '·') + '</td>' +
         '<td>' + (it.stk ? esc(it.stk.list) : '·') + '</td>' +
         '<td><button class="mini" data-edit="' + i + '">Edit</button></td></tr>';
     });
@@ -930,15 +1169,65 @@ function renderMenuSettings() {
   return h;
 }
 
-function termChips(row, ci) {
-  var h = '';
-  row.terms.forEach(function (t, ti) {
-    h += '<span class="term">' + esc(String(t.mult)) + ' × ' + esc(t.item) + ' · ' + esc(SRC_LABEL[t.src] || t.src) +
-      '<button data-delterm="' + ci + ':' + ti + '" title="Remove">✕</button></span>';
-  });
-  return h;
+var ROUND_WORDS = {
+  up: 'rounded up to a whole number',
+  up1: 'rounded up to 1 decimal',
+  up5: 'rounded up to the nearest half',
+  r1: 'to the nearest 1 decimal',
+  r2: 'to the nearest 2 decimals',
+  none: 'exact, no rounding'
+};
+function termChips(terms) {
+  if (!terms.length) return '<p class="help" style="margin:0;">Nothing on this line yet. Add a count below.</p>';
+  return terms.map(function (t, ti) {
+    return '<span class="term">' + esc(String(t.mult)) + ' per <b>' + esc(itemLabel(t.item)) + '</b> ' +
+      '<span class="mono">' + esc(t.item) + '</span> ' + esc(SRC_SHORT[t.src] || t.src) +
+      '<button data-dt="' + ti + '" title="Remove">✕</button></span>';
+  }).join('');
 }
-function calcEditor(ci) {
+/* Things worth saying out loud before a manager saves a line. */
+function termWarnings(terms) {
+  var w = [];
+  terms.forEach(function (t) {
+    if (t.src === 'tsSand' || t.src === 'tsPkg') {
+      var rows = config.items.filter(function (i) { return i.id === t.item; });
+      if (rows.length && !rows.some(function (i) { return i.sheet === 'triple'; })) {
+        w.push('Item ' + t.item + ' is not a triple stack, but this line counts it as ' + SRC_SHORT[t.src] + '.');
+      }
+    }
+    if (!itemKnown(t.item)) w.push('Item ' + t.item + ' is not on the menu and was not ordered today. Check the number.');
+  });
+  return w;
+}
+/* The line, worked out on the orders that are loaded. This is the whole
+   point of the editor: you see what a factor does before you keep it. */
+function calcPreview(row, ctx) {
+  if (!ctx) {
+    return '<p class="help" style="margin-top:12px;">Paste a day of orders on the sheets page first and this box will work the line out on real numbers.</p>';
+  }
+  if (!row.terms.length) return '';
+  var sum = 0;
+  var t = '<div class="pv"><div class="blocklabel">What this line makes of the orders loaded right now</div>' +
+    '<table class="t"><thead><tr><th>Counting</th><th class="num">Ordered</th><th class="num">Per one</th><th class="num">Gives</th></tr></thead><tbody>';
+  row.terms.forEach(function (tm) {
+    var n = srcVal(ctx, tm.item, tm.src);
+    var part = n * (Number(tm.mult) || 0);
+    sum += part;
+    t += '<tr><td>' + esc(itemLabel(tm.item)) + ' <span class="mono">' + esc(tm.item) + '</span><br>' +
+      '<span class="mono">' + esc(SRC_SHORT[tm.src] || tm.src) + '</span></td>' +
+      '<td class="num">' + fmt(n) + '</td><td class="num">x ' + esc(String(tm.mult)) + '</td>' +
+      '<td class="num big">' + fmt(part) + '</td></tr>';
+  });
+  var per = Number(row.per) || 1;
+  t += '<tr class="total"><td>Added up</td><td class="num"></td><td class="num"></td><td class="num big">' + fmt(sum) + '</td></tr>' +
+    '</tbody></table>';
+  var steps = fmt(sum);
+  if (per !== 1) steps += ' ÷ ' + fmt(per) + ' = ' + fmt(sum / per);
+  steps += ', ' + (ROUND_WORDS[row.round] || row.round) + ' = ';
+  t += '<p class="hint"><b>' + esc(steps) + fmt(calcVal(ctx, row)) + ' ' + esc(row.unit || '') + '</b> on the sheet.</p></div>';
+  return t;
+}
+function calcEditor(ci, ctx) {
   var isNew = typeof ci === 'string';
   var row = isNew ? { slot: ci.split(':')[1], sec: '', label: '', unit: 'lbs', round: 'up', per: 1, note: '', terms: [] } : config.calcs[ci];
   var opt = function (v, l, cur) { return '<option value="' + v + '"' + (v === cur ? ' selected' : '') + '>' + l + '</option>'; };
@@ -957,37 +1246,56 @@ function calcEditor(ci) {
     opt('none', 'Exact, no rounding', row.round) + '</select></label>' +
     '<label class="field">Note (shows on the sheet)<input id="cf-note" value="' + esc(row.note || '') + '" size="14"></label>' +
     '</div>' +
-    '<p class="help">This line adds up the counts below (each times its factor), divides by "per", then rounds. Factors are per ordered unit: 0.2 means every unit needs 0.2 ' + esc(row.unit || 'lbs') + '.</p>' +
-    '<div id="cf-terms">' + termChips(row, isNew ? 'new' : ci) + '</div>' +
+    '<p class="help">Read this line as <b>"per one ordered, use this much"</b>. ' +
+    'A factor of 0.2 against Ham on Rye means one ham sandwich eats 0.2 ' + esc(row.unit || 'lbs') + ' of this, so 50 sandwiches need 10. ' +
+    'List every menu item that eats into the same thing, then divide by the pack size if the kitchen pulls it by the pack (6 rolls to a pack means divide by 6), then round.</p>' +
+    '<div class="blocklabel">What this line counts</div>' +
+    '<div id="cf-terms">' + termChips(row.terms) + '</div>' +
     '<div class="formgrid">' +
-    '<label class="field">Factor<input id="cf-t-mult" size="6" value="1" inputmode="decimal"></label>' +
-    '<label class="field">× Item #<input id="cf-t-item" size="8" inputmode="numeric"></label>' +
+    '<label class="field">Amount per one<input id="cf-t-mult" size="6" value="1" inputmode="decimal"></label>' +
+    '<label class="field">of each<input id="cf-t-item" list="itemlist" size="10" placeholder="item # or name" autocomplete="off"></label>' +
+    itemDatalist('itemlist') +
     '<label class="field">Counting<select id="cf-t-src">' +
     Object.keys(SRC_LABEL).map(function (s) { return '<option value="' + s + '">' + SRC_LABEL[s] + '</option>'; }).join('') +
     '</select></label>' +
     '<button class="mini" id="cf-addterm">+ Add to the line</button>' +
-    '</div><div class="formgrid">' +
-    '<button class="btn primary" id="cf-save">Save line</button>' +
-    '<button class="mini" id="cf-cancel">Cancel</button>' +
+    '</div>' +
+    '<p class="hint" id="cf-pick">Start typing a number or a name; the list shows every item the tool knows about.</p>' +
+    '<div id="cf-warn"></div>' +
+    '<div id="cf-preview">' + calcPreview(row, ctx) + '</div>' +
+    '<div class="formgrid">' +
+    '<button class="btn primary" id="cf-save">' + (isNew ? 'Add this line' : 'Done') + '</button>' +
+    (isNew ? '<button class="mini" id="cf-cancel">Cancel</button>' : '') +
     (!isNew ? '<button class="mini danger" id="cf-delete">Delete this line</button>' : '') +
-    '</div><p class="msg" id="cf-msg"></p></div>';
+    '</div>' +
+    (!isNew ? '<p class="autonote">Changes save as you make them, including adding and removing counts. Done just closes the editor.</p>' : '') +
+    '<p class="msg" id="cf-msg"></p></div>';
   return h;
 }
 var draftTerms = null; /* live term list while the calc editor is open */
 function renderWiring(ctx) {
-  var h = '<div class="card"><h3>Linked amounts</h3>' +
+  var h = explainer() +
+    '<div class="card"><h3>Recipe amounts</h3>' +
     '<p class="help">Bread pulls, chicken weights, prep amounts and bulk fruit all follow the orders through these lines. ' +
-    'Live value shows what each line makes of the currently pasted orders, so you can check your change immediately. ' +
-    'Most kitchens touch this once a year, when a recipe or pack size changes.</p></div>';
-  if (editingCalc !== null) h += calcEditor(editingCalc);
+    'Every line reads the same way: <b>this much per one ordered</b>, added up across the items that use it, divided by pack size, rounded. ' +
+    'Live value shows what each line makes of the orders loaded right now, so you can check a change immediately. ' +
+    'Most kitchens touch this once a year, when a recipe or pack size changes.</p>' +
+    (ctx ? '' : '<p class="msg">No orders loaded, so every live value reads a dot. Paste a day on the sheets page to see these work.</p>') +
+    '</div>';
+  if (editingCalc !== null) h += calcEditor(editingCalc, ctx);
   Object.keys(SLOT_LABEL).forEach(function (slot) {
-    h += '<div class="card"><h3>' + esc(SLOT_LABEL[slot]) + '</h3><table class="t"><thead><tr><th>Line</th><th>Recipe (what it adds up)</th><th class="num">Live value</th><th></th></tr></thead><tbody>';
+    h += '<div class="card"><h3>' + esc(SLOT_LABEL[slot]) + '</h3><table class="t"><thead><tr><th>Line</th><th>How it is worked out</th><th class="num">Live value</th><th></th></tr></thead><tbody>';
     config.calcs.forEach(function (row, i) {
       if (row.slot !== slot) return;
-      var formula = row.terms.map(function (t) { return (t.mult === 1 ? '' : t.mult + ' × ') + t.item + ' ' + t.src; }).join('  +  ') +
-        (Number(row.per) > 1 ? '  ÷ ' + row.per : '');
+      var formula = row.terms.map(function (t) {
+        return '<div><b>' + esc(String(t.mult)) + '</b> per ' +
+          '<span' + (itemKnown(t.item) ? '' : ' class="unk"') + '>' + esc(itemLabel(t.item)) + '</span> ' +
+          '<span class="sep">' + esc(t.item) + ' · ' + esc(SRC_SHORT[t.src] || t.src) + '</span></div>';
+      }).join('') +
+        (Number(row.per) > 1 ? '<div class="sep">then divided by ' + esc(String(row.per)) + '</div>' : '') +
+        '<div class="sep">' + esc(ROUND_WORDS[row.round] || row.round) + '</div>';
       h += '<tr><td>' + (row.sec ? '<span class="mono">' + esc(row.sec) + '</span> ' : '') + esc(row.label) + (row.unit ? ' <span class="mono">(' + esc(row.unit) + ')</span>' : '') + '</td>' +
-        '<td class="mono">' + esc(formula) + '</td>' +
+        '<td class="fx">' + formula + '</td>' +
         '<td class="num big">' + (ctx ? fmt(calcVal(ctx, row)) : '·') + '</td>' +
         '<td><button class="mini" data-editcalc="' + i + '">Edit</button></td></tr>';
     });
@@ -1000,36 +1308,78 @@ function renderSetup() {
   var locRows = Object.keys(config.locations).sort(function (a, b) { return +a - +b; }).map(function (code) {
     return '<tr><td class="num mono">' + esc(code) + '</td><td><input data-locname="' + esc(code) + '" value="' + esc(config.locations[code]) + '" size="22" style="border:1px solid var(--rule);border-radius:6px;padding:4px 8px;background:var(--paper);"></td></tr>';
   }).join('');
-  return '<div class="card"><h3>Trays</h3>' +
+  return explainer() + '<div class="card"><h3>Trays</h3>' +
     '<p class="help">How many pieces fit on one packout tray. Trays per cafe are rounded up from these.</p>' +
     '<div class="formgrid">' +
     ['salad', 'sand', 'wrap', 'fruit'].map(function (g) {
       return '<label class="field">' + g + '<input data-tray="' + g + '" value="' + config.trays[g] + '" size="5" inputmode="numeric"></label>';
     }).join('') +
-    '<button class="mini" id="su-trays">Save trays</button></div><p class="msg" id="su-traymsg"></p></div>' +
+    '</div><p class="msg" id="su-traymsg"></p><p class="autonote">Saves as you type.</p></div>' +
     '<div class="card"><h3>Packout route order</h3>' +
     '<p class="help">Cafes appear on the Packout sheet in this order (location codes, comma separated). A cafe that orders but is not listed still shows up, added at the end.</p>' +
     '<div class="formgrid"><input id="su-route" value="' + esc(config.route.join(', ')) + '" style="flex:1;min-width:280px;border:1.5px solid var(--rule);border-radius:7px;padding:8px 10px;background:var(--paper);">' +
-    '<button class="mini" id="su-routesave">Save route</button></div><p class="msg" id="su-routemsg"></p></div>' +
+    '</div><p class="msg" id="su-routemsg"></p><p class="autonote">Saves when you click away from the box.</p></div>' +
     '<div class="card"><h3>Location names</h3>' +
     '<p class="help">Names shown on the Packout sheet. To add a new location, use the row at the bottom. The four dining commons (' + esc(config.dcLocs.join(', ')) + ') are treated as DCs: their orders never count as cafe orders.</p>' +
     '<table class="t" style="max-width:460px;"><thead><tr><th class="num">Code</th><th>Name</th></tr></thead><tbody>' + locRows +
-    '<tr><td class="num"><input id="su-newcode" size="4" placeholder="99" style="border:1px solid var(--rule);border-radius:6px;padding:4px 8px;background:var(--paper);"></td>' +
-    '<td><input id="su-newname" size="22" placeholder="New cafe name" style="border:1px solid var(--rule);border-radius:6px;padding:4px 8px;background:var(--paper);"></td></tr>' +
-    '</tbody></table>' +
-    '<div class="formgrid"><button class="mini" id="su-locsave">Save locations</button></div><p class="msg" id="su-locmsg"></p></div>';
+    '</tbody></table><p class="autonote">Renaming saves as you type.</p>' +
+    '<div class="formgrid" style="margin-top:12px;">' +
+    '<label class="field">New code<input id="su-newcode" size="4" placeholder="99" inputmode="numeric"></label>' +
+    '<label class="field">New name<input id="su-newname" size="22" placeholder="New cafe name"></label>' +
+    '<button class="mini" id="su-locadd">+ Add location</button></div><p class="msg" id="su-locmsg"></p></div>';
 }
 
+var historyRows = null;   /* null = not fetched yet this visit */
+function renderHistory() {
+  var h = '<div class="card"><h3>Version history</h3>' +
+    '<p class="help">Every save is kept. Putting an old version back does not delete anything, it publishes a copy of it as the new current version, ' +
+    'so the record of what the kitchen ran stays complete.</p>';
+  if (cloudState === 'offline') {
+    return h + '<p class="msg">No connection, so the history cannot be loaded right now.</p></div>';
+  }
+  if (historyRows === null) {
+    return h + '<div class="formgrid"><button class="mini" id="hs-load">Show version history</button></div><p class="msg" id="hs-msg"></p></div>';
+  }
+  if (!historyRows.length) {
+    return h + '<p class="msg">No versions saved yet. The first change you make becomes version 1.</p></div>';
+  }
+  h += '<table class="t"><thead><tr><th class="num">Version</th><th>Saved</th><th class="num">Items</th><th class="num">Recipe lines</th><th></th></tr></thead><tbody>';
+  historyRows.forEach(function (r) {
+    var d = new Date(r.created_at);
+    var when = (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear() + ' ' +
+      d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    var live = r.id === cloudVersion;
+    h += '<tr><td class="num mono">' + esc(String(r.id)) + '</td>' +
+      '<td>' + esc(when) + (r.note ? ' <span class="mono">' + esc(r.note) + '</span>' : '') + '</td>' +
+      '<td class="num">' + esc(String(r.items)) + '</td><td class="num">' + esc(String(r.calcs)) + '</td>' +
+      '<td>' + (live ? '<b>in use now</b>' : '<button class="mini" data-restore="' + esc(String(r.id)) + '">Put this back</button>') + '</td></tr>';
+  });
+  return h + '</tbody></table><p class="msg" id="hs-msg"></p></div>';
+}
 function renderBackup() {
-  return '<div class="card"><h3>Backup and restore</h3>' +
-    '<p class="help">Menu changes save in THIS browser only (nothing uploads). Export a settings file after big changes and keep it somewhere safe; ' +
-    'import it on a new computer to carry the menu over.</p>' +
+  var stale = updateWaiting();
+  return explainer() +
+    '<div class="card"><h3>Backup and restore</h3>' +
+    '<p class="help">The menu is stored on the server and shared by every device, and every save is kept as a version you can put back. ' +
+    'An exported file is a second copy you hold yourself, worth taking before a big change. Last export from this browser: <b>' + esc(lastExportWords()) + '</b>.</p>' +
     '<div class="formgrid">' +
     '<button class="btn" id="bk-export">Export settings file</button>' +
     '<label class="btn" style="cursor:pointer;">Import settings file<input type="file" id="bk-import" accept=".json" style="display:none;"></label>' +
     '</div><p class="msg" id="bk-msg"></p></div>' +
+    renderHistory() +
+    '<div class="card"><h3>Tool version</h3>' +
+    '<p class="help">This tool ships with build ' + esc(String(DEFAULT_CONFIG.build)) + '. ' +
+    (savedBuild === null
+      ? 'Nothing is saved in this browser, so you are on the shipped menu and updates arrive on their own.'
+      : 'The menu saved in this browser is based on build ' + esc(String(savedBuild)) + '.' +
+        (stale ? ' <b>A newer menu shipped with the tool and is not in use here.</b>' : ' That is current.')) +
+    '</p>' +
+    (stale ? '<div class="formgrid"><button class="mini" id="bk-takenew">Export mine, then take the update</button>' +
+      '<button class="mini" id="bk-keepmine">Keep mine, stop asking</button></div>' : '') +
+    '</div>' +
     '<div class="card"><h3>Start over</h3>' +
-    '<p class="help">Puts the menu back to the built-in version this tool shipped with (the one checked against the 2026 workbook). Every change made on this computer is cleared.</p>' +
+    '<p class="help">Puts the menu back to the built-in version this tool shipped with (the one checked against the master workbook), and publishes that to every device. ' +
+    'The versions above are kept, so this can be undone by putting an earlier one back.</p>' +
     '<div class="formgrid"><button class="mini danger" id="bk-reset">Reset menu to factory version</button></div></div>' +
     '<div class="card"><h3>Lock</h3>' +
     '<div class="formgrid"><button class="mini" id="bk-lock">Lock Menu setup (sign out)</button></div></div>';
@@ -1037,9 +1387,10 @@ function renderBackup() {
 
 function renderSettings() {
   var ctx = data.rows.length ? makeCtx(indexOrders(data.rows)) : null;
-  var nav = [['menu', 'Menu'], ['wiring', 'Linked amounts'], ['setup', 'Locations & trays'], ['backup', 'Backup']];
+  var nav = [['menu', 'Menu items'], ['wiring', 'Recipe amounts'], ['setup', 'Locations & trays'], ['backup', 'Backup & version']];
   var h = '<div class="sheet-head"><h2 class="sheet-title">Menu setup</h2>' +
-    '<button class="quiet" id="set-close">Close, back to the sheets</button></div>' +
+    '<div class="sheet-headr"><span class="savebar" id="savebar"></span>' +
+    '<button class="quiet" id="set-close">Close, back to the sheets</button></div></div>' +
     '<div class="set-nav">' + nav.map(function (n) {
       return '<button class="tab' + (setTab === n[0] ? ' active' : '') + '" data-setnav="' + n[0] + '">' + n[1] + '</button>';
     }).join('') + '</div>';
@@ -1116,6 +1467,38 @@ function updateDayChip() {
     : 'No orders yet';
 }
 
+/* A menu saved before the current build shadows anything shipped since.
+   Say so where it cannot be missed, rather than letting a fixed formula
+   sit unused behind a stale localStorage copy. */
+function renderNotice() {
+  var el = $('notice');
+  if (!updateWaiting()) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div class="notice"><div class="grow">' +
+    '<strong>This tool shipped an updated menu.</strong>' +
+    'The menu saved in this browser was set up on an older version, so anything corrected since is not being used here. ' +
+    'Nothing was changed for you. A manager can take the update, or keep this menu, under Backup &amp; version.' +
+    '</div><button class="mini" id="nt-open">Open Menu setup</button></div>';
+  $('nt-open').addEventListener('click', function () {
+    setTab = 'backup';
+    view = isUnlocked() ? 'settings' : 'login';
+    render();
+    window.scrollTo(0, 0);
+  });
+}
+
+/* Where the menu on screen came from. Worth stating plainly: a kitchen
+   running yesterday's cached menu should be able to tell. */
+function renderCloudLine() {
+  var el = $('cloudline');
+  if (!el) return;
+  var base = 'Worcester central kitchen production planner. ';
+  if (cloudState === 'checking') el.textContent = base + 'Checking for the shared menu...';
+  else if (cloudState === 'synced') el.textContent = base + 'Using the shared menu, version ' + cloudVersion + '. Orders you paste stay in this browser.';
+  else if (cloudState === 'offline') el.textContent = base + 'No connection, using the last shared menu saved on this computer. Sheets still work.';
+  else if (cloudState === 'error') el.textContent = base + 'The last change did not reach the shared menu.';
+  else el.textContent = base + 'No shared menu published yet, using the menu this tool shipped with.';
+}
+
 function renderInputZone() {
   var zone = $('inputzone');
   if (view !== 'sheets') { zone.innerHTML = ''; return; }
@@ -1178,7 +1561,11 @@ function renderTabs() {
 }
 
 function render() {
+  /* One index per render, so every name lookup in Menu setup can use it. */
+  orderIdx = data.rows.length ? indexOrders(data.rows) : {};
   updateDayChip();
+  renderCloudLine();
+  renderNotice();
   renderInputZone();
   renderTabs();
   var out = $('out');
@@ -1261,16 +1648,20 @@ $('gear').addEventListener('click', function () {
   render(); window.scrollTo(0, 0);
 });
 function bindLoginEvents() {
+  var busy = false;
   var attempt = function () {
-    checkLogin($('li-id').value, $('li-pass').value).then(function (ok) {
-      if (ok) { setUnlocked(true); view = 'settings'; render(); }
-      else $('li-msg').textContent = (window.crypto && crypto.subtle) ? 'Wrong ID or password.' : 'This browser needs a secure (https) connection to sign in.';
+    if (busy) return;
+    busy = true;
+    $('li-msg').textContent = 'Checking...';
+    $('li-msg').className = 'msg';
+    checkLogin($('li-pass').value).then(function (res) {
+      busy = false;
+      if (res.ok) { view = 'settings'; render(); return; }
+      $('li-msg').textContent = res.msg;
     });
   };
   $('li-go').addEventListener('click', attempt);
-  ['li-id', 'li-pass'].forEach(function (id) {
-    $(id).addEventListener('keydown', function (e) { if (e.key === 'Enter') attempt(); });
-  });
+  $('li-pass').addEventListener('keydown', function (e) { if (e.key === 'Enter') attempt(); });
   $('li-back').addEventListener('click', function () { view = 'sheets'; render(); });
 }
 
@@ -1287,45 +1678,68 @@ function bindSettingsEvents() {
   Array.prototype.forEach.call(out.querySelectorAll('[data-toggle]'), function (cb) {
     cb.addEventListener('change', function () {
       config.items[+cb.dataset.toggle].on = cb.checked;
-      saveConfig(); render();
+      saveRenderFlash();
     });
   });
   Array.prototype.forEach.call(out.querySelectorAll('[data-edit]'), function (b) {
     b.addEventListener('click', function () { editingItem = +b.dataset.edit; pendingAdd = null; render(); });
   });
   if ($('if-save')) {
-    $('if-save').addEventListener('click', function () {
+    /* One reader for the form, used by the autosave on every field and by
+       the Add button. Returns the record or the reason it is not valid. */
+    var readItem = function () {
       var id = normItem(($('if-id').value || '').trim());
       var name = ($('if-name').value || '').trim();
       var sheet = $('if-sheet').value;
-      var msg = $('if-msg');
-      if (!/^\d{2,6}$/.test(id)) { msg.textContent = 'Item # must be 2 to 6 digits.'; return; }
-      if (!name) { msg.textContent = 'Give the item a name.'; return; }
+      if (!/^\d{2,6}$/.test(id)) return { err: 'Item # must be 2 to 6 digits.' };
+      if (!name) return { err: 'Give the item a name.' };
       if (editingItem === -1 && config.items.some(function (i) { return i.id === id && i.sheet === sheet; })) {
-        msg.textContent = 'Item ' + id + ' is already on that sheet.'; return;
+        return { err: 'Item ' + id + ' is already on that sheet.' };
       }
       var stkList = $('if-stklist').value;
       var stkSrcBySheet = { dc: 'dc', retail: 'rt', triple: 'pkg', fruit: 'tot' };
-      var rec = {
+      return { rec: {
         id: id, name: name, recipe: ($('if-recipe').value || '').trim(), sheet: sheet,
         sec: ($('if-sec').value || '').trim().toUpperCase(), on: true,
         pack: $('if-pack').value,
         pkLabel: ($('if-pklabel').value || '').trim() || name.slice(0, 12),
-        pkOrd: editingItem === -1 ? 900 : (config.items[editingItem].pkOrd || 900),
+        pkOrd: (function () { var n = parseInt($('if-pkord').value, 10); return n > 0 ? n : 900; })(),
         stk: stkList ? { list: stkList, label: (($('if-stklabel').value || '').trim()) || name, src: stkSrcBySheet[sheet] } : null
-      };
-      if (editingItem === -1) config.items.push(rec);
-      else { rec.on = config.items[editingItem].on; config.items[editingItem] = rec; }
-      saveConfig();
+      } };
+    };
+    /* Editing something that already exists: commit on every keystroke.
+       A half-typed name is not written, it just says so and waits. */
+    var commitItem = function () {
+      var r = readItem();
+      var msg = $('if-msg');
+      if (r.err) { msg.textContent = r.err; msg.className = 'msg'; flashSaved('Not saved', true); return; }
+      msg.textContent = '';
+      r.rec.on = config.items[editingItem].on;
+      config.items[editingItem] = r.rec;
+      autosave();
+    };
+    if (editingItem !== -1) {
+      ['if-name', 'if-recipe', 'if-sheet', 'if-sec', 'if-pack', 'if-pklabel', 'if-pkord', 'if-stklist', 'if-stklabel'].forEach(function (id) {
+        var el = $(id);
+        if (!el) return;
+        el.addEventListener('input', commitItem);
+        el.addEventListener('change', commitItem);
+      });
+    }
+    $('if-save').addEventListener('click', function () {
+      if (editingItem !== -1) { editingItem = null; pendingAdd = null; render(); return; }
+      var r = readItem();
+      if (r.err) { $('if-msg').textContent = r.err; return; }
+      config.items.push(r.rec);
       editingItem = null; pendingAdd = null;
-      render();
+      saveRenderFlash('Added');
     });
-    $('if-cancel').addEventListener('click', function () { editingItem = null; pendingAdd = null; render(); });
+    if ($('if-cancel')) $('if-cancel').addEventListener('click', function () { editingItem = null; pendingAdd = null; render(); });
     var del = $('if-delete');
     if (del) del.addEventListener('click', function () {
-      if (window.confirm('Delete this item from the menu? If it is still ordered, the CHECK tab will flag it.')) {
+      if (window.confirm('Delete this item from the menu?\n\nIf it is still ordered, the CHECK tab will flag it. There is no undo.\nLast export from this browser: ' + lastExportWords())) {
         config.items.splice(editingItem, 1);
-        saveConfig(); editingItem = null; render();
+        editingItem = null; saveRenderFlash('Deleted');
       }
     });
   }
@@ -1346,100 +1760,163 @@ function bindSettingsEvents() {
     });
   });
   if ($('cf-save')) {
-    var refreshChips = function () {
-      $('cf-terms').innerHTML = draftTerms.map(function (t, ti) {
-        return '<span class="term">' + esc(String(t.mult)) + ' × ' + esc(t.item) + ' · ' + esc(SRC_LABEL[t.src] || t.src) +
-          '<button data-dt="' + ti + '" title="Remove">✕</button></span>';
-      }).join('');
-      Array.prototype.forEach.call($('cf-terms').querySelectorAll('[data-dt]'), function (x) {
-        x.addEventListener('click', function () { draftTerms.splice(+x.dataset.dt, 1); refreshChips(); });
-      });
+    var pvCtx = data.rows.length ? makeCtx(indexOrders(data.rows)) : null;
+    /* The line as the form currently reads it, so the preview can answer
+       "what does this factor actually do" before anything is saved. */
+    var draftRow = function () {
+      return {
+        label: ($('cf-label').value || '').trim(),
+        unit: ($('cf-unit').value || '').trim(),
+        round: $('cf-round').value,
+        per: parseFloat($('cf-per').value) || 1,
+        terms: draftTerms
+      };
     };
-    refreshChips();
-    $('cf-addterm').addEventListener('click', function () {
-      var item = normItem(($('cf-t-item').value || '').trim());
-      var mult = parseFloat($('cf-t-mult').value);
-      if (!/^\d{2,6}$/.test(item)) { $('cf-msg').textContent = 'Item # must be 2 to 6 digits.'; return; }
-      if (!(mult > 0)) { $('cf-msg').textContent = 'Factor must be a number above 0.'; return; }
-      draftTerms.push({ item: item, src: $('cf-t-src').value, mult: mult });
-      $('cf-msg').textContent = '';
-      $('cf-t-item').value = '';
-      refreshChips();
-    });
-    $('cf-save').addEventListener('click', function () {
+    var refreshPreview = function () {
+      $('cf-preview').innerHTML = calcPreview(draftRow(), pvCtx);
+      var w = termWarnings(draftTerms);
+      $('cf-warn').innerHTML = w.map(function (s) { return '<p class="warnline">' + esc(s) + '</p>'; }).join('');
+    };
+    var cfIsNew = typeof editingCalc === 'string';
+    /* Same rule as the item form: an existing line commits on every change,
+       a brand new one has nothing to commit until it is added. */
+    var readCalc = function () {
       var label = ($('cf-label').value || '').trim();
-      var per = parseFloat($('cf-per').value) || 1;
-      if (!label) { $('cf-msg').textContent = 'Give the line a name.'; return; }
-      if (!draftTerms.length) { $('cf-msg').textContent = 'Add at least one item to the line.'; return; }
-      var isNew = typeof editingCalc === 'string';
-      var row = {
-        slot: isNew ? editingCalc.split(':')[1] : config.calcs[editingCalc].slot,
-        sec: $('cf-sec') ? ($('cf-sec').value || '').trim().toUpperCase() : (isNew ? '' : config.calcs[editingCalc].sec || ''),
+      if (!label) return { err: 'Give the line a name.' };
+      if (!draftTerms.length) return { err: 'Add at least one count to the line.' };
+      return { rec: {
+        slot: cfIsNew ? editingCalc.split(':')[1] : config.calcs[editingCalc].slot,
+        sec: $('cf-sec') ? ($('cf-sec').value || '').trim().toUpperCase() : (cfIsNew ? '' : config.calcs[editingCalc].sec || ''),
         label: label,
         unit: ($('cf-unit').value || '').trim(),
         round: $('cf-round').value,
-        per: per,
+        per: parseFloat($('cf-per').value) || 1,
         note: ($('cf-note').value || '').trim(),
         terms: draftTerms
-      };
-      if (isNew) config.calcs.push(row); else config.calcs[editingCalc] = row;
-      saveConfig(); editingCalc = null; draftTerms = null; render();
+      } };
+    };
+    var commitCalc = function () {
+      if (cfIsNew) return;
+      var r = readCalc();
+      var msg = $('cf-msg');
+      if (r.err) { msg.textContent = r.err; msg.className = 'msg'; flashSaved('Not saved', true); return; }
+      msg.textContent = '';
+      config.calcs[editingCalc] = r.rec;
+      autosave();
+    };
+    var refreshChips = function (commit) {
+      $('cf-terms').innerHTML = termChips(draftTerms);
+      Array.prototype.forEach.call($('cf-terms').querySelectorAll('[data-dt]'), function (x) {
+        x.addEventListener('click', function () { draftTerms.splice(+x.dataset.dt, 1); refreshChips(true); });
+      });
+      refreshPreview();
+      if (commit) commitCalc();
+    };
+    refreshChips(false);
+    ['cf-label', 'cf-per', 'cf-round', 'cf-unit', 'cf-note', 'cf-sec'].forEach(function (id) {
+      var el = $(id);
+      if (!el) return;
+      el.addEventListener('input', function () { refreshPreview(); commitCalc(); });
+      el.addEventListener('change', function () { refreshPreview(); commitCalc(); });
     });
-    $('cf-cancel').addEventListener('click', function () { editingCalc = null; draftTerms = null; render(); });
+    /* Typing a number shows what it is before the term is even added. */
+    var echoPick = function () {
+      var v = normItem(($('cf-t-item').value || '').trim());
+      $('cf-pick').innerHTML = /^\d{2,6}$/.test(v)
+        ? 'Item ' + esc(v) + ' is <b>' + esc(itemLabel(v)) + '</b>'
+        : 'Start typing a number or a name; the list shows every item the tool knows about.';
+    };
+    $('cf-t-item').addEventListener('input', echoPick);
+    $('cf-t-item').addEventListener('change', echoPick);
+    $('cf-addterm').addEventListener('click', function () {
+      var raw = ($('cf-t-item').value || '').trim();
+      /* The picker shows names, so accept a name the manager clicked too. */
+      if (!/^\d/.test(raw)) {
+        var hit = itemChoices().filter(function (c) { return c[1].toLowerCase() === raw.toLowerCase(); });
+        if (hit.length) raw = hit[0][0];
+      }
+      var item = normItem(raw);
+      var mult = parseFloat($('cf-t-mult').value);
+      if (!/^\d{2,6}$/.test(item)) { $('cf-msg').textContent = 'Pick an item, or type its number (2 to 6 digits).'; return; }
+      if (!(mult > 0)) { $('cf-msg').textContent = 'Amount per one must be a number above 0.'; return; }
+      draftTerms.push({ item: item, src: $('cf-t-src').value, mult: mult });
+      $('cf-msg').textContent = '';
+      $('cf-t-item').value = '';
+      echoPick();
+      refreshChips(true);
+    });
+    $('cf-save').addEventListener('click', function () {
+      if (!cfIsNew) { editingCalc = null; draftTerms = null; render(); return; }
+      var r = readCalc();
+      if (r.err) { $('cf-msg').textContent = r.err; return; }
+      config.calcs.push(r.rec);
+      editingCalc = null; draftTerms = null; saveRenderFlash('Added');
+    });
+    if ($('cf-cancel')) $('cf-cancel').addEventListener('click', function () { editingCalc = null; draftTerms = null; render(); });
     var cdel = $('cf-delete');
     if (cdel) cdel.addEventListener('click', function () {
       if (window.confirm('Delete this line? The sheet loses it immediately.')) {
         config.calcs.splice(editingCalc, 1);
-        saveConfig(); editingCalc = null; draftTerms = null; render();
+        editingCalc = null; draftTerms = null; saveRenderFlash('Deleted');
       }
     });
   }
 
-  /* setup */
-  var trays = $('su-trays');
-  if (trays) trays.addEventListener('click', function () {
-    var ok = true;
-    Array.prototype.forEach.call(out.querySelectorAll('[data-tray]'), function (inp) {
+  /* setup: every field here writes the moment it changes */
+  Array.prototype.forEach.call(out.querySelectorAll('[data-tray]'), function (inp) {
+    inp.addEventListener('input', function () {
       var v = parseInt(inp.value, 10);
-      if (v > 0) config.trays[inp.dataset.tray] = v; else ok = false;
+      var m = $('su-traymsg');
+      if (!(v > 0)) { m.textContent = 'Tray sizes must be a whole number above 0. Not saved.'; m.className = 'msg'; flashSaved('Not saved', true); return; }
+      config.trays[inp.dataset.tray] = v;
+      m.textContent = ''; m.className = 'msg';
+      autosave();
     });
-    saveConfig();
-    $('su-traymsg').textContent = ok ? 'Saved.' : 'Tray sizes must be whole numbers above 0; bad ones were skipped.';
-    $('su-traymsg').className = ok ? 'msg good' : 'msg';
   });
-  var route = $('su-routesave');
-  if (route) route.addEventListener('click', function () {
-    var codes = ($('su-route').value || '').split(',').map(function (s) { return s.trim(); }).filter(function (s) { return /^\d{1,3}$/.test(s); })
+  var route = $('su-route');
+  if (route) route.addEventListener('change', function () {
+    var codes = (route.value || '').split(',').map(function (s) { return s.trim(); }).filter(function (s) { return /^\d{1,3}$/.test(s); })
       .map(function (s) { return s.replace(/^0+(?=\d)/, '').padStart(2, '0'); });
-    if (!codes.length) { $('su-routemsg').textContent = 'No valid codes found.'; return; }
+    var m = $('su-routemsg');
+    if (!codes.length) { m.textContent = 'No valid codes found. Not saved.'; m.className = 'msg'; flashSaved('Not saved', true); return; }
     config.route = codes;
-    saveConfig();
-    $('su-routemsg').textContent = 'Saved: ' + codes.length + ' stops.';
-    $('su-routemsg').className = 'msg good';
+    m.textContent = codes.length + ' stops.'; m.className = 'msg good';
+    autosave();
   });
-  var locsave = $('su-locsave');
-  if (locsave) locsave.addEventListener('click', function () {
-    Array.prototype.forEach.call(out.querySelectorAll('[data-locname]'), function (inp) {
+  Array.prototype.forEach.call(out.querySelectorAll('[data-locname]'), function (inp) {
+    inp.addEventListener('input', function () {
       var v = inp.value.trim();
-      if (v) config.locations[inp.dataset.locname] = v;
+      if (!v) { flashSaved('Name cannot be blank', true); return; }
+      config.locations[inp.dataset.locname] = v;
+      autosave();
     });
+  });
+  var locadd = $('su-locadd');
+  if (locadd) locadd.addEventListener('click', function () {
     var nc = ($('su-newcode').value || '').trim(), nn = ($('su-newname').value || '').trim();
-    if (nc && nn && /^\d{1,3}$/.test(nc)) config.locations[nc.replace(/^0+(?=\d)/, '').padStart(2, '0')] = nn;
-    saveConfig();
-    $('su-locmsg').textContent = 'Saved.';
-    $('su-locmsg').className = 'msg good';
-    render();
+    var m = $('su-locmsg');
+    if (!/^\d{1,3}$/.test(nc)) { m.textContent = 'Code must be 1 to 3 digits.'; m.className = 'msg'; return; }
+    if (!nn) { m.textContent = 'Give the location a name.'; m.className = 'msg'; return; }
+    config.locations[nc.replace(/^0+(?=\d)/, '').padStart(2, '0')] = nn;
+    saveRenderFlash('Added');
   });
 
   /* backup */
   var exp = $('bk-export');
-  if (exp) exp.addEventListener('click', function () {
-    var blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'cpk-menu-settings.json';
-    a.click();
-    setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
+  if (exp) exp.addEventListener('click', function () { downloadConfig('cpk-menu-settings.json'); render(); });
+  var takenew = $('bk-takenew');
+  if (takenew) takenew.addEventListener('click', function () {
+    if (!window.confirm('Download a copy of your current menu, then replace it with the newer one that shipped with the tool?')) return;
+    downloadConfig('cpk-menu-backup-before-update.json');
+    resetConfig();
+    historyRows = null;
+    saveRenderFlash('Updated');
+  });
+  var keepmine = $('bk-keepmine');
+  if (keepmine) keepmine.addEventListener('click', function () {
+    config.build = DEFAULT_CONFIG.build;
+    historyRows = null;
+    saveRenderFlash();
   });
   var imp = $('bk-import');
   if (imp) imp.addEventListener('change', function (e) {
@@ -1449,12 +1926,12 @@ function bindSettingsEvents() {
     reader.onload = function () {
       try {
         var c = JSON.parse(String(reader.result));
-        if (!(c && c.v === 1 && Array.isArray(c.items) && Array.isArray(c.calcs))) throw new Error('shape');
+        if (!validConfig(c)) throw new Error('shape');
         config = c;
-        saveConfig();
-        $('bk-msg').textContent = 'Imported: ' + c.items.length + ' items, ' + c.calcs.length + ' linked lines.';
+        historyRows = null;
+        saveRenderFlash('Imported');
+        $('bk-msg').textContent = 'Imported ' + c.items.length + ' items and ' + c.calcs.length + ' recipe lines, and published to every device.';
         $('bk-msg').className = 'msg good';
-        render();
       } catch (err) {
         $('bk-msg').textContent = 'That file is not a CPK settings file.';
         $('bk-msg').className = 'msg';
@@ -1463,18 +1940,53 @@ function bindSettingsEvents() {
     reader.readAsText(f);
     e.target.value = '';
   });
+  var hsload = $('hs-load');
+  if (hsload) hsload.addEventListener('click', function () {
+    $('hs-msg').textContent = 'Loading...';
+    cloudFn({ action: 'history', password: managerPassword }).then(function (res) {
+      if (res.body && res.body.ok) { historyRows = res.body.rows; render(); }
+      else { $('hs-msg').textContent = (res.body && res.body.message) || 'Could not load the history.'; }
+    }).catch(function () { $('hs-msg').textContent = 'No connection.'; });
+  });
+  Array.prototype.forEach.call(out.querySelectorAll('[data-restore]'), function (b) {
+    b.addEventListener('click', function () {
+      var id = b.dataset.restore;
+      if (!window.confirm('Put version ' + id + ' back?\n\nIt becomes the menu on every device. Nothing is deleted, the current version stays in the history.')) return;
+      $('hs-msg').textContent = 'Restoring...';
+      cloudFn({ action: 'restore', password: managerPassword, id: Number(id) }).then(function (res) {
+        if (res.body && res.body.ok && validConfig(res.body.config)) {
+          config = res.body.config;
+          cloudVersion = res.body.id;
+          savedBuild = Number(config.build) || 0;
+          cloudState = 'synced';
+          writeJSON(CLOUD_CACHE, config);
+          historyRows = null;
+          render();
+          flashSaved('Version ' + id + ' is back');
+        } else {
+          $('hs-msg').textContent = (res.body && res.body.message) || 'Could not restore that version.';
+        }
+      }).catch(function () { $('hs-msg').textContent = 'No connection.'; });
+    });
+  });
+
   var rst = $('bk-reset');
   if (rst) rst.addEventListener('click', function () {
-    if (window.confirm('Reset the whole menu to the factory version? Every change made on this computer is cleared.')) {
-      resetConfig(); render();
+    if (window.confirm('Reset the whole menu to the factory version?\n\nThis publishes the built-in menu to every device. The current version stays in the history, so it can be put back.\nLast export from this browser: ' + lastExportWords())) {
+      resetConfig();
+      historyRows = null;
+      saveRenderFlash('Reset');
     }
   });
   var lock = $('bk-lock');
   if (lock) lock.addEventListener('click', function () { setUnlocked(false); view = 'sheets'; render(); });
 }
 
-/* ---- boot ---- */
+/* ---- boot ----
+   Paint from cache first so the sheets are usable immediately, then ask
+   the server whether a newer shared menu exists. */
 render();
+cloudLoad();
 })();
 </script>
 </body>
