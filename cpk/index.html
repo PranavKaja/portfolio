@@ -280,11 +280,12 @@ function normItem(s) { return String(s).replace(/^0+(?=\d)/, ''); }
    ============================================================ */
 var DEFAULT_CONFIG = {
   v: 1,
-  build: 1,
+  build: 2,
   locations: {
     '01': 'Worcester DC', '02': 'Franklin DC', '03': 'Hampshire', '04': 'Berkshire DC',
     '07': 'Chicken & Co', '08': 'Whitmore', '13': 'Worcester Cafe', '14': 'CC Grill',
     '15': 'Furcolo', '18': 'U Club', '20': 'CC Deli', '21': 'Rec Center', '23': 'Harvest',
+    '25': 'Bluewall - Wasabi',
     '30': 'ISB', '31': 'Herter', '34': 'Catering', '40': "CC People's", '41': 'CC Star Ginger',
     '42': 'Library', '44': 'Morrill', '45': 'Roots', '46': 'Hamp Market', '51': 'CC Peets',
     '52': 'Marcus', '53': 'CC Greenfield', '54': 'OIT', '66': 'Argo', '70': 'Snacks OF',
@@ -327,14 +328,29 @@ var DEFAULT_CONFIG = {
     { id:'9111', name:'Salad Little Leaf & Berry Pecan', recipe:'187600', sheet:'retail', sec:'SALADS', on:true, pack:'salad', pkLabel:'Little Leaf', pkOrd:150, stk:{list:'retail',label:'Salad Little Leaf & Berry Pecan',src:'rt'} },
     { id:'9113', name:'Italian Sandwich New Orleans', recipe:'86002', sheet:'retail', sec:'SALADS', on:true, pack:'sand', pkLabel:'Italian NewO', pkOrd:160, stk:{list:'retail',label:'Italian Sandwich New Orleans',src:'rt'} },
     { id:'301', name:'Driscol Berry Salad', recipe:'181106', sheet:'retail', sec:'SALADS', on:true, pack:'salad', pkLabel:'Berry Sld', pkOrd:40, stk:{list:'retail',label:'Driscol Berry Salad w/ Walnuts + Feta',src:'rt'} },
-    { id:'9212', name:'Cobb Salad', recipe:'186203', sheet:'retail', sec:'SALADS', on:true, pack:'', pkLabel:'', pkOrd:0, stk:null },
+    { id:'9212', name:'Cobb Salad', recipe:'186203', sheet:'retail', sec:'SALADS', on:true, pack:'salad', pkLabel:'Cobb', pkOrd:95, stk:{list:'retail',label:'Cobb Salad',src:'rt'} },
+    /* Ordered by the concessions stops (89 Mullins, 96 Special Events) in the
+       May 2026 recaps and absent from the menu, so they were neither produced
+       nor packed. Added so they are counted and shipped. No bread or prep
+       factors: nobody has given the recipes, and a guessed factor is worse
+       than a visible gap. See the open questions in the career hub log. */
+    { id:'6720', name:'Cheese and Grape Plate', recipe:'', sheet:'retail', sec:'SALADS', on:true, pack:'salad', pkLabel:'Chz+Grape', pkOrd:200, stk:{list:'retail',label:'Cheese and Grape Plate',src:'rt'} },
+    { id:'8191', name:'Sandwich Veg Roasted Hummus', recipe:'', sheet:'retail', sec:'SANDWICHES', on:true, pack:'sand', pkLabel:'Veg Hummus', pkOrd:210, stk:{list:'retail',label:'Sandwich Veg Roasted Hummus',src:'rt'} },
     /* ---- Triple stacks (counted across all locations, x2 packages, x3 sandwiches) ---- */
     { id:'253', name:'Triple Stack PB & J', recipe:'141300', sheet:'triple', sec:'', on:true, pack:'sand', pkLabel:'3 PBJ', pkOrd:10, stk:{list:'retail',label:'Triple Stack PB + J',src:'pkg'} },
     { id:'279', name:'Triple Stack Turkey & Swiss', recipe:'71376', sheet:'triple', sec:'', on:true, pack:'sand', pkLabel:'3 Turk', pkOrd:20, stk:{list:'retail',label:'Turkey, Swiss + Cranberry Aioli Triple',src:'pkg'} },
     { id:'283', name:'Triple Stack Ham & Swiss', recipe:'81181', sheet:'triple', sec:'', on:true, pack:'sand', pkLabel:'3 Ham', pkOrd:30, stk:{list:'retail',label:'Ham + Swiss Triple Stack',src:'pkg'} },
     /* ---- Fruit cups (counted across all locations) ---- */
     { id:'9266', name:'Mixed Fruit Cup (12oz)', recipe:'243004', sheet:'fruit', sec:'', on:true, pack:'fruit', pkLabel:'Fruit', pkOrd:1000, stk:{list:'retail',label:'Mixed Fruit Cup',src:'tot'} },
-    { id:'8637', name:'Grab & Go 8 oz Fruit Cup (DC)', recipe:'243008', sheet:'fruit', sec:'', on:true, pack:'', pkLabel:'', pkOrd:0, stk:{list:'dc',label:'Fruit Cup (8oz)',src:'tot'} }
+    /* Normally a Worcester DC item, but the concessions stops ordered 316 of
+       these across the May 2026 recaps. It was produced (fruit sheet counts
+       every location) and then had no packout column to ship in. */
+    { id:'8637', name:'Grab & Go 8 oz Fruit Cup', recipe:'243008', sheet:'fruit', sec:'', on:true, pack:'fruit', pkLabel:'Fruit 8oz', pkOrd:1010, stk:{list:'dc',label:'Fruit Cup (8oz)',src:'tot'} },
+    /* sheet 'ship' appears on no production sheet on purpose. The pounds to
+       cut are already carried by the Pineapple bulk line, so listing it as a
+       thing to "make" would count the same work twice. It needs a packout
+       column only so the pound actually leaves with the delivery. */
+    { id:'4889', name:'Cut Pineapple (by the pound)', recipe:'', sheet:'ship', sec:'', on:true, pack:'bulk', pkLabel:'Pineapple LB', pkOrd:1100, stk:null }
   ],
   /* Linked amounts. Each row: value = round( sum(mult x count(item)) / per ).
      count source: dc = Worcester DC (loc 01) · rt = cafes (everything except
@@ -364,7 +380,11 @@ var DEFAULT_CONFIG = {
     { slot:'rtchicken', label:'Chicken Caesar (Retail Total)', unit:'LBS', round:'up', per:12, note:'', terms:[{item:'9257',src:'rt',mult:3},{item:'9268',src:'rt',mult:3}] },
     { slot:'tribread', label:'Wheat Bread (LOAF)', unit:'', round:'up', per:7, note:'', terms:[{item:'253',src:'tsSand',mult:1},{item:'279',src:'tsSand',mult:1}] },
     { slot:'tribread', label:'Rye Bread (LOAF)', unit:'', round:'up', per:14, note:'', terms:[{item:'283',src:'tsSand',mult:1}] },
-    { slot:'fruitbulk', label:'Pineapple', unit:'lbs', round:'up5', per:1, note:'1 CS ≈ 9 lbs', terms:[{item:'9266',src:'tot',mult:0.19},{item:'8637',src:'tot',mult:0.12666}] },
+    /* 4889 is cut pineapple ordered straight by the pound (Bluewall, loc 25),
+       not a cup. Same shape as the sliced meats: a direct order adds 1 lb of
+       prep per unit ordered, so it belongs as a term here rather than as a
+       menu item that would be counted as "1 each". */
+    { slot:'fruitbulk', label:'Pineapple', unit:'lbs', round:'up5', per:1, note:'1 CS ≈ 9 lbs; incl. 4889 ordered by the pound', terms:[{item:'4889',src:'tot',mult:1},{item:'9266',src:'tot',mult:0.19},{item:'8637',src:'tot',mult:0.12666}] },
     { slot:'fruitbulk', label:'Honeydew', unit:'lbs', round:'up5', per:1, note:'1 CS ≈ 11 lbs', terms:[{item:'9266',src:'tot',mult:0.19},{item:'8637',src:'tot',mult:0.12666}] },
     { slot:'fruitbulk', label:'Cantaloupe', unit:'lbs', round:'up5', per:1, note:'1 CS ≈ 17 lbs', terms:[{item:'9266',src:'tot',mult:0.19},{item:'8637',src:'tot',mult:0.12666}] },
     { slot:'fruitbulk', label:'Grapes', unit:'lbs', round:'up', per:1, note:'', terms:[{item:'9266',src:'tot',mult:0.0625},{item:'8637',src:'tot',mult:0.04166}] },
@@ -797,7 +817,11 @@ function renderPackout(ctx) {
     { g: 'sand', label: 'SANDWICHES · tray of ' + config.trays.sand },
     { g: 'salad', label: 'SALADS · tray of ' + config.trays.salad },
     { g: 'wrap', label: 'WRAPS · tray of ' + config.trays.wrap },
-    { g: 'fruit', label: 'FRUIT · tray of ' + config.trays.fruit }
+    { g: 'fruit', label: 'FRUIT · tray of ' + config.trays.fruit },
+    /* Goods ordered by weight rather than by the piece. They still have to
+       leave on the truck, so they get a column, but a pound does not occupy
+       a fraction of a tray and must not inflate the tray count. */
+    { g: 'bulk', label: 'BY WEIGHT · no tray' }
   ];
   var all = pkCols();
   var locsAll = packoutLocs(ctx, all);
@@ -847,7 +871,14 @@ function renderPackout(ctx) {
     var acc = 0, cells = '', any = false;
     cols.forEach(function (c, ci) {
       var q = qty[loc][c.it.id];
-      if (q) { any = true; colTot[c.it.id] = (colTot[c.it.id] || 0) + q; acc += q / (config.trays[c.it.pack] || 20); }
+      if (q) {
+        any = true;
+        colTot[c.it.id] = (colTot[c.it.id] || 0) + q;
+        /* No tray size means the item is not trayed (weight goods), so it
+           adds nothing here rather than silently defaulting to a divisor. */
+        var perTray = config.trays[c.it.pack];
+        acc += perTray ? q / perTray : 0;
+      }
       cells += '<td class="num' + (q ? ' q' : ' zero') + (c.gstart ? ' gstart' : '') + '" data-c="' + ci + '">' + (q || '') + '</td>';
     });
     var trays = roundup(acc);
@@ -860,7 +891,8 @@ function renderPackout(ctx) {
   t += '<td class="num tray" data-c="T">' + grand + '</td></tr></tbody></table></div>';
   return head('Packout', 'packout') + t +
     '<p class="hint">Each cell = units to pack for that cafe. Triple stacks count as packages (ordered x2). ' +
-    'Trays per cafe = sandwiches/' + config.trays.sand + ' + salads/' + config.trays.salad + ' + wraps/' + config.trays.wrap + ' + fruit/' + config.trays.fruit + ', rounded up.' +
+    'Trays per cafe = sandwiches/' + config.trays.sand + ' + salads/' + config.trays.salad + ' + wraps/' + config.trays.wrap + ' + fruit/' + config.trays.fruit + ', rounded up. ' +
+    'Anything in the BY WEIGHT group still has to go on the truck but does not count toward trays.' +
     (pkShowEmpty ? ' Grayed rows ship nothing today.' : '') + '</p>' + toggle;
 }
 /* Crosshair highlight on the packout grid: column header lights its column,
@@ -1128,7 +1160,8 @@ function itemForm(it) {
     opt('dc', 'DC Grab & Go (counts Worcester DC orders)', it.sheet) +
     opt('retail', 'Retail Grab & Go (counts cafe orders)', it.sheet) +
     opt('triple', 'Triple stacks (counts every order, x2 packages)', it.sheet) +
-    opt('fruit', 'Fruit cups (counts every order)', it.sheet) + '</select></label>' +
+    opt('fruit', 'Fruit cups (counts every order)', it.sheet) +
+    opt('ship', 'Ships only (no production sheet)', it.sheet) + '</select></label>' +
     '<label class="field">Section on the sheet<input id="if-sec" list="seclist" value="' + esc(it.sec) + '" size="16" placeholder="SANDWICHES"></label>' +
     sectionDatalist() +
     '</div><div class="formgrid">' +
@@ -1137,7 +1170,8 @@ function itemForm(it) {
     opt('sand', 'Sandwich (tray of ' + config.trays.sand + ')', it.pack) +
     opt('salad', 'Salad (tray of ' + config.trays.salad + ')', it.pack) +
     opt('wrap', 'Wrap (tray of ' + config.trays.wrap + ')', it.pack) +
-    opt('fruit', 'Fruit (tray of ' + config.trays.fruit + ')', it.pack) + '</select></label>' +
+    opt('fruit', 'Fruit (tray of ' + config.trays.fruit + ')', it.pack) +
+    opt('bulk', 'By weight (ships, but does not use a tray)', it.pack) + '</select></label>' +
     '<label class="field">Packout column header<input id="if-pklabel" value="' + esc(it.pkLabel) + '" size="12"></label>' +
     '<label class="field">Packout column position<input id="if-pkord" value="' + esc(String(it.pkOrd || 900)) + '" size="6" inputmode="numeric"></label>' +
     '<label class="field">Sticker<select id="if-stklist">' +
@@ -1164,7 +1198,7 @@ function renderMenuSettings() {
     'New items start counting from the pasted orders right away. If an ordered item is missing here, the CHECK tab flags it.</p>' +
     '<div class="formgrid"><button class="btn" id="mi-add">+ Add an item</button></div></div>';
   if (editingItem !== null) h += itemForm(editingItem === -1 ? (pendingAdd ? { id: pendingAdd.id, name: pendingAdd.name, recipe: '', sheet: 'retail', sec: 'SANDWICHES', on: true, pack: 'sand', pkLabel: '', pkOrd: 900, stk: { list: 'retail', label: '', src: 'rt' } } : null) : config.items[editingItem]);
-  var groups = [['dc', 'DC Grab & Go'], ['retail', 'Retail Grab & Go'], ['triple', 'Triple stacks'], ['fruit', 'Fruit cups']];
+  var groups = [['dc', 'DC Grab & Go'], ['retail', 'Retail Grab & Go'], ['triple', 'Triple stacks'], ['fruit', 'Fruit cups'], ['ship', 'Ships only (no production sheet)']];
   groups.forEach(function (g) {
     h += '<div class="card"><h3>' + g[1] + '</h3><table class="t"><thead><tr><th>Make</th><th>Item</th><th class="num">Item #</th><th class="num">Recipe</th><th>Packout</th><th>Sticker</th><th></th></tr></thead><tbody>';
     config.items.forEach(function (it, i) {
@@ -1708,7 +1742,7 @@ function bindSettingsEvents() {
         return { err: 'Item ' + id + ' is already on that sheet.' };
       }
       var stkList = $('if-stklist').value;
-      var stkSrcBySheet = { dc: 'dc', retail: 'rt', triple: 'pkg', fruit: 'tot' };
+      var stkSrcBySheet = { dc: 'dc', retail: 'rt', triple: 'pkg', fruit: 'tot', ship: 'rt' };
       return { rec: {
         id: id, name: name, recipe: ($('if-recipe').value || '').trim(), sheet: sheet,
         sec: ($('if-sec').value || '').trim().toUpperCase(), on: true,
@@ -1941,7 +1975,9 @@ function bindSettingsEvents() {
         config = c;
         historyRows = null;
         saveRenderFlash('Imported');
-        $('bk-msg').textContent = 'Imported ' + c.items.length + ' items and ' + c.calcs.length + ' recipe lines, and published to every device.';
+        /* Do not claim it reached every device here. The push is async and
+           may fail; the Saved/Synced indicator is what reports that truthfully. */
+        $('bk-msg').textContent = 'Imported ' + c.items.length + ' items and ' + c.calcs.length + ' recipe lines.';
         $('bk-msg').className = 'msg good';
       } catch (err) {
         $('bk-msg').textContent = 'That file is not a CPK settings file.';
