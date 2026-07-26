@@ -13,7 +13,7 @@
 /* ============================================================
    CPK Production Sheets: standalone kitchen tool.
    Paper-first design: the screen is the sheet you print.
-   The production date wears its day-dot color (kitchen labels).
+   The production date reads as plain text; no colour coding on screen.
    ============================================================ */
 :root{
   /* Paper-first on purpose: the screen is the sheet you print, so the page
@@ -23,10 +23,6 @@
   --maroon:#881C1C; --maroon-dark:#6E1616; --maroon-soft:#F0E4E4;
   /* Chrome colour, fixed. Buttons, active tab, focus rings, rules. */
   --accent:#881C1C;
-  /* The production weekday's label colour. Marks the day on the date chip
-     and nothing else: it used to drive --accent, which repainted the whole
-     interface a different colour depending on which day you loaded. */
-  --day:#4B5563;
   --warn:#B45309; --warn-bg:#FEF3E2; --ok:#15803D;
   --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
 }
@@ -46,8 +42,7 @@ input[type=checkbox],input[type=radio],progress{accent-color:var(--maroon)}
 .bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 0 12px;border-bottom:2px solid var(--maroon)}
 .brand{font-family:Oswald,sans-serif;font-weight:600;font-size:1.25rem;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:var(--maroon)}
 .brand small{display:block;font-family:Inter,sans-serif;font-weight:500;font-size:.68rem;letter-spacing:.14em;color:var(--muted)}
-.daychip{display:inline-flex;align-items:center;gap:9px;border:1.5px solid var(--ink);border-radius:999px;padding:7px 16px 7px 10px;background:var(--card);font-family:Oswald,sans-serif;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
-.daychip .dot{width:18px;height:18px;border-radius:50%;background:var(--day);flex:none}
+.daychip{display:inline-flex;align-items:center;border:1.5px solid var(--ink);border-radius:999px;padding:7px 16px;background:var(--card);font-family:Oswald,sans-serif;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
 .spacer{flex:1}
 .btn{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--ink);border-radius:8px;padding:9px 16px;font-weight:600;font-size:.85rem;letter-spacing:.04em;background:var(--card)}
 .btn:hover{background:var(--band)}
@@ -254,7 +249,7 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);display
 
   <div class="bar" id="topbar">
     <div class="brand">Worcester CPK<small>Production sheets</small></div>
-    <div class="daychip" id="daychip"><span class="dot" id="daydot" style="display:none"></span><span id="dayword">No orders yet</span></div>
+    <div class="daychip" id="daychip"><span id="dayword">No orders yet</span></div>
     <div class="spacer"></div>
     <button class="btn" id="btn-printall" title="Print all six production sheets">Print all</button>
   </div>
@@ -716,7 +711,6 @@ function stickerVal(ctx, item) {
 
 /* Production date = the due date on the orders themselves (most common
    one), falling back to tomorrow when nothing is loaded. */
-var DAY_DOTS = ['#16161A', '#1D4ED8', '#CA8A04', '#DC2626', '#7C4A03', '#15803D', '#EA580C'];
 var DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 function prodDate() {
   var counts = {};
@@ -1541,12 +1535,8 @@ var SAMPLE = [
 
 function updateDayChip() {
   var d = prodDate();
-  /* Only the day chip, never the whole interface. */
-  document.documentElement.style.setProperty('--day', DAY_DOTS[d.day]);
   // Before any orders are loaded there is no real production date yet, so the
-  // day-colored dot (normally the recap's due date) would just show today+1
-  // with no meaning. Hide it until there is an actual date to color.
-  $('daydot').style.display = data.rows.length ? '' : 'none';
+  // chip says so rather than showing tomorrow's date with no meaning.
   $('dayword').textContent = data.rows.length
     ? 'Production ' + DAY_NAMES[d.day].slice(0, 3) + ' ' + d.label
     : 'No orders yet';
