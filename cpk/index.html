@@ -1580,12 +1580,12 @@ function renderInputZone() {
   if (inputOpen) {
     zone.innerHTML =
       '<div class="inputcard">' +
-      '<h2>Paste the day\'s Orders Recap</h2>' +
-      '<p class="sub">Copy the whole FoodPro Orders Recap (or drop the .txt file on the box). The sheets build themselves.</p>' +
+      '<h2>Load the day\'s Orders Recap</h2>' +
+      '<p class="sub">Upload the FoodPro Orders Recap .txt file, or drop it on the box below. You can also paste the text in and press Make the sheets. Either way the sheets build themselves.</p>' +
       '<textarea id="orders" spellcheck="false" aria-label="Orders Recap"></textarea>' +
       '<div class="inputrow">' +
-      '<button class="btn primary" id="btn-gen">Make the sheets</button>' +
-      '<label class="btn" style="cursor:pointer;">Upload .txt file<input type="file" id="file" accept=".txt,text/plain" style="display:none;"></label>' +
+      '<label class="btn primary" style="cursor:pointer;">Upload .txt file<input type="file" id="file" accept=".txt,text/plain" style="display:none;"></label>' +
+      '<button class="btn" id="btn-gen">Make the sheets</button>' +
       '<button class="quiet" id="btn-sample">Load sample orders</button>' +
       '<button class="quiet" id="btn-clear">Clear</button>' +
       '</div><div class="statusline" id="status"></div></div>';
@@ -1605,7 +1605,7 @@ function updateStatus() {
   if (!el) return;
   if (!data.rows.length) {
     el.innerHTML = lastText
-      ? '<span class="tag warn">No order lines found</span><span>That paste has no orders the tool can read. Paste the whole FoodPro Orders Recap, or copy the rows straight off the Excel Paste page. Your text is still in the box above.</span>'
+      ? '<span class="tag warn">No order lines found</span><span>That file has no orders the tool can read. Upload the whole FoodPro Orders Recap .txt, or copy the rows straight off the Excel Paste page. Your text is still in the box above.</span>'
       : '<span>Nothing loaded yet.</span>';
     return;
   }
@@ -1647,7 +1647,7 @@ function render() {
   if (view === 'login') { out.innerHTML = renderLogin(); bindLoginEvents(); return; }
   if (view === 'settings') { out.innerHTML = renderSettings(); bindSettingsEvents(); return; }
   if (!data.rows.length) {
-    out.innerHTML = '<p class="hint" style="font-size:.95rem;">Paste an Orders Recap above (or load the sample) and the production sheets appear here.</p>';
+    out.innerHTML = '<p class="hint" style="font-size:.95rem;">Upload an Orders Recap above (or load the sample) and the production sheets appear here.</p>';
     return;
   }
   var ctx = makeCtx(indexOrders(data.rows));
@@ -1706,7 +1706,7 @@ function loadFile(f) {
 
 /* ---- print ---- */
 function doPrint(tabs) {
-  if (!data.rows.length) { window.alert('Paste an Orders Recap first, then print.'); return; }
+  if (!data.rows.length) { window.alert('Load an Orders Recap first, then print.'); return; }
   var ctx = makeCtx(indexOrders(data.rows));
   var box = $('printbox');
   box.innerHTML = tabs.map(function (t) {
