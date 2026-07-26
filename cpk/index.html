@@ -988,6 +988,10 @@ function checkLogin(pass) {
   return cloudFn({ action: 'login', password: password })
     .then(function (res) {
       if (res.body && res.body.ok) { managerPassword = password; return { ok: true }; }
+      /* The server counts wrong guesses and says how many are left before a
+         lockout, so pass its wording straight through rather than flattening
+         everything to "wrong password". */
+      if (res.body && res.body.message) return { ok: false, msg: res.body.message };
       if (res.status === 503) return { ok: false, msg: 'The shared menu is not set up yet. CPK_MANAGER_SECRET is missing on the server.' };
       return { ok: false, msg: 'Wrong password.' };
     })
