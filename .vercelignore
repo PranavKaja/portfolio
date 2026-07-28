@@ -12,3 +12,7 @@ test2.html
 test-event.html
 projects/cpktest.txt
 _local/
+
+# Operational script, run from a local shell. The IndexNow key file it points
+# at MUST stay deployed, only the script itself is kept off the site.
+indexnow-ping.ps1
