@@ -381,10 +381,22 @@
                         <span>Summary</span>
                         <input type="text" id="f-summary" class="hl hl-base">
                     </label>
-                    <label class="field" style="max-width: 150px;">
-                        <span>Sort order</span>
-                        <input type="number" id="f-sort" value="100">
+                    <label class="field">
+                        <span>Archive description</span>
+                        <input type="text" id="f-archive-desc"
+                            placeholder="Roomier copy for the /projects card. Blank uses Summary.">
                     </label>
+                    <div class="grid2">
+                        <label class="field">
+                            <span>Case file slug</span>
+                            <input type="text" id="f-slug"
+                                placeholder="fraud-triage, for /projects/fraud-triage. Blank = card is not a link.">
+                        </label>
+                        <label class="field" style="max-width: 150px;">
+                            <span>Sort order</span>
+                            <input type="number" id="f-sort" value="100">
+                        </label>
+                    </div>
 
                     <!-- TIER 2: HOVER CARD -->
                     <button type="button" class="advanced-toggle-btn" id="hover-toggle-btn">[+] HOVER CARD</button>
