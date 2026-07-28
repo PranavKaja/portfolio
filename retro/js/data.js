@@ -186,18 +186,6 @@ window.PRANAV = {
       skills: ["CAPSIM Simulation", "Pricing", "Capacity"],
       github: "https://www.isenberg.umass.edu/news/2026-strategy-summit",
     },
-    {
-      code: "MSN-12", title: "Heart Disease Predictors", stack: "Python / Scikit-learn / Flask",
-      status: "archived",
-      hook: "~82% accuracy, deployed as a Flask app.",
-      brief: "End-to-end capstone comparing five classifiers on the 13-feature clinical heart dataset. Random Forest was the strongest at ~82% accuracy; a top-3 majority-vote ensemble landed just behind, served through a Flask web app that scores risk from a 13-field form.",
-      role: "Capstone lead",
-      method: "Five-model comparison with a top-3 majority-vote ensemble, served via Flask",
-      outcome: "~82% Random Forest accuracy; ensemble just behind, in a live app",
-      chips: ["~82% Accuracy", "5 Models", "Top-3 Ensemble", "Flask App"],
-      skills: ["Python", "Scikit-learn", "Flask"],
-      github: "https://github.com/PranavKaja/heart-disease",
-    },
   ],
 
   skills: [

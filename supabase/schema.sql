@@ -31,6 +31,8 @@ create table if not exists public.projects (
   github_url  text,                                 -- repo, or the live page for link_type 'site'
   show_github boolean not null default true,
   link_type   text not null default 'github',       -- 'github' or 'site' (picks the icon and label)
+  archive_desc text,                                -- roomier card copy on /projects; null falls back to summary
+  case_study_slug text,                             -- /projects/<slug> page the card links to; null = not a link
   sort_order  int not null default 0,               -- grid order (low first)
   published   boolean not null default true,        -- false = hidden from the public site
   created_at  timestamptz not null default now(),
@@ -44,6 +46,8 @@ alter table public.projects add column if not exists show_status  boolean not nu
 alter table public.projects add column if not exists github_url   text;
 alter table public.projects add column if not exists show_github  boolean not null default true;
 alter table public.projects add column if not exists link_type    text not null default 'github';
+alter table public.projects add column if not exists archive_desc text;
+alter table public.projects add column if not exists case_study_slug text;
 
 create index if not exists projects_sort_idx on public.projects (sort_order);
 

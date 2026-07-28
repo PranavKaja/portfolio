@@ -46,8 +46,7 @@
         { "@type": "TechArticle", "name": "Supply Chain Optimization", "url": "https://pranavkaja.com/projects/supply-chain-optimization" },
         { "@type": "TechArticle", "name": "Bullwhip Mitigation", "url": "https://pranavkaja.com/projects/bullwhip-mitigation" },
         { "@type": "TechArticle", "name": "Prime Air Drone Logistics", "url": "https://pranavkaja.com/projects/prime-air-drone-logistics" },
-        { "@type": "TechArticle", "name": "Strategy Summit", "url": "https://pranavkaja.com/projects/strategy-summit" },
-        { "@type": "TechArticle", "name": "Heart Disease Prediction", "url": "https://pranavkaja.com/projects/heart-disease-prediction" }
+        { "@type": "TechArticle", "name": "Strategy Summit", "url": "https://pranavkaja.com/projects/strategy-summit" }
       ]
     }
     </script>
@@ -64,15 +63,19 @@
         <header class="hero">
             <div class="hero-label mb-20"><span class="status-dot"></span>[ MISSION ARCHIVE ]</div>
             <h1 class="hero-title" style="font-size: 3.4rem;">CASE FILES</h1>
-            <p class="hero-subtitle">Twelve case files across machine learning, business intelligence, and
-                supply-chain strategy. Three of them are live and you can open them right now: a shipped SaaS
-                product and two working tools. Each one has the problem, the method, and the result.</p>
+            <p class="hero-subtitle"><span id="archive-count">Eleven</span> case files across machine learning,
+                business intelligence, and supply-chain strategy. Three of them are live and you can open them
+                right now: a shipped SaaS product and two working tools. Each one has the problem, the method,
+                and the result.</p>
         </header>
 
         <section class="section">
-            <div class="grid-3">
-                <!-- Order and codes mirror projects.sort_order in Supabase. If you renumber there,
-                     renumber here and on each case-file page's hero label in the same pass. -->
+            <div class="grid-3" id="archive-grid">
+                <!-- Fallback only. archive.js replaces these with the live rows from Supabase, so
+                     the ops console is what actually decides this list. These cards exist for
+                     crawlers, no-JS visitors, and any moment the backend is unreachable: keep them
+                     in step with the console when you change a project, and remember each case-file
+                     page's hero label still carries its MSN number by hand. -->
                 <a href="/projects/invitovate" class="project-panel no-underline text-inherit interactive-element" style="display:block;">
                     <span class="proj-status proj-status--deployed">LIVE PRODUCT</span>
                     <div class="proj-id">MSN-01</div><h3>Invitovate</h3>
@@ -131,11 +134,6 @@
                     <p class="tech">CAPSIM Simulation / Strategy</p>
                     <p class="desc">483% stock recovery; top-3 of 8 teams.</p>
                 </a>
-                <a href="/projects/heart-disease-prediction" class="project-panel no-underline text-inherit interactive-element" style="display:block;">
-                    <div class="proj-id">MSN-12</div><h3>Heart Disease Prediction</h3>
-                    <p class="tech">Python / Scikit-learn</p>
-                    <p class="desc">~82% accuracy; best of 5 models; live Flask app.</p>
-                </a>
             </div>
         </section>
 
@@ -155,6 +153,7 @@
     <div class="crosshair-v"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="/config.js" defer></script>
+    <script src="/archive.js" defer></script>
     <script src="/analytics.js" defer></script>
     <script src="/main.js" defer></script>
     <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
