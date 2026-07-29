@@ -2409,22 +2409,34 @@ function bindSettingsEvents() {
   Array.prototype.forEach.call(out.querySelectorAll('[data-restore]'), function (b) {
     b.addEventListener('click', function () {
       var id = b.dataset.restore;
-      if (!window.confirm('Put version ' + id + ' back?\n\nIt becomes the menu on every device. Nothing is deleted, the current version stays in the history.')) return;
-      $('hs-msg').textContent = 'Restoring...';
-      cloudFn({ action: 'restore', password: managerPassword, id: Number(id) }).then(function (res) {
-        if (res.body && res.body.ok && validConfig(res.body.config)) {
-          config = res.body.config;
-          cloudVersion = res.body.id;
-          savedBuild = Number(config.build) || 0;
-          cloudState = 'synced';
-          writeJSON(CLOUD_CACHE, config);
-          historyRows = null;
-          render();
-          flashSaved('Version ' + id + ' is back');
-        } else {
-          $('hs-msg').textContent = (res.body && res.body.message) || 'Could not restore that version.';
-        }
-      }).catch(function () { $('hs-msg').textContent = 'No connection.'; });
+      /* Same two-step as every other action that reaches the kitchen. A rule
+         with one exception in it is a rule nobody can repeat back to you. */
+      var row = (historyRows || []).filter(function (r) { return String(r.id) === String(id); })[0];
+      askPassword({
+        title: 'Put version ' + id + ' back',
+        what: 'Version ' + id + (row ? '  (' + row.items + ' items, ' + row.calcs + ' recipe lines)' : ''),
+        detail: (row && row.note ? 'Saved as: ' + row.note + '. ' : '') +
+                'It becomes the menu on every device. Nothing is deleted and the current version ' +
+                'stays in the history, so this can be undone the same way.',
+        go: 'Put it back'
+      }).then(function (ok) {
+        if (!ok) return;
+        $('hs-msg').textContent = 'Restoring...';
+        cloudFn({ action: 'restore', password: managerPassword, id: Number(id) }).then(function (res) {
+          if (res.body && res.body.ok && validConfig(res.body.config)) {
+            config = res.body.config;
+            cloudVersion = res.body.id;
+            savedBuild = Number(config.build) || 0;
+            cloudState = 'synced';
+            writeJSON(CLOUD_CACHE, config);
+            historyRows = null;
+            render();
+            flashSaved('Version ' + id + ' is back');
+          } else {
+            $('hs-msg').textContent = (res.body && res.body.message) || 'Could not restore that version.';
+          }
+        }).catch(function () { $('hs-msg').textContent = 'No connection.'; });
+      });
     });
   });
 
