@@ -174,6 +174,7 @@
     '01': 'Worcester DC', '02': 'Franklin DC', '03': 'Hampshire', '04': 'Berkshire DC',
     '07': 'Chicken & Co', '08': 'Whitmore', '13': 'Worcester Cafe', '14': 'CC Grill',
     '15': 'Furcolo', '18': 'U Club', '20': 'CC Deli', '21': 'Rec Center', '23': 'Harvest',
+    '25': 'Bluewall - Wasabi',
     '30': 'ISB', '31': 'Herter', '34': 'Catering', '40': "CC People's", '41': 'CC Star Ginger',
     '42': 'Library', '44': 'Morrill', '45': 'Roots', '46': 'Hamp Market', '51': 'CC Peets',
     '52': 'Marcus', '53': 'CC Greenfield', '54': 'OIT', '66': 'Argo', '70': 'Snacks OF',
@@ -244,7 +245,12 @@
     { label: 'Salad Little Leaf & Berry Pecan', recipe: 187600, item: '9111' },
     { label: 'Italian Sandwich New Orleans', recipe: 86002, item: '9113' },
     { label: 'Driscol Berry Salad', recipe: 181106, item: '301' },
-    { label: 'Cobb Salad', recipe: 186203, item: '9212' }
+    { label: 'Cobb Salad', recipe: 186203, item: '9212' },
+    // Ordered by the concessions stops (89, 96) in the May 2026 recaps and
+    // missing from the menu, so they were neither produced nor packed.
+    // No bread or prep factors: the recipes have not been supplied.
+    { label: 'Cheese and Grape Plate', recipe: 0, item: '6720' },
+    { label: 'Sandwich Veg Roasted Hummus', recipe: 0, item: '8191' }
   ];
   const RT_TRIPLE = [
     { label: 'Triple Stack PB & J', recipe: 141300, item: '253' },
@@ -275,7 +281,9 @@
   const FRUIT_BULK = [
     // Melons round UP to the nearest 0.5 lb (Pranav's call 2026-07-24). The Excel
     // left these raw; grapes and strawberries already round up to the whole pound.
-    { label: 'Pineapple', note: '1 CS ≈ 9 lbs', f: c => up5(0.19 * c.f12 + 0.12666 * c.f8) },
+    // 4889 is cut pineapple ordered straight by the pound (Bluewall, loc 25).
+    // Same shape as the sliced meats: a direct order adds 1 lb of prep each.
+    { label: 'Pineapple', note: '1 CS ≈ 9 lbs; incl. 4889 by the pound', f: c => up5(c.tot('4889') + 0.19 * c.f12 + 0.12666 * c.f8) },
     { label: 'Honeydew', note: '1 CS ≈ 11 lbs', f: c => up5(0.19 * c.f12 + 0.12666 * c.f8) },
     { label: 'Cantaloupe', note: '1 CS ≈ 17 lbs', f: c => up5(0.19 * c.f12 + 0.12666 * c.f8) },
     { label: 'Grapes', note: '', f: c => roundup(0.0625 * c.f12 + 0.04166 * c.f8) },
@@ -284,7 +292,11 @@
 
   // ---- PREP ----
   // Items PREP counts straight off the recap via c.tot() (raw slicing goods).
-  const PREP_TOT_ITEMS = ['4735', '4926', '4738', '4740', '7173'];
+  // Items counted straight off the order total because a prep line consumes
+  // them 1:1. 4889 is cut pineapple ordered by the pound; it is produced by
+  // the Pineapple bulk line, so it is covered even though it sits on no
+  // production sheet.
+  const PREP_TOT_ITEMS = ['4735', '4926', '4738', '4740', '7173', '4889'];
   const PREP = [
     { sec: 'SLICING' },
     { name: 'Sliced Ham', unit: 'lbs', f: c => roundup(c.tot('4735') + c.dc('2291') * 0.2 + c.dc('2352') * 0.1 + c.rt('7523') * 0.1 + c.tsSand('283') * 0.2) },
@@ -335,7 +347,19 @@
     { item: '9255', label: 'Buff W', g: 'wrap' },
     { item: '9257', label: 'Caesar W', g: 'wrap' },
     { item: '9268', label: 'Caesar GRB', g: 'wrap' },
-    { item: '9266', label: 'Fruit', g: 'fruit' }
+    { item: '9266', label: 'Fruit', g: 'fruit' },
+    // Every one of these was ordered by a cafe and had nowhere to ship:
+    // 9212 was produced on the retail sheet but never packed, 8637 is a DC
+    // item the concessions stops ordered 316 of, and 6720/8191 were missing
+    // from the menu entirely.
+    { item: '9212', label: 'Cobb', g: 'salad' },
+    { item: '8637', label: 'Fruit 8oz', g: 'fruit' },
+    { item: '6720', label: 'Chz+Grape', g: 'salad' },
+    { item: '8191', label: 'Veg Hummus', g: 'sand' },
+    // Ordered by the pound, not by the piece. It still has to go on the
+    // truck, but a pound does not occupy part of a tray, so it has no
+    // divisor and must not inflate the tray count.
+    { item: '4889', label: 'Pineapple LB', g: 'bulk' }
   ];
   const PK_LOCS = ['89', '34', '97', '15', '46', '30', '42', '44', '72', '40', '23', '31',
     '51', '92', '54', '52', '45', '70', '08', '13', '21', '78', '96'];
@@ -379,7 +403,10 @@
     { label: 'Turkey Pesto Croissant', src: 'rt', item: '9230' },
     { label: 'Turkey, Swiss + Cranberry Aioli Triple', src: 'pkg', item: '279' },
     { label: 'Salad Little Leaf & Berry Pecan', src: 'rt', item: '9111' },
-    { label: 'Italian Sandwich New Orleans', src: 'rt', item: '9113' }
+    { label: 'Italian Sandwich New Orleans', src: 'rt', item: '9113' },
+    { label: 'Cobb Salad', src: 'rt', item: '9212' },
+    { label: 'Cheese and Grape Plate', src: 'rt', item: '6720' },
+    { label: 'Sandwich Veg Roasted Hummus', src: 'rt', item: '8191' }
   ];
   const stkVal = (c, s) =>
     s.src === 'dc' ? c.dc(s.item) :
@@ -555,7 +582,9 @@
       eff.pkCols.forEach(col => {
         let q = qLoc(ctx.idx, col.item, loc);
         if (col.tri) q *= 2; // triple stacks ship as packages (ordered x2)
-        if (q) { colTot[col.item] = (colTot[col.item] || 0) + q; trayAcc += q / TRAY_DIV[col.g]; }
+        // No divisor means the item ships but is not trayed (weight goods),
+        // so it adds nothing here rather than defaulting to some tray size.
+        if (q) { colTot[col.item] = (colTot[col.item] || 0) + q; trayAcc += TRAY_DIV[col.g] ? q / TRAY_DIV[col.g] : 0; }
         cells += `<td class="num${q ? '' : ' zero'}">${q || ''}</td>`;
       });
       const trays = roundup(trayAcc);
