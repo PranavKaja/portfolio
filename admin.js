@@ -234,9 +234,9 @@
     id: $('f-id'), code: $('f-code'), title: $('f-title'), tech: $('f-tech'),
     stack: $('f-stack'), summary: $('f-summary'), hook: $('f-hook'), brief: $('f-brief'),
     role: $('f-role'), method: $('f-method'), outcome: $('f-outcome'), chips: $('f-chips'),
-    show_status: $('f-show-status'), sort: $('f-sort'), published: $('f-published'), 
+    show_status: $('f-show-status'), sort: $('f-sort'), published: $('f-published'),
     github: $('f-github'), show_github: $('f-show-github'), link_type: $('f-link-type'),
-    skills: $('f-skills')
+    skills: $('f-skills'), archive_desc: $('f-archive-desc'), slug: $('f-slug')
   };
 
   // dim the inactive link icon so the chosen logo (GitHub vs my page) is obvious
@@ -270,6 +270,8 @@
     F.tech.value = p ? (p.tech || '') : '';
     F.stack.value = p ? (p.stack || '') : '';
     F.summary.value = p ? (p.summary || '') : '';
+    F.archive_desc.value = p ? (p.archive_desc || '') : '';
+    F.slug.value = p ? (p.case_study_slug || '') : '';
     F.hook.value = p ? (p.hook || '') : '';
     F.brief.value = p ? (p.brief || '') : '';
     F.role.value = p ? (p.role || '') : '';
@@ -338,6 +340,10 @@
       tech: F.tech.value.trim(),
       stack: F.stack.value.trim(),
       summary: F.summary.value.trim(),
+      // both null-when-blank: archive.js reads null as "fall back to summary"
+      // and "this card is not a link"
+      archive_desc: F.archive_desc.value.trim() || null,
+      case_study_slug: F.slug.value.trim().toLowerCase() || null,
       hook: F.hook.value.trim(),
       brief: F.brief.value.trim(),
       role: F.role.value.trim(),

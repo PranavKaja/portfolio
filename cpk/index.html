@@ -159,6 +159,25 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);display
 .loginbox .card{padding:26px}
 .loginbox input{width:100%;margin-bottom:10px;border:1.5px solid var(--rule);border-radius:8px;padding:11px 12px;background:var(--paper)}
 
+/* ---- "type the password again" dialog ----
+   Used by the one action with no undo. Signing in at the start of a shift
+   should not leave the machine one stray click from dropping a menu item. */
+.askwrap{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;
+  background:rgba(30,27,27,.45);padding:18px}
+.askbox{width:100%;max-width:430px;background:var(--card);border:1.5px solid var(--ink);
+  border-radius:12px;padding:22px;box-shadow:0 18px 44px rgba(0,0,0,.22)}
+.askbox h3{font-family:Oswald,sans-serif;font-weight:600;font-size:.95rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:9px}
+.askbox .what{border-left:4px solid var(--warn);background:var(--warn-bg);border-radius:0 8px 8px 0;
+  padding:9px 12px;margin-bottom:13px;font-size:.86rem}
+.askbox .what b{display:block;margin-bottom:3px}
+.askbox label{display:block;font-size:.85rem;font-weight:600}
+.askbox input{width:100%;margin-top:5px;border:1.5px solid var(--rule);border-radius:8px;padding:11px 12px;background:var(--paper)}
+.askbox .row{display:flex;gap:9px;margin-top:14px}
+.askbox .row .btn{flex:1;justify-content:center}
+.askbox .btn.danger{background:var(--warn);border-color:var(--warn);color:#fff}
+.askbox .btn.danger:hover{background:#96450A;border-color:#96450A}
+@media print{.askwrap{display:none}}
+
 /* ---- update notice + plain-English recipe lines ---- */
 .notice{background:var(--warn-bg);border:1.5px solid var(--warn);border-radius:10px;padding:12px 16px;margin:16px 0;display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:.86rem}
 .notice .grow{flex:1;min-width:280px}
@@ -196,6 +215,27 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);display
 .pv{margin:10px 0 4px}
 .pv table{margin-top:6px}
 .warnline{color:var(--warn);font-size:.82rem;font-weight:600;margin-top:8px}
+.checkline{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:.85rem;font-weight:600}
+.checkline input{width:16px;height:16px}
+
+/* ---- "is this the whole ingredient list" note on the Prep sheet ---- */
+.ingnote{margin-top:14px;border:1.5px solid var(--rule);border-left:4px solid var(--muted);
+  border-radius:10px;background:var(--card);padding:11px 14px}
+.ingnote.warn{border-left-color:var(--warn)}
+.ingnote-line{font-size:.85rem;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.ingnote.warn .ingnote-line b{color:var(--warn)}
+.ingdetail{margin-top:10px;border-top:1px solid var(--rule-soft);padding-top:10px}
+.ingrp+.ingrp{margin-top:12px}
+.ingrp-h{font-family:Oswald,sans-serif;font-weight:600;font-size:.74rem;letter-spacing:.11em;text-transform:uppercase}
+.ingrp .hint{margin-top:3px}
+.inglist{list-style:none;margin:7px 0 0;padding:0;font-size:.85rem}
+.inglist li{padding:4px 0;border-bottom:1px solid var(--rule-soft)}
+.inglist li:last-child{border-bottom:0}
+.ingl-main{display:flex;gap:9px;align-items:baseline}
+.inglist .mono{color:var(--muted);min-width:5.5ch}
+.inglist .q{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.inglist .stops{font-size:.78rem;color:var(--muted);margin:2px 0 1px 6.5ch;font-variant-numeric:tabular-nums}
+.inglist .stops b{color:var(--ink)}
 .savebar{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ok);opacity:0;transition:opacity .18s;white-space:nowrap}
 .savebar.on{opacity:1}
 .savebar.bad{color:var(--warn)}
@@ -241,6 +281,12 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);display
   #printbox .hint{color:#444;font-size:9px}
   #printbox .blocklabel{color:#000}
   #printbox .warnbox,#printbox .okbox{border-color:#000;color:#000;background:#fff}
+  /* A printed prep sheet that hides what it does not count is worse than one
+     that never mentioned it, so the list always prints open. */
+  #printbox .ingnote{border-color:#000;border-left-color:#000;color:#000;background:#fff}
+  #printbox .ingnote.warn .ingnote-line b{color:#000}
+  #printbox .ingdetail{display:block!important}
+  #printbox .inglist{font-size:10px}
 }
 </style>
 </head>
@@ -813,6 +859,150 @@ function renderFruit(ctx) {
     '<div><div class="blocklabel">Bulk required</div>' + bulk + '</div></div>' +
     '<p class="hint">12oz cup: 3oz cantaloupe · 3oz honeydew · 3oz pineapple · 2oz strawberries · 3 to 4 red grapes.</p>';
 }
+/* ---- is this ingredient list the whole story? ----
+   Every number on the prep, bread, chicken and bulk-fruit blocks comes from a
+   recipe amount, so an ordered item that no recipe line names contributes
+   nothing to any of them. That is correct for a plate assembled from bought
+   parts and it is a shortfall for anything the kitchen makes, and the sheet
+   could not tell the two apart, so it said nothing at all. Now it says which.
+   Scoped to the order in hand: an item nobody ordered cannot make today's
+   ingredient list short. */
+function uncountedIngredients(ctx) {
+  var used = {};
+  config.calcs.forEach(function (c) {
+    c.terms.forEach(function (t) { if (t.item) used[normItem(t.item)] = 1; });
+  });
+  var skipped = [], missing = [], offMenu = [], switchedOff = [];
+  Object.keys(ctx.idx).sort(function (a, b) { return +a - +b; }).forEach(function (id) {
+    var e = ctx.idx[id];
+    if (!e.total || used[id]) return;
+    var m = menuRow(id);
+    var row = { id: id, name: m.row ? m.row.name : titleCase(e.name || ''), qty: e.total };
+    if (!m.row) offMenu.push(row);
+    else if (!m.on) switchedOff.push(row);
+    else if (m.row.noIng) skipped.push(row);
+    else missing.push(row);
+  });
+  return { skipped: skipped, missing: missing, offMenu: offMenu, switchedOff: switchedOff,
+    n: skipped.length + missing.length + offMenu.length + switchedOff.length,
+    needsLook: missing.length + offMenu.length + switchedOff.length };
+}
+/* An item switched off is not the same as an item nobody ever added, and
+   sending someone to look for a menu row that is sitting right there, unticked,
+   wastes the trip. Returns the live row if there is one, otherwise the switched
+   off row, so the caller can tell the two apart. */
+function menuRow(id) {
+  var off = null;
+  for (var i = 0; i < config.items.length; i++) {
+    if (config.items[i].id !== id) continue;
+    if (config.items[i].on) return { row: config.items[i], on: true };
+    if (!off) off = config.items[i];
+  }
+  return off ? { row: off, on: false } : { row: null, on: false };
+}
+/* ---- what this sheet does not cover ----
+   One panel, used by any sheet that can be short. It always prints the ordered
+   quantity next to the item, and the per-stop split where the sheet is a
+   per-stop sheet, so the answer can be checked straight off the Orders Recap
+   without adding anything up by hand. */
+var noteOpen = { ing: false, pk: false };
+function coveragePanel(o) {
+  var body = o.groups.map(function (g) {
+    if (!g.rows.length) return '';
+    return '<div class="ingrp"><div class="ingrp-h">' + esc(g.title) + '</div>' +
+      '<p class="hint">' + esc(g.why) + '</p><ul class="inglist">' +
+      g.rows.map(function (r) {
+        return '<li><div class="ingl-main"><span class="mono">' + esc(r.id) + '</span> ' + esc(r.name) +
+          '<span class="q">' + fmt(r.qty) + ' ' + esc(r.unitWord || 'ordered') + '</span></div>' +
+          (r.stops && r.stops.length
+            ? '<div class="stops">' + r.stops.map(function (s) {
+                return esc(s.loc + (s.name ? ' ' + s.name : '')) + ' <b>' + fmt(s.qty) + '</b>';
+              }).join('<span class="sep"> · </span>') + '</div>'
+            : '') +
+          '</li>';
+      }).join('') + '</ul></div>';
+  }).join('');
+  var open = noteOpen[o.key];
+  return '<div class="ingnote' + (o.warn ? ' warn' : '') + '">' +
+    '<p class="ingnote-line">' + o.line +
+    '<button class="infobtn noprint" id="more-' + o.key + '" data-more="' + o.key + '" aria-expanded="' + (open ? 'true' : 'false') +
+    '" aria-controls="detail-' + o.key + '" title="Show what is not covered" aria-label="Show what is not covered">i</button>' +
+    '</p>' +
+    '<div class="ingdetail" id="detail-' + o.key + '"' + (open ? '' : ' hidden') + '>' + body + '</div></div>';
+}
+function ingNote(ctx) {
+  var u = uncountedIngredients(ctx);
+  if (!u.n) return '<p class="hint">Every item on this order has its ingredients counted here.</p>';
+  var word = function (n, s, p) { return n + ' ' + (n === 1 ? s : (p || s + 's')); };
+  return coveragePanel({
+    key: 'ing', warn: !!u.needsLook,
+    line: u.needsLook
+      ? '<b>Partial ingredient list.</b> ' + word(u.n, 'item') + ' on this order ' +
+        (u.n === 1 ? 'is' : 'are') + ' not counted in the amounts above.'
+      : word(u.skipped.length, 'item') + ' on this order ' + (u.skipped.length === 1 ? 'needs' : 'need') +
+        ' no ingredients. Everything else is counted above.',
+    groups: [
+      { title: 'Not set up yet', rows: u.missing,
+        why: 'These are on the menu but no recipe amount names them, so they pull no bread, meat, chicken or fruit. Add a line on the Recipe amounts tab, or tick "needs no ingredients" on the item if that is right.' },
+      { title: 'Switched off, still being ordered', rows: u.switchedOff,
+        why: 'The menu row exists but its Make box is unticked, so nothing counts them. Switch it back on, or tell the cafe it is discontinued.' },
+      { title: 'Not on the menu', rows: u.offMenu,
+        why: 'These were ordered but have no menu row at all, so nothing counts them anywhere. The CHECK tab has the same list.' },
+      { title: 'Needs no ingredients', rows: u.skipped,
+        why: 'Marked as bought ready made, so there is nothing to prep for them. Listed here so the short list is never a surprise.' }
+    ]
+  });
+}
+/* ---- the packout failsafe ----
+   One rule, no exceptions: anything a cafe ordered has to have a column here,
+   whatever sheet it is made on and whether it is made at all. An item with no
+   column is invisible to the person loading the truck, so it does not ship and
+   nothing else on any sheet would say so. Worcester DC and the three dining
+   commons that make their own are left out, because this sheet never packed
+   them. */
+function uncoveredPackout(ctx) {
+  var packed = {};
+  config.items.forEach(function (i) { if (i.on && i.pack) packed[i.id] = 1; });
+  var rows = [], units = 0;
+  Object.keys(ctx.idx).sort(function (a, b) { return +a - +b; }).forEach(function (id) {
+    if (packed[id]) return;
+    var e = ctx.idx[id], stops = [], qty = 0;
+    Object.keys(e.byLoc).forEach(function (l) {
+      if (config.dcLocs.indexOf(l) !== -1 || !e.byLoc[l]) return;
+      stops.push({ loc: l, name: config.locations[l] || '', qty: e.byLoc[l] });
+      qty += e.byLoc[l];
+    });
+    if (!qty) return;
+    stops.sort(function (a, b) { return +a.loc - +b.loc; });
+    units += qty;
+    var m = menuRow(id);
+    rows.push({ id: id, name: (m.row ? m.row.name : titleCase(e.name || '')),
+      qty: qty, unitWord: 'to ship', stops: stops,
+      where: !m.row ? 'off' : (m.on ? 'live' : 'unticked') });
+  });
+  var pick = function (w) { return rows.filter(function (r) { return r.where === w; }); };
+  return { rows: rows, units: units,
+    live: pick('live'), unticked: pick('unticked'), offMenu: pick('off') };
+}
+function packoutNote(ctx) {
+  var u = uncoveredPackout(ctx);
+  if (!u.rows.length) return '<p class="hint">Every unit the cafes ordered has a column on this sheet.</p>';
+  var word = function (n, s) { return n + ' ' + (n === 1 ? s : s + 's'); };
+  return coveragePanel({
+    key: 'pk', warn: true,
+    line: '<b>Caution: ' + word(u.units, 'unit') + ' ordered by the cafes ' + (u.units === 1 ? 'has' : 'have') +
+      ' no column on this sheet</b>, across ' + word(u.rows.length, 'item') + ', so nothing here tells anyone to load ' +
+      (u.units === 1 ? 'it' : 'them') + '.',
+    groups: [
+      { title: 'On the menu, but not packed', rows: u.live,
+        why: 'The kitchen may well be making these, and the truck would still leave without them. Give each one a Packout column in Menu setup.' },
+      { title: 'Switched off, still being ordered', rows: u.unticked,
+        why: 'The menu row exists with its Make box unticked, so it is neither made nor packed. Switch it back on and give it a column, or tell the cafe it is discontinued.' },
+      { title: 'Not on the menu at all', rows: u.offMenu,
+        why: 'Ordered by a cafe with no menu row, so nothing counts them and nothing packs them. Add the item, then give it a Packout column.' }
+    ]
+  });
+}
 function renderPrep(ctx) {
   var h = '<table class="t"><thead><tr><th>Item</th><th class="num">Needed</th><th>Unit</th></tr></thead><tbody>';
   var lastSec = null;
@@ -821,7 +1011,8 @@ function renderPrep(ctx) {
     h += '<tr><td>' + esc(row.label) + '</td><td class="num big">' + fmt(calcVal(ctx, row)) + '</td><td>' + esc(row.unit) + '</td></tr>';
   });
   return head('Prep', 'prep') + h + '</tbody></table>' +
-    '<p class="hint">Amounts come from the per-item factors in Menu setup (Recipe amounts).</p>';
+    '<p class="hint">Amounts come from the per-item factors in Menu setup (Recipe amounts).</p>' +
+    ingNote(ctx);
 }
 function pkCols() {
   return config.items.filter(function (i) { return i.on && i.pack; })
@@ -923,7 +1114,7 @@ function renderPackout(ctx) {
     '<p class="hint">Each cell = units to pack for that cafe. Triple stacks count as packages (ordered x2). ' +
     'Trays per cafe = sandwiches/' + config.trays.sand + ' + salads/' + config.trays.salad + ' + wraps/' + config.trays.wrap + ' + fruit/' + config.trays.fruit + ', rounded up. ' +
     'Anything in the BY WEIGHT group still has to go on the truck but does not count toward trays.' +
-    (pkShowEmpty ? ' Grayed rows ship nothing today.' : '') + '</p>' + toggle;
+    (pkShowEmpty ? ' Grayed rows ship nothing today.' : '') + '</p>' + toggle + packoutNote(ctx);
 }
 /* Crosshair highlight on the packout grid: column header lights its column,
    location cell lights its row, a matrix cell lights both. */
@@ -980,13 +1171,18 @@ function renderStickers(ctx) {
    CHECK (audit): every ordered unit must land on a sheet.
    ============================================================ */
 function auditData(ctx) {
-  var dcItems = {}, rtItems = {}, whole = {}, pkItems = {};
+  var dcItems = {}, rtItems = {}, whole = {}, pkItems = {}, shipOnly = {}, pkCount = {};
   config.items.forEach(function (i) {
     if (!i.on) return;
     if (i.sheet === 'dc') dcItems[i.id] = 1;
     if (i.sheet === 'retail') rtItems[i.id] = 1;
     if (i.sheet === 'triple' || i.sheet === 'fruit') whole[i.id] = 1;
-    if (i.pack) pkItems[i.id] = 1;
+    if (i.sheet === 'ship') shipOnly[i.id] = 1;
+    /* One item number is allowed on two sheets on purpose (the DC and cafe
+       versions of the same sandwich), but only one of those rows may carry a
+       packout column. Two columns means the cafe is sent the same units twice
+       and charged trays for both. */
+    if (i.pack) { pkItems[i.id] = 1; pkCount[i.id] = (pkCount[i.id] || 0) + 1; }
   });
   config.calcs.forEach(function (c) {
     c.terms.forEach(function (t) { if (t.src === 'tot') whole[t.item] = whole[t.item] || 2; });
@@ -1000,14 +1196,25 @@ function auditData(ctx) {
     var rtQty = e.total - dcQty - otherDC;
     var notes = [], uncovered = 0;
     if (!dcItems[it] && !rtItems[it] && !whole[it]) {
-      notes.push('on NO sheet: ' + e.total + ' units not produced');
+      /* Ships only is not the same mistake as being off the menu entirely, and
+         saying so points at the fix instead of at a missing item. */
+      notes.push(shipOnly[it]
+        ? 'ships only, but no recipe amount counts it, so nothing is being made for these ' + e.total + ' units'
+        : 'on NO sheet: ' + e.total + ' units not produced');
       uncovered = e.total;
     } else if (!whole[it]) {
       if (dcQty > 0 && !dcItems[it]) { notes.push('DC qty not counted (no DC row)'); uncovered += dcQty; }
       if (rtQty > 0 && !rtItems[it]) { notes.push('cafe qty not counted (no Retail row)'); uncovered += rtQty; }
       if (otherDC > 0) notes.push(otherDC + ' at Franklin/Hampshire/Berkshire excluded (made by that DC, not Worcester)');
     }
-    if (rtQty > 0 && !pkItems[it] && (rtItems[it] || whole[it])) notes.push('no Packout column: cafe units will not ship');
+    /* Any sheet, or no sheet at all: cafe units with no column do not ship.
+       This used to ask only about retail and whole-count items, which let a
+       ships-only item with no column through in silence, the one case where
+       shipping is the item's entire reason to exist. */
+    if (rtQty > 0 && !pkItems[it] && (dcItems[it] || rtItems[it] || whole[it] || shipOnly[it])) {
+      notes.push('no Packout column: cafe units will not ship');
+    }
+    if (pkCount[it] > 1) notes.push(pkCount[it] + ' Packout columns for this one item: it is packed and trayed ' + pkCount[it] + ' times over. Leave the column on one row only.');
     if (uncovered > 0 || notes.some(function (n) { return n.indexOf('Packout') !== -1; })) problems++;
     uncoveredTotal += uncovered;
     rows.push({
@@ -1067,6 +1274,73 @@ function checkLogin(pass) {
     .catch(function () {
       return { ok: false, msg: 'No connection. Changing the menu needs internet; printing sheets does not.' };
     });
+}
+
+/* Confirm something that cannot be undone, by naming the thing that is about
+   to go and asking for the manager password a second time.
+
+   The password is compared with the one this session signed in with, not sent
+   to the server. The server still gates the save that follows, so nothing here
+   weakens what actually protects the shared menu, and checking locally avoids
+   two ways this could bite a kitchen: a fumbled delete burning tries against
+   the 5-attempt sign-in throttle and locking a manager out of saving mid-shift,
+   and the dialog needing a connection to tell you that you typed it wrong.
+   What it does stop is the real pair of risks, a stray click and a signed-in
+   screen left unattended.
+
+   Resolves true only when the password matches and the danger button is used. */
+function askPassword(o) {
+  return new Promise(function (resolve) {
+    var wrap = document.createElement('div');
+    wrap.className = 'askwrap';
+    wrap.innerHTML =
+      '<div class="askbox" role="dialog" aria-modal="true" aria-labelledby="ask-h">' +
+        '<h3 id="ask-h">' + esc(o.title) + '</h3>' +
+        '<div class="what"><b>' + esc(o.what) + '</b>' + esc(o.detail || '') + '</div>' +
+        '<label for="ask-pass">Manager password' +
+          '<input id="ask-pass" type="password" autocomplete="off"></label>' +
+        '<p class="msg" id="ask-msg"></p>' +
+        '<div class="row">' +
+          '<button class="btn" id="ask-no">Cancel</button>' +
+          '<button class="btn danger" id="ask-yes">' + esc(o.go || 'Delete') + '</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(wrap);
+    var pass = wrap.querySelector('#ask-pass');
+    var msg = wrap.querySelector('#ask-msg');
+    pass.focus();
+
+    function close(v) {
+      document.removeEventListener('keydown', onKey);
+      wrap.parentNode.removeChild(wrap);
+      resolve(v);
+    }
+    function go() {
+      if (managerPassword && pass.value === managerPassword) { close(true); return; }
+      msg.textContent = pass.value
+        ? 'That is not the manager password. Nothing was deleted.'
+        : 'Type the manager password to confirm.';
+      pass.value = '';
+      pass.focus();
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') { close(false); return; }
+      /* Enter saves or moves on everywhere else in this page, so it must not
+         be the key that deletes. It only fires from inside the password box. */
+      if (e.key === 'Enter' && document.activeElement === pass) { e.preventDefault(); go(); }
+    }
+    wrap.querySelector('#ask-no').addEventListener('click', function () { close(false); });
+    wrap.querySelector('#ask-yes').addEventListener('click', go);
+    /* Clicking the backdrop cancels, but only when the press started there, so
+       a drag that ends outside the box does not count as walking away. */
+    wrap.addEventListener('mousedown', function (e) {
+      if (e.target === wrap) wrap.addEventListener('mouseup', function up(e2) {
+        wrap.removeEventListener('mouseup', up);
+        if (e2.target === wrap) close(false);
+      });
+    });
+    document.addEventListener('keydown', onKey);
+  });
 }
 
 var SRC_LABEL = {
@@ -1196,7 +1470,7 @@ function itemForm(it) {
     opt('retail', 'Retail Grab & Go (counts cafe orders)', it.sheet) +
     opt('triple', 'Triple stacks (counts every order, x2 packages)', it.sheet) +
     opt('fruit', 'Fruit cups (counts every order)', it.sheet) +
-    opt('ship', 'Ships only (no production sheet)', it.sheet) + '</select></label>' +
+    opt('ship', 'Ships only (already made on another line)', it.sheet) + '</select></label>' +
     '<label class="field">Section on the sheet<input id="if-sec" list="seclist" value="' + esc(it.sec) + '" size="16" placeholder="SANDWICHES"></label>' +
     sectionDatalist() +
     '</div><div class="formgrid">' +
@@ -1215,8 +1489,20 @@ function itemForm(it) {
     opt('retail', 'Retail sticker run (Harvest Fresh)', stkList) + '</select></label>' +
     '<label class="field">Sticker label<input id="if-stklabel" value="' + esc(it.stk ? it.stk.label : '') + '" size="30" placeholder="blank = item name"></label>' +
     '</div>' +
+    '<label class="checkline"><input type="checkbox" id="if-noing"' + (it.noIng ? ' checked' : '') + '> ' +
+    'This item needs no ingredients (bought ready made)</label>' +
+    '<p class="help">Tick this and the Prep sheet stops asking about it. Leave it clear and any item with no recipe amounts is listed on the Prep sheet as not counted, ' +
+    'so a missing setup shows up instead of quietly making the prep list short.</p>' +
     '<p class="help">The sticker count follows the sheet: DC items print their DC amount, retail items their cafe amount, triples print packages, fruit prints the full total. ' +
+    'The sticker run follows the sheet too until you pick one yourself, so a DC item goes on the DC run rather than the cafes\'. ' +
     'Packout column position orders the columns left to right inside each tray group, lowest number first. Leave it at 900 to land at the end.</p>' +
+    '<p class="help"><b>Ships only</b> is for something the kitchen is already told to make somewhere else, and that just needs to get on the truck. ' +
+    'Cut pineapple ordered by the pound is the example: the pounds to cut are already on the fruit sheet\'s bulk line, so listing it as a thing to make would count the same work twice. ' +
+    'It gets a packout column and nothing else. Give it a recipe amount that counts it (Recipe amounts tab), or the CHECK tab will say nothing is being made.</p>' +
+    (editingItem !== -1 && !it.noIng && !calcsUsing(it.id).length
+      ? '<p class="warnline">No recipe line uses item ' + esc(it.id) + ', so it pulls no bread, meat, chicken or fruit on the prep sheets. ' +
+        'That is right for something bought ready made, and wrong for anything the kitchen assembles.</p>'
+      : '') +
     '<div class="formgrid">' +
     '<button class="btn primary" id="if-save">' + (editingItem === -1 ? 'Add this item' : 'Done') + '</button>' +
     (editingItem === -1 ? '<button class="mini" id="if-cancel">Cancel</button>' : '') +
@@ -1660,6 +1946,9 @@ function render() {
   });
   var pe = out.querySelector('#pk-showempty');
   if (pe) pe.addEventListener('change', function () { pkShowEmpty = pe.checked; render(); });
+  Array.prototype.forEach.call(out.querySelectorAll('[data-more]'), function (b) {
+    b.addEventListener('click', function () { noteOpen[b.dataset.more] = !noteOpen[b.dataset.more]; render(); });
+  });
   var pkt = out.querySelector('table.pk');
   if (pkt) bindPackoutHover(pkt);
   Array.prototype.forEach.call(out.querySelectorAll('[data-addmenu]'), function (b) {
@@ -1816,6 +2105,7 @@ function bindSettingsEvents() {
         pack: $('if-pack').value,
         pkLabel: ($('if-pklabel').value || '').trim() || name.slice(0, 12),
         pkOrd: (function () { var n = parseInt($('if-pkord').value, 10); return n > 0 ? n : 900; })(),
+        noIng: !!$('if-noing').checked,
         stk: stkList ? { list: stkList, label: (($('if-stklabel').value || '').trim()) || name, src: stkSrcBySheet[sheet] } : null
       } };
     };
@@ -1830,6 +2120,20 @@ function bindSettingsEvents() {
       config.items[editingItem] = r.rec;
       autosave();
     };
+    if (editingItem === -1) {
+      /* The sticker COUNT already follows the sheet, so the sticker RUN has to
+         as well: a DC item whose labels print on the cafes' run is the kind of
+         mistake nobody spots until the wrong stickers are on the wrong tray.
+         Follow the sheet until the manager picks a run themselves, then leave
+         their choice alone. */
+      var stkTouched = false;
+      var runBySheet = { dc: 'dc', retail: 'retail', triple: 'retail', fruit: 'retail', ship: '' };
+      $('if-stklist').addEventListener('change', function () { stkTouched = true; });
+      $('if-sheet').addEventListener('change', function () {
+        if (stkTouched) return;
+        $('if-stklist').value = runBySheet[$('if-sheet').value];
+      });
+    }
     if (editingItem !== -1) {
       ['if-name', 'if-recipe', 'if-sheet', 'if-sec', 'if-pack', 'if-pklabel', 'if-pkord', 'if-stklist', 'if-stklabel'].forEach(function (id) {
         var el = $(id);
@@ -1837,6 +2141,10 @@ function bindSettingsEvents() {
         el.addEventListener('input', commitItem);
         el.addEventListener('change', commitItem);
       });
+      /* Redrawn rather than just saved, so ticking the box clears the "no
+         recipe line uses this" warning in front of you. Nothing to lose focus
+         in a checkbox, so the redraw costs nothing here. */
+      $('if-noing').addEventListener('change', function () { commitItem(); render(); });
     }
     $('if-save').addEventListener('click', function () {
       if (editingItem !== -1) { editingItem = null; pendingAdd = null; render(); return; }
@@ -1849,10 +2157,23 @@ function bindSettingsEvents() {
     if ($('if-cancel')) $('if-cancel').addEventListener('click', function () { editingItem = null; pendingAdd = null; render(); });
     var del = $('if-delete');
     if (del) del.addEventListener('click', function () {
-      if (window.confirm('Delete this item from the menu?\n\nIf it is still ordered, the CHECK tab will flag it. There is no undo.\nLast export from this browser: ' + lastExportWords())) {
-        config.items.splice(editingItem, 1);
+      /* Hold the row itself, not just its index, so the splice below can only
+         ever remove the item the dialog named. */
+      var idx = editingItem;
+      var row = config.items[idx];
+      if (!row) return;
+      askPassword({
+        title: 'Delete this menu item',
+        what: (row.name || 'This item') + (row.id ? '  (' + row.id + ')' : ''),
+        detail: 'It goes from every device that opens this tool, and there is no undo. ' +
+                'If it is still ordered, the CHECK tab will flag it. ' +
+                'Last export from this browser: ' + lastExportWords(),
+        go: 'Delete it'
+      }).then(function (ok) {
+        if (!ok || config.items[idx] !== row) return;
+        config.items.splice(idx, 1);
         editingItem = null; saveRenderFlash('Deleted');
-      }
+      });
     });
   }
 
