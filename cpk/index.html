@@ -2288,10 +2288,24 @@ function bindSettingsEvents() {
     if ($('cf-cancel')) $('cf-cancel').addEventListener('click', function () { editingCalc = null; draftTerms = null; render(); });
     var cdel = $('cf-delete');
     if (cdel) cdel.addEventListener('click', function () {
-      if (window.confirm('Delete this line? The sheet loses it immediately.')) {
-        config.calcs.splice(editingCalc, 1);
+      /* Hold the line itself, not just its index, so the splice can only ever
+         remove the one the dialog named. */
+      var ci = editingCalc;
+      var line = config.calcs[ci];
+      if (!line) return;
+      askPassword({
+        title: 'Delete this recipe line',
+        what: (line.label || 'This line') + (SLOT_LABEL[line.slot] ? '  on ' + SLOT_LABEL[line.slot] : ''),
+        detail: 'This is the quiet one to get wrong. The item stays on the menu and the sheet still ' +
+                'prints, it just stops counting this raw good, so the shortfall turns up in the ' +
+                'kitchen rather than on the screen. It goes from every device, and there is no undo. ' +
+                'Last export from this browser: ' + lastExportWords(),
+        go: 'Delete the line'
+      }).then(function (ok) {
+        if (!ok || config.calcs[ci] !== line) return;
+        config.calcs.splice(ci, 1);
         editingCalc = null; draftTerms = null; saveRenderFlash('Deleted');
-      }
+      });
     });
   }
 
@@ -2339,11 +2353,20 @@ function bindSettingsEvents() {
   if (exp) exp.addEventListener('click', function () { downloadConfig('cpk-menu-settings.json'); render(); });
   var takenew = $('bk-takenew');
   if (takenew) takenew.addEventListener('click', function () {
-    if (!window.confirm('Download a copy of your current menu, then replace it with the newer one that shipped with the tool?')) return;
-    downloadConfig('cpk-menu-backup-before-update.json');
-    resetConfig();
-    historyRows = null;
-    saveRenderFlash('Updated');
+    askPassword({
+      title: 'Replace the menu with the shipped one',
+      what: 'Every menu change made here, on every device',
+      detail: 'A copy of the current menu downloads first, and the version history keeps it too, ' +
+              'so this can be put back. Until someone does, every kitchen sees the menu that came ' +
+              'with the tool instead of yours.',
+      go: 'Replace it'
+    }).then(function (ok) {
+      if (!ok) return;
+      downloadConfig('cpk-menu-backup-before-update.json');
+      resetConfig();
+      historyRows = null;
+      saveRenderFlash('Updated');
+    });
   });
   var keepmine = $('bk-keepmine');
   if (keepmine) keepmine.addEventListener('click', function () {
@@ -2407,11 +2430,19 @@ function bindSettingsEvents() {
 
   var rst = $('bk-reset');
   if (rst) rst.addEventListener('click', function () {
-    if (window.confirm('Reset the whole menu to the factory version?\n\nThis publishes the built-in menu to every device. The current version stays in the history, so it can be put back.\nLast export from this browser: ' + lastExportWords())) {
+    askPassword({
+      title: 'Reset the whole menu to factory',
+      what: 'Every item, recipe line, location and tray setting',
+      detail: 'The built-in menu publishes to every device. The current version stays in the ' +
+              'history and can be put back, but until someone does, this is what the whole kitchen ' +
+              'is working from. Last export from this browser: ' + lastExportWords(),
+      go: 'Reset the menu'
+    }).then(function (ok) {
+      if (!ok) return;
       resetConfig();
       historyRows = null;
       saveRenderFlash('Reset');
-    }
+    });
   });
   var lock = $('bk-lock');
   if (lock) lock.addEventListener('click', function () { setUnlocked(false); view = 'sheets'; render(); });
