@@ -3,14 +3,63 @@
  * No cookies, no PII. A random session id in localStorage and a
  * normalized referrer are all it sends. Honors Do Not Track.
  * Other scripts can call window.intel.track(type, meta).
+ *
+ * Link codes: resumes and cover letters link to /brief?r=<code>, one
+ * code per application. The code is saved with every event of that
+ * visit, then taken off the address bar. Any page accepts one.
+ *
+ * Own visits: open any page once with ?me=1 and this browser is never
+ * counted again. ?me=0 turns counting back on.
  * ============================================================ */
 (function () {
   // respect Do Not Track
   var dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
   if (dnt === '1' || dnt === 'yes') return;
 
+  // own-visit switch, so checking my own resume links does not look like a recruiter
+  try {
+    var me = new URLSearchParams(location.search).get('me');
+    if (me === '1') localStorage.setItem('intel_off', '1');
+    if (me === '0') localStorage.removeItem('intel_off');
+    if (localStorage.getItem('intel_off') === '1') { window.intel = { track: function () {} }; return; }
+  } catch (e) { /* storage blocked: carry on and count the visit */ }
+
   var db = window.getSupabase && window.getSupabase();
   if (!db) { window.intel = { track: function () {} }; return; } // offline: no-op
+
+  // Read the link code (and any utm_ tags) once, keep it for this tab's visit, clean the URL.
+  var TAG_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_id'];
+  function linkTag() {
+    var tag = {};
+    try {
+      var q = new URLSearchParams(location.search), found = false;
+      var r = (q.get('r') || '').trim().toLowerCase().replace(/[^a-z0-9]+$/, '');
+      if (/^[a-z0-9-]{6,40}$/.test(r)) { tag.r = r; found = true; }
+      TAG_KEYS.forEach(function (k) {
+        var v = q.get(k);
+        if (v) { tag[k] = String(v).slice(0, 80); found = true; }
+      });
+      if (found) {
+        try { sessionStorage.setItem('intel_tag', JSON.stringify(tag)); } catch (e) { /* no-op */ }
+        ['r', 'me'].concat(TAG_KEYS).forEach(function (k) { q.delete(k); });
+        var rest = q.toString();
+        history.replaceState(null, '', location.pathname + (rest ? '?' + rest : '') + location.hash);
+      } else {
+        var saved = sessionStorage.getItem('intel_tag');
+        if (saved) tag = JSON.parse(saved) || {};
+      }
+    } catch (e) { /* analytics must never break the page */ }
+    if (navigator.webdriver) tag.bot = '1';   // a browser driven by a script, not a person
+    return tag;
+  }
+  var TAG = linkTag();
+
+  function withTag(meta) {
+    var out = {}, k;
+    for (k in TAG) if (Object.prototype.hasOwnProperty.call(TAG, k)) out[k] = TAG[k];
+    for (k in (meta || {})) if (Object.prototype.hasOwnProperty.call(meta, k)) out[k] = meta[k];
+    return out;
+  }
 
   function sessionId() {
     try {
@@ -53,7 +102,7 @@
         path: location.pathname,
         source: SOURCE,
         session_id: SESSION,
-        meta: meta || {}
+        meta: withTag(meta)
       }).then(function () {}, function () {}); // swallow errors, analytics must never break the page
     } catch (e) { /* no-op */ }
   }
@@ -102,7 +151,7 @@
           'Content-Type': 'application/json',
           'Prefer': 'return=minimal'
         },
-        body: JSON.stringify({ type: 'page_time', path: location.pathname, source: SOURCE, session_id: SESSION, meta: { seconds: seconds } })
+        body: JSON.stringify({ type: 'page_time', path: location.pathname, source: SOURCE, session_id: SESSION, meta: withTag({ seconds: seconds }) })
       }).catch(function () {});
     } catch (e) { /* no-op */ }
   }
