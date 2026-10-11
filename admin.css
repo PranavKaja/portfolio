@@ -369,6 +369,12 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
 .game-toggle button:hover { background: #e5e5e5; }
 .game-toggle button.active { background: var(--accent); color: #fff; }
 .intel-wide { margin-bottom: 16px; }
+.rl-wrap { overflow-x: auto; }
+table.rl { width: 100%; font-size: 0.8rem; }
+table.rl th, table.rl td { text-align: left; padding: 6px 10px 6px 0; white-space: nowrap; }
+table.rl td a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+table.rl tr.rl-dim td { opacity: 0.5; }
+table.rl td.rl-note { font-family: 'Share Tech Mono', monospace; color: var(--text-muted); }
 
 .barlist { display: flex; flex-direction: column; gap: 9px; }
 .bl-row { display: grid; grid-template-columns: 140px 1fr 42px; align-items: center; gap: 10px; }

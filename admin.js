@@ -1141,6 +1141,7 @@
     if (error) { msg($('intel-msg'), error.message, 'err'); return; }
     intelLoaded = true;
     renderIntel(data || {});
+    loadResumeOpens();
     
     // Update dashboard title
     const tEl = $('home-daily-views-title');
@@ -1251,6 +1252,75 @@
         <td class="lb-plays">${r.plays}</td>
       </tr>`).join('') +
       '</tbody></table>';
+  }
+
+  // ---- Resume link opens -------------------------------------------------------------
+  // Every resume and cover letter links to /brief?r=<code>. The code is built by
+  // 13-Jobs/engine/brieflink.py in the career hub; this reads one back. Layout:
+  //   r li 61011 - k3f9q - da 7m x   document, source, date, company key, role family, role key, check
+  const RL_ALPHABET = '0123456789abcdefghjkmnpqrstvwxyz';
+  const RL_DOCS = { r: 'Resume', c: 'Cover letter', m: 'Message', o: 'Other' };
+  const RL_SOURCES = { li: 'LinkedIn', hs: 'Handshake', gh: 'Greenhouse', as: 'Ashby', lv: 'Lever', wd: 'Workday',
+    in: 'Indeed', zr: 'ZipRecruiter', wk: 'Workable', bh: 'BambooHR', ic: 'iCIMS', sr: 'SmartRecruiters', pl: 'Paylocity',
+    pc: 'Paycor', or: 'Oracle or Taleo', ad: 'ADP', uk: 'UKG', jv: 'Jobvite', rp: 'Rippling', yc: 'Y Combinator',
+    wf: 'Wellfound', bi: 'Built In', dc: 'Dice', gd: 'Glassdoor', cs: 'Company site', rf: 'Referral', ou: 'Outreach',
+    em: 'Emailed', cf: 'Career fair', st: 'Portfolio site', gn: 'General resume', xx: 'Unknown' };
+  const RL_FAMILIES = { ai: 'AI and automation', de: 'Data engineering', sc: 'Supply chain and purchasing', mk: 'Marketing',
+    sl: 'Sales and revenue', it: 'IT and systems', cx: 'Customer and client', fn: 'Finance', re: 'Property and real estate',
+    pm: 'Project and program', pd: 'Product', qc: 'Quality, risk and compliance', hr: 'People', ba: 'Business analyst',
+    da: 'Data and reporting', op: 'Operations', ot: 'Other' };
+
+  function decodeResumeCode(code) {
+    const m = /^([a-z])([a-z]{2})(\d)(\d{2})(\d{2})-([0-9a-z]{5})-([a-z]{2})([0-9a-z]{2})([0-9a-z])$/.exec(String(code || '').toLowerCase());
+    if (!m) return null;
+    let h = 7;
+    for (const ch of m[0].slice(0, -1).replace(/-/g, '')) h = (h * 31 + ch.charCodeAt(0)) % 1021;
+    if (RL_ALPHABET[h % 32] !== m[9]) return null;
+    const now = new Date().getFullYear();
+    const year = now - (((now - parseInt(m[3], 10)) % 10) + 10) % 10;
+    return { doc: RL_DOCS[m[1]] || 'Other', source: RL_SOURCES[m[2]] || 'Unknown', built: `${year}-${m[4]}-${m[5]}`,
+             general: m[6] === '00000', family: RL_FAMILIES[m[7]] || 'Other' };
+  }
+
+  function rlWhen(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' ' +
+           d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  }
+
+  function rlTime(s) {
+    s = Number(s) || 0;
+    return s < 60 ? s + 's' : Math.floor(s / 60) + 'm ' + (s % 60) + 's';
+  }
+
+  async function loadResumeOpens() {
+    const box = $('intel-resume-opens');
+    if (!box) return;
+    const { data, error } = await db.from('v_resume_opens').select('*').order('last_seen', { ascending: false }).limit(300);
+    if (error) { box.innerHTML = `<div class="bl-empty">// ${esc(error.message)}</div>`; return; }
+    if (!data || !data.length) {
+      box.innerHTML = '<div class="bl-empty">// no coded link has been opened yet. Resumes built from 2026-10-11 on carry one.</div>';
+      return;
+    }
+    box.innerHTML = '<div class="rl-wrap"><table class="lb rl"><thead><tr><th>Company</th><th>Role</th><th>Document</th>' +
+      '<th>Sent via</th><th>First open</th><th>Last seen</th><th>Opens</th><th>Read</th><th>Clicked</th><th></th></tr></thead><tbody>' +
+      data.map(r => {
+        const d = decodeResumeCode(r.code);
+        const company = r.company || (d && d.general ? 'General resume' : (d ? 'Not in the registry' : 'Unreadable code'));
+        const role = r.role || (d ? d.family : '');
+        const clicks = [r.resume_clicks ? 'resume PDF' : '', r.project_clicks ? 'project' : '', r.contact_clicks ? 'contact' : ''].filter(Boolean).join(', ');
+        const quick = (Number(r.seconds) || 0) < 5 && !clicks;
+        const note = r.automated ? 'script' : (quick ? 'likely a scanner' : (r.days_seen > 1 ? 'came back' : ''));
+        const safeUrl = /^https?:\/\//i.test(r.job_url || '') ? r.job_url : '';
+        const link = safeUrl ? `<a href="${esc(safeUrl)}" target="_blank" rel="noopener">${esc(role)}</a>` : esc(role);
+        return `<tr class="${quick || r.automated ? 'rl-dim' : ''}" title="${esc(r.code)}${d ? ', built ' + d.built : ''}">
+          <td class="lb-player">${esc(company)}</td><td>${link}</td>
+          <td>${esc(d ? d.doc : (r.doc || ''))}</td><td>${esc(d ? d.source : (r.source || ''))}</td>
+          <td>${esc(rlWhen(r.first_open))}</td><td>${esc(rlWhen(r.last_seen))}</td>
+          <td class="lb-best">${r.views}${r.visitors > 1 ? ' / ' + r.visitors + ' people' : ''}</td>
+          <td>${esc(rlTime(r.seconds))}</td><td>${esc(clicks)}</td><td class="rl-note">${esc(note)}</td></tr>`;
+      }).join('') + '</tbody></table></div>';
   }
 
   function renderLeaderboard(id, rows) {
