@@ -311,6 +311,12 @@
         .vital:last-child {
             border-right: none;
         }
+
+        @media (max-width: 700px) {
+            .vitals { grid-template-columns: 1fr; }
+            .vital { border-right: none; border-bottom: 1.5px solid var(--text-main); }
+            .vital:last-child { border-bottom: none; }
+        }
         
         .vital .k {
             font-family: 'Share Tech Mono', monospace;
