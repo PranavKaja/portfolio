@@ -73,11 +73,31 @@
             margin-bottom: 40px !important;
         }
         
-        .hero-pitch {
-            font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+        .hero-name {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 14px;
+        }
+
+        .hero-headline {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: clamp(1.9rem, 4.2vw, 3rem);
+            line-height: 1.1;
+            letter-spacing: -1px;
+            max-width: 780px;
+            margin-bottom: 16px;
+            color: var(--text-main);
+        }
+
+        .hero-sub {
+            font-size: 1.05rem;
             line-height: 1.55;
-            max-width: 820px;
-            margin-bottom: 24px;
+            max-width: 640px;
+            margin-bottom: 26px;
             color: var(--text-main);
         }
         
@@ -370,18 +390,14 @@
 
     <main class="container" id="main">
         <header class="hero">
-            <h1 class="sr-only">Pranav Kaja</h1>
-            <p class="hero-pitch">I'm a full stack generalist. I've worked across marketing, hospitality and design, in
-                industries from gaming and education to construction and automotive, and I deliver the outcome myself
-                without handing the work off. I'm chronically online, I keep up with what's new, I have taste and I
-                can make things. I understand AI and I'm technical enough to build with it. I'm curious about
-                everything around me and I'm usually nerding out on something.</p>
-            <p class="hero-subtitle">Data &amp; Analytics Engineer. I build pipelines, models, and dashboards that
-                survive contact with real data.</p>
+            <h1 class="hero-name">Pranav Kaja</h1>
+            <p class="hero-headline">Full stack generalist. I deliver the outcome myself, start to finish.</p>
+            <p class="hero-sub">I keep up with what's new, I have taste and I can make things. I understand AI and I'm
+                technical enough to build with it.</p>
             <div class="hero-actions brief-hero-actions">
                 <a href="mailto:balajipranavreddyk@gmail.com" class="btn btn-primary" data-cta="email">EMAIL ME</a>
-                <a href="tel:+14134724729" class="btn btn-secondary" data-cta="phone">PHONE</a>
                 <a href="/Resume_PranavKaja.pdf" target="_blank" class="btn btn-secondary" data-cta="resume">RESUME (PDF)</a>
+                <a href="tel:+14134724729" class="btn btn-secondary" data-cta="phone">PHONE</a>
                 <a href="https://www.linkedin.com/in/pranavkaja" target="_blank" rel="noopener" class="btn btn-secondary"
                     data-cta="linkedin">LINKEDIN</a>
                 <a href="https://github.com/PranavKaja" target="_blank" rel="noopener" class="btn btn-secondary"
