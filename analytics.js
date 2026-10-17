@@ -1,7 +1,9 @@
 /* ============================================================
  * Visitor Intel, lightweight, privacy-preserving tracker.
- * No cookies, no PII. A random session id in localStorage and a
- * normalized referrer are all it sends. Honors Do Not Track.
+ * No cookies, no PII. A random session id in localStorage, a
+ * normalized referrer, and on page views the browser string, time
+ * zone and screen size (to tell link scanners from people). Honors
+ * Do Not Track.
  * Other scripts can call window.intel.track(type, meta).
  *
  * Link codes: resumes and cover letters link to /brief?r=<code>, one
@@ -109,8 +111,35 @@
 
   window.intel = { track: track };
 
-  // page view
-  track('pageview');
+  // page view, with what it takes to tell a link scanner from a person
+  function device() {
+    var d = {};
+    try { d.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { /* no-op */ }
+    try {
+      d.ua = String(navigator.userAgent || '').slice(0, 200);
+      d.screen = screen.width + 'x' + screen.height;
+      d.view = window.innerWidth + 'x' + window.innerHeight;
+    } catch (e) { /* no-op */ }
+    return d;
+  }
+  track('pageview', device());
+
+  // first sign of a person on this page: a click, a key, or a real scroll. Sent once.
+  var engaged = false;
+  function onEngage(how) {
+    if (engaged) return;
+    engaged = true;
+    track('engaged', { how: how });
+    ['pointerdown', 'keydown', 'scroll'].forEach(function (t) { window.removeEventListener(t, handlers[t], true); });
+  }
+  var handlers = {
+    pointerdown: function () { onEngage('click'); },
+    keydown: function () { onEngage('key'); },
+    scroll: function () { if (window.scrollY > 200) onEngage('scroll'); }
+  };
+  ['pointerdown', 'keydown', 'scroll'].forEach(function (t) {
+    window.addEventListener(t, handlers[t], { capture: true, passive: true });
+  });
 
   // resume downloads + project-card opens (delegated, survives dynamic cards)
   document.addEventListener('click', function (e) {

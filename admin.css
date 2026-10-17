@@ -375,6 +375,9 @@ table.rl th, table.rl td { text-align: left; padding: 6px 10px 6px 0; white-spac
 table.rl td a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 table.rl tr.rl-dim td { opacity: 0.5; }
 table.rl td.rl-note { font-family: 'Share Tech Mono', monospace; color: var(--text-muted); }
+table.rl tr.rl-person td.rl-note { color: var(--accent); font-weight: 700; }
+.rl-summary { font-size: 0.85rem; margin: 0 0 10px; }
+.intel-hint { font-size: 0.8rem; color: var(--text-muted); margin: -4px 0 12px; }
 
 .barlist { display: flex; flex-direction: column; gap: 9px; }
 .bl-row { display: grid; grid-template-columns: 140px 1fr 42px; align-items: center; gap: 10px; }
