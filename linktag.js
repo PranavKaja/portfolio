@@ -24,7 +24,8 @@
   }
 
   function letters(name, skip) {
-    const words = fold(name).replace(/&/g, ' ').split(/[^a-z0-9]+/)
+    // Apostrophes and periods are deleted (Macy's is "macys"); every other mark breaks words.
+    const words = fold(name).replace(/[.'’`]/g, '').replace(/&/g, ' ').split(/[^a-z0-9]+/)
       .filter(w => w && /^[a-z]/.test(w) && !skip.has(w));
     if (!words.length) return 'x';
     if (words.length === 1) return words[0].replace(/[^a-z]/g, '').slice(0, 3) || 'x';
@@ -38,8 +39,10 @@
     let m, d;
     if (typeof date === 'string' && (m = /^(\d{4})-(\d{2})-(\d{2})/.exec(date))) { d = [m[2], m[3]]; }
     else { const x = date instanceof Date ? date : new Date(); d = [pad(x.getMonth() + 1), pad(x.getDate())]; }
-    return letters(company, COMPANY_SKIP) + letters(role, ROLE_SKIP) + d[0] + d[1] +
-      (/^c/i.test(String(doc || '')) ? 'c' : '');
+    // same document words as brieflink.doc_code: cover, coverletter, letter, c
+    const k = String(doc || '').toLowerCase().replace(/[^a-z]/g, '');
+    const cover = ['c', 'cover', 'coverletter', 'letter'].includes(k);
+    return letters(company, COMPANY_SKIP) + letters(role, ROLE_SKIP) + d[0] + d[1] + (cover ? 'c' : '');
   }
 
   function parseTag(text) {

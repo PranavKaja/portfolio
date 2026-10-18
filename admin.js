@@ -1326,19 +1326,20 @@
     if (!tags.length) return out;
     const etDay = iso => new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
     const dayOf = x => {
-      const seen = new Date(x.r.first_open || x.r.last_seen || Date.now());
-      let y = seen.getFullYear();
-      const cand = `${y}-${String(x.t.month).padStart(2, '0')}-${String(x.t.day).padStart(2, '0')}`;
-      if (cand > etDay(seen)) y -= 1;
-      return `${y}-${String(x.t.month).padStart(2, '0')}-${String(x.t.day).padStart(2, '0')}`;
+      const today = etDay(x.r.first_open || x.r.last_seen || Date.now());   // year from the ET day, not the viewer's clock
+      const md = `${String(x.t.month).padStart(2, '0')}-${String(x.t.day).padStart(2, '0')}`;
+      let y = +today.slice(0, 4);
+      if (`${y}-${md}` > today) y -= 1;
+      return `${y}-${md}`;
     };
     tags.forEach(x => { x.day = dayOf(x); });
     const since = tags.map(x => x.day).sort()[0];
     const apps = [];
     for (let from = 0; from < 5000; from += 1000) {   // reads stop at 1000 rows, so page
       const { data, error } = await db.from('applications').select('company, role, job_url, applied_at, created_at')
-        .or(`created_at.gte.${since},applied_at.gte.${since}`).range(from, from + 999);
-      if (error || !data) break;
+        .or(`created_at.gte.${since},applied_at.gte.${since}`).order('id', { ascending: true }).range(from, from + 999);
+      if (error) { out.__error = error.message; break; }
+      if (!data) break;
       apps.push(...data);
       if (data.length < 1000) break;
     }
@@ -1369,6 +1370,17 @@
     // clicked, scrolled or came back. Most LinkedIn opens are scans, so people go to the top.
     const tagMatches = await matchShortTags(data);
     const n = v => Number(v) || 0;
+    // The view labels "likely scan" only for registered codes. For a short tag with one tracker match,
+    // a single quiet open within 10 minutes of the application going in is the same machine scan.
+    data.forEach(r => {
+      const hits = tagMatches[r.code] || [];
+      const sent = hits.length === 1 ? (hits[0].applied_at || hits[0].created_at) : null;
+      if (sent && !n(r.person_visits) && n(r.unclear_visits) &&
+          Math.abs(new Date(r.first_open) - new Date(sent)) <= 600000) {
+        r.likely_scan_visits = n(r.likely_scan_visits) + n(r.unclear_visits);
+        r.unclear_visits = 0;
+      }
+    });
     const people = r => n(r.person_visits) + n(r.unclear_visits);
     const rank = r => (n(r.person_visits) ? 2 : 0) + (n(r.unclear_visits) ? 1 : 0);
     const rows = data.slice().sort((a, b) => rank(b) - rank(a) || String(b.last_seen).localeCompare(String(a.last_seen)));
@@ -1388,7 +1400,8 @@
         let role = r.role || (d ? d.family : '');
         if (st) {
           company = hits.length === 1 ? hits[0].company + ' (tag ' + st.tag + ')' : 'Tag ' + st.tag;
-          role = hits.length === 1 ? (hits[0].role || '') :
+          role = tagMatches.__error ? 'Tracker read failed: ' + tagMatches.__error :
+                 hits.length === 1 ? (hits[0].role || '') :
                  hits.length ? hits.length + ' possible: ' + hits.map(h => h.company).join(', ') : 'No tracker match yet';
           if (hits.length === 1 && !r.job_url) r.job_url = hits[0].job_url;
         }

@@ -13,7 +13,7 @@ for (const c of cases) {
   const got = L.shortTag(c.company, c.role, c.date, c.doc);
   check(`short tag for ${JSON.stringify(c.company)} / ${JSON.stringify(c.role)}`, got === c.tag, got);
   const p = L.parseTag(got);
-  check(`parses back: ${got}`, p && p.tag === got && p.cover === (c.doc === 'cover'), JSON.stringify(p));
+  check(`parses back: ${got}`, p && p.tag === got && p.cover === c.tag.endsWith('c'), JSON.stringify(p));
   check(`passes the site's code filter: ${got}`, /^[a-z0-9-]{6,40}$/.test(got));
 }
 for (const bad of ['jjama1318', 'jjama1000', 'j1018', 'jjamaxxx1018', 'rli61011-k3f9q-da7mx']) {

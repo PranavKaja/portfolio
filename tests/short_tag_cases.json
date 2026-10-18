@@ -1,14 +1,103 @@
 {
   "_note": "Shared cases for the short tag rule (his ruling 2026-10-18). Worked out by hand, not generated. tests/test_brieflink.py runs them against engine/brieflink.py and the portfolio repo's linktag.test.js runs a copy against linktag.js. Change both copies together.",
   "cases": [
-    {"company": "Johnson & Johnson", "role": "Analyst, Modeling and Analytics", "date": "2026-10-18", "doc": "resume", "tag": "jjama1018"},
-    {"company": "Lincoln Avenue Communities", "role": "Accounts Payable Clerk", "date": "2026-10-18", "doc": "cover", "tag": "lacapc1018c"},
-    {"company": "Samsara", "role": "Customer Success Manager", "date": "2026-10-17", "doc": "resume", "tag": "samcsm1017"},
-    {"company": "The Bluebird Group", "role": "Business Development & Digital Growth Associate", "date": "2026-10-18", "doc": "resume", "tag": "bgbdd1018"},
-    {"company": "1823 Partners", "role": "Operations Analyst", "date": "2026-10-17", "doc": "resume", "tag": "paroa1017"},
-    {"company": "Acme Corp, Inc.", "role": "Senior Data Analyst II", "date": "2026-01-05", "doc": "resume", "tag": "acmda0105"},
-    {"company": "Café Société", "role": "Data Analyst", "date": "2026-03-09", "doc": "resume", "tag": "csda0309"},
-    {"company": "Q", "role": "I", "date": "2026-12-31", "doc": "resume", "tag": "qx1231"},
-    {"company": "", "role": "", "date": "2026-01-01", "doc": "resume", "tag": "xx0101"}
+    {
+      "company": "Johnson & Johnson",
+      "role": "Analyst, Modeling and Analytics",
+      "date": "2026-10-18",
+      "doc": "resume",
+      "tag": "jjama1018"
+    },
+    {
+      "company": "Lincoln Avenue Communities",
+      "role": "Accounts Payable Clerk",
+      "date": "2026-10-18",
+      "doc": "cover",
+      "tag": "lacapc1018c"
+    },
+    {
+      "company": "Samsara",
+      "role": "Customer Success Manager",
+      "date": "2026-10-17",
+      "doc": "resume",
+      "tag": "samcsm1017"
+    },
+    {
+      "company": "The Bluebird Group",
+      "role": "Business Development & Digital Growth Associate",
+      "date": "2026-10-18",
+      "doc": "resume",
+      "tag": "bgbdd1018"
+    },
+    {
+      "company": "1823 Partners",
+      "role": "Operations Analyst",
+      "date": "2026-10-17",
+      "doc": "resume",
+      "tag": "paroa1017"
+    },
+    {
+      "company": "Acme Corp, Inc.",
+      "role": "Senior Data Analyst II",
+      "date": "2026-01-05",
+      "doc": "resume",
+      "tag": "acmda0105"
+    },
+    {
+      "company": "Café Société",
+      "role": "Data Analyst",
+      "date": "2026-03-09",
+      "doc": "resume",
+      "tag": "csda0309"
+    },
+    {
+      "company": "Q",
+      "role": "I",
+      "date": "2026-12-31",
+      "doc": "resume",
+      "tag": "qx1231"
+    },
+    {
+      "company": "",
+      "role": "",
+      "date": "2026-01-01",
+      "doc": "resume",
+      "tag": "xx0101"
+    },
+    {
+      "company": "Macy's",
+      "role": "Entry-Level Data Analyst",
+      "date": "2026-10-18",
+      "doc": "resume",
+      "tag": "maceld1018"
+    },
+    {
+      "company": "U.S. Bank",
+      "role": "CDDO Closures Analyst",
+      "date": "2026-10-18",
+      "doc": "resume",
+      "tag": "ubcca1018"
+    },
+    {
+      "company": "O’Reilly Media",
+      "role": "E-commerce Analyst",
+      "date": "2026-10-18",
+      "doc": "resume",
+      "tag": "omeca1018"
+    },
+    {
+      "company": "Coca-Cola",
+      "role": "Analyst",
+      "date": "2026-10-18",
+      "doc": "cv",
+      "tag": "ccana1018"
+    },
+    {
+      "company": "Hagler & Kerr, LLC.",
+      "role": "Estimating Trainee",
+      "date": "2026-10-18",
+      "doc": "letter",
+      "tag": "hket1018c"
+    }
   ]
 }
