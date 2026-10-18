@@ -1115,6 +1115,7 @@
   let currentGameTab = 'wasd';
   let intelRange = 1; // 1 = today; otherwise day window (7, 30, 365, or 0 = all time, 'custom' = custom dates)
   let intelCustomRange = null; // { start: 'YYYY-MM-DD', end: 'YYYY-MM-DD' }
+  let intelEveryone = false; // false = people only; true = also the link scanner, bots and Pranav's own browsers
   
   function intelSince() {
     if (intelRange === 'custom' && intelCustomRange) {
@@ -1137,7 +1138,9 @@
   async function loadIntel(force) {
     if (intelLoaded && !force) return;
     msg($('intel-msg'), '', '');
-    const { data, error } = await db.rpc('intel_dashboard', { p_since: intelSince(), p_until: intelUntil() });
+    // intel_dashboard_v2 (supabase/visitor_kinds.sql) leaves out the application link scanner, bots,
+    // pings and Pranav's own browsers unless intelEveryone is on.
+    const { data, error } = await db.rpc('intel_dashboard_v2', { p_since: intelSince(), p_until: intelUntil(), p_everyone: intelEveryone });
     if (error) { msg($('intel-msg'), error.message, 'err'); return; }
     intelLoaded = true;
     renderIntel(data || {});
@@ -1194,6 +1197,8 @@
     $('intel-kpis').innerHTML = kpis.map(([label, val]) =>
       `<div class="kpi"><div class="kpi-num">${val == null ? 0 : val}</div><div class="kpi-label">${label}</div></div>`).join('');
 
+    renderLeftOut(d.kinds || {});
+
     barlist('intel-traffic', (d.traffic || []).map(t => [t.source, t.n]));
     barlist('intel-projects', (d.top_projects || []).map(p => [p.title || p.code, p.n]));
     barlist('intel-pages', (d.top_pages || []).map(p => [p.path === '/' ? '/ (home)' : p.path, p.n]));
@@ -1202,6 +1207,23 @@
 
     renderLeaderboard('intel-leaderboard', d.leaderboard || []);
     renderDaily('intel-daily', d.daily || []);
+  }
+
+  // What the numbers above leave out, with a switch to count everything
+  function renderLeftOut(kinds) {
+    const el = $('intel-left-out');
+    if (!el) return;
+    const n = k => Number(kinds[k]) || 0;
+    const parts = [
+      n('scanner') ? `${n('scanner')} link scan${n('scanner') === 1 ? '' : 's'} from job applications` : '',
+      n('ping') ? `${n('ping')} instant ping${n('ping') === 1 ? '' : 's'}` : '',
+      n('bot') ? `${n('bot')} bot${n('bot') === 1 ? '' : 's'}` : '',
+      n('owner') ? `${n('owner')} of your own browser${n('owner') === 1 ? '' : 's'}` : ''
+    ].filter(Boolean);
+    el.innerHTML = intelEveryone
+      ? `// counting everything: ${n('visitor')} people plus ${parts.join(', ') || 'nothing else'}. <button type="button" id="intel-people-only">Count people only</button>`
+      : `// people only. Left out: ${parts.join(', ') || 'nothing'}. <button type="button" id="intel-everyone">Show everything</button>`;
+    el.querySelector('button')?.addEventListener('click', () => { intelEveryone = !intelEveryone; loadIntel(true); });
   }
 
   function renderGameStats() {
@@ -1445,15 +1467,34 @@
       '</tbody>' + tfoot + '</table>';
   }
 
+  // Browsers to leave out of the raw-event panels: everything v_session_kinds does not call a visitor.
+  // Returns null when counting everything. Pages through the view, which stops at 1000 rows a read.
+  async function hiddenSessions(sinceIso) {
+    if (intelEveryone) return null;
+    const hidden = new Set();
+    for (let from = 0; ; from += 1000) {
+      let q = db.from('v_session_kinds').select('session_id, kind').neq('kind', 'visitor').range(from, from + 999);
+      if (sinceIso) q = q.gte('last_at', sinceIso);
+      const { data, error } = await q;
+      if (error || !data) break;
+      data.forEach(r => hidden.add(r.session_id));
+      if (data.length < 1000) break;
+    }
+    return hidden;
+  }
+
   // ---- Today view: hourly pageview breakdown (queries the events table directly) ----
   async function loadTodayHourly() {
     const start = new Date(); start.setHours(0, 0, 0, 0); // local midnight, in the viewer's timezone
     const buckets = new Array(24).fill(0).map(() => ({ views: 0, time: 0 }));
     try {
-      const { data, error } = await db.from('events')
-        .select('type, created_at, meta').in('type', ['pageview', 'page_time']).gte('created_at', start.toISOString()).limit(5000);
+      const [{ data, error }, hidden] = await Promise.all([
+        db.from('events').select('type, created_at, meta, session_id')
+          .in('type', ['pageview', 'page_time']).gte('created_at', start.toISOString()).limit(5000),
+        hiddenSessions(start.toISOString())
+      ]);
       if (!error && data) {
-        data.forEach(ev => {
+        data.filter(ev => !hidden || !hidden.has(ev.session_id)).forEach(ev => {
           const h = new Date(ev.created_at).getHours();
           if (ev.type === 'pageview') {
             buckets[h].views++;
@@ -1507,9 +1548,9 @@
       query = query.lt('created_at', endIso);
     }
     
-    const { data, error } = await query.limit(10000);
-      
-    if (error || !data) return [];
+    const [{ data: raw, error }, hidden] = await Promise.all([query.limit(10000), hiddenSessions(startIso)]);
+    if (error || !raw) return [];
+    const data = hidden ? raw.filter(ev => !hidden.has(ev.session_id)) : raw;
     
     // Sort chronologically so page_time events follow their corresponding pageviews
     data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
