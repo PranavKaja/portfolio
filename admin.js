@@ -1316,6 +1316,45 @@
     return s < 60 ? s + 's' : Math.floor(s / 60) + 'm ' + (s % 60) + 's';
   }
 
+  // Short tags (/brief?r=jjama1018) are not registered, so match them against the tracker:
+  // same company and role letters, logged on the tag's day or up to 3 days after it.
+  async function matchShortTags(rows) {
+    const out = {};
+    if (!window.linkTag) return out;
+    const tags = rows.map(r => ({ r, t: !r.company && !decodeResumeCode(r.code) ? window.linkTag.parseTag(r.code) : null }))
+      .filter(x => x.t);
+    if (!tags.length) return out;
+    const etDay = iso => new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+    const dayOf = x => {
+      const seen = new Date(x.r.first_open || x.r.last_seen || Date.now());
+      let y = seen.getFullYear();
+      const cand = `${y}-${String(x.t.month).padStart(2, '0')}-${String(x.t.day).padStart(2, '0')}`;
+      if (cand > etDay(seen)) y -= 1;
+      return `${y}-${String(x.t.month).padStart(2, '0')}-${String(x.t.day).padStart(2, '0')}`;
+    };
+    tags.forEach(x => { x.day = dayOf(x); });
+    const since = tags.map(x => x.day).sort()[0];
+    const apps = [];
+    for (let from = 0; from < 5000; from += 1000) {   // reads stop at 1000 rows, so page
+      const { data, error } = await db.from('applications').select('company, role, job_url, applied_at, created_at')
+        .or(`created_at.gte.${since},applied_at.gte.${since}`).range(from, from + 999);
+      if (error || !data) break;
+      apps.push(...data);
+      if (data.length < 1000) break;
+    }
+    const plus = (day, k) => { const x = new Date(day + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + k); return x.toISOString().slice(0, 10); };
+    tags.forEach(x => {
+      const last = plus(x.day, 3);
+      out[x.r.code] = apps.filter(a => {
+        const when = a.applied_at || a.created_at;
+        if (!when) return false;
+        const d = etDay(when);
+        return d >= x.day && d <= last && window.linkTag.rowLetters(a.company, a.role) === x.t.letters;
+      });
+    });
+    return out;
+  }
+
   async function loadResumeOpens() {
     const box = $('intel-resume-opens');
     if (!box) return;
@@ -1328,6 +1367,7 @@
     // Each visit is labelled in v_resume_opens (supabase/resume_opens.sql): a link scan opens every
     // link in the PDF at once, a likely scan is one quiet visit within minutes of sending, a person
     // clicked, scrolled or came back. Most LinkedIn opens are scans, so people go to the top.
+    const tagMatches = await matchShortTags(data);
     const n = v => Number(v) || 0;
     const people = r => n(r.person_visits) + n(r.unclear_visits);
     const rank = r => (n(r.person_visits) ? 2 : 0) + (n(r.unclear_visits) ? 1 : 0);
@@ -1342,8 +1382,16 @@
       '<th>Sent via</th><th>First open</th><th>Last seen</th><th>Visits</th><th>Read</th><th>Clicked</th><th>Who</th></tr></thead><tbody>' +
       rows.map(r => {
         const d = decodeResumeCode(r.code);
-        const company = r.company || (d && d.general ? 'General resume' : (d ? 'Not in the registry' : 'Unreadable code'));
-        const role = r.role || (d ? d.family : '');
+        const st = !d && !r.company && window.linkTag ? window.linkTag.parseTag(r.code) : null;
+        const hits = st ? (tagMatches[r.code] || []) : [];
+        let company = r.company || (d && d.general ? 'General resume' : (d ? 'Not in the registry' : 'Unreadable code'));
+        let role = r.role || (d ? d.family : '');
+        if (st) {
+          company = hits.length === 1 ? hits[0].company + ' (tag ' + st.tag + ')' : 'Tag ' + st.tag;
+          role = hits.length === 1 ? (hits[0].role || '') :
+                 hits.length ? hits.length + ' possible: ' + hits.map(h => h.company).join(', ') : 'No tracker match yet';
+          if (hits.length === 1 && !r.job_url) r.job_url = hits[0].job_url;
+        }
         const clicks = [r.resume_clicks ? 'resume PDF' : '', r.project_clicks ? 'project' : '', r.contact_clicks ? 'contact' : ''].filter(Boolean).join(', ');
         const who = [
           n(r.person_visits) ? plural(n(r.person_visits), 'person', 'people') : '',
@@ -1357,7 +1405,7 @@
         const visits = n(r.visitors) + (n(r.visitors) === 1 ? ' visit' : ' visits') + (n(r.views) > n(r.visitors) ? `, ${n(r.views)} pages` : '');
         return `<tr class="${scanOnly ? 'rl-dim' : (n(r.person_visits) ? 'rl-person' : '')}" title="${esc(r.code)}${d ? ', built ' + d.built : ''}">
           <td class="lb-player">${esc(company)}</td><td>${link}</td>
-          <td>${esc(d ? d.doc : (r.doc || ''))}</td><td>${esc(d ? d.source : (r.source || ''))}</td>
+          <td>${esc(d ? d.doc : (st ? (st.cover ? 'Cover letter' : 'Resume') : (r.doc || '')))}</td><td>${esc(d ? d.source : (st ? 'Short tag' : (r.source || '')))}</td>
           <td>${esc(rlWhen(r.first_open))}</td><td>${esc(rlWhen(r.last_seen))}</td>
           <td class="lb-best">${esc(visits)}</td>
           <td>${esc(rlTime(r.seconds))}</td><td>${esc(clicks)}</td><td class="rl-note">${esc(who)}</td></tr>`;
