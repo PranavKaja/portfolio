@@ -1303,23 +1303,42 @@
       box.innerHTML = '<div class="bl-empty">// no coded link has been opened yet. Resumes built from 2026-10-11 on carry one.</div>';
       return;
     }
-    box.innerHTML = '<div class="rl-wrap"><table class="lb rl"><thead><tr><th>Company</th><th>Role</th><th>Document</th>' +
-      '<th>Sent via</th><th>First open</th><th>Last seen</th><th>Opens</th><th>Read</th><th>Clicked</th><th></th></tr></thead><tbody>' +
-      data.map(r => {
+    // Each visit is labelled in v_resume_opens (supabase/resume_opens.sql): a link scan opens every
+    // link in the PDF at once, a likely scan is one quiet visit within minutes of sending, a person
+    // clicked, scrolled or came back. Most LinkedIn opens are scans, so people go to the top.
+    const n = v => Number(v) || 0;
+    const people = r => n(r.person_visits) + n(r.unclear_visits);
+    const rank = r => (n(r.person_visits) ? 2 : 0) + (n(r.unclear_visits) ? 1 : 0);
+    const rows = data.slice().sort((a, b) => rank(b) - rank(a) || String(b.last_seen).localeCompare(String(a.last_seen)));
+    const tot = k => data.reduce((s, r) => s + n(r[k]), 0);
+    const plural = (k, one, many) => `${k} ${k === 1 ? one : many}`;
+    const scans = tot('scan_visits') + tot('likely_scan_visits');
+    const summary = `<div class="rl-summary">${plural(data.length, 'link', 'links')} opened, ${plural(tot('visitors'), 'visit', 'visits')}: ` +
+      `<b>${plural(tot('person_visits'), 'person', 'people')}</b>, ${tot('unclear_visits')} unclear, ` +
+      `${plural(scans, 'link scan', 'link scans')} when the application went in.</div>`;
+    box.innerHTML = summary + '<div class="rl-wrap"><table class="lb rl"><thead><tr><th>Company</th><th>Role</th><th>Document</th>' +
+      '<th>Sent via</th><th>First open</th><th>Last seen</th><th>Visits</th><th>Read</th><th>Clicked</th><th>Who</th></tr></thead><tbody>' +
+      rows.map(r => {
         const d = decodeResumeCode(r.code);
         const company = r.company || (d && d.general ? 'General resume' : (d ? 'Not in the registry' : 'Unreadable code'));
         const role = r.role || (d ? d.family : '');
         const clicks = [r.resume_clicks ? 'resume PDF' : '', r.project_clicks ? 'project' : '', r.contact_clicks ? 'contact' : ''].filter(Boolean).join(', ');
-        const quick = (Number(r.seconds) || 0) < 5 && !clicks;
-        const note = r.automated ? 'script' : (quick ? 'likely a scanner' : (r.days_seen > 1 ? 'came back' : ''));
+        const who = [
+          n(r.person_visits) ? plural(n(r.person_visits), 'person', 'people') : '',
+          n(r.unclear_visits) ? `${n(r.unclear_visits)} unclear` : '',
+          n(r.scan_visits) ? plural(n(r.scan_visits), 'link scan', 'link scans') : '',
+          n(r.likely_scan_visits) ? plural(n(r.likely_scan_visits), 'likely scan', 'likely scans') : ''
+        ].filter(Boolean).join(', ') + (n(r.person_visits) && r.days_seen > 1 ? ', came back' : '') + (r.automated ? ', script' : '');
+        const scanOnly = !people(r);
         const safeUrl = /^https?:\/\//i.test(r.job_url || '') ? r.job_url : '';
         const link = safeUrl ? `<a href="${esc(safeUrl)}" target="_blank" rel="noopener">${esc(role)}</a>` : esc(role);
-        return `<tr class="${quick || r.automated ? 'rl-dim' : ''}" title="${esc(r.code)}${d ? ', built ' + d.built : ''}">
+        const visits = n(r.visitors) + (n(r.visitors) === 1 ? ' visit' : ' visits') + (n(r.views) > n(r.visitors) ? `, ${n(r.views)} pages` : '');
+        return `<tr class="${scanOnly ? 'rl-dim' : (n(r.person_visits) ? 'rl-person' : '')}" title="${esc(r.code)}${d ? ', built ' + d.built : ''}">
           <td class="lb-player">${esc(company)}</td><td>${link}</td>
           <td>${esc(d ? d.doc : (r.doc || ''))}</td><td>${esc(d ? d.source : (r.source || ''))}</td>
           <td>${esc(rlWhen(r.first_open))}</td><td>${esc(rlWhen(r.last_seen))}</td>
-          <td class="lb-best">${r.views}${r.visitors > 1 ? ' / ' + r.visitors + ' people' : ''}</td>
-          <td>${esc(rlTime(r.seconds))}</td><td>${esc(clicks)}</td><td class="rl-note">${esc(note)}</td></tr>`;
+          <td class="lb-best">${esc(visits)}</td>
+          <td>${esc(rlTime(r.seconds))}</td><td>${esc(clicks)}</td><td class="rl-note">${esc(who)}</td></tr>`;
       }).join('') + '</tbody></table></div>';
   }
 
