@@ -33,13 +33,18 @@
             };
             var OK = { gen: 1, data: 1, ops: 1, sc: 1 };
             var ABC = '0123456789abcdefghjkmnpqrstvwxyz';
+            /* Two code shapes, both read: long rli61019-wz7ve-sl7pw and short rli93wz7sl7pn
+               (since 2026-10-20). The role family is the two letters before the last three. */
             function fromCode(r) {
-                var m = /^([a-z])([a-z]{2})(\d)(\d{2})(\d{2})-([0-9a-z]{5})-([a-z]{2})([0-9a-z]{2})([0-9a-z])$/.exec(r);
+                var m = /^([a-z])([a-z]{2})(\d)(\d{2})(\d{2})-([0-9a-z]{5})-([a-z]{2})([0-9a-z]{2})([0-9a-z])$/.exec(r) ||
+                        /^([a-z])([a-z]{2})([0-9a-z]{2})([0-9a-z]{3})([a-z]{2})([0-9a-z]{2})([0-9a-z])$/.exec(r);
                 if (!m) return null;
+                if (m[0].indexOf('-') > 0 && (+m[4] < 1 || +m[4] > 12 || +m[5] < 1 || +m[5] > 31)) return null;
+                var fam = m[0].slice(-5, -3), chk = m[0].slice(-1);
                 var h = 7, s = m[0].slice(0, -1).replace(/-/g, '');
                 for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 1021;
-                if (ABC[h % 32] !== m[9]) return null;
-                return FAMILY[m[7]] || 'gen';
+                if (ABC[h % 32] !== chk) return null;
+                return FAMILY[fam] || 'gen';
             }
             var v = null;
             try {
