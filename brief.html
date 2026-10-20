@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-v="gen">
 
 <head>
     <meta charset="UTF-8">
@@ -21,6 +21,44 @@
     <meta name="twitter:image" content="https://pranavkaja.com/images/og-card.png?v=2">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="icon" href="favicon.png" type="image/png">
+    <script>
+        /* Pick the version before first paint. Order: ?v=, then the resume link code's
+           role family, then whatever this tab already showed. No match keeps "gen".
+           This runs before analytics.js, which takes ?r= off the address bar. */
+        (function () {
+            var FAMILY = {
+                da: 'data', ba: 'data', de: 'data', ai: 'data', pd: 'data', fn: 'data', qc: 'data', it: 'data',
+                op: 'ops', pm: 'ops', cx: 'ops', sl: 'ops', re: 'ops',
+                sc: 'sc'
+            };
+            var OK = { gen: 1, data: 1, ops: 1, sc: 1 };
+            var ABC = '0123456789abcdefghjkmnpqrstvwxyz';
+            function fromCode(r) {
+                var m = /^([a-z])([a-z]{2})(\d)(\d{2})(\d{2})-([0-9a-z]{5})-([a-z]{2})([0-9a-z]{2})([0-9a-z])$/.exec(r);
+                if (!m) return null;
+                var h = 7, s = m[0].slice(0, -1).replace(/-/g, '');
+                for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 1021;
+                if (ABC[h % 32] !== m[9]) return null;
+                return FAMILY[m[7]] || 'gen';
+            }
+            var v = null;
+            try {
+                var q = new URLSearchParams(location.search);
+                var pick = (q.get('v') || '').toLowerCase();
+                if (OK[pick]) v = pick;
+                if (!v) {
+                    var r = (q.get('r') || '').trim().toLowerCase().replace(/[^a-z0-9]+$/, '');
+                    if (r) v = fromCode(r);
+                }
+                if (!v) {
+                    var saved = sessionStorage.getItem('brief_v');
+                    if (OK[saved]) v = saved;
+                }
+                if (v) sessionStorage.setItem('brief_v', v);
+            } catch (e) { /* storage or URL API blocked: keep the default */ }
+            document.documentElement.setAttribute('data-v', v || 'gen');
+        })();
+    </script>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,7 +66,13 @@
         href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <style>
-        /* Page-local styles */
+        /* Versions: anything marked .vx shows only in the versions it names (v-gen, v-data, v-ops, v-sc).
+           Anything without .vx shows in every version. */
+        html[data-v="gen"] .vx:not(.v-gen),
+        html[data-v="data"] .vx:not(.v-data),
+        html[data-v="ops"] .vx:not(.v-ops),
+        html[data-v="sc"] .vx:not(.v-sc) { display: none !important; }
+
         .nav-back {
             font-family: 'Share Tech Mono', monospace;
             font-size: 0.8rem;
@@ -37,24 +81,64 @@
 
         .nav-back:hover { color: var(--accent); }
 
-        .container {
-            max-width: 1055px;
-        }
-        
-        .section:last-of-type {
-            margin-bottom: 70px;
+        .container { max-width: 1055px; }
+
+        .section:last-of-type { margin-bottom: 110px; }
+
+        @media (min-width: 701px) {
+            body { zoom: 0.9; }
         }
 
-        .brief-hero-actions { 
+        /* Big screens: scale the whole page up in steps so it fills the screen like it does on a
+           laptop. Same layout, everything proportionally bigger. */
+        @media (min-width: 1600px) { body { zoom: 1.05; } }
+        @media (min-width: 1800px) { body { zoom: 1.2; } }
+        @media (min-width: 2100px) { body { zoom: 1.35; } }
+        @media (min-width: 2500px) { body { zoom: 1.6; } }
+        @media (min-width: 3200px) { body { zoom: 2; } }
+
+        /* Hero */
+        .hero {
+            padding: 35px 40px !important;
+            margin-bottom: 24px !important;
+        }
+
+        .hero-headline {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: clamp(1.9rem, 4.2vw, 3rem);
+            line-height: 1.1;
+            letter-spacing: -1px;
+            max-width: 780px;
+            margin-bottom: 16px;
+            color: var(--text-main);
+        }
+
+        .hero-sub {
+            font-size: 1.05rem;
+            line-height: 1.55;
+            max-width: 660px;
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
+
+        .hero-focus {
+            font-size: 1rem;
+            line-height: 1.55;
+            max-width: 660px;
+            margin-bottom: 26px;
+            padding-left: 14px;
+            border-left: 3px solid var(--accent);
+            color: var(--text-muted);
+        }
+
+        .brief-hero-actions {
             display: flex;
-            flex-wrap: wrap; 
+            flex-wrap: wrap;
             gap: 12px;
         }
-        
+
         @media (min-width: 701px) {
-            body {
-                zoom: 0.9;
-            }
             .brief-hero-actions .btn {
                 width: 175px;
                 height: 56px;
@@ -67,27 +151,79 @@
             }
         }
 
-        /* 5-SEC RULE: Compact Hero */
-        .hero {
-            padding: 35px 40px !important;
-            margin-bottom: 40px !important;
-        }
-        
-        .hero-title {
-            font-size: clamp(2.8rem, 7vw, 4.5rem) !important;
-            margin-bottom: 12px !important;
-            letter-spacing: -1.5px !important;
-        }
-        
-        .hero-subtitle {
-            font-size: 0.95rem !important;
-            margin-bottom: 24px !important;
-            max-width: 550px;
+        /* Vitals */
+        .vitals {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border: 1.5px solid var(--text-main);
+            background: var(--bg);
+            margin-bottom: 24px;
         }
 
-        .proof-row {
+        .vital {
+            padding: 20px 16px;
+            border-right: 1.5px solid var(--text-main);
+        }
+
+        .vital:last-child { border-right: none; }
+
+        .vital .k {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .vital .v {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 0.95rem;
+            line-height: 1.3;
+            text-transform: uppercase;
+            color: var(--text-main);
+        }
+
+        .vital .v.live { color: var(--accent); }
+
+        /* Number strip */
+        .numbers {
             display: grid;
-            grid-template-columns: 220px 1fr;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .num-card {
+            padding: 20px 18px;
+            background: var(--bg);
+            border: 1.5px solid var(--text-main);
+            box-shadow: 4px 4px 0 var(--border);
+        }
+
+        .num-card .n {
+            font-family: 'Archivo', 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: clamp(1.4rem, 2.3vw, 1.9rem);
+            line-height: 1.05;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        @media (min-width: 701px) {
+            .num-card .n { white-space: nowrap; }
+        }
+
+        .num-card .l {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: var(--text-muted);
+        }
+
+        /* Project and experience cards */
+        .proof-row, .tl-row {
+            display: grid;
             gap: 10px 40px;
             align-items: start;
             padding: 24px 30px;
@@ -95,19 +231,18 @@
             border: 1.5px solid var(--text-main);
             margin-bottom: 20px;
             box-shadow: 4px 4px 0 var(--border);
-            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
             position: relative;
             z-index: 1;
         }
 
-        .proof-row:hover {
+        .proof-row { grid-template-columns: 220px 1fr; }
+        .tl-row { grid-template-columns: 170px 1fr; gap: 10px 30px; }
+
+        .proof-row:hover, .tl-row:hover {
             transform: translate(-2px, -2px);
             box-shadow: 6px 6px 0 var(--text-main);
-            background-color: var(--bg);
-            border-color: var(--text-main);
         }
-
-        .proof-row:last-of-type { border-bottom: 1.5px solid var(--text-main); }
 
         .proof-num {
             font-family: 'Archivo', 'Inter', sans-serif;
@@ -131,7 +266,7 @@
             margin-bottom: 12px;
         }
 
-        .proof-link {
+        .proof-link, .more-links a {
             font-family: 'Share Tech Mono', monospace;
             font-size: 0.8rem;
             letter-spacing: 1.5px;
@@ -139,12 +274,23 @@
             padding-bottom: 2px;
         }
 
-        .proof-link:hover { color: var(--accent); }
+        .proof-link:hover, .more-links a:hover { color: var(--accent); }
 
-        .chips-container {
-            margin-top: 30px;
-            margin-bottom: 40px;
+        .tl-when {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            color: var(--accent);
+            padding-top: 3px;
         }
+
+        .tl-what strong { font-weight: 700; }
+        .tl-what .tl-title { display: block; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px; }
+        .tl-what ul { margin: 0; padding-left: 18px; }
+        .tl-what li { margin-bottom: 4px; }
+
+        /* Stack chips */
+        .chips-container { margin-bottom: 40px; }
 
         .chips {
             display: flex;
@@ -157,53 +303,14 @@
             font-size: 0.75rem;
             letter-spacing: 1px;
             padding: 8px 14px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            white-space: nowrap;
+            background: var(--bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
             border-radius: 4px;
-            transition: border-color 0.2s ease, background 0.2s ease;
-        }
-        
-        .chip:hover {
-            border-color: var(--accent);
-            background: rgba(255, 255, 255, 0.08);
+            white-space: nowrap;
         }
 
-        .tl-row {
-            display: grid;
-            grid-template-columns: 150px 1fr;
-            gap: 20px;
-            padding: 24px 30px;
-            background-color: var(--bg);
-            border: 1.5px solid var(--text-main);
-            margin-bottom: 20px;
-            box-shadow: 4px 4px 0 var(--border);
-            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-            position: relative;
-            z-index: 1;
-        }
-
-        .tl-row:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 6px 6px 0 var(--text-main);
-            background-color: var(--bg);
-            border-color: var(--text-main);
-        }
-
-        .tl-row:last-of-type { border-bottom: 1.5px solid var(--text-main); }
-
-        .tl-when {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.8rem;
-            letter-spacing: 1px;
-            color: var(--accent);
-            padding-top: 3px;
-        }
-
-        .tl-what strong { font-weight: 600; }
-        .tl-what span { color: var(--text-muted); }
+        .chip:hover { border-color: var(--text-main); }
 
         .more-links {
             display: flex;
@@ -212,172 +319,74 @@
             margin-top: 6px;
         }
 
-        .more-links a {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.8rem;
-            letter-spacing: 1.5px;
-            border-bottom: 2px solid var(--accent);
-            padding-bottom: 2px;
-        }
-
-        .more-links a:hover { color: var(--accent); }
-
-        .footer-inner {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            flex-wrap: wrap;
-            gap: 12px 30px;
-            max-width: 1000px;
-            margin: 0 auto;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.75rem;
-            letter-spacing: 1.5px;
-        }
-
-        .footer-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px 22px;
-        }
-
-        .footer-links a { color: var(--text-muted); }
-        .footer-links a:hover { color: var(--accent); }
-
         a:focus-visible, button:focus-visible {
             outline: 2px solid var(--accent);
             outline-offset: 3px;
         }
 
-        /* Pulse Animation for Status Dot */
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
-            70% { transform: scale(1.1); opacity: 0.8; box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
-            100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
-        }
-
-        .status-dot-animated {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: #4ade80; /* Assuming a green accent for live status */
-            border-radius: 50%;
-            margin-right: 10px;
-            animation: pulse 2s infinite;
-        }
-        
-        /* Sticky Action Bar */
+        /* Contact bar, shows near the bottom of the page */
         .sticky-action-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            background: rgba(255, 255, 255, 0.65);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-top: 1px solid rgba(0, 0, 0, 0.1);
-            padding: 15px 20px;
+            padding: 12px 20px;
             display: flex;
             justify-content: center;
-            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px 18px;
             z-index: 100;
             transform: translateY(100%);
             transition: transform 0.3s ease;
         }
-        
-        .sticky-action-bar.visible {
-            transform: translateY(0);
+
+        .sticky-action-bar.visible { transform: translateY(0); }
+
+        .sticky-action-bar .bar-text {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            color: var(--text-main);
+        }
+
+        .sticky-action-bar .btn { padding: 10px 18px; }
+
+        @media (max-width: 900px) {
+            .numbers { grid-template-columns: repeat(2, 1fr); }
         }
 
         @media (max-width: 700px) {
-            .proof-row, .tl-row { grid-template-columns: 1fr; gap: 8px; }
-            .proof-num { font-size: 2.1rem; }
-            .footer-inner { justify-content: center; text-align: center; }
-            .sticky-action-bar { padding: 12px 15px; }
-            .vitals { grid-template-columns: 1fr; border-right: 1.5px solid var(--text-main); border-bottom: none; }
+            .hero { padding: 26px 20px !important; }
+            .vitals { grid-template-columns: 1fr; }
             .vital { border-right: none; border-bottom: 1.5px solid var(--text-main); }
+            .vital:last-child { border-bottom: none; }
+            .numbers { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .proof-row, .tl-row { grid-template-columns: 1fr; gap: 8px; padding: 20px; }
+            .proof-num { font-size: 2.1rem; }
+            .chip { white-space: normal; }
+            .sticky-action-bar .bar-text { display: none; }
+            .sticky-action-bar { flex-wrap: nowrap; }
+            .sticky-action-bar .btn { width: auto; flex: 1 1 0; text-align: center; }
         }
-        
-        /* 5-SEC RULE REFINEMENTS */
-        .vitals {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            border: 1.5px solid var(--text-main);
-            background: var(--bg);
-            margin-bottom: 24px;
+
+        /* Background only: the same white page and grid paper as the live site, with the grid
+           blurred and softened like frosted glass. Cards, borders, buttons and layout unchanged. */
+        body::before {
+            background-image: linear-gradient(#cfcfd6 1px, transparent 1px),
+                              linear-gradient(90deg, #cfcfd6 1px, transparent 1px);
+            filter: blur(2px);
+            opacity: 0.85;
         }
-        
-        .vital {
-            padding: 20px 16px;
-            border-right: 1.5px solid var(--text-main);
-        }
-        
-        .vital:last-child {
-            border-right: none;
-        }
-        
-        .vital .k {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.65rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-        }
-        
-        .vital .v {
-            font-family: 'Inter', sans-serif;
-            font-weight: 800;
-            font-size: 0.95rem;
-            line-height: 1.3;
-            text-transform: uppercase;
-            color: var(--text-main);
-        }
-        
-        .vital .v.live {
-            color: var(--accent); /* Matches the orange/red status color */
-        }
-        
-        .chips-container h3 {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.85rem;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: var(--text-main);
-            margin-bottom: 16px;
-        }
-        
-        .chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        
-        .chip {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.75rem;
-            padding: 8px 16px;
-            background: var(--bg);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border-radius: 4px;
-            white-space: nowrap;
-        }
-        
-        .chip:hover {
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            background: var(--bg);
-            border-color: var(--text-main);
-        }
-        
-        /* Removed redundant proof-row styles */
     </style>
 </head>
 
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
-
     <nav class="top-nav">
         <a href="/" class="nav-logo no-underline text-inherit" data-cta="full_site">SUBJECT // PRANAV KAJA</a>
         <a href="/" class="nav-back" data-cta="full_site">&larr; FULL SITE</a>
@@ -385,14 +394,23 @@
 
     <main class="container" id="main">
         <header class="hero">
-            <div class="hero-label mb-20"><span class="status-dot-animated"></span>[ OPERATOR BRIEF ]</div>
-            <h1 class="hero-title">PRANAV<br>KAJA</h1>
-            <p class="hero-subtitle">Data &amp; Analytics Engineer. I build pipelines, models, and dashboards that
-                survive contact with real data.</p>
+            <h1 class="sr-only">Pranav Kaja</h1>
+            <p class="hero-headline">Full stack generalist. I deliver the outcome myself, start to finish.</p>
+            <p class="hero-sub">I keep up with what's new, I have taste and I can make things. I understand AI and I'm
+                technical enough to build with it.</p>
+            <p class="hero-focus vx v-gen">I've handled procurement and payments on 3 building sites, automated production planning
+                at UMass Dining, and I build the tools I need, like a planner that
+                replaced a 39-tab spreadsheet.</p>
+            <p class="hero-focus vx v-data">Python, SQL and Power BI, at work and in my own projects: a planning pipeline for 37 dining
+                locations, dashboards that cut weekly reviews 30%, and a fraud model that went from 0.60 to 0.978 AUC.</p>
+            <p class="hero-focus vx v-ops">I ran 3 building sites and managed 10 rental units at Om Sri Projects. Then I supervised
+                18 to 36 student staff per shift at UMass Dining.</p>
+            <p class="hero-focus vx v-sc">I ran procurement on 3 active building sites, held 2 to 3 competing quotes on every
+                order and saved up to $12,000 per site on material. Then I forecast demand at UMass Dining.</p>
             <div class="hero-actions brief-hero-actions">
                 <a href="mailto:balajipranavreddyk@gmail.com" class="btn btn-primary" data-cta="email">EMAIL ME</a>
-                <a href="tel:+14134724729" class="btn btn-secondary" data-cta="phone">PHONE</a>
                 <a href="/Resume_PranavKaja.pdf" target="_blank" class="btn btn-secondary" data-cta="resume">RESUME (PDF)</a>
+                <a href="tel:+14134724729" class="btn btn-secondary" data-cta="phone">PHONE</a>
                 <a href="https://www.linkedin.com/in/pranavkaja" target="_blank" rel="noopener" class="btn btn-secondary"
                     data-cta="linkedin">LINKEDIN</a>
                 <a href="https://github.com/PranavKaja" target="_blank" rel="noopener" class="btn btn-secondary"
@@ -403,7 +421,10 @@
         <div class="vitals">
             <div class="vital">
                 <div class="k">Role</div>
-                <div class="v">Data &amp; Analytics Engineer</div>
+                <div class="v vx v-gen">Analytics and Operations</div>
+                <div class="v vx v-data">Data &amp; Analytics</div>
+                <div class="v vx v-ops">Operations</div>
+                <div class="v vx v-sc">Supply Chain &amp; Procurement</div>
             </div>
             <div class="vital">
                 <div class="k">Education</div>
@@ -415,98 +436,277 @@
             </div>
             <div class="vital">
                 <div class="k">Status</div>
-                <div class="v live">Open to Full-Time Roles</div>
+                <div class="v live">Open to full time roles</div>
             </div>
         </div>
 
-        <div class="chips-container">
-            <h3 class="subsection-title" style="margin-bottom: 12px; font-size: 0.8rem;">CORE STACK</h3>
-            <div class="chips">
-                <span class="chip">Python</span>
-                <span class="chip">SQL (PostgreSQL)</span>
-                <span class="chip">XGBoost</span>
-                <span class="chip">scikit-learn</span>
-                <span class="chip">Power BI + DAX</span>
-                <span class="chip">Excel (VBA, Power Query)</span>
-                <span class="chip">Flask</span>
-                <span class="chip">Supabase / Postgres</span>
-                <span class="chip">ETL pipelines</span>
-                <span class="chip">REST APIs</span>
-                <span class="chip">Git</span>
-                <span class="chip">AI Integration</span>
-            </div>
+        <!-- Headline numbers, four per version -->
+        <div class="numbers vx v-gen">
+            <div class="num-card"><div class="n">0.978</div><div class="l">Fraud model AUC, up from 0.60</div></div>
+            <div class="num-card"><div class="n">2 hrs &rarr; 12 min</div><div class="l">Daily production planning at UMass Dining, with a VBA and Power Query pipeline</div></div>
+            <div class="num-card"><div class="n">$12K</div><div class="l">Up to this much saved on material per building site by holding competing quotes</div></div>
+            <div class="num-card"><div class="n">~7 in 10</div><div class="l">Customer messages to 17 brands on Instagram with no public reply, from my Overheard study</div></div>
+        </div>
+        <div class="numbers vx v-data">
+            <div class="num-card"><div class="n">0.978</div><div class="l">Fraud model AUC on 284,807 transactions, up from 0.60</div></div>
+            <div class="num-card"><div class="n">30%</div><div class="l">Faster weekly reviews from Power BI dashboards</div></div>
+            <div class="num-card"><div class="n">3,662</div><div class="l">Social mentions classified with Gemini on Vertex AI</div></div>
+            <div class="num-card"><div class="n">27%</div><div class="l">Yield lift from a data audit across prep and service</div></div>
+        </div>
+        <div class="numbers vx v-ops">
+            <div class="num-card"><div class="n">18 to 36</div><div class="l">Student staff supervised per shift</div></div>
+            <div class="num-card"><div class="n">3</div><div class="l">Building sites where I ran sourcing, quality and payments</div></div>
+            <div class="num-card"><div class="n">10</div><div class="l">Rental units where I handled tenants and rent</div></div>
+            <div class="num-card"><div class="n">2 hrs &rarr; 12 min</div><div class="l">Daily production planning at UMass Dining, with a VBA and Power Query pipeline</div></div>
+        </div>
+        <div class="numbers vx v-sc">
+            <div class="num-card"><div class="n">$12K</div><div class="l">Up to this much saved on material per site by holding 2 to 3 quotes</div></div>
+            <div class="num-card"><div class="n">9</div><div class="l">Trades sourced, from concrete to elevators</div></div>
+            <div class="num-card"><div class="n">98%</div><div class="l">Service level with zero stockouts, in a supply chain simulation</div></div>
+            <div class="num-card"><div class="n">~550K</div><div class="l">Residents in reach of a modeled 3-hub drone network</div></div>
         </div>
 
         <section class="section">
             <div class="section-header">
-                <h2>Proof</h2>
+                <h2>Experience</h2>
                 <div class="line"></div>
             </div>
 
-            <div class="proof-row">
-                <div class="proof-num">0.978 AUC</div>
-                <div>
-                    <div class="proof-kicker">Fraud Triage // XGBoost + Gemini</div>
-                    <p class="proof-copy">Fraud detection lifted from 0.60 to 0.978 AUC on 284,807 card transactions.
-                        A <strong>Gemini</strong> triage layer reviews each flag and writes a verdict an analyst can audit.</p>
-                    <a href="/projects/fraud-triage" class="proof-link no-underline" data-cta="fraud_case">READ THE CASE STUDY &rarr;</a>
+            <div class="tl-row">
+                <div class="tl-when">Sep 2024 to May 2026</div>
+                <div class="tl-what">
+                    <strong>UMass Amherst Dining Services</strong>
+                    <span class="tl-title">Student Supervisor &middot; Amherst, MA</span>
+                    <ul class="vx v-gen">
+                        <li>Supervised 18 to 36 student staff per shift.</li>
+                        <li>Cut daily production planning from about 2 hours to about 12 minutes with a VBA and Power Query
+                            pipeline across 37 retail locations, then rebuilt it as a browser tool.</li>
+                    </ul>
+                    <ul class="vx v-data">
+                        <li>Built an ETL pipeline in VBA and Power Query across 37 retail locations, cutting manual entry 90%.</li>
+                        <li>Audited data across prep and service stages and lifted yield 27%.</li>
+                        <li>Segmented 15,000 daily patrons by volume and product mix to plan staffing.</li>
+                    </ul>
+                    <ul class="vx v-ops">
+                        <li>Supervised 18 to 36 student staff per shift across high-volume retail and stadium dining.</li>
+                        <li>Segmented 15,000 daily patrons by volume and product mix and moved staff into peak windows.</li>
+                        <li>Cut daily production planning from about 2 hours to about 12 minutes with a VBA and Power Query pipeline.</li>
+                    </ul>
+                    <ul class="vx v-sc">
+                        <li>Forecasted daily inventory from historical demand to prevent stockouts.</li>
+                        <li>Audited data across prep and service stages and lifted yield 27%.</li>
+                        <li>Cut daily production planning from about 2 hours to about 12 minutes with a VBA and Power Query pipeline.</li>
+                    </ul>
                 </div>
             </div>
 
-            <div class="proof-row">
-                <div class="proof-num">Live CRM</div>
-                <div>
-                    <div class="proof-kicker">Invitovate // Full-Stack Application</div>
-                    <p class="proof-copy">Founded and led development of a live multiuser AI-powered LinkedIn and email outreach SaaS that lets users bring their own AI agent to automate sourcing, drafting, and sending while maintaining inbox safety and data isolation.</p>
-                    <a href="https://invitovate.com" target="_blank" rel="noopener" class="proof-link no-underline" data-cta="invitovate_case">VISIT INVITOVATE &rarr;</a>
+            <div class="tl-row">
+                <div class="tl-when">May 2022 to Aug 2024</div>
+                <div class="tl-what">
+                    <strong>Om Sri Projects LLP</strong>
+                    <span class="tl-title vx v-gen v-ops">Business Analyst</span>
+                    <span class="tl-title vx v-data">Project Analyst</span>
+                    <span class="tl-title vx v-sc">Procurement Analyst</span>
+                    <ul class="vx v-gen">
+                        <li>Ran sourcing, quality and payment approval on 3 building sites end to end.</li>
+                        <li>Saved up to $12,000 per site on material by holding 2 to 3 competing quotes on every order.</li>
+                        <li>Managed tenants and rent collection for 10 rental units, 6 residential and 4 commercial.</li>
+                    </ul>
+                    <ul class="vx v-data">
+                        <li>Built the Excel cost and progress records for 3 sites, measuring spend against estimate by trade.</li>
+                        <li>Recorded quantities and measurements per trade to check contractor billing against work actually done.</li>
+                        <li>Reported site spend, progress and pending work to the owner from those records.</li>
+                    </ul>
+                    <ul class="vx v-ops">
+                        <li>Scheduled electrical, plumbing and the other trades so no two teams overlapped on site.</li>
+                        <li>Approved every contractor payment across 3 sites, only once work passed a spec check.</li>
+                        <li>Managed tenants and rent collection for 10 rental units, 6 residential and 4 commercial, and scheduled their repairs.</li>
+                    </ul>
+                    <ul class="vx v-sc">
+                        <li>Ran procurement for 3 active sites across concrete, plumbing, electrical, paint and heavy equipment.</li>
+                        <li>Sourced and compared 2 to 3 suppliers per item across 9 trades, from concrete to elevators.</li>
+                        <li>Saved up to $12,000 per site on material by holding competing quotes on every order.</li>
+                    </ul>
                 </div>
             </div>
 
-            <div class="proof-row">
-                <div class="proof-num">7 in 10</div>
-                <div>
-                    <div class="proof-kicker">Overheard // BigQuery + Vertex AI Gemini</div>
-                    <p class="proof-copy">Classified 3,662 mentions with <strong>Gemini on Vertex AI</strong>. Across 17 brands, roughly 7 in 10 directed
-                        customer messages get no public reply, corrected by 32 hand-checks.</p>
-                    <a href="/projects/overheard" class="proof-link no-underline" data-cta="overheard_case">READ THE CASE STUDY &rarr;</a>
+            <div class="tl-row">
+                <div class="tl-when">Sep 2022 to May 2023</div>
+                <div class="tl-what">
+                    <strong>Esports SIG, GITAM</strong>
+                    <span class="tl-title">Operations and Finance Lead</span>
+                    <ul class="vx v-gen v-data v-sc">
+                        <li>Tracked finances across 7 concurrent programs; turnout tripled to 1,800+.</li>
+                        <li>Secured 100% of program funding from outside sponsors.</li>
+                    </ul>
+                    <ul class="vx v-ops">
+                        <li>Planned and ran 7 concurrent events, coordinating venues, vendors and volunteers.</li>
+                        <li>Turnout tripled to 1,800+, with 100% of funding from outside sponsors.</li>
+                    </ul>
                 </div>
             </div>
 
-            <div class="proof-row">
-                <div class="proof-num">39 &rarr; 1</div>
-                <div>
-                    <div class="proof-kicker">UMass Dining CPK Planner // ETL to Live Tool</div>
-                    <p class="proof-copy">Cut manual entry by 90% across 37 locations. What started as a <strong>VBA / Power Query</strong> script evolved into a live <strong>in-browser planner</strong> that replaces a 39-tab daily spreadsheet.</p>
-                    <a href="/projects/cpk-production" class="proof-link no-underline" data-cta="cpk_case">TRY THE LIVE TOOL &rarr;</a>
+            <div class="tl-row vx v-gen v-data">
+                <div class="tl-when">May 2022 to Jul 2022</div>
+                <div class="tl-what">
+                    <strong>Acmegrade</strong>
+                    <span class="tl-title">Data Science Intern &middot; Remote</span>
+                    <ul>
+                        <li>Trained Random Forest and Gradient Boosting models on a 100,000-record dataset, lifting accuracy 15% over baseline.</li>
+                        <li>Automated preprocessing in Python, cutting prep time 30%.</li>
+                    </ul>
                 </div>
             </div>
         </section>
 
         <section class="section">
             <div class="section-header">
-                <h2>Timeline</h2>
+                <h2>Projects</h2>
                 <div class="line"></div>
             </div>
 
-            <div class="tl mb-40">
-                <div class="tl-row">
-                    <div class="tl-when">2024 - 2026</div>
-                    <div class="tl-what"><strong>UMass Amherst Dining &middot; Student Supervisor.</strong>
-                        <span>Led student teams; built the ETL and demand forecasting for 37 locations.</span>
-                    </div>
+            <!-- Each version shows four. Order follows the markup, so a card used high in one version
+                 and low in another appears twice with different version classes. -->
+
+            <div class="proof-row vx v-sc">
+                <div class="proof-num">~550K</div>
+                <div>
+                    <div class="proof-kicker">Prime Air Drone Logistics // Python + Folium</div>
+                    <p class="proof-copy">Designed a hub and spoke drone delivery network for Massachusetts with weighted
+                        multi-criteria scoring and geospatial analysis. The model's 3 hubs reach about 550,000 residents,
+                        about 7.9% of the state, and about 1,900 packages a day. These are modeled estimates from documented, conservative assumptions.</p>
+                    <a href="/projects/prime-air-drone-logistics" class="proof-link no-underline" data-cta="primeair_case">READ THE CASE STUDY &rarr;</a>
                 </div>
-                <div class="tl-row">
-                    <div class="tl-when">2022 - 2023</div>
-                    <div class="tl-what"><strong>Esports SIG, GITAM &middot; Operations and Finance Lead.</strong>
-                        <span>7 concurrent programs; turnout tripled to 1,800+; 100% sponsor-funded.</span>
-                    </div>
+            </div>
+
+            <div class="proof-row vx v-sc">
+                <div class="proof-num">34%</div>
+                <div>
+                    <div class="proof-kicker">Supply Chain Optimization // HBP simulation</div>
+                    <p class="proof-copy">A 4-year supply chain simulation: 34% cumulative margin at a 98% service level with
+                        zero stockouts, from hybrid offshore and nearshore sourcing with statistical inventory buffers.</p>
+                    <a href="/projects/supply-chain-optimization" class="proof-link no-underline" data-cta="supplychain_case">READ THE CASE STUDY &rarr;</a>
                 </div>
-                <div class="tl-row">
-                    <div class="tl-when">2022</div>
-                    <div class="tl-what"><strong>Acmegrade &middot; Data Science Intern.</strong>
-                        <span>Random Forest and Gradient Boosting on 100,000 records; conversion-prediction accuracy up
-                            15%.</span>
-                    </div>
+            </div>
+
+            <div class="proof-row vx v-ops">
+                <div class="proof-num">39 tabs</div>
+                <div>
+                    <div class="proof-kicker">CPK Production Planner // From spreadsheet to live tool</div>
+                    <p class="proof-copy">Daily production planning at UMass Dining went from about 2 hours to about 12 minutes
+                        with a <strong>VBA and Power Query</strong> pipeline. I then rebuilt it as a browser tool that replaces a
+                        39-tab spreadsheet.</p>
+                    <a href="/projects/cpk-production" class="proof-link no-underline" data-cta="cpk_case">TRY THE LIVE TOOL &rarr;</a>
+                </div>
+            </div>
+
+            <div class="proof-row vx v-gen v-data">
+                <div class="proof-num">0.978</div>
+                <div>
+                    <div class="proof-kicker">Fraud Triage // XGBoost + Gemini</div>
+                    <p class="proof-copy">Fraud detection lifted from 0.60 to 0.978 AUC on 284,807 transactions, where fraud is
+                        under 1% of the data. The model catches 84% of fraud, and a <strong>Gemini</strong> layer reviews each
+                        high-risk flag and returns a structured verdict.</p>
+                    <a href="/projects/fraud-triage" class="proof-link no-underline" data-cta="fraud_case">READ THE CASE STUDY &rarr;</a>
+                </div>
+            </div>
+
+            <div class="proof-row vx v-data v-ops">
+                <div class="proof-num">30%</div>
+                <div>
+                    <div class="proof-kicker">Corporate Analytics, TapInnovations // Power BI + DAX</div>
+                    <p class="proof-copy">Executive dashboards on live B2B data with custom DAX measures. Weekly review time fell
+                        30% because I cut what leadership did not need to see.</p>
+                    <a href="/projects/corporate-analytics" class="proof-link no-underline" data-cta="corp_case">READ THE CASE STUDY &rarr;</a>
+                </div>
+            </div>
+
+            <div class="proof-row vx v-gen v-data v-ops v-sc">
+                <div class="proof-num">7 in 10</div>
+                <div>
+                    <div class="proof-kicker">Overheard // BigQuery + Vertex AI Gemini</div>
+                    <p class="proof-copy">Classified 3,662 social mentions with <strong>Gemini on Vertex AI</strong>. Across 17
+                        brands, roughly 7 in 10 customer messages aimed at the brand get no public reply, a figure I corrected
+                        after checking 32 of them by hand. In an audit of SharkNinja's recent Instagram posts, 53 comments showed clear intent to
+                        buy and none got a reply.</p>
+                    <a href="/projects/overheard" class="proof-link no-underline" data-cta="overheard_case">READ THE CASE STUDY &rarr;</a>
+                </div>
+            </div>
+
+            <div class="proof-row vx v-gen v-data v-sc">
+                <div class="proof-num">39 tabs</div>
+                <div>
+                    <div class="proof-kicker">CPK Production Planner // From spreadsheet to live tool</div>
+                    <p class="proof-copy">Daily production planning at UMass Dining went from about 2 hours to about 12 minutes
+                        with a <strong>VBA and Power Query</strong> pipeline. I then rebuilt it as a browser tool that replaces a
+                        39-tab spreadsheet.</p>
+                    <a href="/projects/cpk-production" class="proof-link no-underline" data-cta="cpk_case">TRY THE LIVE TOOL &rarr;</a>
+                </div>
+            </div>
+
+            <div class="proof-row vx v-gen v-ops">
+                <div class="proof-num">1,387</div>
+                <div>
+                    <div class="proof-kicker">Invitovate // Multi-user outreach CRM</div>
+                    <p class="proof-copy">A multi-user outreach CRM I run my own job search on, built on Supabase Postgres with
+                        each user's data kept separate. On my own board it tracks 1,387 contacts, 146 invite accepts and 25 replies. Every message is tagged
+                        by variant, so the accept rate shows what works. Every reply so far came through LinkedIn; email has 0
+                        replies from 114 sends.</p>
+                    <a href="/projects/invitovate" class="proof-link no-underline" data-cta="invitovate_case">READ THE CASE STUDY &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>Stack</h2>
+                <div class="line"></div>
+            </div>
+            <div class="chips-container">
+                <div class="chips vx v-gen">
+                    <span class="chip">Python</span>
+                    <span class="chip">SQL (PostgreSQL)</span>
+                    <span class="chip">Power BI + DAX</span>
+                    <span class="chip">Excel (VBA, Power Query)</span>
+                    <span class="chip">XGBoost</span>
+                    <span class="chip">scikit-learn</span>
+                    <span class="chip">ETL pipelines</span>
+                    <span class="chip">Supabase / Postgres</span>
+                    <span class="chip">LLM integration</span>
+                    <span class="chip">RAG</span>
+                    <span class="chip">REST APIs</span>
+                    <span class="chip">Git</span>
+                </div>
+                <div class="chips vx v-data">
+                    <span class="chip">Python (pandas, scikit-learn)</span>
+                    <span class="chip">SQL (PostgreSQL, window functions)</span>
+                    <span class="chip">Power BI + DAX</span>
+                    <span class="chip">Excel (VBA, Power Query)</span>
+                    <span class="chip">XGBoost</span>
+                    <span class="chip">ETL pipelines</span>
+                    <span class="chip">KPI dashboarding</span>
+                    <span class="chip">Feature engineering</span>
+                    <span class="chip">LLM integration</span>
+                    <span class="chip">RAG</span>
+                    <span class="chip">Git</span>
+                </div>
+                <div class="chips vx v-ops">
+                    <span class="chip">Excel (VBA, Power Query)</span>
+                    <span class="chip">Power BI + DAX</span>
+                    <span class="chip">SQL</span>
+                    <span class="chip">Google Sheets</span>
+                    <span class="chip">KPI dashboarding</span>
+                    <span class="chip">Microsoft Office (Word, Outlook)</span>
+                                        <span class="chip">Python</span>
+                </div>
+                <div class="chips vx v-sc">
+                    <span class="chip">Excel (VBA, Power Query)</span>
+                    <span class="chip">Demand forecasting</span>
+                    <span class="chip">SQL</span>
+                    <span class="chip">Python (pandas)</span>
+                    <span class="chip">Folium / geospatial</span>
+                    <span class="chip">Power BI + DAX</span>
+                    <span class="chip">KPI dashboarding</span>
                 </div>
             </div>
 
@@ -519,37 +719,36 @@
             </div>
         </section>
     </main>
+
     <div id="footer-trigger" style="height: 1px; width: 100%;"></div>
-    
+
     <div class="sticky-action-bar" id="stickyBar">
-        <span style="font-family: 'Share Tech Mono', monospace; font-size: 0.95rem; font-weight: bold; display: flex; align-items: center; color: var(--text-main);">TIME TO GIVE PRANAV A CHANCE</span>
+        <span class="bar-text">balajipranavreddyk@gmail.com &middot; +1 413-472-4729</span>
+        <a href="mailto:balajipranavreddyk@gmail.com" class="btn btn-primary" data-cta="bar_email">EMAIL ME</a>
+        <a href="/Resume_PranavKaja.pdf" target="_blank" class="btn btn-secondary" data-cta="bar_resume">RESUME</a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="config.js" defer></script>
     <script src="analytics.js" defer></script>
     <script>
-        var yearEl = document.getElementById('year');
-        if (yearEl) yearEl.textContent = new Date().getFullYear();
-        
-        // Use IntersectionObserver to completely bypass all browser scroll math and zoom bugs
-        var observer = new IntersectionObserver(function(entries) {
-            var stickyBar = document.getElementById('stickyBar');
-            if (entries[0].isIntersecting) {
-                stickyBar.classList.add('visible');
-            } else {
-                stickyBar.classList.remove('visible');
-            }
-        }, { rootMargin: '100px' }); // Triggers when within 100px of the absolute bottom
-        
-        // Wait for DOM to be ready before observing
-        document.addEventListener("DOMContentLoaded", function() {
+        // Show the contact bar once the reader reaches the bottom of the page
+        var observer = new IntersectionObserver(function (entries) {
+            var bar = document.getElementById('stickyBar');
+            if (entries[0].isIntersecting) bar.classList.add('visible');
+            else bar.classList.remove('visible');
+        }, { rootMargin: '100px' });
+
+        document.addEventListener('DOMContentLoaded', function () {
             observer.observe(document.getElementById('footer-trigger'));
         });
-        
+
         document.addEventListener('click', function (e) {
             var el = e.target.closest && e.target.closest('[data-cta]');
-            if (el && window.intel) window.intel.track('brief_cta', { target: el.dataset.cta });
+            if (el && window.intel) window.intel.track('brief_cta', {
+                target: el.dataset.cta,
+                version: document.documentElement.getAttribute('data-v')
+            });
         });
     </script>
 </body>
