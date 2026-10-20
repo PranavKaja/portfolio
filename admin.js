@@ -1366,8 +1366,9 @@
       return;
     }
     // Each visit is labelled in v_resume_opens (supabase/resume_opens.sql): a link scan opens every
-    // link in the PDF at once, a likely scan is one quiet visit within minutes of sending, a person
-    // clicked, scrolled or came back. Most LinkedIn opens are scans, so people go to the top.
+    // link in the PDF at once or comes from a machine browser (supabase/machine_visits.sql), a likely
+    // scan is one quiet visit within minutes of sending, a person clicked, scrolled or came back.
+    // Most LinkedIn opens are scans, so people go to the top.
     const tagMatches = await matchShortTags(data);
     const n = v => Number(v) || 0;
     // The view labels "likely scan" only for registered codes. For a short tag with one tracker match,
@@ -1389,7 +1390,7 @@
     const scans = tot('scan_visits') + tot('likely_scan_visits');
     const summary = `<div class="rl-summary">${plural(data.length, 'link', 'links')} opened, ${plural(tot('visitors'), 'visit', 'visits')}: ` +
       `<b>${plural(tot('person_visits'), 'person', 'people')}</b>, ${tot('unclear_visits')} unclear, ` +
-      `${plural(scans, 'link scan', 'link scans')} when the application went in.</div>`;
+      `${plural(scans, 'link scan', 'link scans')} by machines, not people.</div>`;
     box.innerHTML = summary + '<div class="rl-wrap"><table class="lb rl"><thead><tr><th>Company</th><th>Role</th><th>Document</th>' +
       '<th>Sent via</th><th>First open</th><th>Last seen</th><th>Visits</th><th>Read</th><th>Clicked</th><th>Who</th></tr></thead><tbody>' +
       rows.map(r => {

@@ -11,12 +11,18 @@
  * visit, then taken off the address bar. Any page accepts one.
  *
  * Own visits: open any page once with ?me=1 and this browser is never
- * counted again. ?me=0 turns counting back on.
+ * counted again. ?me=0 turns counting back on. Local copies (file:// or
+ * localhost) are never counted.
  * ============================================================ */
 (function () {
   // respect Do Not Track
   var dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
   if (dnt === '1' || dnt === 'yes') return;
+
+  // local copies (a file opened from disk, a dev server) are me testing: never log them to the live table
+  var host = location.hostname;
+  if (location.protocol === 'file:' || host === 'localhost' || host === '127.0.0.1' || host === '[::1]' ||
+      /\.localhost$/.test(host)) { window.intel = { track: function () {} }; return; }
 
   // own-visit switch, so checking my own resume links does not look like a recruiter
   try {
