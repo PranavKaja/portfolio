@@ -1,11 +1,13 @@
 -- Visitor kinds: which browsers on the site are people, and which are machines or Pranav.
--- Safe to run again. Needs events, applications and own_sessions (supabase/resume_opens.sql).
+-- Safe to run again. Needs events, applications, own_sessions (supabase/resume_opens.sql) and
+-- visit_machine (supabase/machine_visits.sql).
 --
 -- One label per browser (session_id is a random id kept per browser):
 --   owner    Pranav: listed in own_sessions, or loaded a local .html dev copy of a page
---   bot      flagged bot=1 by analytics.js, a headless browser, or events with no page view
---   scanner  the application link scanner: 2+ pages loaded within 1 s, or a quiet one-day visit that
---            started within 1.5 s of another new browser, or within 3 min of an application being sent
+--   bot      flagged bot=1 by analytics.js, a browser that says it is a bot or crawler, or events with no page view
+--   scanner  the application link scanner: 2+ pages loaded within 1 s, or a quiet visit from a machine
+--            browser (see machine_visits.sql), or a quiet one-day visit that started within 1.5 s of
+--            another new browser, or within 3 min of an application being sent
 --   ping     one page, 0 visible seconds, nothing else: prefetch and uptime checks (and instant bounces)
 --   visitor  everything else
 -- "Quiet" means no click, key, scroll, resume download, contact, project or game event.
@@ -21,7 +23,8 @@ CREATE OR REPLACE VIEW public.v_session_kinds WITH (security_invoker = true) AS
      count(DISTINCT (created_at AT TIME ZONE 'America/New_York')::date) AS days,
      bool_or(type IN ('engaged', 'brief_cta', 'resume_download', 'contact_click', 'contact_submit',
                       'project_click', 'game_score', 'ttt_match')) AS acted,
-     bool_or(meta ->> 'bot' = '1' OR meta ->> 'ua' ILIKE '%headless%') AS botflag,
+     bool_or(meta ->> 'bot' = '1' OR meta ->> 'ua' ILIKE '%headless%' OR CASE WHEN type = 'pageview' THEN public.visit_machine(meta) END = 'bot') AS botflag,
+     bool_or(CASE WHEN type = 'pageview' THEN public.visit_machine(meta) END = 'machine') AS machine,
      bool_or(type = 'pageview' AND path LIKE '%.html') AS devcopy,
      COALESCE(sum((meta ->> 'seconds')::numeric) FILTER (WHERE type = 'page_time'
               AND (meta ->> 'seconds') ~ '^[0-9]+([.][0-9]+)?$'), 0) AS secs
@@ -49,6 +52,7 @@ CREATE OR REPLACE VIEW public.v_session_kinds WITH (security_invoker = true) AS
      WHEN s.devcopy OR EXISTS (SELECT 1 FROM own_sessions o WHERE o.session_id = s.session_id) THEN 'owner'
      WHEN s.botflag OR s.pv = 0 THEN 'bot'
      WHEN EXISTS (SELECT 1 FROM burst b WHERE b.session_id = s.session_id) THEN 'scanner'
+     WHEN s.machine AND NOT s.acted THEN 'scanner'
      WHEN s.days = 1 AND NOT s.acted AND EXISTS (
        SELECT 1 FROM near n WHERE n.session_id = s.session_id AND n.gap < 1.5) THEN 'scanner'
      WHEN s.days = 1 AND NOT s.acted AND EXISTS (

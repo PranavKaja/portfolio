@@ -1,9 +1,11 @@
 -- Resume link opens: what the Ops Console "Resume link opens" table reads.
--- Safe to run again. Needs the events, resume_links and applications tables.
+-- Safe to run again. Needs the events, resume_links and applications tables, and visit_machine
+-- (supabase/machine_visits.sql).
 --
 -- Every resume and cover letter links to /brief?r=<code>. analytics.js saves the code with
 -- each event of that tab. This view groups those events per code and labels each visit:
---   scan         2+ pages loaded within 1 s (every link in the PDF at once; no person does that)
+--   scan         2+ pages loaded within 1 s (every link in the PDF at once; no person does that), or a
+--                quiet visit from a machine browser (see machine_visits.sql)
 --   person       clicked or typed or scrolled (engaged, brief_cta, resume, contact, project) or came back another day
 --   likely_scan  one quiet visit within 10 min of sending (tracker applied_at or created_at, joined on job_url)
 --   unclear      one quiet visit with no send time to compare against
@@ -50,13 +52,16 @@ CREATE OR REPLACE VIEW public.v_resume_opens WITH (security_invoker = true) AS
      count(DISTINCT (ev.created_at AT TIME ZONE 'America/New_York')::date) AS days,
      bool_or(ev.type IN ('engaged', 'brief_cta', 'resume_download', 'contact_click', 'contact_submit', 'project_click')) AS acted,
      EXISTS (SELECT 1 FROM pv WHERE pv.code = ev.code AND pv.session_id = ev.session_id
-                                AND pv.gap < interval '1 second') AS burst
+                                AND pv.gap < interval '1 second') AS burst,
+     bool_or(CASE WHEN ev.type = 'pageview' THEN public.visit_machine(ev.meta) END IS NOT NULL) AS machine
    FROM ev WHERE ev.code IS NOT NULL
    GROUP BY ev.code, ev.session_id
  ), labeled AS (
    SELECT v.code, v.session_id, CASE
      WHEN v.burst THEN 'scan'
-     WHEN v.acted OR v.days > 1 THEN 'person'
+     WHEN v.acted THEN 'person'
+     WHEN v.machine THEN 'scan'
+     WHEN v.days > 1 THEN 'person'
      WHEN EXISTS (
        SELECT 1 FROM resume_links l JOIN applications a ON a.job_url = l.job_url
        WHERE l.code = v.code AND COALESCE(l.job_url, '') <> ''
@@ -84,7 +89,8 @@ CREATE OR REPLACE VIEW public.v_resume_opens WITH (security_invoker = true) AS
      count(*) FILTER (WHERE ev.type = 'project_click') AS project_clicks,
      count(*) FILTER (WHERE ev.type = ANY (ARRAY['contact_click', 'contact_submit'])
                         OR (ev.type = 'brief_cta' AND ev.meta ->> 'target' IN ('email', 'phone', 'linkedin', 'bar_email'))) AS contact_clicks,
-     COALESCE(bool_or((ev.meta ->> 'bot') = '1'), false) AS automated
+     COALESCE(bool_or(CASE WHEN ev.type = 'pageview' THEN public.visit_machine(ev.meta) END = 'bot'
+                      OR (ev.meta ->> 'bot') = '1'), false) AS automated
    FROM ev WHERE ev.code IS NOT NULL GROUP BY ev.code
  )
  SELECT a.code, a.first_open, a.last_seen, a.views, a.visitors, a.days_seen, a.seconds,
