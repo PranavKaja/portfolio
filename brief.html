@@ -89,6 +89,14 @@
             body { zoom: 0.9; }
         }
 
+        /* Big screens: scale the whole page up in steps so it fills the screen like it does on a
+           laptop. Same layout, everything proportionally bigger. */
+        @media (min-width: 1600px) { body { zoom: 1.05; } }
+        @media (min-width: 1800px) { body { zoom: 1.2; } }
+        @media (min-width: 2100px) { body { zoom: 1.35; } }
+        @media (min-width: 2500px) { body { zoom: 1.6; } }
+        @media (min-width: 3200px) { body { zoom: 2; } }
+
         /* Hero */
         .hero {
             padding: 35px 40px !important;
@@ -364,6 +372,15 @@
             .sticky-action-bar .bar-text { display: none; }
             .sticky-action-bar { flex-wrap: nowrap; }
             .sticky-action-bar .btn { width: auto; flex: 1 1 0; text-align: center; }
+        }
+
+        /* Background only: the same white page and grid paper as the live site, with the grid
+           blurred and softened like frosted glass. Cards, borders, buttons and layout unchanged. */
+        body::before {
+            background-image: linear-gradient(#cfcfd6 1px, transparent 1px),
+                              linear-gradient(90deg, #cfcfd6 1px, transparent 1px);
+            filter: blur(2px);
+            opacity: 0.85;
         }
     </style>
 </head>
@@ -655,7 +672,8 @@
                     <span class="chip">scikit-learn</span>
                     <span class="chip">ETL pipelines</span>
                     <span class="chip">Supabase / Postgres</span>
-                    <span class="chip">Google Gemini API</span>
+                    <span class="chip">LLM integration</span>
+                    <span class="chip">RAG</span>
                     <span class="chip">REST APIs</span>
                     <span class="chip">Git</span>
                 </div>
@@ -668,7 +686,8 @@
                     <span class="chip">ETL pipelines</span>
                     <span class="chip">KPI dashboarding</span>
                     <span class="chip">Feature engineering</span>
-                    <span class="chip">Google Gemini API</span>
+                    <span class="chip">LLM integration</span>
+                    <span class="chip">RAG</span>
                     <span class="chip">Git</span>
                 </div>
                 <div class="chips vx v-ops">
