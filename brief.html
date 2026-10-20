@@ -24,7 +24,7 @@
     <script>
         /* Pick the version before first paint. Order: ?v=, then the resume link code's
            role family, then whatever this tab already showed. No match keeps "gen".
-           This runs before analytics.js, which takes ?r= off the address bar. */
+           It then takes ?r=, ?v=, ?me= and utm tags off the address bar (see the end). */
         (function () {
             var FAMILY = {
                 da: 'data', ba: 'data', de: 'data', ai: 'data', pd: 'data', fn: 'data', qc: 'data', it: 'data',
@@ -57,6 +57,30 @@
                 if (v) sessionStorage.setItem('brief_v', v);
             } catch (e) { /* storage or URL API blocked: keep the default */ }
             document.documentElement.setAttribute('data-v', v || 'gen');
+
+            /* Clean the address bar right away, so a visitor sees pranavkaja.com/brief and never
+               the code. analytics.js loads later and used to do this, which skipped Do Not Track
+               visitors and browsers with ?me=1. The code is kept in the same place analytics.js
+               reads it from (sessionStorage intel_tag), so the visit is still credited. */
+            try {
+                var p = new URLSearchParams(location.search), tag = {}, found = false;
+                var code = (p.get('r') || '').trim().toLowerCase().replace(/[^a-z0-9]+$/, '');
+                if (/^[a-z0-9-]{6,40}$/.test(code)) { tag.r = code; found = true; }
+                ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_id'].forEach(function (k) {
+                    var val = p.get(k);
+                    if (val) { tag[k] = String(val).slice(0, 80); found = true; }
+                });
+                if (found) sessionStorage.setItem('intel_tag', JSON.stringify(tag));
+                var me = p.get('me');
+                if (me === '1') localStorage.setItem('intel_off', '1');
+                if (me === '0') localStorage.removeItem('intel_off');
+                ['r', 'v', 'me', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_id']
+                    .forEach(function (k) { p.delete(k); });
+                var rest = p.toString();
+                if (rest !== location.search.replace(/^\?/, '')) {
+                    history.replaceState(null, '', location.pathname + (rest ? '?' + rest : '') + location.hash);
+                }
+            } catch (e) { /* storage or history blocked: leave the address as it is */ }
         })();
     </script>
     <link rel="stylesheet" href="style.css">
