@@ -33,13 +33,27 @@
             };
             var OK = { gen: 1, data: 1, ops: 1, sc: 1 };
             var ABC = '0123456789abcdefghjkmnpqrstvwxyz';
+            /* Two code shapes, both read: long rli61019-wz7ve-sl7pw and short rli93wz7sl7pn
+               (since 2026-10-20). The role family is the two letters before the last three. */
             function fromCode(r) {
-                var m = /^([a-z])([a-z]{2})(\d)(\d{2})(\d{2})-([0-9a-z]{5})-([a-z]{2})([0-9a-z]{2})([0-9a-z])$/.exec(r);
+                var m = /^([a-z])([a-z]{2})(\d)(\d{2})(\d{2})-([0-9a-z]{5})-([a-z]{2})([0-9a-z]{2})([0-9a-z])$/.exec(r) ||
+                        /^([a-z])([a-z]{2})([0-9a-z]{2})([0-9a-z]{3})([a-z]{2})([0-9a-z]{2})([0-9a-z])$/.exec(r);
                 if (!m) return null;
+                var isLong = m[0].indexOf('-') > 0;
+                /* same rules as brieflink.py: key, role and check letters from the code alphabet,
+                   and a long code's date must be a real day */
+                var keyed = isLong ? m[6] + m[8] + m[9] : m[3] + m[4] + m[6] + m[7];
+                for (var k = 0; k < keyed.length; k++) if (ABC.indexOf(keyed[k]) < 0) return null;
+                if (isLong) {
+                    var yr = new Date().getFullYear(), y = yr - (((yr - +m[3]) % 10) + 10) % 10;
+                    var dd = new Date(Date.UTC(y, +m[4] - 1, +m[5]));
+                    if (dd.getUTCMonth() !== +m[4] - 1 || dd.getUTCDate() !== +m[5]) return null;
+                }
+                var fam = m[0].slice(-5, -3), chk = m[0].slice(-1);
                 var h = 7, s = m[0].slice(0, -1).replace(/-/g, '');
                 for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 1021;
-                if (ABC[h % 32] !== m[9]) return null;
-                return FAMILY[m[7]] || 'gen';
+                if (ABC[h % 32] !== chk) return null;
+                return FAMILY[fam] || 'gen';
             }
             var v = null;
             try {

@@ -1292,14 +1292,42 @@
     pm: 'Project and program', pd: 'Product', qc: 'Quality, risk and compliance', hr: 'People', ba: 'Business analyst',
     da: 'Data and reporting', op: 'Operations', ot: 'Other' };
 
-  function decodeResumeCode(code) {
-    const m = /^([a-z])([a-z]{2})(\d)(\d{2})(\d{2})-([0-9a-z]{5})-([a-z]{2})([0-9a-z]{2})([0-9a-z])$/.exec(String(code || '').toLowerCase());
-    if (!m) return null;
+  // Since 2026-10-20 there is also a short code, 13 characters, no hyphens:
+  //   r li 93 wz7 sl 7p w             document, source, day count, company key, role family, role key, check
+  // The day count is days since 2026-01-01 in RL_ALPHABET, repeating every 1,024 days; the
+  // latest such day up to a week ahead is the one meant. Both shapes are read.
+  function rlCheck(body) {
     let h = 7;
-    for (const ch of m[0].slice(0, -1).replace(/-/g, '')) h = (h * 31 + ch.charCodeAt(0)) % 1021;
-    if (RL_ALPHABET[h % 32] !== m[9]) return null;
+    for (const ch of body.replace(/-/g, '')) h = (h * 31 + ch.charCodeAt(0)) % 1021;
+    return RL_ALPHABET[h % 32];
+  }
+
+  function rlDayFromCount(two) {
+    const i = RL_ALPHABET.indexOf(two[0]) * 32 + RL_ALPHABET.indexOf(two[1]);
+    const now = new Date();
+    const ref = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() + 7);   // up to a week ahead, as brieflink.py
+    const refDays = Math.round((ref - Date.UTC(2026, 0, 1)) / 86400000);
+    const back = (((refDays - i) % 1024) + 1024) % 1024;
+    return new Date(ref - back * 86400000).toISOString().slice(0, 10);
+  }
+
+  function decodeResumeCode(code) {
+    const s = String(code || '').toLowerCase();
+    const short = /^([a-z])([a-z]{2})([0-9a-z]{2})([0-9a-z]{3})([a-z]{2})([0-9a-z]{2})([0-9a-z])$/.exec(s);
+    if (short) {
+      if (![...short[3] + short[4] + short[6] + short[7]].every(ch => RL_ALPHABET.includes(ch))) return null;
+      if (rlCheck(s.slice(0, -1)) !== short[7]) return null;
+      return { doc: RL_DOCS[short[1]] || 'Other', source: RL_SOURCES[short[2]] || 'Unknown', built: rlDayFromCount(short[3]),
+               general: short[4] === '000', family: RL_FAMILIES[short[5]] || 'Other' };
+    }
+    const m = /^([a-z])([a-z]{2})(\d)(\d{2})(\d{2})-([0-9a-z]{5})-([a-z]{2})([0-9a-z]{2})([0-9a-z])$/.exec(s);
+    if (!m) return null;
+    if (![...m[6] + m[8] + m[9]].every(ch => RL_ALPHABET.includes(ch))) return null;
+    if (rlCheck(m[0].slice(0, -1)) !== m[9]) return null;
     const now = new Date().getFullYear();
     const year = now - (((now - parseInt(m[3], 10)) % 10) + 10) % 10;
+    const day = new Date(Date.UTC(year, parseInt(m[4], 10) - 1, parseInt(m[5], 10)));
+    if (day.getUTCMonth() !== parseInt(m[4], 10) - 1 || day.getUTCDate() !== parseInt(m[5], 10)) return null;
     return { doc: RL_DOCS[m[1]] || 'Other', source: RL_SOURCES[m[2]] || 'Unknown', built: `${year}-${m[4]}-${m[5]}`,
              general: m[6] === '00000', family: RL_FAMILIES[m[7]] || 'Other' };
   }
