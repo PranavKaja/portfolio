@@ -1295,7 +1295,7 @@
   // Since 2026-10-20 there is also a short code, 13 characters, no hyphens:
   //   r li 93 wz7 sl 7p w             document, source, day count, company key, role family, role key, check
   // The day count is days since 2026-01-01 in RL_ALPHABET, repeating every 1,024 days; the
-  // latest such day up to tomorrow is the one meant. Both shapes are read.
+  // latest such day up to a week ahead is the one meant. Both shapes are read.
   function rlCheck(body) {
     let h = 7;
     for (const ch of body.replace(/-/g, '')) h = (h * 31 + ch.charCodeAt(0)) % 1021;
@@ -1305,7 +1305,7 @@
   function rlDayFromCount(two) {
     const i = RL_ALPHABET.indexOf(two[0]) * 32 + RL_ALPHABET.indexOf(two[1]);
     const now = new Date();
-    const ref = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const ref = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() + 7);   // up to a week ahead, as brieflink.py
     const refDays = Math.round((ref - Date.UTC(2026, 0, 1)) / 86400000);
     const back = (((refDays - i) % 1024) + 1024) % 1024;
     return new Date(ref - back * 86400000).toISOString().slice(0, 10);
@@ -1322,6 +1322,7 @@
     }
     const m = /^([a-z])([a-z]{2})(\d)(\d{2})(\d{2})-([0-9a-z]{5})-([a-z]{2})([0-9a-z]{2})([0-9a-z])$/.exec(s);
     if (!m) return null;
+    if (![...m[6] + m[8] + m[9]].every(ch => RL_ALPHABET.includes(ch))) return null;
     if (rlCheck(m[0].slice(0, -1)) !== m[9]) return null;
     const now = new Date().getFullYear();
     const year = now - (((now - parseInt(m[3], 10)) % 10) + 10) % 10;
