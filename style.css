@@ -2022,29 +2022,6 @@ body.msn-open {
     flex-direction: column;
 }
 
-/* hover cue: accent arrow pops in at 45 degrees, top-right */
-.dossier-arrow {
-    position: absolute;
-    top: 16px;
-    right: 18px;
-    color: var(--accent);
-    font-size: 1.35rem;
-    font-weight: 700;
-    line-height: 1;
-    opacity: 0;
-    transform: translate(-8px, 8px);
-    transition: opacity 0.25s ease, transform 0.25s ease;
-    pointer-events: none;
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .dossier-card:hover .dossier-arrow,
-    .dossier-card:focus-visible .dossier-arrow {
-        opacity: 1;
-        transform: translate(0, 0);
-    }
-}
-
 .dossier-subhead {
     font-family: 'Space Mono', monospace;
     font-size: 14px;
@@ -2185,28 +2162,6 @@ body.msn-open {
     }
     .d-val { text-align: left; }
 }
-/* Project Panel Hover Arrow */
-.project-arrow {
-    position: absolute;
-    bottom: 16px;
-    right: 18px;
-    color: var(--accent);
-    font-size: 1.35rem;
-    font-weight: 700;
-    line-height: 1;
-    opacity: 0;
-    transform: translate(-8px, -8px);
-    transition: opacity 0.25s ease, transform 0.25s ease;
-    pointer-events: none;
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .project-panel:hover .project-arrow,
-    .project-panel:focus-visible .project-arrow {
-        opacity: 1;
-        transform: translate(0, 0);
-    }
-}
 
 
 /* ============================================================
@@ -2296,17 +2251,9 @@ body.msn-open {
     letter-spacing: 1.5px;
 }
 
-/* the easter-egg row is clickable: arrow cue always on for touch,
-   hover-revealed on desktop along with a faint accent wash */
+/* the easter-egg row is clickable: a faint accent wash on desktop hover */
 .dsr-game-row {
     cursor: pointer;
-}
-
-.dsr-game-row .d-val::after {
-    content: ' \2197';
-    color: var(--accent);
-    opacity: 0;
-    transition: opacity 0.2s ease;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -2317,16 +2264,6 @@ body.msn-open {
     .dsr-game-row:hover .d-val,
     .dsr-game-row:focus-visible .d-val {
         text-decoration: underline;
-    }
-    .dsr-game-row:hover .d-val::after,
-    .dsr-game-row:focus-visible .d-val::after {
-        opacity: 1;
-    }
-}
-
-@media (hover: none), (pointer: coarse) {
-    .dsr-game-row .d-val::after {
-        opacity: 1;
     }
 }
 
@@ -2809,26 +2746,12 @@ body.game-active .trophy-container {
 
 /* ============================================================
    OPS LOG: experience timeline items are clickable like the
-   project/dossier cards: hover shows an arrow + an expand cue,
+   project/dossier cards: hover shows an expand cue,
    click/tap opens the detail overlay (#ops-overlay).
    ============================================================ */
 .timeline-item {
     position: relative;
     cursor: pointer;
-}
-
-.timeline-item .tl-arrow {
-    position: absolute;
-    top: 16px;
-    right: 18px;
-    color: var(--accent-text);
-    font-size: 1.35rem;
-    font-weight: 700;
-    line-height: 1;
-    opacity: 0;
-    transform: translate(-8px, 8px);
-    transition: opacity 0.25s ease, transform 0.25s ease;
-    pointer-events: none;
 }
 
 .timeline-item .tl-cue {
@@ -2845,11 +2768,6 @@ body.game-active .trophy-container {
 }
 
 @media (hover: hover) and (pointer: fine) {
-    .timeline-item:hover .tl-arrow,
-    .timeline-item:focus-visible .tl-arrow {
-        opacity: 1;
-        transform: translate(0, 0);
-    }
     .timeline-item:hover .tl-cue,
     .timeline-item:focus-visible .tl-cue {
         opacity: 1;

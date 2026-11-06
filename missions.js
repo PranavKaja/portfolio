@@ -74,7 +74,6 @@
         <p class="tech">${esc(p.tech)}</p>
         <p class="desc">${esc(p.summary)}</p>
         <div class="pp-expand" aria-hidden="true">
-            <span class="project-arrow" aria-hidden="true">&nearr;</span>
             <div class="pp-head"><span class="proj-id">${esc(p.code)}</span><span class="pp-stack">${esc(p.stack)}</span></div>
             <h3>${esc(p.title)}</h3>
             <p class="pp-hook">${esc(p.hook)}</p>
