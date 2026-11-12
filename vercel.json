@@ -8,6 +8,11 @@
       "destination": "https://pranavkaja.com/$1",
       "permanent": true
     }
+    {
+      "source": "/overheard",
+      "destination": "https://overheardcustom.lovable.app",
+      "permanent": false
+    }
   ],
   "headers": [
     {
