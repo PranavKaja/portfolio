@@ -223,8 +223,11 @@
       return;
     }
 
-    // sort_order is the running order; the homepage takes the first slice of it
-    const featured = projects.slice(0, HOME_CARD_LIMIT);
+    // sort_order is the running order; the homepage takes the first slice of it.
+    // Overheard is off the public lists for a few days (2026-11-15). The /overheard forward stays.
+    const featured = projects
+      .filter(p => p.case_study_slug !== 'overheard' && p.title !== 'Overheard')
+      .slice(0, HOME_CARD_LIMIT);
 
     const byCode = {};
     featured.forEach(p => { byCode[codeNum(p.code)] = p; });
