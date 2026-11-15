@@ -66,6 +66,7 @@ window.PRANAV = {
       skills: ["Supabase/Postgres", "Row-Level Security", "Vanilla JavaScript"],
       github: "https://invitovate.com",
     },
+    /* Overheard entry hidden for a few days, 2026-11-15. The /overheard forward stays.
     {
       code: "MSN-02", title: "Overheard", stack: "BigQuery / Vertex AI (Gemini) / Apify / Python",
       status: "deployed",
@@ -78,6 +79,7 @@ window.PRANAV = {
       skills: ["BigQuery", "Vertex AI / Gemini", "Python"],
       github: "https://pranavkaja.com/overheard",
     },
+    */
     {
       code: "MSN-03", title: "CPK Production Planner", stack: "Vanilla JS / In-Browser",
       status: "deployed",
