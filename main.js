@@ -803,9 +803,9 @@ document.addEventListener('DOMContentLoaded', () => {
             dates: 'MAY 2022 - JUL 2022',
             role: 'Data Science Intern',
             company: 'ACMEGRADE',
-            brief: 'Trained Random Forest and Gradient Boosting on a 100,000-record client portfolio, lifting conversion-prediction accuracy 15% over baseline.',
+            brief: 'Trained Random Forest and Gradient Boosting on a 100,000-record dataset, lifting conversion-prediction accuracy 15% over baseline.',
             points: [
-                'Trained Random Forest and Gradient Boosting on a 100,000-record client portfolio',
+                'Trained Random Forest and Gradient Boosting on a 100,000-record dataset',
                 'Lifted conversion-prediction accuracy 15% over baseline'
             ]
         }
