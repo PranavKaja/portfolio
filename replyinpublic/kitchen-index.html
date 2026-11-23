@@ -4,21 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Kitchen Index: 20 customer messages brands left on read | Overheard</title>
+    <title>The Kitchen Index, July 2026 | ReplyInPublic</title>
     <meta name="description"
-        content="Field report: 20 real customer complaints and questions on kitchen brands' own Instagram posts, each hand-verified unanswered in the live thread. Every item links to its source.">
+        content="A July 2026 field report from Overheard, the earlier phase of ReplyInPublic: 19 customer complaints and questions from kitchen brands' Instagram posts, each linked to its source.">
     <meta name="author" content="Pranav Kaja">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="The Kitchen Index: 20 customer messages brands left on read">
-    <meta property="og:description" content="Real complaints and questions on kitchen brands' own Instagram posts, hand-verified unanswered in the live threads. Every item links to its source.">
+    <meta property="og:title" content="The Kitchen Index, July 2026 | ReplyInPublic">
+    <meta property="og:description" content="19 customer complaints and questions from kitchen brands' Instagram posts, from the earlier phase of ReplyInPublic. Each links to its source.">
     <meta property="og:type" content="article">
-    <meta property="og:url" content="https://pranavkaja.com/overheard/kitchen-index">
-    <meta property="og:image" content="https://pranavkaja.com/images/og-overheard.png">
+    <meta property="og:url" content="https://pranavkaja.com/replyinpublic/kitchen-index">
+    <meta property="og:image" content="https://pranavkaja.com/images/og-card.png?v=2">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://pranavkaja.com/images/og-overheard.png">
-    <link rel="canonical" href="https://pranavkaja.com/overheard/kitchen-index">
+    <meta name="twitter:image" content="https://pranavkaja.com/images/og-card.png?v=2">
+    <link rel="canonical" href="https://pranavkaja.com/replyinpublic/kitchen-index">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,7 +26,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <style>
-        /* Scrollable list panel, same pattern as the /overheard console's .feedbox */
+        /* Scrollable list panel, the page stays short with 19 quotes in it */
         .feedbox {
             max-height: min(76vh, 780px);
             overflow-y: auto;
@@ -45,6 +45,9 @@
             background: linear-gradient(to bottom, transparent, var(--bg));
             pointer-events: none;
         }
+        .interests-simple-box .btn { display: inline-block; max-width: 100%; margin: 6px 4px; overflow-wrap: anywhere; }
+        @media (max-width: 768px) { .interests-simple-box .btn { margin: 6px 0; } }
+        @media (max-width: 480px) { .interests-simple-box { padding: 40px 18px; } }
         /* the site-wide hover pop would clip and jitter inside a scroll container */
         .feedbox .panel:hover {
             transform: none;
@@ -68,18 +71,16 @@
     <nav class="top-nav">
         <a href="/" class="nav-logo interactive-element no-underline text-inherit">SUBJECT // PRANAV KAJA</a>
         <div class="nav-links">
-            <a href="/overheard"><span class="nav-num">&larr; </span>THE LIVE TOOL</a>
-            <a href="/projects/overheard">CASE STUDY</a>
+            <a href="/projects/replyinpublic"><span class="nav-num">&larr; </span>REPLYINPUBLIC</a>
         </div>
     </nav>
 
     <main class="container" id="main">
         <header class="hero">
-            <div class="hero-label mb-20"><span class="status-dot"></span>[ OVERHEARD FIELD REPORT 001 ]</div>
-            <h1 class="hero-title" style="font-size: 2.9rem; line-height: 1.08;">20 CUSTOMER MESSAGES KITCHEN BRANDS LEFT ON READ</h1>
-            <p class="hero-subtitle">Kitchen and coffee DTC, July 2026. Real people addressed a brand on the brand's own
-                Instagram post and got silence. Every item below was hand-verified unanswered in the live thread on
-                July 18, 2026, and links to its source. Click any of them and check.</p>
+            <div class="hero-label mb-20"><span class="status-dot"></span>[ JULY 2026 ARCHIVE ]</div>
+            <h1 class="hero-title" style="font-size: clamp(1.75rem, 7vw, 2.9rem); line-height: 1.08;">THE KITCHEN INDEX</h1>
+            <p class="hero-subtitle">19 customer complaints and questions from kitchen brands' own Instagram posts.
+                It's a July 2026 field report from Overheard, the earlier phase of ReplyInPublic.</p>
         </header>
 
         <section class="section">
@@ -87,42 +88,36 @@
                 <div class="vital"><div class="k">Comments scanned</div><div class="v">791</div></div>
                 <div class="vital"><div class="k">Brands</div><div class="v">17</div></div>
                 <div class="vital"><div class="k">Directed at a brand</div><div class="v">276</div></div>
-                <div class="vital"><div class="k">Verified unanswered here</div><div class="v live">20</div></div>
-                <div class="vital"><div class="k">Thread-checked</div><div class="v">2026-07-18</div></div>
+                <div class="vital"><div class="k">Snapshot</div><div class="v">July 2026</div></div>
             </div>
         </section>
 
         <section class="section">
             <div class="section-header">
-                <h2>HOW THIS LIST WAS MADE</h2>
+                <h2>HOW TO READ IT</h2>
                 <div class="line"></div>
             </div>
             <div class="panel" style="border-left: 4px solid var(--accent);">
                 <p style="font-size: 1rem; line-height: 1.7;">
-                    The pipeline pulls comments from brands' own Instagram posts, classifies each one with Gemini
-                    (question, complaint, purchase intent, or noise), and ranks the flagged ones by a 0-100 response
-                    priority. Then the honest part: scrapers can't see reply threads, so every candidate for this page
-                    was checked by hand in the live thread. Of the 33 top-priority complaints checked, 17 had picked up
-                    a brand reply by check time, and nearly every one of those replies was a version of "please DM us."
-                    Three comments had been deleted or hidden. One was unclear. The rest, plus verified items from a
-                    separate random calibration sample, are the 20 below: no public reply of any kind as of the check
-                    date. Replies that arrive later are counted in the next report. Full methodology:
-                    <a href="/projects/overheard">the case study</a>.
+                    Overheard pulled comments from the brands' Instagram posts, tagged them with Gemini and gave the ones
+                    aimed at a brand a 0 to 100 response priority score. This is a dated snapshot. Threads change, and the scraper couldn't
+                    see every brand reply, so open the thread before you judge a brand by it. The rest of the story is in
+                    <a href="/projects/replyinpublic#overheard" style="text-decoration: underline; text-underline-offset: 3px; color: var(--text-main);">the case study</a>.
                 </p>
             </div>
         </section>
 
         <section class="section">
             <div class="section-header">
-                <h2>THE LIST, HARDEST FIRST</h2>
+                <h2>THE LIST, BY PRIORITY</h2>
                 <div class="line"></div>
-                <span class="feedcount">20 items</span>
+                <span class="feedcount">19 items</span>
             </div>
-            <div class="feedbox" tabindex="0" aria-label="The list: 20 verified items, scrollable">
+            <div class="feedbox" tabindex="0" aria-label="The list: 19 items, scrollable">
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">FELLOW</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-07-06</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 70.9</span>
                 </div>
@@ -135,11 +130,11 @@
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">VITAMIX</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-02-21</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 68.8</span>
                 </div>
-                <p style="font-size:1rem;line-height:1.65;margin-top:10px;">&ldquo;I have 750 model that I bought about 10 years ago. Amazing product . I needed new containers though . Since the containers are so expensive , I just went ahead and bought the whole thing. I got the X5. Three days now , and I am so disappointed.  The container doesn’t fit well with the unit . It’s so loose . When you try to blend it moves . When you try to put the container on top you have to twist it for 2-3 seconds to make it fit in place . The old 750 didn’t have these issues . It did fit perf&rdquo;</p>
+                <p style="font-size:1rem;line-height:1.65;margin-top:10px;">&ldquo;I have 750 model that I bought about 10 years ago. Amazing product . I needed new containers though . Since the containers are so expensive , I just went ahead and bought the whole thing. I got the X5. Three days now , and I am so disappointed.  The container doesn’t fit well with the unit . It’s so loose . When you try to blend it moves . When you try to put the container on top you have to twist it for 2-3 seconds to make it fit in place . The old 750 didn’t have these issues . It did fit perf&hellip;&rdquo;</p>
                 
                 <p style="margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:0.85rem;">
                     <a href="https://www.instagram.com/p/DMImT9DvUTG/c/18033357455783000" target="_blank" rel="noopener">view the live thread &rarr;</a>
@@ -148,11 +143,11 @@
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">NESPRESSO</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-07-13</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 68.8</span>
                 </div>
-                <p style="font-size:1rem;line-height:1.65;margin-top:10px;">&ldquo;Nespresso Portugal&#x27;s customer service is unacceptable. Last Friday, my order was delivered to the wrong address and handed to someone else without verifying my personal delivery PIN. I&#x27;ve already contacted customer service twice (over 30 minutes each call), and they still haven&#x27;t resolved the issue—they just tell me to wait for the postal service&#x27;s response. So the customer is expected to bear the loss for Nespresso&#x27;s mistake? This is not the level of service I expected, especially for an order&rdquo;</p>
+                <p style="font-size:1rem;line-height:1.65;margin-top:10px;">&ldquo;Nespresso Portugal&#x27;s customer service is unacceptable. Last Friday, my order was delivered to the wrong address and handed to someone else without verifying my personal delivery PIN. I&#x27;ve already contacted customer service twice (over 30 minutes each call), and they still haven&#x27;t resolved the issue—they just tell me to wait for the postal service&#x27;s response. So the customer is expected to bear the loss for Nespresso&#x27;s mistake? This is not the level of service I expected, especially for an order&hellip;&rdquo;</p>
                 
                 <p style="margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:0.85rem;">
                     <a href="https://www.instagram.com/p/Daqi-zaE3or/c/18607375786033843" target="_blank" rel="noopener">view the live thread &rarr;</a>
@@ -161,7 +156,7 @@
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">DE&#x27;LONGHI</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-07-02</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 68.8</span>
                 </div>
@@ -174,11 +169,11 @@
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">DE&#x27;LONGHI</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-07-11</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 65.9</span>
                 </div>
-                <p style="font-size:1rem;line-height:1.65;margin-top:10px;">&ldquo;@DeLonghiUK It has been weeks now and this is completely unacceptable. You promised someone would call me regarding my warranty issue — no one has contacted me at all. I have replied to your messages, sent multiple emails including official proof from your own manuals that confirm the extra year warranty I am entitled to, and you are simply ignoring me.   You advertise an extended warranty to sell machines, but refuse to honour it when customers need it. You break your own written promises and U&rdquo;</p>
+                <p style="font-size:1rem;line-height:1.65;margin-top:10px;">&ldquo;@DeLonghiUK It has been weeks now and this is completely unacceptable. You promised someone would call me regarding my warranty issue — no one has contacted me at all. I have replied to your messages, sent multiple emails including official proof from your own manuals that confirm the extra year warranty I am entitled to, and you are simply ignoring me.   You advertise an extended warranty to sell machines, but refuse to honour it when customers need it. You break your own written promises and U&hellip;&rdquo;</p>
                 
                 <p style="margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:0.85rem;">
                     <a href="https://www.instagram.com/p/DPEPr97imMV/c/18088812521538121" target="_blank" rel="noopener">view the live thread &rarr;</a>
@@ -187,7 +182,7 @@
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">DE&#x27;LONGHI</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-07-10</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 65.2</span>
                 </div>
@@ -200,7 +195,7 @@
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">SOLO STOVE</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-04-30</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 65.2</span>
                 </div>
@@ -213,11 +208,11 @@
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">NESPRESSO</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-07-11</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 65.2</span>
                 </div>
-                <p style="font-size:1rem;line-height:1.65;margin-top:10px;">&ldquo;I am writing to express my deep disappointment with Nespresso&#x27;s recent pricing strategy.  Only about a month ago, the same coffee was sold for TRY 39. It was then increased to TRY 45.90, followed almost immediately by a &quot;25% discount&quot; campaign. This does not appear to be a genuine promotion. Rather, it creates the impression that prices were first inflated in order to advertise an artificial discount.  What exactly changed over the course of a single month to justify such a significant price inc&rdquo;</p>
+                <p style="font-size:1rem;line-height:1.65;margin-top:10px;">&ldquo;I am writing to express my deep disappointment with Nespresso&#x27;s recent pricing strategy.  Only about a month ago, the same coffee was sold for TRY 39. It was then increased to TRY 45.90, followed almost immediately by a &quot;25% discount&quot; campaign. This does not appear to be a genuine promotion. Rather, it creates the impression that prices were first inflated in order to advertise an artificial discount.  What exactly changed over the course of a single month to justify such a significant price inc&hellip;&rdquo;</p>
                 
                 <p style="margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:0.85rem;">
                     <a href="https://www.instagram.com/p/DanDz5QNuLJ/c/17974495448899919" target="_blank" rel="noopener">view the live thread &rarr;</a>
@@ -226,7 +221,7 @@
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">INSTANT POT</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-07-16</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 65.2</span>
                 </div>
@@ -239,7 +234,7 @@
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">NINJA</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-07-16</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 65.2</span>
                 </div>
@@ -252,7 +247,7 @@
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">FELLOW</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-07-08</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 65.2</span>
                 </div>
@@ -265,7 +260,7 @@
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">DE&#x27;LONGHI</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-04-01</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 65.2</span>
                 </div>
@@ -278,7 +273,7 @@
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">DE&#x27;LONGHI</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-07-14</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 65.2</span>
                 </div>
@@ -291,7 +286,7 @@
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">NESPRESSO</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-07-10</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 62.2</span>
                 </div>
@@ -304,7 +299,7 @@
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">FELLOW</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-07-17</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 62.2</span>
                 </div>
@@ -317,7 +312,7 @@
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">SOLO STOVE</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-06-18</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 62.2</span>
                 </div>
@@ -330,7 +325,7 @@
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">LA MARZOCCO</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-07-14</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 48.0</span>
                 </div>
@@ -343,7 +338,7 @@
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">KITCHENAID</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
+                    <span style="color:#b42318;border:1px solid #b42318;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
                     <span style="color:var(--text-muted);">2026-07-16</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 41.9</span>
                 </div>
@@ -355,21 +350,8 @@
             </div>
             <div class="panel" style="margin-bottom:16px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
-                    <span style="font-weight:700;letter-spacing:0.05em;">FELLOW</span>
-                    <span style="color:#ff5d5d;border:1px solid #ff5d5d;padding:1px 8px;border-radius:3px;">COMPLAINT</span>
-                    <span style="color:var(--text-muted);">2026-07-07</span>
-                    <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 37.7</span>
-                </div>
-                <p style="font-size:1rem;line-height:1.65;margin-top:10px;">&ldquo;Just ordered one. And hope you guys have better service then @ascasousa can’t seems to get any help from them��‍��.&rdquo;</p>
-                
-                <p style="margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:0.85rem;">
-                    <a href="https://www.instagram.com/p/DVqh5sXjsMx/c/17901562038464940" target="_blank" rel="noopener">view the live thread &rarr;</a>
-                </p>
-            </div>
-            <div class="panel" style="margin-bottom:16px;">
-                <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:'Share Tech Mono',monospace;font-size:0.8rem;">
                     <span style="font-weight:700;letter-spacing:0.05em;">MEATER</span>
-                    <span style="color:#ffc857;border:1px solid #ffc857;padding:1px 8px;border-radius:3px;">QUESTION</span>
+                    <span style="color:#805300;border:1px solid #805300;padding:1px 8px;border-radius:3px;">QUESTION</span>
                     <span style="color:var(--text-muted);">2026-07-06</span>
                     <span style="color:var(--text-muted);" title="response-priority score, 0-100">priority 33.6</span>
                 </div>
@@ -384,17 +366,15 @@
 
         <section class="section">
             <div class="interests-simple-box">
-                <h3 class="beyond-title">WANT YOUR CATEGORY SCORED?</h3>
-                <p class="beyond-subtitle">This report is produced by Overheard, a social response-gap engine.
-                    If you run social or CX for a consumer brand and want this for your category, or your own brand's
-                    missed-message feed, get in touch.</p>
-                <a href="mailto:balajipranavreddyk@gmail.com" class="btn interactive-element no-underline">EMAIL PRANAV</a>
-                <a href="/overheard" class="btn btn-secondary interactive-element no-underline">OPEN THE LIVE TOOL</a>
+                <h3 class="beyond-title">WHAT IT BECAME</h3>
+                <p class="beyond-subtitle">ReplyInPublic, a public comment inbox for brands.</p>
+                <a href="/projects/replyinpublic" class="btn btn-primary interactive-element no-underline">READ THE CASE STUDY</a>
+                <a href="https://replyinpublic.us" target="_blank" rel="noopener" class="btn btn-secondary interactive-element no-underline">VISIT REPLYINPUBLIC.US</a>
             </div>
         </section>
 
         <footer class="section" style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:var(--text-muted);">
-            Public data from brands' own Instagram posts. Counts and rates only, no invented damages. Each item traces
+            Public data from brands' own Instagram posts. Each item traces
             to a source URL; author handles are visible at the source but not amplified here.
         </footer>
     </main>
