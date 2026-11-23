@@ -1115,6 +1115,7 @@
   let currentGameTab = 'wasd';
   let intelRange = 1; // 1 = today; otherwise day window (7, 30, 365, or 0 = all time, 'custom' = custom dates)
   let intelCustomRange = null; // { start: 'YYYY-MM-DD', end: 'YYYY-MM-DD' }
+  let intelEveryone = false; // false = people only; true = also the link scanner, bots and Pranav's own browsers
   
   function intelSince() {
     if (intelRange === 'custom' && intelCustomRange) {
@@ -1137,10 +1138,13 @@
   async function loadIntel(force) {
     if (intelLoaded && !force) return;
     msg($('intel-msg'), '', '');
-    const { data, error } = await db.rpc('intel_dashboard', { p_since: intelSince(), p_until: intelUntil() });
+    // intel_dashboard_v2 (supabase/visitor_kinds.sql) leaves out the application link scanner, bots,
+    // pings and Pranav's own browsers unless intelEveryone is on.
+    const { data, error } = await db.rpc('intel_dashboard_v2', { p_since: intelSince(), p_until: intelUntil(), p_everyone: intelEveryone });
     if (error) { msg($('intel-msg'), error.message, 'err'); return; }
     intelLoaded = true;
     renderIntel(data || {});
+    loadResumeOpens();
     
     // Update dashboard title
     const tEl = $('home-daily-views-title');
@@ -1193,6 +1197,8 @@
     $('intel-kpis').innerHTML = kpis.map(([label, val]) =>
       `<div class="kpi"><div class="kpi-num">${val == null ? 0 : val}</div><div class="kpi-label">${label}</div></div>`).join('');
 
+    renderLeftOut(d.kinds || {});
+
     barlist('intel-traffic', (d.traffic || []).map(t => [t.source, t.n]));
     barlist('intel-projects', (d.top_projects || []).map(p => [p.title || p.code, p.n]));
     barlist('intel-pages', (d.top_pages || []).map(p => [p.path === '/' ? '/ (home)' : p.path, p.n]));
@@ -1201,6 +1207,23 @@
 
     renderLeaderboard('intel-leaderboard', d.leaderboard || []);
     renderDaily('intel-daily', d.daily || []);
+  }
+
+  // What the numbers above leave out, with a switch to count everything
+  function renderLeftOut(kinds) {
+    const el = $('intel-left-out');
+    if (!el) return;
+    const n = k => Number(kinds[k]) || 0;
+    const parts = [
+      n('scanner') ? `${n('scanner')} link scan${n('scanner') === 1 ? '' : 's'} from job applications` : '',
+      n('ping') ? `${n('ping')} instant ping${n('ping') === 1 ? '' : 's'}` : '',
+      n('bot') ? `${n('bot')} bot${n('bot') === 1 ? '' : 's'}` : '',
+      n('owner') ? `${n('owner')} of your own browser${n('owner') === 1 ? '' : 's'}` : ''
+    ].filter(Boolean);
+    el.innerHTML = intelEveryone
+      ? `// counting everything: ${n('visitor')} people plus ${parts.join(', ') || 'nothing else'}. <button type="button" id="intel-people-only">Count people only</button>`
+      : `// people only. Left out: ${parts.join(', ') || 'nothing'}. <button type="button" id="intel-everyone">Show everything</button>`;
+    el.querySelector('button')?.addEventListener('click', () => { intelEveryone = !intelEveryone; loadIntel(true); });
   }
 
   function renderGameStats() {
@@ -1251,6 +1274,184 @@
         <td class="lb-plays">${r.plays}</td>
       </tr>`).join('') +
       '</tbody></table>';
+  }
+
+  // ---- Resume link opens -------------------------------------------------------------
+  // Every resume and cover letter links to /brief?r=<code>. The code is built by
+  // 13-Jobs/engine/brieflink.py in the career hub; this reads one back. Layout:
+  //   r li 61011 - k3f9q - da 7m x   document, source, date, company key, role family, role key, check
+  const RL_ALPHABET = '0123456789abcdefghjkmnpqrstvwxyz';
+  const RL_DOCS = { r: 'Resume', c: 'Cover letter', m: 'Message', o: 'Other' };
+  const RL_SOURCES = { li: 'LinkedIn', hs: 'Handshake', gh: 'Greenhouse', as: 'Ashby', lv: 'Lever', wd: 'Workday',
+    in: 'Indeed', zr: 'ZipRecruiter', wk: 'Workable', bh: 'BambooHR', ic: 'iCIMS', sr: 'SmartRecruiters', pl: 'Paylocity',
+    pc: 'Paycor', or: 'Oracle or Taleo', ad: 'ADP', uk: 'UKG', jv: 'Jobvite', rp: 'Rippling', yc: 'Y Combinator',
+    wf: 'Wellfound', bi: 'Built In', dc: 'Dice', gd: 'Glassdoor', cs: 'Company site', rf: 'Referral', ou: 'Outreach',
+    em: 'Emailed', cf: 'Career fair', st: 'Portfolio site', gn: 'General resume', xx: 'Unknown' };
+  const RL_FAMILIES = { ai: 'AI and automation', de: 'Data engineering', sc: 'Supply chain and purchasing', mk: 'Marketing',
+    sl: 'Sales and revenue', it: 'IT and systems', cx: 'Customer and client', fn: 'Finance', re: 'Property and real estate',
+    pm: 'Project and program', pd: 'Product', qc: 'Quality, risk and compliance', hr: 'People', ba: 'Business analyst',
+    da: 'Data and reporting', op: 'Operations', ot: 'Other' };
+
+  // Since 2026-10-20 there is also a short code, 13 characters, no hyphens:
+  //   r li 93 wz7 sl 7p w             document, source, day count, company key, role family, role key, check
+  // The day count is days since 2026-01-01 in RL_ALPHABET, repeating every 1,024 days; the
+  // latest such day up to a week ahead is the one meant. Both shapes are read.
+  function rlCheck(body) {
+    let h = 7;
+    for (const ch of body.replace(/-/g, '')) h = (h * 31 + ch.charCodeAt(0)) % 1021;
+    return RL_ALPHABET[h % 32];
+  }
+
+  function rlDayFromCount(two) {
+    const i = RL_ALPHABET.indexOf(two[0]) * 32 + RL_ALPHABET.indexOf(two[1]);
+    const now = new Date();
+    const ref = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() + 7);   // up to a week ahead, as brieflink.py
+    const refDays = Math.round((ref - Date.UTC(2026, 0, 1)) / 86400000);
+    const back = (((refDays - i) % 1024) + 1024) % 1024;
+    return new Date(ref - back * 86400000).toISOString().slice(0, 10);
+  }
+
+  function decodeResumeCode(code) {
+    const s = String(code || '').toLowerCase();
+    const short = /^([a-z])([a-z]{2})([0-9a-z]{2})([0-9a-z]{3})([a-z]{2})([0-9a-z]{2})([0-9a-z])$/.exec(s);
+    if (short) {
+      if (![...short[3] + short[4] + short[6] + short[7]].every(ch => RL_ALPHABET.includes(ch))) return null;
+      if (rlCheck(s.slice(0, -1)) !== short[7]) return null;
+      return { doc: RL_DOCS[short[1]] || 'Other', source: RL_SOURCES[short[2]] || 'Unknown', built: rlDayFromCount(short[3]),
+               general: short[4] === '000', family: RL_FAMILIES[short[5]] || 'Other' };
+    }
+    const m = /^([a-z])([a-z]{2})(\d)(\d{2})(\d{2})-([0-9a-z]{5})-([a-z]{2})([0-9a-z]{2})([0-9a-z])$/.exec(s);
+    if (!m) return null;
+    if (![...m[6] + m[8] + m[9]].every(ch => RL_ALPHABET.includes(ch))) return null;
+    if (rlCheck(m[0].slice(0, -1)) !== m[9]) return null;
+    const now = new Date().getFullYear();
+    const year = now - (((now - parseInt(m[3], 10)) % 10) + 10) % 10;
+    const day = new Date(Date.UTC(year, parseInt(m[4], 10) - 1, parseInt(m[5], 10)));
+    if (day.getUTCMonth() !== parseInt(m[4], 10) - 1 || day.getUTCDate() !== parseInt(m[5], 10)) return null;
+    return { doc: RL_DOCS[m[1]] || 'Other', source: RL_SOURCES[m[2]] || 'Unknown', built: `${year}-${m[4]}-${m[5]}`,
+             general: m[6] === '00000', family: RL_FAMILIES[m[7]] || 'Other' };
+  }
+
+  function rlWhen(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' ' +
+           d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  }
+
+  function rlTime(s) {
+    s = Number(s) || 0;
+    return s < 60 ? s + 's' : Math.floor(s / 60) + 'm ' + (s % 60) + 's';
+  }
+
+  // Short tags (/brief?r=jjama1018) are not registered, so match them against the tracker:
+  // same company and role letters, logged on the tag's day or up to 3 days after it.
+  async function matchShortTags(rows) {
+    const out = {};
+    if (!window.linkTag) return out;
+    const tags = rows.map(r => ({ r, t: !r.company && !decodeResumeCode(r.code) ? window.linkTag.parseTag(r.code) : null }))
+      .filter(x => x.t);
+    if (!tags.length) return out;
+    const etDay = iso => new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+    const dayOf = x => {
+      const today = etDay(x.r.first_open || x.r.last_seen || Date.now());   // year from the ET day, not the viewer's clock
+      const md = `${String(x.t.month).padStart(2, '0')}-${String(x.t.day).padStart(2, '0')}`;
+      let y = +today.slice(0, 4);
+      if (`${y}-${md}` > today) y -= 1;
+      return `${y}-${md}`;
+    };
+    tags.forEach(x => { x.day = dayOf(x); });
+    const since = tags.map(x => x.day).sort()[0];
+    const apps = [];
+    for (let from = 0; from < 5000; from += 1000) {   // reads stop at 1000 rows, so page
+      const { data, error } = await db.from('applications').select('company, role, job_url, applied_at, created_at')
+        .or(`created_at.gte.${since},applied_at.gte.${since}`).order('id', { ascending: true }).range(from, from + 999);
+      if (error) { out.__error = error.message; break; }
+      if (!data) break;
+      apps.push(...data);
+      if (data.length < 1000) break;
+    }
+    const plus = (day, k) => { const x = new Date(day + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + k); return x.toISOString().slice(0, 10); };
+    tags.forEach(x => {
+      const last = plus(x.day, 3);
+      out[x.r.code] = apps.filter(a => {
+        const when = a.applied_at || a.created_at;
+        if (!when) return false;
+        const d = etDay(when);
+        return d >= x.day && d <= last && window.linkTag.rowLetters(a.company, a.role) === x.t.letters;
+      });
+    });
+    return out;
+  }
+
+  async function loadResumeOpens() {
+    const box = $('intel-resume-opens');
+    if (!box) return;
+    const { data, error } = await db.from('v_resume_opens').select('*').order('last_seen', { ascending: false }).limit(300);
+    if (error) { box.innerHTML = `<div class="bl-empty">// ${esc(error.message)}</div>`; return; }
+    if (!data || !data.length) {
+      box.innerHTML = '<div class="bl-empty">// no coded link has been opened yet. Resumes built from 2026-10-11 on carry one.</div>';
+      return;
+    }
+    // Each visit is labelled in v_resume_opens (supabase/resume_opens.sql): a link scan opens every
+    // link in the PDF at once or comes from a machine browser (supabase/machine_visits.sql), a likely
+    // scan is one quiet visit within minutes of sending, a person clicked, scrolled or came back.
+    // Most LinkedIn opens are scans, so people go to the top.
+    const tagMatches = await matchShortTags(data);
+    const n = v => Number(v) || 0;
+    // The view labels "likely scan" only for registered codes. For a short tag with one tracker match,
+    // a single quiet open within 10 minutes of the application going in is the same machine scan.
+    data.forEach(r => {
+      const hits = tagMatches[r.code] || [];
+      const sent = hits.length === 1 ? (hits[0].applied_at || hits[0].created_at) : null;
+      if (sent && !n(r.person_visits) && n(r.unclear_visits) &&
+          Math.abs(new Date(r.first_open) - new Date(sent)) <= 600000) {
+        r.likely_scan_visits = n(r.likely_scan_visits) + n(r.unclear_visits);
+        r.unclear_visits = 0;
+      }
+    });
+    const people = r => n(r.person_visits) + n(r.unclear_visits);
+    const rank = r => (n(r.person_visits) ? 2 : 0) + (n(r.unclear_visits) ? 1 : 0);
+    const rows = data.slice().sort((a, b) => rank(b) - rank(a) || String(b.last_seen).localeCompare(String(a.last_seen)));
+    const tot = k => data.reduce((s, r) => s + n(r[k]), 0);
+    const plural = (k, one, many) => `${k} ${k === 1 ? one : many}`;
+    const scans = tot('scan_visits') + tot('likely_scan_visits');
+    const summary = `<div class="rl-summary">${plural(data.length, 'link', 'links')} opened, ${plural(tot('visitors'), 'visit', 'visits')}: ` +
+      `<b>${plural(tot('person_visits'), 'person', 'people')}</b>, ${tot('unclear_visits')} unclear, ` +
+      `${plural(scans, 'link scan', 'link scans')} by machines, not people.</div>`;
+    box.innerHTML = summary + '<div class="rl-wrap"><table class="lb rl"><thead><tr><th>Company</th><th>Role</th><th>Document</th>' +
+      '<th>Sent via</th><th>First open</th><th>Last seen</th><th>Visits</th><th>Read</th><th>Clicked</th><th>Who</th></tr></thead><tbody>' +
+      rows.map(r => {
+        const d = decodeResumeCode(r.code);
+        const st = !d && !r.company && window.linkTag ? window.linkTag.parseTag(r.code) : null;
+        const hits = st ? (tagMatches[r.code] || []) : [];
+        let company = r.company || (d && d.general ? 'General resume' : (d ? 'Not in the registry' : 'Unreadable code'));
+        let role = r.role || (d ? d.family : '');
+        if (st) {
+          company = hits.length === 1 ? hits[0].company + ' (tag ' + st.tag + ')' : 'Tag ' + st.tag;
+          role = tagMatches.__error ? 'Tracker read failed: ' + tagMatches.__error :
+                 hits.length === 1 ? (hits[0].role || '') :
+                 hits.length ? hits.length + ' possible: ' + hits.map(h => h.company).join(', ') : 'No tracker match yet';
+          if (hits.length === 1 && !r.job_url) r.job_url = hits[0].job_url;
+        }
+        const clicks = [r.resume_clicks ? 'resume PDF' : '', r.project_clicks ? 'project' : '', r.contact_clicks ? 'contact' : ''].filter(Boolean).join(', ');
+        const who = [
+          n(r.person_visits) ? plural(n(r.person_visits), 'person', 'people') : '',
+          n(r.unclear_visits) ? `${n(r.unclear_visits)} unclear` : '',
+          n(r.scan_visits) ? plural(n(r.scan_visits), 'link scan', 'link scans') : '',
+          n(r.likely_scan_visits) ? plural(n(r.likely_scan_visits), 'likely scan', 'likely scans') : ''
+        ].filter(Boolean).join(', ') + (n(r.person_visits) && r.days_seen > 1 ? ', came back' : '') + (r.automated ? ', script' : '');
+        const scanOnly = !people(r);
+        const safeUrl = /^https?:\/\//i.test(r.job_url || '') ? r.job_url : '';
+        const link = safeUrl ? `<a href="${esc(safeUrl)}" target="_blank" rel="noopener">${esc(role)}</a>` : esc(role);
+        const visits = n(r.visitors) + (n(r.visitors) === 1 ? ' visit' : ' visits') + (n(r.views) > n(r.visitors) ? `, ${n(r.views)} pages` : '');
+        return `<tr class="${scanOnly ? 'rl-dim' : (n(r.person_visits) ? 'rl-person' : '')}" title="${esc(r.code)}${d ? ', built ' + d.built : ''}">
+          <td class="lb-player">${esc(company)}</td><td>${link}</td>
+          <td>${esc(d ? d.doc : (st ? (st.cover ? 'Cover letter' : 'Resume') : (r.doc || '')))}</td><td>${esc(d ? d.source : (st ? 'Short tag' : (r.source || '')))}</td>
+          <td>${esc(rlWhen(r.first_open))}</td><td>${esc(rlWhen(r.last_seen))}</td>
+          <td class="lb-best">${esc(visits)}</td>
+          <td>${esc(rlTime(r.seconds))}</td><td>${esc(clicks)}</td><td class="rl-note">${esc(who)}</td></tr>`;
+      }).join('') + '</tbody></table></div>';
   }
 
   function renderLeaderboard(id, rows) {
@@ -1356,15 +1557,34 @@
       '</tbody>' + tfoot + '</table>';
   }
 
+  // Browsers to leave out of the raw-event panels: everything v_session_kinds does not call a visitor.
+  // Returns null when counting everything. Pages through the view, which stops at 1000 rows a read.
+  async function hiddenSessions(sinceIso) {
+    if (intelEveryone) return null;
+    const hidden = new Set();
+    for (let from = 0; ; from += 1000) {
+      let q = db.from('v_session_kinds').select('session_id, kind').neq('kind', 'visitor').range(from, from + 999);
+      if (sinceIso) q = q.gte('last_at', sinceIso);
+      const { data, error } = await q;
+      if (error || !data) break;
+      data.forEach(r => hidden.add(r.session_id));
+      if (data.length < 1000) break;
+    }
+    return hidden;
+  }
+
   // ---- Today view: hourly pageview breakdown (queries the events table directly) ----
   async function loadTodayHourly() {
     const start = new Date(); start.setHours(0, 0, 0, 0); // local midnight, in the viewer's timezone
     const buckets = new Array(24).fill(0).map(() => ({ views: 0, time: 0 }));
     try {
-      const { data, error } = await db.from('events')
-        .select('type, created_at, meta').in('type', ['pageview', 'page_time']).gte('created_at', start.toISOString()).limit(5000);
+      const [{ data, error }, hidden] = await Promise.all([
+        db.from('events').select('type, created_at, meta, session_id')
+          .in('type', ['pageview', 'page_time']).gte('created_at', start.toISOString()).limit(5000),
+        hiddenSessions(start.toISOString())
+      ]);
       if (!error && data) {
-        data.forEach(ev => {
+        data.filter(ev => !hidden || !hidden.has(ev.session_id)).forEach(ev => {
           const h = new Date(ev.created_at).getHours();
           if (ev.type === 'pageview') {
             buckets[h].views++;
@@ -1418,9 +1638,9 @@
       query = query.lt('created_at', endIso);
     }
     
-    const { data, error } = await query.limit(10000);
-      
-    if (error || !data) return [];
+    const [{ data: raw, error }, hidden] = await Promise.all([query.limit(10000), hiddenSessions(startIso)]);
+    if (error || !raw) return [];
+    const data = hidden ? raw.filter(ev => !hidden.has(ev.session_id)) : raw;
     
     // Sort chronologically so page_time events follow their corresponding pageviews
     data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));

@@ -78,7 +78,7 @@
   function openProject(code) {
     const p = D.projects.find((x) => x.code === code);
     if (!p) return;
-    const gh = p.github ? `<a class="btn95" href="${esc(p.github)}" target="_blank" rel="noopener" style="text-decoration:none; display:inline-block">${p.github.includes("github") ? "View on GitHub ↗" : "View Link ↗"}</a>` : "";
+    const gh = p.github ? `<a class="btn95" href="${esc(p.github)}" target="_blank" rel="noopener" style="text-decoration:none; display:inline-block">${p.github.includes("github") ? "View on GitHub" : "View Link"}</a>` : "";
     const body = `
       <div class="app" style="padding:16px 18px">
         <div class="row" style="justify-content:space-between">
@@ -137,7 +137,7 @@
     const body = `
       <div style="height:100%; display:flex; flex-direction:column">
         <div class="row" style="padding:6px 8px; background:var(--silver); gap:8px">
-          <a class="btn95" href="${resumeUrl}" target="_blank" rel="noopener" style="text-decoration:none">Open in new tab ↗</a>
+          <a class="btn95" href="${resumeUrl}" target="_blank" rel="noopener" style="text-decoration:none">Open in new tab</a>
           <a class="btn95" href="${resumeUrl}" download style="text-decoration:none">Download</a>
           <span class="muted" style="margin-left:auto">Resume_PranavKaja.pdf</span>
         </div>
@@ -215,9 +215,9 @@
         <div class="group" style="margin-bottom:2px"><span class="legend">Direct Channels</span>
           <div class="row">
             <a class="btn95" style="text-decoration:none" href="mailto:${esc(id.email)}">Email</a>
-            <a class="btn95" style="text-decoration:none" href="${esc(id.linkedin)}" target="_blank" rel="noopener">LinkedIn ↗</a>
-            <a class="btn95" style="text-decoration:none" href="${esc(id.github)}" target="_blank" rel="noopener">GitHub ↗</a>
-            <a class="btn95" style="text-decoration:none" href="${esc(id.portfolio)}" target="_blank" rel="noopener">Live Site ↗</a>
+            <a class="btn95" style="text-decoration:none" href="${esc(id.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>
+            <a class="btn95" style="text-decoration:none" href="${esc(id.github)}" target="_blank" rel="noopener">GitHub</a>
+            <a class="btn95" style="text-decoration:none" href="${esc(id.portfolio)}" target="_blank" rel="noopener">Live Site</a>
           </div>
         </div>
       </div>`;
@@ -243,7 +243,7 @@
     const items = D.blog.map((b) => `
       <div class="fileicon" style="width:auto; flex-direction:row; gap:10px; align-items:center; padding:8px 10px; justify-content:flex-start">
         <span class="ico" style="font-size:22px">📝</span>
-        <a href="${esc(b.url)}" target="_blank" rel="noopener" style="font-size:13px">${esc(b.title)} ↗</a>
+        <a href="${esc(b.url)}" target="_blank" rel="noopener" style="font-size:13px">${esc(b.title)}</a>
       </div>`).join("");
     return { id: "blog", title: "Blog - Notepad", icon: "📝", width: 440, height: 320,
       menubar: `<span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>H</u>elp</span>`,

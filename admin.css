@@ -369,6 +369,15 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
 .game-toggle button:hover { background: #e5e5e5; }
 .game-toggle button.active { background: var(--accent); color: #fff; }
 .intel-wide { margin-bottom: 16px; }
+.rl-wrap { overflow-x: auto; }
+table.rl { width: 100%; font-size: 0.8rem; }
+table.rl th, table.rl td { text-align: left; padding: 6px 10px 6px 0; white-space: nowrap; }
+table.rl td a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+table.rl tr.rl-dim td { opacity: 0.5; }
+table.rl td.rl-note { font-family: 'Share Tech Mono', monospace; color: var(--text-muted); }
+table.rl tr.rl-person td.rl-note { color: var(--accent); font-weight: 700; }
+.rl-summary { font-size: 0.85rem; margin: 0 0 10px; }
+.intel-hint { font-size: 0.8rem; color: var(--text-muted); margin: -4px 0 12px; }
 
 .barlist { display: flex; flex-direction: column; gap: 9px; }
 .bl-row { display: grid; grid-template-columns: 140px 1fr 42px; align-items: center; gap: 10px; }
@@ -444,7 +453,7 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
   box-shadow: 0 6px 16px rgba(0,0,0,0.08); 
 }
 .intel-clickable h3 { display: flex; align-items: center; justify-content: space-between; }
-.intel-clickable h3::after { content: 'view all \2197'; font-size: 0.6rem; color: var(--accent); letter-spacing: 1px; }
+.intel-clickable h3::after { content: 'view all'; font-size: 0.6rem; color: var(--accent); letter-spacing: 1px; }
 .bl-more { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; letter-spacing: 1px; color: var(--text-muted); padding-top: 4px; }
 .detail-table { width: 100%; border-collapse: collapse; }
 .detail-table th { text-align: left; font: 700 0.66rem/1 'Share Tech Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); padding: 0 10px 8px 0; border-bottom: 1px solid var(--border); }
@@ -711,6 +720,9 @@ td .code { font-family: 'Share Tech Mono', monospace; color: var(--accent); }
     border-bottom: 1px solid var(--border);
     padding-bottom: 0;
 }
+.intel-left-out { font-size: 0.8rem; color: var(--text-muted); margin: 8px 0 18px; }
+.intel-left-out button { font: inherit; background: none; border: none; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; }
+
 #intel-range .intel-range-btn {
     border: none;
     background: transparent;

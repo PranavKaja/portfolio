@@ -269,6 +269,7 @@
                 <div class="msg" id="intel-msg"></div>
 
                 <div class="kpi-grid" id="intel-kpis"></div>
+                <div class="intel-left-out" id="intel-left-out"></div>
 
                 <div class="intel-cols">
                     <div class="intel-card intel-clickable" data-detail="traffic">
@@ -293,6 +294,12 @@
                         </div>
                         <div id="intel-game" class="gamestats"></div>
                     </div>
+                </div>
+
+                <div class="intel-card intel-wide">
+                    <h3>Resume link opens: who clicked pranavkaja.com on a resume or cover letter</h3>
+                    <p class="intel-hint">LinkedIn opens every link in a resume by machine the minute you apply. Those rows are greyed out as link scans. A person is a visit that clicked, scrolled or came back.</p>
+                    <div id="intel-resume-opens"><div class="bl-empty">// loading</div></div>
                 </div>
 
                 <div class="intel-card intel-wide intel-clickable" data-detail="leaderboard">
@@ -572,6 +579,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
+    <script src="linktag.js"></script>
     <script src="admin.js"></script>
 </body>
 

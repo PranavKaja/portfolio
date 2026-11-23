@@ -1,16 +1,73 @@
 /* ============================================================
  * Visitor Intel, lightweight, privacy-preserving tracker.
- * No cookies, no PII. A random session id in localStorage and a
- * normalized referrer are all it sends. Honors Do Not Track.
+ * No cookies, no PII. A random session id in localStorage, a
+ * normalized referrer, and on page views the browser string, time
+ * zone and screen size (to tell link scanners from people). Honors
+ * Do Not Track.
  * Other scripts can call window.intel.track(type, meta).
+ *
+ * Link codes: resumes and cover letters link to /brief?r=<code>, one
+ * code per application. The code is saved with every event of that
+ * visit, then taken off the address bar. Any page accepts one.
+ *
+ * Own visits: open any page once with ?me=1 and this browser is never
+ * counted again. ?me=0 turns counting back on. Local copies (file:// or
+ * localhost) are never counted.
  * ============================================================ */
 (function () {
   // respect Do Not Track
   var dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
   if (dnt === '1' || dnt === 'yes') return;
 
+  // local copies (a file opened from disk, a dev server) are me testing: never log them to the live table
+  var host = location.hostname;
+  if (location.protocol === 'file:' || host === 'localhost' || host === '127.0.0.1' || host === '[::1]' ||
+      /\.localhost$/.test(host)) { window.intel = { track: function () {} }; return; }
+
+  // own-visit switch, so checking my own resume links does not look like a recruiter
+  try {
+    var me = new URLSearchParams(location.search).get('me');
+    if (me === '1') localStorage.setItem('intel_off', '1');
+    if (me === '0') localStorage.removeItem('intel_off');
+    if (localStorage.getItem('intel_off') === '1') { window.intel = { track: function () {} }; return; }
+  } catch (e) { /* storage blocked: carry on and count the visit */ }
+
   var db = window.getSupabase && window.getSupabase();
   if (!db) { window.intel = { track: function () {} }; return; } // offline: no-op
+
+  // Read the link code (and any utm_ tags) once, keep it for this tab's visit, clean the URL.
+  var TAG_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_id'];
+  function linkTag() {
+    var tag = {};
+    try {
+      var q = new URLSearchParams(location.search), found = false;
+      var r = (q.get('r') || '').trim().toLowerCase().replace(/[^a-z0-9]+$/, '');
+      if (/^[a-z0-9-]{6,40}$/.test(r)) { tag.r = r; found = true; }
+      TAG_KEYS.forEach(function (k) {
+        var v = q.get(k);
+        if (v) { tag[k] = String(v).slice(0, 80); found = true; }
+      });
+      if (found) {
+        try { sessionStorage.setItem('intel_tag', JSON.stringify(tag)); } catch (e) { /* no-op */ }
+        ['r', 'me'].concat(TAG_KEYS).forEach(function (k) { q.delete(k); });
+        var rest = q.toString();
+        history.replaceState(null, '', location.pathname + (rest ? '?' + rest : '') + location.hash);
+      } else {
+        var saved = sessionStorage.getItem('intel_tag');
+        if (saved) tag = JSON.parse(saved) || {};
+      }
+    } catch (e) { /* analytics must never break the page */ }
+    if (navigator.webdriver) tag.bot = '1';   // a browser driven by a script, not a person
+    return tag;
+  }
+  var TAG = linkTag();
+
+  function withTag(meta) {
+    var out = {}, k;
+    for (k in TAG) if (Object.prototype.hasOwnProperty.call(TAG, k)) out[k] = TAG[k];
+    for (k in (meta || {})) if (Object.prototype.hasOwnProperty.call(meta, k)) out[k] = meta[k];
+    return out;
+  }
 
   function sessionId() {
     try {
@@ -53,15 +110,42 @@
         path: location.pathname,
         source: SOURCE,
         session_id: SESSION,
-        meta: meta || {}
+        meta: withTag(meta)
       }).then(function () {}, function () {}); // swallow errors, analytics must never break the page
     } catch (e) { /* no-op */ }
   }
 
   window.intel = { track: track };
 
-  // page view
-  track('pageview');
+  // page view, with what it takes to tell a link scanner from a person
+  function device() {
+    var d = {};
+    try { d.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { /* no-op */ }
+    try {
+      d.ua = String(navigator.userAgent || '').slice(0, 200);
+      d.screen = screen.width + 'x' + screen.height;
+      d.view = window.innerWidth + 'x' + window.innerHeight;
+    } catch (e) { /* no-op */ }
+    return d;
+  }
+  track('pageview', device());
+
+  // first sign of a person on this page: a click, a key, or a real scroll. Sent once.
+  var engaged = false;
+  function onEngage(how) {
+    if (engaged) return;
+    engaged = true;
+    track('engaged', { how: how });
+    ['pointerdown', 'keydown', 'scroll'].forEach(function (t) { window.removeEventListener(t, handlers[t], true); });
+  }
+  var handlers = {
+    pointerdown: function () { onEngage('click'); },
+    keydown: function () { onEngage('key'); },
+    scroll: function () { if (window.scrollY > 200) onEngage('scroll'); }
+  };
+  ['pointerdown', 'keydown', 'scroll'].forEach(function (t) {
+    window.addEventListener(t, handlers[t], { capture: true, passive: true });
+  });
 
   // resume downloads + project-card opens (delegated, survives dynamic cards)
   document.addEventListener('click', function (e) {
@@ -102,7 +186,7 @@
           'Content-Type': 'application/json',
           'Prefer': 'return=minimal'
         },
-        body: JSON.stringify({ type: 'page_time', path: location.pathname, source: SOURCE, session_id: SESSION, meta: { seconds: seconds } })
+        body: JSON.stringify({ type: 'page_time', path: location.pathname, source: SOURCE, session_id: SESSION, meta: withTag({ seconds: seconds }) })
       }).catch(function () {});
     } catch (e) { /* no-op */ }
   }

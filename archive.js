@@ -88,9 +88,12 @@
     const projects = await loadProjects();
     if (!projects) return;   // static cards stand
 
-    grid.innerHTML = '\n' + projects.map(cardHTML).join('\n') + '\n            ';
+    // Overheard is off the public lists for a few days (2026-11-15). The /overheard forward stays.
+    const shown = projects.filter(p => p.case_study_slug !== 'overheard' && p.title !== 'Overheard');
+
+    grid.innerHTML = '\n' + shown.map(cardHTML).join('\n') + '\n            ';
 
     const count = document.getElementById('archive-count');
-    if (count) count.textContent = COUNT_WORDS[projects.length] || String(projects.length);
+    if (count) count.textContent = COUNT_WORDS[shown.length] || String(shown.length);
   });
 })();
