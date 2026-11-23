@@ -38,7 +38,7 @@
           <span class="legend">Operations Log</span>
           ${D.experience.map((x) => `
             <div style="margin-bottom:10px">
-              <div style="font-weight:700">${esc(x.org)} &mdash; ${esc(x.role)}</div>
+              <div style="font-weight:700">${esc(x.org)}, ${esc(x.role)}</div>
               <div class="muted" style="font-size:11px; margin-bottom:3px">${esc(x.dates)}</div>
               <ul style="margin:0; padding-left:18px">${x.points.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>
             </div>`).join("")}
@@ -69,7 +69,7 @@
       });
       wrap.appendChild(f);
     });
-    return { id: "projects", title: "My Projects", icon: "🗂️", width: 560, height: 420,
+    return { id: "projects", title: "My Projects", icon: "🗂️", width: 560, height: 460,
       menubar: `<span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>V</u>iew</span><span><u>H</u>elp</span>`,
       body: wrap,
       status: `<div class="cell">${D.projects.length} object(s)</div><div class="cell grow">Double-click a file to open.</div>` };
@@ -305,7 +305,7 @@ HOW TO GET AROUND
 
 WHERE TO LOOK FIRST
   • About Pranav .... who I am, fast.
-  • My Projects ..... 10 builds, double-click any.
+  • My Projects ..... 11 builds, double-click any.
   • Resume .......... the one-pager, downloadable.
   • Minesweeper ..... yes, it actually works.
 

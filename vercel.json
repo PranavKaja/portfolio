@@ -9,10 +9,16 @@
       "permanent": true
     },
     {
-      "source": "/overheard",
-      "destination": "https://overheard.pranavkaja.com",
-      "permanent": false
-    }
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "overheard.pranavkaja.com" }],
+      "destination": "https://pranavkaja.com/projects/replyinpublic",
+      "permanent": true
+    },
+    { "source": "/overheard/kitchen-index", "destination": "/replyinpublic/kitchen-index", "permanent": true },
+    { "source": "/overheard/:path*", "destination": "/projects/replyinpublic", "permanent": true },
+    { "source": "/projects/overheard", "destination": "/projects/replyinpublic", "permanent": true },
+    { "source": "/replyinpublic", "destination": "/projects/replyinpublic", "permanent": true },
+    { "source": "/images/og-overheard.png", "destination": "/images/og-card.png", "permanent": true }
   ],
   "headers": [
     {

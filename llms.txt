@@ -17,12 +17,19 @@ only look good on a slide.
 - [Contact](https://pranavkaja.com/contact): Email, LinkedIn, and a contact form
 - [Interests](https://pranavkaja.com/interests): Interests beyond work
 
+## Projects
+- [ReplyInPublic](https://pranavkaja.com/projects/replyinpublic): a public comment
+  inbox for brands, formerly called Overheard. 6,900+ public comments collected on
+  17 kitchen brands, mostly from YouTube, with a code rule and Gemini sorting
+  complaints, questions and buyers from noise. The inbox shows five of the brands. It does not post replies. Live site: https://replyinpublic.us
+- [All case files](https://pranavkaja.com/projects)
+
 ## Experience
 - Student Supervisor, UMass Amherst Dining (Sep 2024 - May 2026): automated a
   37-location ETL pipeline, cutting manual reporting from 2 hrs/day to 12 min/day;
   led a team of student employees; built data-driven inventory forecasting.
 - Data Science Intern, Acmegrade (May 2022 - Jul 2022): trained Random Forest
-  and Gradient Boosting on a 100,000-record client portfolio, lifting
+  and Gradient Boosting on a 100,000-record dataset, lifting
   conversion-prediction accuracy 15% over baseline.
 
 ## Skills

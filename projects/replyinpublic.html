@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReplyInPublic: Public Comment Inbox for Brands | Pranav Kaja</title>
+    <meta name="description"
+        content="ReplyInPublic, formerly Overheard, is Pranav Kaja's public comment inbox for brands. It has collected 6,900+ public comments on 17 kitchen brands, mostly from YouTube. The inbox shows five of them.">
+    <meta name="author" content="Pranav Kaja">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta property="og:title" content="ReplyInPublic: Public Comment Inbox for Brands | Pranav Kaja">
+    <meta property="og:description" content="Customers already post their feedback in public. ReplyInPublic puts it in one inbox for the brand. Built solo at HackUMass XIV, formerly Overheard.">
+    <meta property="og:image" content="https://pranavkaja.com/images/og-card.png?v=2">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://pranavkaja.com/projects/replyinpublic">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ReplyInPublic: Public Comment Inbox for Brands | Pranav Kaja">
+    <meta name="twitter:description" content="6,900+ public comments collected on 17 kitchen brands, with five of those brands in the inbox. Formerly Overheard.">
+    <meta name="twitter:image" content="https://pranavkaja.com/images/og-card.png?v=2">
+    <link rel="canonical" href="https://pranavkaja.com/projects/replyinpublic">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;800;900&family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* One long word: size it to the screen so it never runs off a phone. */
+        .hero .rip-title { font-size: clamp(1.75rem, 8.4vw, 3.2rem); line-height: 1.05; }
+        .rip-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+        .rip-copy { font-size: 1.05rem; line-height: 1.7; max-width: 760px; }
+        .rip-copy + .rip-copy { margin-top: 14px; }
+        .rip-note { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; max-width: 760px; }
+        #overheard { scroll-margin-top: 90px; }
+        .interests-simple-box .btn { display: inline-block; max-width: 100%; margin: 6px 4px; overflow-wrap: anywhere; }
+        @media (max-width: 768px) { .interests-simple-box .btn { margin: 6px 0; } }
+        @media (max-width: 480px) { .interests-simple-box { padding: 40px 18px; } }
+        @media (max-width: 768px) { #overheard { scroll-margin-top: 120px; } }
+        @media (max-width: 480px) { #overheard .section-header .line { display: none; } }
+        @media (max-width: 330px) { .section-header h2 { font-size: 1.4rem; } }
+        #overheard .section-header .line { min-width: 0; }
+        #overheard .section-header h2 { flex-shrink: 0; }
+        @media (max-width: 480px) { #overheard .section-header h2 { white-space: normal; flex-shrink: 1; min-width: 0; } }
+    </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "TechArticle",
+          "headline": "ReplyInPublic: Public Comment Inbox for Brands",
+          "alternativeHeadline": "Formerly Overheard",
+          "description": "A public comment inbox for brands. It has collected public comments on 17 kitchen brands, mostly from YouTube, sorts them with a code rule and Gemini, and groups some into named issues for five brands.",
+          "author": { "@type": "Person", "name": "Pranav Kaja", "url": "https://pranavkaja.com/" },
+          "url": "https://pranavkaja.com/projects/replyinpublic",
+          "image": "https://pranavkaja.com/images/og-card.png?v=2",
+          "sameAs": ["https://replyinpublic.us", "https://github.com/PranavKaja/replyinpublic", "https://devpost.com/software/replyinpublic"],
+          "keywords": "ReplyInPublic, Overheard, public comments, customer feedback, Python, PostgreSQL, Gemini, Pranav Kaja",
+          "about": ["Customer Feedback", "Social Media Comments", "Data Pipelines"],
+          "inLanguage": "en"
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://pranavkaja.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Projects", "item": "https://pranavkaja.com/projects" },
+            { "@type": "ListItem", "position": 3, "name": "ReplyInPublic", "item": "https://pranavkaja.com/projects/replyinpublic" }
+          ]
+        }
+      ]
+    }
+    </script>
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <nav class="top-nav">
+        <a href="/" class="nav-logo interactive-element no-underline text-inherit">SUBJECT // PRANAV KAJA</a>
+        <div class="nav-links">
+            <a href="/projects"><span class="nav-num">&larr; </span>ALL MISSIONS</a>
+        </div>
+    </nav>
+
+    <main class="container" id="main">
+        <header class="hero">
+            <div class="hero-label mb-20"><span class="status-dot"></span>MSN-02 // LIVE</div>
+            <h1 class="hero-title rip-title">REPLYINPUBLIC</h1>
+            <p class="hero-subtitle">A public comment inbox for brands. Formerly Overheard.</p>
+            <div class="pp-chips" style="margin-top: 8px;">
+                <span>6,900+ Comments</span>
+                <span>17 Kitchen Brands</span>
+                <span>5 Brands in Inbox</span>
+                <span>Built Solo</span>
+                <span>HackUMass XIV</span>
+            </div>
+            <div class="rip-links">
+                <a href="https://replyinpublic.us" target="_blank" rel="noopener" class="btn btn-primary interactive-element no-underline">VISIT REPLYINPUBLIC.US</a>
+                <a href="https://github.com/PranavKaja/replyinpublic" target="_blank" rel="noopener" class="btn btn-secondary interactive-element no-underline">VIEW THE CODE</a>
+                <a href="https://devpost.com/software/replyinpublic" target="_blank" rel="noopener" class="btn btn-secondary interactive-element no-underline">DEVPOST</a>
+            </div>
+            <p class="rip-note">The site is public. The inbox needs a sign in and shows complaints, questions and buyers for five of the brands.</p>
+        </header>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>BRIEFING</h2>
+                <div class="line"></div>
+            </div>
+            <p class="rip-copy">
+                Brands pay for surveys to find out what customers think, and I've seen them hand out discount codes
+                just to get one filled in. Customers already post that feedback in public.
+            </p>
+            <p class="rip-copy">
+                ReplyInPublic puts those public comments in one inbox for the brand, so money spent
+                asking can go to answering.
+            </p>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>ROLE / METHOD / OUTCOME</h2>
+                <div class="line"></div>
+            </div>
+            <div class="msn-rmo">
+                <div class="rmo-cell">
+                    <div class="k">Role</div>
+                    <div class="v">Solo build at HackUMass XIV, November 2026.</div>
+                </div>
+                <div class="rmo-cell">
+                    <div class="k">Method</div>
+                    <div class="v">Timed collectors, a noise rule, Gemini labels and issue grouping, on PostgreSQL.</div>
+                </div>
+                <div class="rmo-cell">
+                    <div class="k">Outcome</div>
+                    <div class="v">A live inbox at replyinpublic.us, on real public comments.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>HOW IT WORKS</h2>
+                <div class="line"></div>
+            </div>
+            <div class="grid-2">
+                <div class="panel">
+                    <h3>1. COLLECT</h3>
+                    <p>Timed workers pull public comments about all 17 brands from YouTube. Instagram, TikTok, X and
+                        Reddit cover five of those brands, unevenly.</p>
+                </div>
+                <div class="panel">
+                    <h3>2. CHECK FOR A REPLY</h3>
+                    <p>It records whether the brand already replied. On YouTube a reply only counts when it comes from
+                        the brand's own channel. On the other platforms it's mostly unknown.</p>
+                </div>
+                <div class="panel">
+                    <h3>3. LABEL</h3>
+                    <p>A code rule marks obvious noise. Gemini labels the rest as a complaint, question, purchase intent, praise or noise.</p>
+                </div>
+                <div class="panel">
+                    <h3>4. GROUP</h3>
+                    <p>For KitchenAid, Nespresso, Breville, Instant Pot and Ninja, Gemini groups complaints, questions and buyer comments into named issues
+                        where they fit. The inbox has two sign ins, one for a brand team and one for the ReplyInPublic team.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>WHERE IT STANDS</h2>
+                <div class="line"></div>
+            </div>
+            <div class="vitals">
+                <div class="vital"><div class="k">Public comments</div><div class="v live">6,900+</div></div>
+                <div class="vital"><div class="k">Kitchen brands</div><div class="v">17</div></div>
+                <div class="vital"><div class="k">Brands in the inbox</div><div class="v">5</div></div>
+                <div class="vital"><div class="k">Counted</div><div class="v">Nov 21, 2026</div></div>
+            </div>
+            <p class="rip-copy">
+                Most of the comments come from YouTube. ReplyInPublic doesn't post replies and has no customers.
+                There's no reply rate from these comments, because replies are only confirmed on YouTube so far.
+            </p>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 16px; font-family: 'Share Tech Mono', monospace;">
+                STACK: Python &middot; PostgreSQL (Tiger Data) &middot; Gemini
+            </p>
+        </section>
+
+        <section class="section" id="overheard">
+            <div class="section-header">
+                <h2>HOW IT STARTED: OVERHEARD</h2>
+                <div class="line"></div>
+            </div>
+            <p class="rip-copy">
+                From July to November 2026 this project was called Overheard. It was a study of the customer questions
+                and complaints brands miss on their own social posts. For HackUMass XIV I built it as an inbox in a
+                new repo and renamed it ReplyInPublic.
+            </p>
+            <div class="vitals" style="margin-top: 22px;">
+                <div class="vital"><div class="k">Mentions classified</div><div class="v">3,662</div></div>
+                <div class="vital"><div class="k">Aimed at a brand on Instagram</div><div class="v">276</div></div>
+                <div class="vital"><div class="k">Of those, complaints</div><div class="v">104</div></div>
+                <div class="vital"><div class="k">Counted</div><div class="v">July 2026</div></div>
+            </div>
+            <p class="rip-note">These are the earlier phase's counts. They are separate from the 6,900+ above.</p>
+
+            <div class="grid-2" style="margin-top: 22px;">
+                <div class="panel">
+                    <h3>THE DATA</h3>
+                    <p>It collected 3,097 YouTube comments on 21 brands through the official API, and 791 Instagram
+                        comments on 17 kitchen brands through Apify.</p>
+                </div>
+                <div class="panel">
+                    <h3>THE METHOD</h3>
+                    <p>The comments landed in BigQuery. Gemini on Vertex AI tagged type, sentiment and urgency. The Instagram
+                        comments aimed at a brand were clustered into themes with KMeans on embeddings and given a 0 to
+                        100 response priority score.</p>
+                </div>
+                <div class="panel">
+                    <h3>WRONG ACCOUNTS</h3>
+                    <p>5 of the 17 brand handles were wrong or impostors before they were checked. De'Longhi could only
+                        be measured once its dead handle was fixed. In July, all 37 comments aimed at it were complaints.</p>
+                </div>
+                <div class="panel">
+                    <h3>REPLIES THE SCRAPER MISSED</h3>
+                    <p>34 comments flagged as ignored were checked by hand in the live threads. Some had brand replies
+                        the scraper couldn't see, so "no reply found" was never proof of no reply.</p>
+                </div>
+            </div>
+
+            <div class="rip-links">
+                <a href="/replyinpublic/kitchen-index" class="btn btn-secondary interactive-element no-underline">READ THE JULY KITCHEN INDEX</a>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="interests-simple-box">
+                <h3 class="beyond-title">MORE MISSIONS</h3>
+                <p class="beyond-subtitle">Case files across ML, BI, and supply-chain strategy.</p>
+                <a href="/projects" class="btn btn-secondary interactive-element no-underline">VIEW ALL MISSIONS</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        &copy; <span id="year"></span> Pranav Kaja. All rights reserved.
+    </footer>
+
+    <div class="custom-cursor" id="custom-cursor"></div>
+    <div class="crosshair-h"></div>
+    <div class="crosshair-v"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="/config.js" defer></script>
+    <script src="/analytics.js" defer></script>
+    <script src="/main.js" defer></script>
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>

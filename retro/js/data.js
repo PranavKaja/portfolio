@@ -46,7 +46,7 @@ window.PRANAV = {
       org: "Acmegrade",
       role: "Data Science Intern",
       points: [
-        "Trained Random Forest and Gradient Boosting on a 100K-record client portfolio.",
+        "Trained Random Forest and Gradient Boosting on a 100K-record dataset.",
         "Improved conversion-prediction accuracy 15% over baseline.",
       ],
     },
@@ -66,20 +66,18 @@ window.PRANAV = {
       skills: ["Supabase/Postgres", "Row-Level Security", "Vanilla JavaScript"],
       github: "https://invitovate.com",
     },
-    /* Overheard entry hidden for a few days, 2026-11-15. The /overheard forward stays.
     {
-      code: "MSN-02", title: "Overheard", stack: "BigQuery / Vertex AI (Gemini) / Apify / Python",
+      code: "MSN-02", title: "ReplyInPublic", stack: "Python / PostgreSQL (Tiger Data) / Gemini",
       status: "deployed",
-      hook: "Customers ask brands questions in public. Most never get an answer.",
-      brief: "Every day customers ask questions under a brand's own YouTube videos and Instagram posts, and brands miss a huge share of them. Social teams know it hurts but cannot put a number on it. Overheard measures it: it collects the public conversation on a set of competing brands' own posts, uses Gemini to tell a real question or complaint from noise, checks whether the brand ever replied, and ranks the field by who answers and who goes silent.",
-      role: "Solo build, end to end: pipeline, AI layer, marts, and the front-end tool.",
-      method: "An ELT pipeline on BigQuery with a Gemini classification layer, validated against a hand-labeled set.",
-      outcome: "A live index of which brands ignore their customers, and the exact comments they missed.",
-      chips: ["17 Brands", "3,000+ Comments", "BigQuery + Vertex AI", "Gemini Classified"],
-      skills: ["BigQuery", "Vertex AI / Gemini", "Python"],
-      github: "https://pranavkaja.com/overheard",
+      hook: "Customers already post their feedback in public. Put it in one inbox.",
+      brief: "ReplyInPublic, formerly Overheard, is a public comment inbox for brands. It has collected public comments on 17 kitchen brands, mostly from YouTube. Instagram, TikTok, X and Reddit are collected for five of them, and those five are the brands in the inbox. A code rule and Gemini sort complaints, questions and buyers from noise, and Gemini groups some of them into named issues. It doesn't post replies.",
+      role: "Solo build at HackUMass XIV, November 2026.",
+      method: "Timed collectors, a noise rule, Gemini labels and issue grouping, on PostgreSQL.",
+      outcome: "A live inbox at replyinpublic.us, on real public comments.",
+      chips: ["6,900+ Comments", "17 Kitchen Brands", "5 Brands in Inbox", "HackUMass XIV"],
+      skills: ["Python", "PostgreSQL", "Gemini"],
+      github: "https://replyinpublic.us",
     },
-    */
     {
       code: "MSN-03", title: "CPK Production Planner", stack: "Vanilla JS / In-Browser",
       status: "deployed",
